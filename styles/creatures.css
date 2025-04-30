@@ -1,0 +1,44 @@
+.creature {
+    position: absolute;
+    width: 62px;
+    aspect-ratio: 1;
+
+    --creature__offset-x: calc(var(--creature_position-x) * 60px + 1px);
+    --creature__offset-y: calc(var(--creature_position-y) * 60px + 1px);
+
+    top: var(--creature__offset-y);
+    left: var(--creature__offset-x);
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 8px;
+
+    transition: 1000ms top, 1000ms left;
+
+    pointer-events: none;
+}
+
+.creature__image {
+    border-radius: 50%;
+    background-color: var(--creature__image_color);
+    width: 40px;
+    aspect-ratio: 1;
+}
+
+.creature__lifebar {
+    position: absolute;
+    width: 52px;
+    height: 8px;
+    border: 1px solid black;
+    top: 4px;
+    left: 4px;
+}
+
+.creature__lifebar::before {
+    content: "";
+    display: block;
+    width: calc(100% / var(--creature__lifebar_max-hp) * var(--creature__lifebar_current-hp));
+    height: 100%;
+    background-color: red;
+}

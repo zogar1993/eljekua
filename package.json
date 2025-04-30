@@ -1,0 +1,16 @@
+{
+  "name": "ts-html-app",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "esbuild main.ts --bundle --outfile=bundle.js --format=esm",
+    "watch": "esbuild main.ts --bundle --outfile=bundle.js --format=esm --watch",
+    "dev": "concurrently -k \"pnpm:watch\" \"pnpm:start\"",
+    "start": "live-server --open=./index.html --watch=./"
+  },
+  "devDependencies": {
+    "concurrently": "9.1.2",
+    "esbuild": "0.25.3",
+    "live-server": "1.2.2",
+    "typescript": "5.8.3"
+  }
+}

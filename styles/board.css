@@ -1,0 +1,62 @@
+.board {
+    display: inline-flex;
+    flex-direction: column;
+    border: black 1px solid;
+}
+
+.board__row {
+    display: flex;
+}
+
+.board__cell {
+    border: black 1px solid;
+    width: 60px;
+    aspect-ratio: 1;
+}
+
+
+.board__cell[data-indicator=selected] {
+    background-color: greenyellow;
+    anchor-name: --cell--selected;
+}
+
+.board__cell[data-indicator=selected]:hover {
+    background-color: lawngreen;
+}
+
+.board__cell[data-indicator=available-target] {
+    background-color: lightblue;
+}
+
+.board__cell[data-indicator=available-target]:hover {
+    background-color: cadetblue;
+}
+
+body:not(:has(.board__cell[data-indicator=selected])) #actions_menu {
+    display: none;
+}
+
+#actions_menu {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: absolute;
+    position-anchor: --cell--selected;
+    top: anchor(top);
+    left: anchor(right);
+
+    border: 4px gray solid;
+    border-radius: 8px;
+}
+
+button {
+    padding: 0.5rem;
+    font-size: 1rem;
+    text-align: left;
+    background-color: lightpink;
+    border: none;
+}
+
+button:hover {
+    background-color: hotpink;
+}
