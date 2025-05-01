@@ -10,7 +10,7 @@ export type Power = {
     },
     happenings: [
         {
-            type: "shift",
+            type: "move" | "shift",
             target: "owner",
             destination: "target"
         }

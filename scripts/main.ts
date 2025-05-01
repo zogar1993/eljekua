@@ -1,6 +1,7 @@
 import {Board, Cell, Position} from "board";
 import {BASIC_MOVEMENT_ACTIONS} from "powers/basic";
 import {Power} from "types";
+import {raw} from "concurrently/dist/src/defaults";
 
 const board = new Board()
 
@@ -20,7 +21,7 @@ board.get_all_cells().forEach(cell =>
 const get_in_range = (range: Power["targeting"]) => {
     if (selected_character === null) throw Error("Character cannot be null")
     if (range.type === "movement") {
-        const distance = "owner.movement" === range.distance ? selected_character.movement : Number(range.distance)
+        const distance = new IntFormula(`${range.distance}`).func()
         return board.get_move_area({origin: selected_character.position, distance})
     }
 
@@ -136,4 +137,51 @@ type Creature = {
     hp: number
     max_hp: number
     html_creature?: HTMLDivElement
+}
+
+class IntFormula {
+    raw: string
+    offset = 0
+    func: () => number
+
+    constructor(raw: string) {
+        this.raw = raw
+        this.func = this.parse_expression()
+    }
+
+    owner() {
+        if (selected_character === null) throw Error(`Selected character needs to be set in order for "owner()" to run`)
+        return selected_character
+    }
+
+    parse_expression() {
+        return this.parse_until_end_or(".")
+    }
+
+    parse_until_end_or(delimiter: string) {
+        const remaining = this.raw.substring(this.offset)
+        const i = remaining.indexOf(delimiter)
+        if (i === -1) {
+            this.offset = this.raw.length
+            return () => Number(remaining)
+        } else if (delimiter === ".") {
+            const object_name = this.raw.substring(this.offset, i)
+            if (object_name !== "owner") throw Error(`Can't parse "${delimiter}"`)
+            this.offset = i + 1
+            return this.parse_creature_characteristic(this.owner)
+        } else {
+            throw Error(`Can't parse "${delimiter}"`)
+        }
+    }
+
+    parse_creature_characteristic(creature: () => Creature) {
+        const remaining = this.raw.substring(this.offset)
+        if (remaining !== "movement") throw Error(`Can't parse "${remaining}"`)
+        return () => creature().movement
+    }
+
+    is_not_end() {
+        return this.offset < this.raw.length
+    }
+
 }

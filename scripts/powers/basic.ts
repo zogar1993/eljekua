@@ -19,21 +19,14 @@ const shift: Power = {
     ]
 }
 
-
-export const BASIC_MOVEMENT_ACTIONS = [shift]
-
-/*
-
-
-export const movement: Power = {
+const movement: Power = {
     name: "Move",
     action: "movement",
-    range: {
+    targeting: {
         type: "movement",
-        distance: "owner.movement"
-    },
-    target: {
-        type: "unoccupied_terrain",
+        distance: "owner.movement",
+        target_type: "terrain",
+        terrain_prerequisite: "unoccupied",
         amount: 1
     },
     happenings: [
@@ -44,6 +37,10 @@ export const movement: Power = {
         }
     ]
 }
+
+export const BASIC_MOVEMENT_ACTIONS = [movement, shift]
+
+/*
 
 export const melee_basic_attack: Power = {
     name: "Melee Basic Attack",
@@ -66,26 +63,6 @@ export const melee_basic_attack: Power = {
                     value: "4"
                 }
             ]
-        }
-    ]
-}
-
-export const shift: Power = {
-    name: "Shift",
-    action: "movement",
-    range: {
-        type: "shift",
-        range: "1"
-    },
-    target: {
-        type: "unoccupied_terrain",
-        amount: 1
-    },
-    happenings: [
-        {
-            type: "shift",
-            target: "owner",
-            destination: "target"
         }
     ]
 }
