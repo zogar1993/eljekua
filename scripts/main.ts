@@ -1,8 +1,9 @@
-import {BattleGrid, Creature, Position, Square} from "BattleGrid";
+import {BattleGrid, Creature, Square} from "battlegrid/BattleGrid";
 import {Power} from "types";
-import {VisualSquareCreator} from "visuals/VisualSquare";
-import {VisualCreatureCreator} from "visuals/VisualCreature";
+import {VisualSquareCreator} from "battlegrid/board/SquareVisual";
+import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
 import {BASIC_MOVEMENT_ACTIONS} from "./powers/basic";
+import {Position} from "./battlegrid/Position";
 
 
 const visual_square_creator = new VisualSquareCreator()
@@ -15,15 +16,15 @@ const board = new BattleGrid({visual_square_creator, visual_creature_creator})
 class PlayerControl {
     private selected: null | Creature = null
 
-    selectCreature(creature: Creature) {
+    select(creature: Creature) {
         this.selected = creature
         const cell = board.get_square(creature.position)
         cell.visual.setIndicator("selected")
         build_actions_menu()
     }
 
-    deselectCreature() {
-        const square = board.get_square(this.getSelectedCharacter().position)
+    deselect() {
+        const square = board.get_square(this.getSelectedCreature().position)
         square.visual.clearIndicator()
         this.selected = null
 
@@ -41,8 +42,8 @@ class PlayerControl {
     isAvailableTarget = (position: Position) => this.available_targets
         .some(({position: {x, y}}) => position.x === x && position.y === y)
 
-    hasSelectedCharacter = () => !!this.selected
-    getSelectedCharacter = () => {
+    hasSelectedCreature = () => !!this.selected
+    getSelectedCreature = () => {
         if (this.selected === null) throw Error("Character cannot be null")
         return this.selected
     }
@@ -51,13 +52,13 @@ class PlayerControl {
 const player_control = new PlayerControl()
 
 visual_square_creator.addOnSquareClickEvent(({position}) => {
-    if (player_control.hasSelectedCharacter()) {
+    if (player_control.hasSelectedCreature()) {
         if (player_control.isAvailableTarget(position))
             move_character(position)
     } else {
         if (board.is_terrain_occupied(position)) {
             const creature = board.get_creature_by_position(position)
-            player_control.selectCreature(creature)
+            player_control.select(creature)
         }
     }
 })
@@ -66,7 +67,7 @@ visual_square_creator.addOnSquareClickEvent(({position}) => {
 const get_in_range = (range: Power["targeting"]) => {
     if (range.type === "movement") {
         const distance = new IntFormula(`${range.distance}`).func()
-        return board.get_move_area({origin: player_control.getSelectedCharacter().position, distance})
+        return board.get_move_area({origin: player_control.getSelectedCreature().position, distance})
     }
 
     throw `Range "${range.type}" not supported`
@@ -79,9 +80,9 @@ const filter_targets = ({target, position}: { target: Power["targeting"], positi
 }
 
 function move_character(position: Position) {
-    if (!player_control.hasSelectedCharacter()) throw Error("Character cannot be null")
-    const creature = player_control.getSelectedCharacter()
-    player_control.deselectCreature()
+    if (!player_control.hasSelectedCreature()) throw Error("Character cannot be null")
+    const creature = player_control.getSelectedCreature()
+    player_control.deselect()
 
     board.place_character({creature, position})
 }
@@ -108,7 +109,7 @@ class IntFormula {
     }
 
     owner() {
-        return player_control.getSelectedCharacter()
+        return player_control.getSelectedCreature()
     }
 
     parse_expression() {
@@ -146,7 +147,7 @@ class IntFormula {
 function build_actions_menu() {
     const cancel = document.createElement("button");
     cancel.addEventListener("click", () => {
-        player_control.deselectCreature()
+        player_control.deselect()
         clear_actions_menu()
     })
     cancel.innerText = "Cancel"

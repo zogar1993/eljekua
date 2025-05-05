@@ -1,5 +1,6 @@
-import {VisualSquare, VisualSquareCreator} from "visuals/VisualSquare";
-import {VisualCreature, VisualCreatureCreator} from "./visuals/VisualCreature";
+import {SquareVisual, VisualSquareCreator} from "battlegrid/board/SquareVisual";
+import {CreatureVisual, VisualCreatureCreator} from "./creatures/CreatureVisual";
+import {Position} from "./Position";
 
 export class BattleGrid {
     private BOARD_HEIGHT = 10
@@ -73,11 +74,9 @@ export class BattleGrid {
 }
 
 export type Square = {
-    visual: VisualSquare,
+    visual: SquareVisual,
     position: Position
 }
-
-export type Position = { x: number, y: number }
 
 export type Creature = {
     position: Position
@@ -85,5 +84,5 @@ export type Creature = {
     movement: number
     hp: number
     max_hp: number
-    visual: VisualCreature
+    visual: CreatureVisual
 }

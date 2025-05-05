@@ -1,6 +1,6 @@
-import {Position} from "../BattleGrid";
+import {Position} from "../Position";
 
-export type VisualCreature = {
+export type CreatureVisual = {
     placeAt: (position: Position) => void
 }
 
@@ -9,7 +9,7 @@ export class VisualCreatureCreator {
         image: string,
         position: Position,
         hp: { current: number, max: number }
-    }): VisualCreature {
+    }): CreatureVisual {
         const html_creature = document.createElement("div")
         html_creature.classList.add("creature")
         html_creature.style.setProperty("--creature__image_color", image)
@@ -36,8 +36,6 @@ export class VisualCreatureCreator {
                 html_creature.style.setProperty("--creature_position-x", `${position.x}`)
                 html_creature.style.setProperty("--creature_position-y", `${position.y}`)
             }
-
         }
     }
-
 }

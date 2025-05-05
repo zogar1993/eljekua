@@ -1,11 +1,11 @@
-import {Position} from "../BattleGrid";
+import {Position} from "../Position";
 
-export type VisualSquare = {
+export type SquareVisual = {
     clearIndicator: () => void
     setIndicator: (value: "selected" | "available-target") => void
 }
 
-export type OnSquareClick = (params: { position: Position, visual_square: VisualSquare }) => void
+export type OnSquareClick = (params: { position: Position, visual_square: SquareVisual }) => void
 
 export class VisualSquareCreator {
     onSquareClickHandlers: Array<OnSquareClick> = []
