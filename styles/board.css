@@ -1,11 +1,7 @@
 .board {
-    display: inline-flex;
-    flex-direction: column;
+    display: inline-grid;
+    grid-template-columns: repeat(10, 1fr);
     border: black 1px solid;
-}
-
-.board__row {
-    display: flex;
 }
 
 .board__cell {

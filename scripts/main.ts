@@ -1,143 +1,104 @@
-import {Board, Cell, Position} from "board";
-import {BASIC_MOVEMENT_ACTIONS} from "powers/basic";
+import {BattleGrid, Creature, Position, Square} from "BattleGrid";
 import {Power} from "types";
-import {raw} from "concurrently/dist/src/defaults";
+import {VisualSquareCreator} from "visuals/VisualSquare";
+import {VisualCreatureCreator} from "visuals/VisualCreature";
+import {BASIC_MOVEMENT_ACTIONS} from "./powers/basic";
 
-const board = new Board()
 
-board.get_all_cells().forEach(cell =>
-    cell.html_element.addEventListener("click", () => {
-        if (selected_character === null) {
-            if (cell.character)
-                select_character(cell)
-        } else {
-            if (cell.html_element.dataset["indicator"] === "available-target")
-                move_character(cell)
+const visual_square_creator = new VisualSquareCreator()
+const visual_creature_creator = new VisualCreatureCreator()
+
+
+const board = new BattleGrid({visual_square_creator, visual_creature_creator})
+
+
+class PlayerControl {
+    private selected: null | Creature = null
+
+    selectCreature(creature: Creature) {
+        this.selected = creature
+        const cell = board.get_square(creature.position)
+        cell.visual.setIndicator("selected")
+        build_actions_menu()
+    }
+
+    deselectCreature() {
+        const square = board.get_square(this.getSelectedCharacter().position)
+        square.visual.clearIndicator()
+        this.selected = null
+
+        this.available_targets.forEach(cell => cell.visual.clearIndicator())
+        this.available_targets.length = 0
+    }
+
+    addAvailableTarget(square: Square) {
+        square.visual.setIndicator("available-target")
+        this.available_targets.push(square)
+    }
+
+    available_targets: Array<Square> = []
+
+    isAvailableTarget = (position: Position) => this.available_targets
+        .some(({position: {x, y}}) => position.x === x && position.y === y)
+
+    hasSelectedCharacter = () => !!this.selected
+    getSelectedCharacter = () => {
+        if (this.selected === null) throw Error("Character cannot be null")
+        return this.selected
+    }
+}
+
+const player_control = new PlayerControl()
+
+visual_square_creator.addOnSquareClickEvent(({position}) => {
+    console.log(1)
+    if (player_control.hasSelectedCharacter()) {
+
+        console.log(player_control.isAvailableTarget(position))
+        if (player_control.isAvailableTarget(position))
+            move_character(position)
+    } else {
+        if (board.is_terrain_occupied(position)) {
+            const creature = board.get_creature_by_position(position)
+            player_control.selectCreature(creature)
         }
-    })
-)
+    }
+})
 
 
 const get_in_range = (range: Power["targeting"]) => {
-    if (selected_character === null) throw Error("Character cannot be null")
     if (range.type === "movement") {
         const distance = new IntFormula(`${range.distance}`).func()
-        return board.get_move_area({origin: selected_character.position, distance})
+        return board.get_move_area({origin: player_control.getSelectedCharacter().position, distance})
     }
 
     throw `Range "${range.type}" not supported`
 }
 
-const filter_targets = ({target, cell}: { target: Power["targeting"], cell: Cell }) => {
+const filter_targets = ({target, position}: { target: Power["targeting"], position: Position }) => {
     if (target.target_type === "terrain")
-        return !cell.character
+        return !board.is_terrain_occupied(position)
     throw `Target "${target.type}" not supported`
 }
 
-function build_action_button(action: Power) {
-    const button = document.createElement("button");
-    button.addEventListener("click", () => {
-        [...get_in_range(action.targeting)].filter(cell => filter_targets({
-            target: action.targeting,
-            cell
-        })).forEach(cell => {
-            cell.html_element.dataset["indicator"] = "available-target"
-        })
-        clear_actions_menu()
-    })
-    button.innerText = action.name
-    return button
+function move_character(position: Position) {
+    if (!player_control.hasSelectedCharacter()) throw Error("Character cannot be null")
+    const creature = player_control.getSelectedCharacter()
+    player_control.deselectCreature()
+
+    board.place_character({creature, position})
 }
-
-function build_actions_menu() {
-    const cancel = document.createElement("button");
-    cancel.addEventListener("click", () => {
-        selected_character = null
-        board.clear_indicators()
-        clear_actions_menu()
-    })
-    cancel.innerText = "Cancel"
-
-    const buttons = BASIC_MOVEMENT_ACTIONS.map(build_action_button)
-
-    const actions_menu = document.querySelector("#actions_menu")!
-    buttons.forEach(button => actions_menu.appendChild(button))
-
-    actions_menu.appendChild(cancel)
-}
-
-function select_character(cell: Cell) {
-    selected_character = cell.character
-    cell.html_element.dataset["indicator"] = "selected"
-    build_actions_menu()
-}
-
-function move_character(cell: Cell) {
-    if (selected_character === null) throw Error("Character cannot be null")
-
-    const old_position = board.get_cell(selected_character.position)
-    old_position.character = null
-
-    cell.character = selected_character
-    selected_character.position = cell.position
-
-    const html_creature = selected_character.html_creature
-    if (html_creature === undefined) throw Error("selected_character.html_creature cannot be null")
-    html_creature.style.setProperty("--creature_position-x", `${selected_character.position.x}`)
-    html_creature.style.setProperty("--creature_position-y", `${selected_character.position.y}`)
-
-    selected_character = null
-    board.clear_indicators()
-}
-
-let selected_character: Creature | null = null
 
 function clear_actions_menu() {
     const buttons = document.querySelectorAll("#actions_menu > button")
     buttons.forEach(button => button.remove())
 }
 
-
-function place_character(creature: Creature) {
-    const cell = board.get_cell(creature.position)
-    cell.character = creature
-
-    const html_creature = document.createElement("div")
-    html_creature.style.setProperty("--creature__image_color", creature.image)
-    html_creature.classList.add("creature")
-    html_creature.style.setProperty("--creature_position-x", `${creature.position.x}`)
-    html_creature.style.setProperty("--creature_position-y", `${creature.position.y}`)
-    html_creature.style.setProperty("--creature__lifebar_max-hp", `${creature.max_hp}`)
-    html_creature.style.setProperty("--creature__lifebar_current-hp", `${creature.hp}`)
-
-    const html_sprite = document.createElement("div")
-    html_sprite.style.setProperty("--creature__image_color", creature.image)
-    html_sprite.classList.add("creature__image")
-    html_creature.appendChild(html_sprite)
-
-    const html_lifebar = document.createElement("div")
-    html_lifebar.classList.add("creature__lifebar")
-    html_creature.appendChild(html_lifebar)
-
-    const html_creatures = document.getElementById("creatures")!
-    html_creatures.appendChild(html_creature)
-    creature.html_creature = html_creature
-}
-
 const player = {position: {x: 1, y: 2}, image: "blue", movement: 5, hp: 7, max_hp: 10}
 const enemy = {position: {x: 5, y: 5}, image: "orange", movement: 2, hp: 10, max_hp: 10}
 
-place_character(player)
-place_character(enemy)
-
-type Creature = {
-    position: Position
-    image: string
-    movement: number
-    hp: number
-    max_hp: number
-    html_creature?: HTMLDivElement
-}
+board.create_creature(player)
+board.create_creature(enemy)
 
 class IntFormula {
     raw: string
@@ -150,8 +111,7 @@ class IntFormula {
     }
 
     owner() {
-        if (selected_character === null) throw Error(`Selected character needs to be set in order for "owner()" to run`)
-        return selected_character
+        return player_control.getSelectedCharacter()
     }
 
     parse_expression() {
@@ -183,5 +143,35 @@ class IntFormula {
     is_not_end() {
         return this.offset < this.raw.length
     }
+}
 
+
+function build_actions_menu() {
+    const cancel = document.createElement("button");
+    cancel.addEventListener("click", () => {
+        player_control.deselectCreature()
+        clear_actions_menu()
+    })
+    cancel.innerText = "Cancel"
+
+    const buttons = BASIC_MOVEMENT_ACTIONS.map(build_action_button)
+
+    const actions_menu = document.querySelector("#actions_menu")!
+    buttons.forEach(button => actions_menu.appendChild(button))
+    actions_menu.appendChild(cancel)
+}
+
+function build_action_button(action: Power) {
+    const button = document.createElement("button");
+    button.addEventListener("click", () => {
+        [...get_in_range(action.targeting)].filter(cell => filter_targets({
+            target: action.targeting,
+            position: cell.position
+        })).forEach(cell => {
+            player_control.addAvailableTarget(cell)
+        })
+        clear_actions_menu()
+    })
+    button.innerText = action.name
+    return button
 }
