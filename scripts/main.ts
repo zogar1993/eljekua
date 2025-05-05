@@ -51,10 +51,7 @@ class PlayerControl {
 const player_control = new PlayerControl()
 
 visual_square_creator.addOnSquareClickEvent(({position}) => {
-    console.log(1)
     if (player_control.hasSelectedCharacter()) {
-
-        console.log(player_control.isAvailableTarget(position))
         if (player_control.isAvailableTarget(position))
             move_character(position)
     } else {
