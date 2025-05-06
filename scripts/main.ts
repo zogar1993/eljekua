@@ -219,7 +219,7 @@ function build_action_button(action: Power) {
 
 
 const bob = {position: {x: 1, y: 2}, image: "blue", movement: 5, hp: 7, max_hp: 10}
-const maik = {position: {x: 5, y: 5}, image: "orange", movement: 2, hp: 10, max_hp: 10}
+const maik = {position: {x: 2, y: 5}, image: "orange", movement: 2, hp: 10, max_hp: 10}
 
 board.create_creature(bob)
 board.create_creature(maik)

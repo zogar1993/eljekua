@@ -122,6 +122,6 @@ export class Creature {
 
     receive_damage(value: number) {
         this.data.hp -= value
-        this.visual.receive_damage(this.data.hp)
+        this.visual.receive_damage({hp: this.data.hp, damage: value})
     }
 }

@@ -38,6 +38,23 @@ const movement: Power = {
     ]
 }
 
+const magic_melee_misile: Power = {
+    name: "Magic Melee Missile",
+    action: "standard",
+    targeting: {
+        type: "melee",
+        target_type: "enemy",
+        amount: 1
+    },
+    happenings: [
+        {
+            type: "apply_damage",
+            target: "power_target",
+            value: "4"
+        }
+    ]
+}
+
 const melee_basic_attack: Power = {
     name: "Melee Basic Attack",
     action: "standard",
@@ -57,23 +74,6 @@ const melee_basic_attack: Power = {
                     value: "4"
                 }
             ]
-        }
-    ]
-}
-
-const magic_melee_misile: Power = {
-    name: "Magic Melee Missile",
-    action: "standard",
-    targeting: {
-        type: "melee",
-        target_type: "enemy",
-        amount: 1
-    },
-    happenings: [
-        {
-            type: "apply_damage",
-            target: "power_target",
-            value: "4"
         }
     ]
 }

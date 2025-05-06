@@ -40,5 +40,31 @@
     display: block;
     width: calc(100% / var(--creature__lifebar_max-hp) * var(--creature__lifebar_current-hp));
     height: 100%;
+    transition: width 0.5s ease-in-out;
     background-color: red;
+}
+
+.fading-number {
+    position: absolute;
+    animation: fading-number-animation var(--fading-number_animation-duration) forwards;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: crimson;
+}
+
+@keyframes fading-number-animation {
+    from {
+        top: 0;
+        opacity: 1
+    }
+
+    66% {
+        top: -50%;
+        opacity: 1;
+    }
+
+    to {
+        top: -50%;
+        opacity: 0
+    }
 }
