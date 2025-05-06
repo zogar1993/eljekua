@@ -34,7 +34,7 @@ class PlayerControl {
         this.available_targets?.destroy()
     }
 
-    setAvailableTargets({squares, onClick}: {squares: Array<Square>, onClick: (position: Position) => void}) {
+    setAvailableTargets({squares, onClick}: { squares: Array<Square>, onClick: (position: Position) => void }) {
         this.available_targets = new AvailableTargets({
             squares,
             onClick,
@@ -60,7 +60,11 @@ class AvailableTargets {
     onDestroy: () => void
     squares: Array<Square> = []
 
-    constructor({squares, onClick, onDestroy}: { squares: Array<Square>, onClick: (position: Position) => void, onDestroy: () => void }) {
+    constructor({squares, onClick, onDestroy}: {
+        squares: Array<Square>,
+        onClick: (position: Position) => void,
+        onDestroy: () => void
+    }) {
         this.squares = squares
         this.onClick = onClick
         this.onDestroy = onDestroy
@@ -102,13 +106,13 @@ const get_in_range = (range: Power["targeting"]) => {
     throw `Range "${range.type}" not supported`
 }
 
-const filter_targets = ({target, position}: { target: Power["targeting"], position: Position }) => {
-    if (target.target_type === "terrain")
+const filter_targets = ({targeting, position}: { targeting: Power["targeting"], position: Position }) => {
+    if (targeting.target_type === "terrain")
         return !board.is_terrain_occupied(position)
-    if (target.target_type === "enemy")
+    if (targeting.target_type === "enemy")
         return board.is_terrain_occupied(position)
 
-    throw `Target "${target.type}" not supported`
+    throw `Target "${targeting.type}" not supported`
 }
 
 function clear_actions_menu() {
@@ -180,14 +184,17 @@ function build_actions_menu() {
 
 function build_action_button(action: Power) {
     const button = document.createElement("button");
-    button.addEventListener("click", () => {
-        const in_range = [...get_in_range(action.targeting)]
-        const valid_targets = in_range.filter(cell => filter_targets({
-            target: action.targeting,
-            position: cell.position
+
+    const valid_targets = [...get_in_range(action.targeting)]
+        .filter(square => filter_targets({
+            targeting: action.targeting,
+            position: square.position
         }))
 
+    if (valid_targets.length === 0)
+        button.setAttribute("disabled", "")
 
+    button.addEventListener("click", () => {
         const onClick = (position: Position) => {
             action.happenings.forEach(happening => {
                 if (["move", "shift"].includes(happening.type)) {
@@ -204,8 +211,6 @@ function build_action_button(action: Power) {
                 } else {
                     throw Error("action not implemented " + happening.type)
                 }
-
-
             })
         }
         player_control.setAvailableTargets({squares: valid_targets, onClick})
