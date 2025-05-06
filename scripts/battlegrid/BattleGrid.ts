@@ -38,6 +38,21 @@ export class BattleGrid {
     }
 
     * get_move_area({origin, distance}: { origin: Position, distance: number }) {
+
+        //TODO extract foreachSquareInGrid
+        const lower_x = Math.max(0, origin.x - distance)
+        const upper_x = Math.min(this.BOARD_WIDTH - 1, origin.x + distance)
+        const lower_y = Math.max(0, origin.y - distance)
+        const upper_y = Math.min(this.BOARD_HEIGHT - 1, origin.y + distance)
+        for (let x = lower_x; x <= upper_x; x++)
+            for (let y = lower_y; y <= upper_y; y++) {
+                if (origin.x === x && origin.y === y) continue
+                yield this.get_square({x, y})
+            }
+    }
+
+    * get_melee({origin}: { origin: Position }) {
+        const distance = 1
         const lower_x = Math.max(0, origin.x - distance)
         const upper_x = Math.min(this.BOARD_WIDTH - 1, origin.x + distance)
         const lower_y = Math.max(0, origin.y - distance)
@@ -52,8 +67,7 @@ export class BattleGrid {
     private creatures: Array<Creature> = []
 
     place_character({position, creature}: { position: Position, creature: Creature }) {
-        creature.position = position
-        creature.visual.placeAt(position)
+        creature.move_to(position)
     }
 
     get_creature_by_position(position: Position): Creature {
@@ -66,9 +80,13 @@ export class BattleGrid {
         return this.creatures.some(c => c.position.x === position.x && c.position.y === position.y)
     }
 
-    create_creature(data: Omit<Creature, "visual">) {
-        const visual = this.visual_creature_creator.create({image: data.image, hp: {current: data.hp, max: data.max_hp}, position: data.position})
-        const creature = {...data, visual}
+    create_creature(data: CreatureData) {
+        const visual = this.visual_creature_creator.create({
+            image: data.image,
+            hp: {current: data.hp, max: data.max_hp},
+            position: data.position
+        })
+        const creature = new Creature({data, visual})
         this.creatures.push(creature)
     }
 }
@@ -78,11 +96,32 @@ export type Square = {
     position: Position
 }
 
-export type Creature = {
+export type CreatureData = {
     position: Position
     image: string
     movement: number
     hp: number
     max_hp: number
-    visual: CreatureVisual
+}
+
+export class Creature {
+    private visual: CreatureVisual
+    position: Position
+    data: CreatureData
+
+    constructor({data, visual}: { data: CreatureData, visual: CreatureVisual }) {
+        this.data = data
+        this.visual = visual
+        this.position = data.position
+    }
+
+    move_to(position: Position) {
+        this.position = position
+        this.visual.place_at(position)
+    }
+
+    receive_damage(value: number) {
+        this.data.hp -= value
+        this.visual.receive_damage(this.data.hp)
+    }
 }

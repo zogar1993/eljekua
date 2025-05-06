@@ -38,18 +38,12 @@ const movement: Power = {
     ]
 }
 
-export const BASIC_MOVEMENT_ACTIONS = [movement, shift]
-
-/*
-
-export const melee_basic_attack: Power = {
+const melee_basic_attack: Power = {
     name: "Melee Basic Attack",
     action: "standard",
-    range: {
-        type: "melee"
-    },
-    target: {
-        type: "enemy",
+    targeting: {
+        type: "melee",
+        target_type: "enemy",
         amount: 1
     },
     happenings: [
@@ -67,4 +61,22 @@ export const melee_basic_attack: Power = {
     ]
 }
 
- */
+const magic_melee_misile: Power = {
+    name: "Magic Melee Missile",
+    action: "standard",
+    targeting: {
+        type: "melee",
+        target_type: "enemy",
+        amount: 1
+    },
+    happenings: [
+        {
+            type: "apply_damage",
+            target: "power_target",
+            value: "4"
+        }
+    ]
+}
+
+export const BASIC_MOVEMENT_ACTIONS = [movement, shift]
+export const BASIC_ATTACK_ACTIONS = [magic_melee_misile]

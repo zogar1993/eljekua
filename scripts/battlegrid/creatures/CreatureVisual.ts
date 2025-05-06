@@ -1,7 +1,8 @@
-import {Position} from "../Position";
+import {Position} from "battlegrid/Position";
 
 export type CreatureVisual = {
-    placeAt: (position: Position) => void
+    place_at: (position: Position) => void
+    receive_damage: (value: number) => void
 }
 
 export class VisualCreatureCreator {
@@ -32,9 +33,12 @@ export class VisualCreatureCreator {
         html_creatures.appendChild(html_creature)
 
         return {
-            placeAt: (position: Position) => {
+            place_at: (position: Position) => {
                 html_creature.style.setProperty("--creature_position-x", `${position.x}`)
                 html_creature.style.setProperty("--creature_position-y", `${position.y}`)
+            },
+            receive_damage: (value: number) => {
+                html_creature.style.setProperty("--creature__lifebar_current-hp", `${value}`)
             }
         }
     }

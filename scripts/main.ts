@@ -2,18 +2,16 @@ import {BattleGrid, Creature, Square} from "battlegrid/BattleGrid";
 import {Power} from "types";
 import {VisualSquareCreator} from "battlegrid/board/SquareVisual";
 import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
-import {BASIC_MOVEMENT_ACTIONS} from "./powers/basic";
+import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "./powers/basic";
 import {Position} from "./battlegrid/Position";
 
 
 const visual_square_creator = new VisualSquareCreator()
 const visual_creature_creator = new VisualCreatureCreator()
-
-
 const board = new BattleGrid({visual_square_creator, visual_creature_creator})
 
-
 class PlayerControl {
+    private available_targets: AvailableTargets | null = null
     private selected: null | Creature = null
 
     select(creature: Creature) {
@@ -23,24 +21,32 @@ class PlayerControl {
         build_actions_menu()
     }
 
+    target(position: Position) {
+        if (this.available_targets === null) throw Error("available targets are not set")
+        this.available_targets?.onClick(position)
+    }
+
     deselect() {
         const square = board.get_square(this.getSelectedCreature().position)
         square.visual.clearIndicator()
         this.selected = null
 
-        this.available_targets.forEach(cell => cell.visual.clearIndicator())
-        this.available_targets.length = 0
+        this.available_targets?.destroy()
     }
 
-    addAvailableTarget(square: Square) {
-        square.visual.setIndicator("available-target")
-        this.available_targets.push(square)
+    setAvailableTargets({squares, onClick}: {squares: Array<Square>, onClick: (position: Position) => void}) {
+        this.available_targets = new AvailableTargets({
+            squares,
+            onClick,
+            onDestroy: () => this.available_targets = null
+        })
     }
 
-    available_targets: Array<Square> = []
 
-    isAvailableTarget = (position: Position) => this.available_targets
-        .some(({position: {x, y}}) => position.x === x && position.y === y)
+    isAvailableTarget = (position: Position) => {
+        if (this.available_targets === null) throw Error("available targets are not set")
+        return this.available_targets.contains(position)
+    }
 
     hasSelectedCreature = () => !!this.selected
     getSelectedCreature = () => {
@@ -49,12 +55,34 @@ class PlayerControl {
     }
 }
 
+class AvailableTargets {
+    onClick: (position: Position) => void
+    onDestroy: () => void
+    squares: Array<Square> = []
+
+    constructor({squares, onClick, onDestroy}: { squares: Array<Square>, onClick: (position: Position) => void, onDestroy: () => void }) {
+        this.squares = squares
+        this.onClick = onClick
+        this.onDestroy = onDestroy
+        this.squares.forEach(({visual}) => visual.setIndicator("available-target"))
+    }
+
+    destroy() {
+        this.squares.forEach(square => square.visual.clearIndicator())
+        this.onDestroy()
+    }
+
+    contains(position: Position) {
+        return this.squares.some(({position: {x, y}}) => position.x === x && position.y === y)
+    }
+}
+
 const player_control = new PlayerControl()
 
 visual_square_creator.addOnSquareClickEvent(({position}) => {
     if (player_control.hasSelectedCreature()) {
         if (player_control.isAvailableTarget(position))
-            move_character(position)
+            player_control.target(position)
     } else {
         if (board.is_terrain_occupied(position)) {
             const creature = board.get_creature_by_position(position)
@@ -63,11 +91,12 @@ visual_square_creator.addOnSquareClickEvent(({position}) => {
     }
 })
 
-
 const get_in_range = (range: Power["targeting"]) => {
     if (range.type === "movement") {
         const distance = new IntFormula(`${range.distance}`).func()
         return board.get_move_area({origin: player_control.getSelectedCreature().position, distance})
+    } else if (range.type === "melee") {
+        return board.get_melee({origin: player_control.getSelectedCreature().position})
     }
 
     throw `Range "${range.type}" not supported`
@@ -76,27 +105,16 @@ const get_in_range = (range: Power["targeting"]) => {
 const filter_targets = ({target, position}: { target: Power["targeting"], position: Position }) => {
     if (target.target_type === "terrain")
         return !board.is_terrain_occupied(position)
+    if (target.target_type === "enemy")
+        return board.is_terrain_occupied(position)
+
     throw `Target "${target.type}" not supported`
-}
-
-function move_character(position: Position) {
-    if (!player_control.hasSelectedCreature()) throw Error("Character cannot be null")
-    const creature = player_control.getSelectedCreature()
-    player_control.deselect()
-
-    board.place_character({creature, position})
 }
 
 function clear_actions_menu() {
     const buttons = document.querySelectorAll("#actions_menu > button")
     buttons.forEach(button => button.remove())
 }
-
-const player = {position: {x: 1, y: 2}, image: "blue", movement: 5, hp: 7, max_hp: 10}
-const enemy = {position: {x: 5, y: 5}, image: "orange", movement: 2, hp: 10, max_hp: 10}
-
-board.create_creature(player)
-board.create_creature(enemy)
 
 class IntFormula {
     raw: string
@@ -135,14 +153,13 @@ class IntFormula {
     parse_creature_characteristic(creature: () => Creature) {
         const remaining = this.raw.substring(this.offset)
         if (remaining !== "movement") throw Error(`Can't parse "${remaining}"`)
-        return () => creature().movement
+        return () => creature().data.movement
     }
 
     is_not_end() {
         return this.offset < this.raw.length
     }
 }
-
 
 function build_actions_menu() {
     const cancel = document.createElement("button");
@@ -152,24 +169,83 @@ function build_actions_menu() {
     })
     cancel.innerText = "Cancel"
 
-    const buttons = BASIC_MOVEMENT_ACTIONS.map(build_action_button)
+    const movement_action_buttons = BASIC_MOVEMENT_ACTIONS.map(build_action_button)
+    const basic_attack_actions = BASIC_ATTACK_ACTIONS.map(build_action_button)
 
     const actions_menu = document.querySelector("#actions_menu")!
-    buttons.forEach(button => actions_menu.appendChild(button))
+    movement_action_buttons.forEach(button => actions_menu.appendChild(button))
+    basic_attack_actions.forEach(button => actions_menu.appendChild(button))
     actions_menu.appendChild(cancel)
 }
 
 function build_action_button(action: Power) {
     const button = document.createElement("button");
     button.addEventListener("click", () => {
-        [...get_in_range(action.targeting)].filter(cell => filter_targets({
+        const in_range = [...get_in_range(action.targeting)]
+        const valid_targets = in_range.filter(cell => filter_targets({
             target: action.targeting,
             position: cell.position
-        })).forEach(cell => {
-            player_control.addAvailableTarget(cell)
-        })
+        }))
+
+
+        const onClick = (position: Position) => {
+            action.happenings.forEach(happening => {
+                if (["move", "shift"].includes(happening.type)) {
+                    const creature = player_control.getSelectedCreature()
+                    player_control.deselect()
+
+                    board.place_character({creature, position})
+                } else if ("apply_damage" === happening.type) {
+                    const creature = player_control.getSelectedCreature()
+                    player_control.deselect()
+
+                    const target = board.get_creature_by_position(position)
+                    target.receive_damage(Number(happening.value))
+                } else {
+                    throw Error("action not implemented " + happening.type)
+                }
+
+
+            })
+        }
+        player_control.setAvailableTargets({squares: valid_targets, onClick})
+
+
         clear_actions_menu()
     })
     button.innerText = action.name
     return button
+}
+
+
+const bob = {position: {x: 1, y: 2}, image: "blue", movement: 5, hp: 7, max_hp: 10}
+const maik = {position: {x: 5, y: 5}, image: "orange", movement: 2, hp: 10, max_hp: 10}
+
+board.create_creature(bob)
+board.create_creature(maik)
+
+const ATTRIBUTES = {
+    STRENGTH: "str",
+    CONSTITUTION: "con",
+    DEXTERITY: "dex",
+    INTELLIGENCE: "int",
+    WISDOM: "wis",
+    CHARISMA: "cha",
+} as const
+
+type Attribute = typeof ATTRIBUTES[keyof typeof ATTRIBUTES]
+
+class CharacterSheet {
+    private attributes: Record<Attribute, number> = {
+        str: 10,
+        con: 10,
+        dex: 10,
+        int: 10,
+        wis: 10,
+        cha: 10
+    }
+
+    getAttributeMod(attribute: Attribute) {
+        return Math.floor((this.attributes[attribute] - 10) / 2)
+    }
 }
