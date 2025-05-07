@@ -13,7 +13,7 @@ export class VisualSquareCreator {
     create({x, y}: { x: number, y: number }) {
         const html_board = document.querySelector(".board")!
         const html_square = document.createElement("div")
-        html_square.classList.add("board__cell")
+        html_square.classList.add("board__square")
         html_board.appendChild(html_square)
 
         const visual_square = {

@@ -1,4 +1,4 @@
-import {SquareVisual, VisualSquareCreator} from "battlegrid/board/SquareVisual";
+import {SquareVisual, VisualSquareCreator} from "battlegrid/squares/SquareVisual";
 import {CreatureVisual, VisualCreatureCreator} from "./creatures/CreatureVisual";
 import {Position} from "./Position";
 

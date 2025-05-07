@@ -13,7 +13,7 @@ export class VisualCreatureCreator {
     }): CreatureVisual {
         const creature = document.createElement("div")
         creature.classList.add("creature")
-        creature.style.setProperty("--creature__image_color", image)
+        creature.style.setProperty("--creature__image", image)
 
         creature.style.setProperty("--creature_position-x", `${position.x}`)
         creature.style.setProperty("--creature_position-y", `${position.y}`)
