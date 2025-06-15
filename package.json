@@ -5,12 +5,16 @@
     "build": "esbuild main.ts --bundle --outfile=bundle.js --format=esm",
     "watch": "esbuild main.ts --bundle --outfile=bundle.js --format=esm --watch",
     "dev": "concurrently -k \"pnpm:watch\" \"pnpm:start\"",
-    "start": "live-server --open=./index.html --watch=./"
+    "start": "live-server --open=./index.html --watch=./",
+    "test": "jest"
   },
   "devDependencies": {
+    "@types/jest": "29.5.14",
     "concurrently": "9.1.2",
     "esbuild": "0.25.3",
+    "jest": "29.7.0",
     "live-server": "1.2.2",
+    "ts-jest": "29.3.2",
     "typescript": "5.8.3"
   }
 }

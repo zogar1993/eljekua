@@ -1,11 +1,12 @@
-import type {Power} from "../types.ts";
+import type {Power} from "types.ts";
+import {tokenize} from "formulas/tokenize";
 
 const shift: Power = {
     name: "Shift",
     action: "movement",
     targeting: {
         type: "movement",
-        distance: 1,
+        distance: tokenize("1"),
         target_type: "terrain",
         terrain_prerequisite: "unoccupied",
         amount: 1
@@ -24,7 +25,7 @@ const movement: Power = {
     action: "movement",
     targeting: {
         type: "movement",
-        distance: "owner.movement",
+        distance: tokenize("owner.movement"),
         target_type: "terrain",
         terrain_prerequisite: "unoccupied",
         amount: 1

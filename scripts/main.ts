@@ -1,22 +1,21 @@
 import {BattleGrid} from "battlegrid/BattleGrid";
 import {VisualSquareCreator} from "battlegrid/squares/SquareVisual";
 import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
-import {PlayerTurnHandler} from "./battlegrid/player_turn_handler/PlayerTurnHandler";
-
+import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 
 const visual_square_creator = new VisualSquareCreator()
 const visual_creature_creator = new VisualCreatureCreator()
 const battle_grid = new BattleGrid({visual_square_creator, visual_creature_creator})
-const player_control = new PlayerTurnHandler(battle_grid)
+const player_turn_handler = new PlayerTurnHandler(battle_grid)
 
 visual_square_creator.addOnSquareClickEvent(({position}) => {
-    if (player_control.has_selected_creature()) {
-        if (player_control.is_available_target(position))
-            player_control.target(position)
+    if (player_turn_handler.has_selected_creature()) {
+        if (player_turn_handler.is_available_target(position))
+            player_turn_handler.target(position)
     } else {
         if (battle_grid.is_terrain_occupied(position)) {
             const creature = battle_grid.get_creature_by_position(position)
-            player_control.select(creature)
+            player_turn_handler.select(creature)
         }
     }
 })

@@ -1,4 +1,4 @@
-import {Position} from "../Position";
+import {Position} from "battlegrid/Position";
 
 export type SquareVisual = {
     clearIndicator: () => void

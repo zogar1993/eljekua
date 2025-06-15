@@ -38,8 +38,6 @@ export class BattleGrid {
     }
 
     * get_move_area({origin, distance}: { origin: Position, distance: number }) {
-
-        //TODO extract foreachSquareInGrid
         const lower_x = Math.max(0, origin.x - distance)
         const upper_x = Math.min(this.BOARD_WIDTH - 1, origin.x + distance)
         const lower_y = Math.max(0, origin.y - distance)

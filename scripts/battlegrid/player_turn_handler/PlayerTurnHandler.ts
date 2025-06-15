@@ -1,8 +1,9 @@
-import {BattleGrid, Creature, Square} from "../BattleGrid";
-import {Position} from "../Position";
-import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "../../powers/basic";
-import {Power} from "../../types";
-
+import {BattleGrid, Creature, Square} from "battlegrid/BattleGrid";
+import {Position} from "battlegrid/Position";
+import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "powers/basic";
+import {Power} from "types";
+import {KeywordToken, Token} from "formulas/tokenize";
+import {assert} from "assert";
 
 export class PlayerTurnHandler {
     private battle_grid: BattleGrid
@@ -79,13 +80,13 @@ export class PlayerTurnHandler {
 
     get_in_range({targeting, origin}: { targeting: Power["targeting"], origin: Position }) {
         if (targeting.type === "movement") {
-            const distance = new IntFormula(`${targeting.distance}`, this).func()
-            return this.battle_grid.get_move_area({origin, distance})
+            const distance = new IntFormulaFromTokens(targeting.distance, this).precomputed_values
+            return this.battle_grid.get_move_area({origin, distance: distance.reduce((result, x) => x.value + result, 0)})
         } else if (targeting.type === "melee") {
             return this.battle_grid.get_melee({origin})
         }
 
-        throw `Range "${targeting.type}" not supported`
+        throw `Range "${targeting}" not supported`
     }
 
     filter_targets({targeting, position}: { targeting: Power["targeting"], position: Position }) {
@@ -166,7 +167,6 @@ class AvailableTargets {
     }
 }
 
-
 class IntFormula {
     raw: string
     offset = 0
@@ -212,4 +212,43 @@ class IntFormula {
     is_not_end() {
         return this.offset < this.raw.length
     }
+}
+
+class IntFormulaFromTokens {
+    tokens: Array<Token>
+    player_control: PlayerTurnHandler
+    precomputed_values: Array<PrecomputedValue>
+
+    constructor(tokens: Array<Token>, player_control: PlayerTurnHandler) {
+        this.tokens = tokens
+        this.player_control = player_control
+        this.precomputed_values = tokens.map(this.parse_token)
+    }
+
+    parse_token = (token: Token) => {
+        if (token.type === "number") return {value: token.value}
+        if (token.type === "keyword") return {value: this.parse_keyword_token(token)}
+        throw Error(`token type invalid: ${token}`)
+    }
+
+    parse_keyword_token = (token: KeywordToken) => {
+        assert(token.type === "keyword", () => `token is not of keword type: ${token}`)
+        const creature = this.parse_keyword(token.value)
+        return this.parse_creature_property(creature, token.property)
+    }
+
+    parse_keyword = (keyword: string) => {
+        if (keyword === "owner") return this.player_control.get_selected_creature()
+        throw Error(`Invalid keyword ${keyword}`)
+    }
+
+    parse_creature_property = (creature: Creature, property: string | undefined) => {
+        if (property === undefined) throw Error(`property can't be undefined here`)
+        if (property === "movement") return creature.data.movement
+        throw Error(`Invalid property ${property}`)
+    }
+}
+
+type PrecomputedValue = {
+    value: number
 }

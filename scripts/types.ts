@@ -1,9 +1,16 @@
+import {Token} from "formulas/tokenize";
+
 export type Power = {
     name: string,
     action: "standard" | "movement",
     targeting: {
-        type: "melee" | "movement",
-        distance?: 1 | "owner.movement",
+        type: "movement",
+        distance: Array<Token>,
+        target_type: "terrain" | "enemy",
+        terrain_prerequisite?: "unoccupied",
+        amount: 1
+    } | {
+        type: "melee",
         target_type: "terrain" | "enemy",
         terrain_prerequisite?: "unoccupied",
         amount: 1
