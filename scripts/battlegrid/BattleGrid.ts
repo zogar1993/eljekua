@@ -95,6 +95,7 @@ export type Square = {
 }
 
 export type CreatureData = {
+    name: string
     position: Position
     image: string
     movement: number

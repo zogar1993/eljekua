@@ -2,11 +2,13 @@ import {BattleGrid} from "battlegrid/BattleGrid";
 import {VisualSquareCreator} from "battlegrid/squares/SquareVisual";
 import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
 import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
+import {ActionLog} from "action_log/ActionLog";
 
 const visual_square_creator = new VisualSquareCreator()
 const visual_creature_creator = new VisualCreatureCreator()
+const action_log = new ActionLog()
 const battle_grid = new BattleGrid({visual_square_creator, visual_creature_creator})
-const player_turn_handler = new PlayerTurnHandler(battle_grid)
+const player_turn_handler = new PlayerTurnHandler(battle_grid, action_log)
 
 visual_square_creator.addOnSquareClickEvent(({position}) => {
     if (player_turn_handler.has_selected_creature()) {
@@ -20,8 +22,8 @@ visual_square_creator.addOnSquareClickEvent(({position}) => {
     }
 })
 
-const bob = {position: {x: 1, y: 2}, image: `url("/public/mech.webp")`, movement: 5, hp: 7, max_hp: 10}
-const maik = {position: {x: 2, y: 5}, image: `url("/public/mech.webp")`, movement: 2, hp: 10, max_hp: 10}
+const bob = {name: "bob", position: {x: 1, y: 2}, image: `url("/public/mech.webp")`, movement: 5, hp: 7, max_hp: 10}
+const maik = {name: "maik", position: {x: 2, y: 5}, image: `url("/public/mech.webp")`, movement: 2, hp: 10, max_hp: 10}
 
 battle_grid.create_creature(bob)
 battle_grid.create_creature(maik)
@@ -36,3 +38,4 @@ const ATTRIBUTES = {
 } as const
 
 type Attribute = typeof ATTRIBUTES[keyof typeof ATTRIBUTES]
+

@@ -4,14 +4,17 @@ import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "powers/basic";
 import {Power} from "types";
 import {KeywordToken, Token} from "formulas/tokenize";
 import {assert} from "assert";
+import {ActionLog} from "action_log/ActionLog";
 
 export class PlayerTurnHandler {
+    private action_log: ActionLog
     private battle_grid: BattleGrid
     private available_targets: AvailableTargets | null = null
     private selected: null | Creature = null
 
-    constructor(battle_grid: BattleGrid) {
+    constructor(battle_grid: BattleGrid, action_log: ActionLog) {
         this.battle_grid = battle_grid
+        this.action_log = action_log
     }
 
     select(creature: Creature) {
@@ -139,6 +142,7 @@ export class PlayerTurnHandler {
                             const target = this.battle_grid.get_creature_by_position(position)
                             const resolved = resolve_all_unresolved_number_values(new IntFormulaFromTokens(consequence.value, this).get_all_number_values())
                             target.receive_damage(add_all_resolved_number_values(resolved))
+                            this.action_log.add_new_action_log(`${target.data.name} was hit ${add_all_resolved_number_values(resolved)} by ${creature.data.name}`)
                         } else {
                             throw Error("action not implemented " + consequence.type)
                         }
