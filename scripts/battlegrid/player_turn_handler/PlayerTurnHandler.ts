@@ -80,8 +80,11 @@ export class PlayerTurnHandler {
 
     get_in_range({targeting, origin}: { targeting: Power["targeting"], origin: Position }) {
         if (targeting.type === "movement") {
-            const distance = new IntFormulaFromTokens(targeting.distance, this).precomputed_values
-            return this.battle_grid.get_move_area({origin, distance: distance.reduce((result, x) => x.value + result, 0)})
+            const distance = new IntFormulaFromTokens(targeting.distance, this).get_resolved_number_values()
+            return this.battle_grid.get_move_area({
+                origin,
+                distance: add_all_resolved_number_values(distance)
+            })
         } else if (targeting.type === "melee") {
             return this.battle_grid.get_melee({origin})
         }
@@ -110,27 +113,48 @@ export class PlayerTurnHandler {
                 position: square.position
             }))
 
+        /*
+                const action_preview = document.querySelector("#action_preview")!
+                button.addEventListener("mouseenter", () => {
+                    action_preview.textContent = ""
+                })
+         */
+
         if (valid_targets.length === 0)
             button.setAttribute("disabled", "")
 
         button.addEventListener("click", () => {
             const onClick = (position: Position) => {
-                action.happenings.forEach(happening => {
-                    if (["move", "shift"].includes(happening.type)) {
-                        const creature = this.get_selected_creature()
-                        this.deselect()
+                if (action.hit) {
+                    action.hit.forEach(consequence => {
+                        if (["move", "shift"].includes(consequence.type)) {
+                            const creature = this.get_selected_creature()
+                            this.deselect()
 
-                        this.battle_grid.place_character({creature, position})
-                    } else if ("apply_damage" === happening.type) {
-                        const creature = this.get_selected_creature()
-                        this.deselect()
+                            this.battle_grid.place_character({creature, position})
+                        } else if ("apply_damage" === consequence.type) {
+                            const creature = this.get_selected_creature()
+                            this.deselect()
 
-                        const target = this.battle_grid.get_creature_by_position(position)
-                        target.receive_damage(Number(happening.value))
-                    } else {
-                        throw Error("action not implemented " + happening.type)
-                    }
-                })
+                            const target = this.battle_grid.get_creature_by_position(position)
+                            const resolved = resolve_all_unresolved_number_values(new IntFormulaFromTokens(consequence.value, this).get_all_number_values())
+                            target.receive_damage(add_all_resolved_number_values(resolved))
+                        } else {
+                            throw Error("action not implemented " + consequence.type)
+                        }
+                    })
+                }
+                if (action.effect)
+                    action.effect.forEach(consequence => {
+                        if (["move", "shift"].includes(consequence.type)) {
+                            const creature = this.get_selected_creature()
+                            this.deselect()
+
+                            this.battle_grid.place_character({creature, position})
+                        } else {
+                            throw Error("action not implemented " + consequence.type)
+                        }
+                    })
             }
             this.set_available_targets({squares: valid_targets, onClick})
 
@@ -139,6 +163,8 @@ export class PlayerTurnHandler {
         button.innerText = action.name
         return button
     }
+
+
 }
 
 class AvailableTargets {
@@ -167,67 +193,19 @@ class AvailableTargets {
     }
 }
 
-class IntFormula {
-    raw: string
-    offset = 0
-    func: () => number
-    player_control: PlayerTurnHandler
-
-    constructor(raw: string, player_control: PlayerTurnHandler) {
-        this.raw = raw
-        this.func = this.parse_expression()
-        this.player_control = player_control
-    }
-
-    owner() {
-        return this.player_control.get_selected_creature()
-    }
-
-    parse_expression() {
-        return this.parse_until_end_or(".")
-    }
-
-    parse_until_end_or(delimiter: string) {
-        const remaining = this.raw.substring(this.offset)
-        const i = remaining.indexOf(delimiter)
-        if (i === -1) {
-            this.offset = this.raw.length
-            return () => Number(remaining)
-        } else if (delimiter === ".") {
-            const object_name = this.raw.substring(this.offset, i)
-            if (object_name !== "owner") throw Error(`Can't parse "${delimiter}"`)
-            this.offset = i + 1
-            return this.parse_creature_characteristic(() => this.owner())
-        } else {
-            throw Error(`Can't parse "${delimiter}"`)
-        }
-    }
-
-    parse_creature_characteristic(creature: () => Creature) {
-        const remaining = this.raw.substring(this.offset)
-        if (remaining !== "movement") throw Error(`Can't parse "${remaining}"`)
-        return () => creature().data.movement
-    }
-
-    is_not_end() {
-        return this.offset < this.raw.length
-    }
-}
-
 class IntFormulaFromTokens {
-    tokens: Array<Token>
-    player_control: PlayerTurnHandler
-    precomputed_values: Array<PrecomputedValue>
+    private readonly player_control: PlayerTurnHandler
+    private readonly number_values: Array<NumberValue>
 
     constructor(tokens: Array<Token>, player_control: PlayerTurnHandler) {
-        this.tokens = tokens
         this.player_control = player_control
-        this.precomputed_values = tokens.map(this.parse_token)
+        this.number_values = tokens.map(this.parse_token)
     }
 
     parse_token = (token: Token) => {
         if (token.type === "number") return {value: token.value}
         if (token.type === "keyword") return {value: this.parse_keyword_token(token)}
+        if (token.type === "dice") return {min: 1, max: token.faces}
         throw Error(`token type invalid: ${token}`)
     }
 
@@ -247,8 +225,45 @@ class IntFormulaFromTokens {
         if (property === "movement") return creature.data.movement
         throw Error(`Invalid property ${property}`)
     }
+
+    get_resolved_number_values = (): Array<ResolvedNumberValue> => {
+        assert(this.number_values.every(x => is_resolved_number_value(x)), () => "found unresolved number values")
+        return this.number_values as Array<ResolvedNumberValue>
+    }
+
+    get_all_number_values = (): Array<NumberValue> => {
+        return this.number_values
+    }
 }
 
-type PrecomputedValue = {
+type NumberValue = ResolvedNumberValue | UnresolvedNumberValue
+
+type ResolvedNumberValue = {
     value: number
+}
+
+type UnresolvedNumberValue = {
+    min: number
+    max: number
+}
+
+const is_resolved_number_value = (value: NumberValue): value is ResolvedNumberValue => value.hasOwnProperty("value")
+
+function add_preview_card_handlers({}) {
+
+}
+
+const add_all_resolved_number_values = (number_values: Array<ResolvedNumberValue>) => {
+    return number_values.reduce((result, x) => x.value + result, 0)
+}
+
+const resolve_all_unresolved_number_values = (number_values: Array<NumberValue>): Array<ResolvedNumberValue> => {
+    return number_values.map(x => is_resolved_number_value(x) ? x : {value: get_random_number(x)})
+}
+
+const get_random_number= ({min, max}: {min: number, max: number}) => {
+    assert(min <= max, () => "min can not be lower than max")
+    const result = Math.floor(Math.random() * (max - min + 1)) + min
+    assert(min <= result && result <= max, () => `result of random needs to be bewteen mind and max, was ${result}`)
+    return result
 }

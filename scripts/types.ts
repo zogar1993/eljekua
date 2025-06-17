@@ -2,7 +2,11 @@ import {Token} from "formulas/tokenize";
 
 export type Power = {
     name: string,
-    action: "standard" | "movement",
+    type: {
+        action: "standard" | "movement" | "minor" | "free",
+        cooldown: "at-will" | "encounter" | "daily",
+        attack: boolean
+    }
     targeting: {
         type: "movement",
         distance: Array<Token>,
@@ -15,27 +19,21 @@ export type Power = {
         terrain_prerequisite?: "unoccupied",
         amount: 1
     },
-    happenings: Array<
+    attack?: {
+        attack: "strength_mod",
+        defense: "ac",
+    }
+    hit?: Array<
+        {
+            type: "apply_damage",
+            value: Array<Token>,
+        }
+    >
+    effect?: [
         {
             type: "move" | "shift",
             target: "owner",
             destination: "target"
-        } |
-        {
-            type: "attack",
-            attack: "strength_mod",
-            defense: "ac",
-            hit: [
-                {
-                    type: "apply_damage",
-                    value: "4"
-                }
-            ]
-        } |
-        {
-            type: "apply_damage",
-            target: "power_target"
-            value: "4"
         }
-    >
+    ]
 }

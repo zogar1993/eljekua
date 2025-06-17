@@ -3,7 +3,11 @@ import {tokenize} from "formulas/tokenize";
 
 const shift: Power = {
     name: "Shift",
-    action: "movement",
+    type: {
+        action: "movement",
+        cooldown: "at-will",
+        attack: false,
+    },
     targeting: {
         type: "movement",
         distance: tokenize("1"),
@@ -11,7 +15,7 @@ const shift: Power = {
         terrain_prerequisite: "unoccupied",
         amount: 1
     },
-    happenings: [
+    effect: [
         {
             type: "shift",
             target: "owner",
@@ -22,7 +26,11 @@ const shift: Power = {
 
 const movement: Power = {
     name: "Move",
-    action: "movement",
+    type: {
+        action: "movement",
+        cooldown: "at-will",
+        attack: false,
+    },
     targeting: {
         type: "movement",
         distance: tokenize("owner.movement"),
@@ -30,7 +38,7 @@ const movement: Power = {
         terrain_prerequisite: "unoccupied",
         amount: 1
     },
-    happenings: [
+    effect: [
         {
             type: "move",
             target: "owner",
@@ -39,45 +47,29 @@ const movement: Power = {
     ]
 }
 
-const magic_melee_misile: Power = {
-    name: "Magic Melee Missile",
-    action: "standard",
-    targeting: {
-        type: "melee",
-        target_type: "enemy",
-        amount: 1
-    },
-    happenings: [
-        {
-            type: "apply_damage",
-            target: "power_target",
-            value: "4"
-        }
-    ]
-}
-
 const melee_basic_attack: Power = {
     name: "Melee Basic Attack",
-    action: "standard",
+    type: {
+        action: "standard",
+        cooldown: "at-will",
+        attack: true,
+    },
     targeting: {
         type: "melee",
         target_type: "enemy",
         amount: 1
     },
-    happenings: [
+    attack: {
+        attack: "strength_mod",
+        defense: "ac",
+    },
+    hit: [
         {
-            type: "attack",
-            attack: "strength_mod",
-            defense: "ac",
-            hit: [
-                {
-                    type: "apply_damage",
-                    value: "4"
-                }
-            ]
+            type: "apply_damage",
+            value: tokenize("d4")
         }
     ]
 }
 
 export const BASIC_MOVEMENT_ACTIONS = [movement, shift]
-export const BASIC_ATTACK_ACTIONS = [magic_melee_misile]
+export const BASIC_ATTACK_ACTIONS = [melee_basic_attack]
