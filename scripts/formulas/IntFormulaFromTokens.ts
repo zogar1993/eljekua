@@ -1,9 +1,8 @@
-import {Creature} from "battlegrid/BattleGrid";
 import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 import {get_random_number} from "randomness/dice";
 import {KeywordToken, Token} from "tokenizer/tokenize";
 import {assert} from "assert";
-
+import {Creature} from "battlegrid/creatures/Creature";
 
 export class IntFormulaFromTokens {
     private readonly player_control: PlayerTurnHandler

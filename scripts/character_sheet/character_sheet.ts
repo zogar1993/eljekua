@@ -1,5 +1,5 @@
-import {Creature} from "battlegrid/BattleGrid";
 import {ResolvedNumberValue} from "formulas/IntFormulaFromTokens";
+import {Creature} from "battlegrid/creatures/Creature";
 
 const resolve_half_level = ({creature}: { creature: Creature }): ResolvedNumberValue => ({
     value: Math.floor(creature.data.level / 2),
