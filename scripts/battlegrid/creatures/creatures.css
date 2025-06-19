@@ -77,3 +77,15 @@
         opacity: 0
     }
 }
+
+.hit-chance {
+    position: absolute;
+    background-color: white;
+    padding: 4px;
+    left: 100%;
+    width: 100px;
+}
+
+.board__square:not(:hover) .hit-chance {
+    display: none;
+}

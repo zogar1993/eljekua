@@ -5,6 +5,7 @@ import {Position} from "./Position";
 export class BattleGrid {
     private BOARD_HEIGHT = 10
     private BOARD_WIDTH = 10
+    private creatures: Array<Creature> = []
 
     board: Array<Array<Square>>
     visual_creature_creator: VisualCreatureCreator
@@ -26,6 +27,8 @@ export class BattleGrid {
             }
         )
     }
+
+    get_all_creatures = () => this.creatures;
 
     * get_area_burst({origin, radius}: { origin: Position, radius: number }) {
         const lower_x = Math.max(0, origin.x - radius)
@@ -62,7 +65,6 @@ export class BattleGrid {
             }
     }
 
-    private creatures: Array<Creature> = []
 
     place_character({position, creature}: { position: Position, creature: Creature }) {
         creature.move_to(position)
@@ -128,5 +130,13 @@ export class Creature {
 
     display_miss() {
         this.visual.display_miss()
+    }
+
+    display_hit_chance_on_hover = ({attack, defense, chance}: { attack: number, defense: number, chance: number }) => {
+        this.visual.display_hit_chance_on_hover({attack, defense, chance})
+    }
+
+    remove_hit_chance_on_hover = () => {
+        this.visual.remove_hit_chance_on_hover()
     }
 }

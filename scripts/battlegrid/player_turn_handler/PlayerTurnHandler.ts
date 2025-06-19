@@ -170,11 +170,27 @@ export class PlayerTurnHandler {
                             throw Error("action not implemented " + consequence.type)
                         }
                     })
+                this.battle_grid.get_all_creatures().forEach(creature => creature.remove_hit_chance_on_hover())
             }
             this.set_available_targets({squares: valid_targets, onClick})
 
+            if (action.attack) {
+                valid_targets.forEach(square => {
+                    const owner = this.get_selected_creature()
+                    const target = this.battle_grid.get_creature_by_position(square.position)
+
+                    const attack = add_all_resolved_number_values(get_attack({creature: owner, attribute_code: "str"}))
+                    const defense = add_all_resolved_number_values(get_defense({creature: target, defense_code: "ac"}))
+                    const chance = (attack + 20 - defense + 1) * 5
+
+                    target.display_hit_chance_on_hover({attack, defense, chance})
+                    //TODO remove the hover
+                })
+            }
+
             this.clear_actions_menu()
         })
+
         button.innerText = action.name
         return button
     }

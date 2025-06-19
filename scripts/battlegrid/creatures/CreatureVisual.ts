@@ -4,6 +4,8 @@ export type CreatureVisual = {
     place_at: (position: Position) => void
     receive_damage: ({hp, damage}: {hp: number, damage: number}) => void
     display_miss: () => void
+    display_hit_chance_on_hover: ({attack, defense, chance}: {attack: number, defense: number, chance: number}) => void
+    remove_hit_chance_on_hover: () => void
 }
 
 export class VisualCreatureCreator {
@@ -57,6 +59,16 @@ export class VisualCreatureCreator {
                 creature.appendChild(fading_miss)
 
                 setTimeout(() => fading_miss.remove(), FADING_TEXT_ANIMATION_DURATION)
+            },
+            display_hit_chance_on_hover: ({attack, defense, chance}) => {
+                const hit_chance = document.createElement("div")
+                hit_chance.classList.add("hit-chance")
+                hit_chance.textContent = `${attack} vs ${defense}: %${chance}`
+                creature.appendChild(hit_chance)
+            },
+            remove_hit_chance_on_hover: () => {
+                const hit_chance = creature.querySelector(".hit-chance")
+                hit_chance?.remove()
             }
         }
     }
