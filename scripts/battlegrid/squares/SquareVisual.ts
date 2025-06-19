@@ -1,14 +1,12 @@
-import {Position} from "battlegrid/Position";
+import {OnPositionClick} from "battlegrid/Position";
 
 export type SquareVisual = {
     clearIndicator: () => void
     setIndicator: (value: "selected" | "available-target") => void
 }
 
-export type OnSquareClick = (params: { position: Position, visual_square: SquareVisual }) => void
-
 export class VisualSquareCreator {
-    onSquareClickHandlers: Array<OnSquareClick> = []
+    onSquareClickHandlers: Array<OnPositionClick> = []
 
     create({x, y}: { x: number, y: number }) {
         const html_board = document.querySelector(".board")!
@@ -22,13 +20,13 @@ export class VisualSquareCreator {
         }
 
         html_square.addEventListener("click", () => this.onSquareClickHandlers.forEach(
-            handler => handler({visual_square, position: {x, y}})
+            handler => handler({position: {x, y}})
         ))
 
         return visual_square
     }
 
-    addOnSquareClickEvent = (onSquareClick: OnSquareClick) => {
-        this.onSquareClickHandlers.push(onSquareClick)
+    addOnSquareClickEvent = (onClick: OnPositionClick) => {
+        this.onSquareClickHandlers.push(onClick)
     }
 }

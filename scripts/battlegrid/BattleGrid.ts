@@ -1,6 +1,8 @@
 import {SquareVisual, VisualSquareCreator} from "battlegrid/squares/SquareVisual";
 import {CreatureVisual, VisualCreatureCreator} from "./creatures/CreatureVisual";
 import {Position} from "./Position";
+import {CreatureData} from "battlegrid/creatures/CreatureData";
+import {Creature} from "battlegrid/creatures/Creature";
 
 export class BattleGrid {
     private BOARD_HEIGHT = 10
@@ -71,21 +73,17 @@ export class BattleGrid {
     }
 
     get_creature_by_position(position: Position): Creature {
-        const creature = this.creatures.find(c => c.position.x === position.x && c.position.y === position.y)
+        const creature = this.creatures.find(c => c.data.position.x === position.x && c.data.position.y === position.y)
         if (!creature) throw Error(`creature not found for cell ${position}`)
         return creature
     }
 
     is_terrain_occupied(position: Position) {
-        return this.creatures.some(c => c.position.x === position.x && c.position.y === position.y)
+        return this.creatures.some(c => c.data.position.x === position.x && c.data.position.y === position.y)
     }
 
-    create_creature(data: CreatureData) {
-        const visual = this.visual_creature_creator.create({
-            image: data.image,
-            hp: {current: data.hp, max: data.max_hp},
-            position: data.position
-        })
+    create_creature = (data: CreatureData) => {
+        const visual = this.visual_creature_creator.create(data)
         const creature = new Creature({data, visual})
         this.creatures.push(creature)
     }
@@ -94,49 +92,4 @@ export class BattleGrid {
 export type Square = {
     visual: SquareVisual,
     position: Position
-}
-
-export type CreatureData = {
-    name: string
-    level: number
-    attributes: Record<"str" | "con" | "dex" | "int" | "wis" | "cha", number>
-    position: Position
-    image: string
-    movement: number
-    hp: number
-    max_hp: number
-}
-
-export class Creature {
-    private visual: CreatureVisual
-    position: Position
-    data: CreatureData
-
-    constructor({data, visual}: { data: CreatureData, visual: CreatureVisual }) {
-        this.data = data
-        this.visual = visual
-        this.position = data.position
-    }
-
-    move_to(position: Position) {
-        this.position = position
-        this.visual.place_at(position)
-    }
-
-    receive_damage(value: number) {
-        this.data.hp -= value
-        this.visual.receive_damage({hp: this.data.hp, damage: value})
-    }
-
-    display_miss() {
-        this.visual.display_miss()
-    }
-
-    display_hit_chance_on_hover = ({attack, defense, chance}: { attack: number, defense: number, chance: number }) => {
-        this.visual.display_hit_chance_on_hover({attack, defense, chance})
-    }
-
-    remove_hit_chance_on_hover = () => {
-        this.visual.remove_hit_chance_on_hover()
-    }
 }

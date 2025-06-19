@@ -15,8 +15,6 @@
     padding-bottom: 4px;
 
     transition: 1000ms top, 1000ms left;
-
-    pointer-events: none;
 }
 
 .creature__image {

@@ -1,4 +1,4 @@
-import {BattleGrid, Creature, Square} from "battlegrid/BattleGrid";
+import {BattleGrid, Square} from "battlegrid/BattleGrid";
 import {Position} from "battlegrid/Position";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "powers/basic";
 import {Power} from "types";
@@ -9,7 +9,8 @@ import {
     resolve_all_unresolved_number_values
 } from "formulas/IntFormulaFromTokens";
 import {roll_d} from "randomness/dice";
-import {get_attack, get_defense} from "../../character_sheet/character_sheet";
+import {Creature} from "battlegrid/creatures/Creature";
+import {get_attack, get_defense} from "character_sheet/character_sheet";
 
 export class PlayerTurnHandler {
     private action_log: ActionLog
@@ -24,7 +25,7 @@ export class PlayerTurnHandler {
 
     select(creature: Creature) {
         this.selected = creature
-        const cell = this.battle_grid.get_square(creature.position)
+        const cell = this.battle_grid.get_square(creature.data.position)
         cell.visual.setIndicator("selected")
         this.build_actions_menu()
     }
@@ -35,7 +36,7 @@ export class PlayerTurnHandler {
     }
 
     deselect() {
-        const square = this.battle_grid.get_square(this.get_selected_creature().position)
+        const square = this.battle_grid.get_square(this.get_selected_creature().data.position)
         square.visual.clearIndicator()
         this.selected = null
 
@@ -114,7 +115,7 @@ export class PlayerTurnHandler {
 
         const valid_targets = [...this.get_in_range({
             targeting: action.targeting,
-            origin: this.get_selected_creature().position
+            origin: this.get_selected_creature().data.position
         })]
             .filter(square => this.filter_targets({
                 targeting: action.targeting,
