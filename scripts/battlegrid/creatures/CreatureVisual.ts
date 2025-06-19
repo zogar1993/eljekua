@@ -66,7 +66,7 @@ export class VisualCreatureCreator {
             display_hit_chance_on_hover: ({attack, defense, chance}: {attack: number, defense: number, chance: number}) => {
                 const hit_chance = document.createElement("div")
                 hit_chance.classList.add("hit-chance")
-                hit_chance.textContent = `${attack} vs ${defense}: %${chance}`
+                hit_chance.textContent = `${attack} vs ${defense}: ${chance}%`
                 html_creature.appendChild(hit_chance)
             },
             remove_hit_chance_on_hover: () => {
