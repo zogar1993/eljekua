@@ -1,5 +1,5 @@
 import type {Power} from "types.ts";
-import {tokenize} from "formulas/tokenize";
+import {tokenize} from "tokenizer/tokenize";
 
 const shift: Power = {
     name: "Shift",
@@ -60,8 +60,8 @@ const melee_basic_attack: Power = {
         amount: 1
     },
     attack: {
-        attack: "strength_mod",
-        defense: "ac",
+        attack: "str",
+        defense_code: "ac",
     },
     hit: [
         {

@@ -1,4 +1,4 @@
-import {Token} from "formulas/tokenize";
+import {Token} from "tokenizer/tokenize";
 
 export type Power = {
     name: string,
@@ -20,7 +20,7 @@ export type Power = {
         amount: 1
     },
     attack?: {
-        attack: "strength_mod",
+        attack: "str",
         defense: "ac",
     }
     hit?: Array<

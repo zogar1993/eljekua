@@ -3,6 +3,7 @@ import {Position} from "battlegrid/Position";
 export type CreatureVisual = {
     place_at: (position: Position) => void
     receive_damage: ({hp, damage}: {hp: number, damage: number}) => void
+    display_miss: () => void
 }
 
 export class VisualCreatureCreator {
@@ -21,7 +22,7 @@ export class VisualCreatureCreator {
         creature.style.setProperty("--creature__lifebar_max-hp", `${hp.max}`)
         creature.style.setProperty("--creature__lifebar_current-hp", `${hp.current}`)
 
-        creature.style.setProperty("--fading-number_animation-duration", `${FADING_NUMBER_ANIMATION_DURATION}ms`)
+        creature.style.setProperty("--fading-text_animation-duration", `${FADING_TEXT_ANIMATION_DURATION}ms`)
 
         const sprite = document.createElement("div")
         sprite.classList.add("creature__image")
@@ -44,13 +45,21 @@ export class VisualCreatureCreator {
 
                 const fading_number = document.createElement("div")
                 fading_number.classList.add("fading-number")
-                creature.appendChild(fading_number)
                 fading_number.textContent = `${damage}`
+                creature.appendChild(fading_number)
 
-                setTimeout(() => fading_number.remove(), FADING_NUMBER_ANIMATION_DURATION)
+                setTimeout(() => fading_number.remove(), FADING_TEXT_ANIMATION_DURATION)
+            },
+            display_miss: () => {
+                const fading_miss = document.createElement("div")
+                fading_miss.classList.add("fading-miss")
+                fading_miss.textContent = `miss`
+                creature.appendChild(fading_miss)
+
+                setTimeout(() => fading_miss.remove(), FADING_TEXT_ANIMATION_DURATION)
             }
         }
     }
 }
 
-const FADING_NUMBER_ANIMATION_DURATION = 1500
+const FADING_TEXT_ANIMATION_DURATION = 1500

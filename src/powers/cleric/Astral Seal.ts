@@ -17,7 +17,7 @@ export const power: Power = {
         {
             type: "attack",
             attack: "wisdom_mod + 2",
-            defense: "reflex",
+            defense_code: "reflex",
             hit: [
                 {
                     type: "apply_condition",

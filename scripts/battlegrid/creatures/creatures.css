@@ -47,13 +47,21 @@
 
 .fading-number {
     position: absolute;
-    animation: fading-number-animation var(--fading-number_animation-duration) forwards;
+    animation: fading-text-animation var(--fading-text_animation-duration) forwards;
     font-weight: bold;
     font-size: 1.5rem;
     color: crimson;
 }
 
-@keyframes fading-number-animation {
+.fading-miss {
+    position: absolute;
+    animation: fading-text-animation var(--fading-text_animation-duration) forwards;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: darkgrey;
+}
+
+@keyframes fading-text-animation {
     from {
         top: 0;
         opacity: 1

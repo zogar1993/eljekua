@@ -1,0 +1,21 @@
+.action-log__value {
+    position: relative;
+    font-weight: bold;
+    color: dodgerblue;
+    text-decoration-line: underline;
+}
+
+.action-log__value:not(:hover) .action-log-details {
+    display: none;
+}
+
+.action-log-details {
+    top: 100%;
+    left: 0;
+    background-color: white;
+    padding: 4px;
+    border: 1px black solid;
+    position: absolute;
+    width: 100px;
+    z-index: 1;
+}

@@ -2,9 +2,14 @@ import {BattleGrid, Creature, Square} from "battlegrid/BattleGrid";
 import {Position} from "battlegrid/Position";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "powers/basic";
 import {Power} from "types";
-import {KeywordToken, Token} from "formulas/tokenize";
-import {assert} from "assert";
 import {ActionLog} from "action_log/ActionLog";
+import {
+    add_all_resolved_number_values,
+    IntFormulaFromTokens,
+    resolve_all_unresolved_number_values
+} from "formulas/IntFormulaFromTokens";
+import {roll_d} from "randomness/dice";
+import {get_attack, get_defense} from "../../character_sheet/character_sheet";
 
 export class PlayerTurnHandler {
     private action_log: ActionLog
@@ -128,25 +133,31 @@ export class PlayerTurnHandler {
 
         button.addEventListener("click", () => {
             const onClick = (position: Position) => {
-                if (action.hit) {
-                    action.hit.forEach(consequence => {
-                        if (["move", "shift"].includes(consequence.type)) {
-                            const creature = this.get_selected_creature()
-                            this.deselect()
+                if (action.attack && action.hit) {
+                    const owner = this.get_selected_creature()
+                    const target = this.battle_grid.get_creature_by_position(position)
+                    this.deselect()
 
-                            this.battle_grid.place_character({creature, position})
-                        } else if ("apply_damage" === consequence.type) {
-                            const creature = this.get_selected_creature()
-                            this.deselect()
+                    const d20_result = roll_d(20)
 
-                            const target = this.battle_grid.get_creature_by_position(position)
-                            const resolved = resolve_all_unresolved_number_values(new IntFormulaFromTokens(consequence.value, this).get_all_number_values())
-                            target.receive_damage(add_all_resolved_number_values(resolved))
-                            this.action_log.add_new_action_log(`${target.data.name} was hit ${add_all_resolved_number_values(resolved)} by ${creature.data.name}`)
-                        } else {
-                            throw Error("action not implemented " + consequence.type)
-                        }
-                    })
+                    const attack = [...get_attack({creature: owner, attribute_code: "str"}), d20_result]
+                    const defense = get_defense({creature: target, defense_code: "ac"})
+                    const is_hit = add_all_resolved_number_values(attack) >= add_all_resolved_number_values(defense)
+
+                    this.action_log.add_new_action_log(`${owner.data.name}'s ${action.name} (`, attack, `) ${is_hit ? "hits" : "misses"} against ${target.data.name}'s AC (`, defense, `).`)
+
+                    if (is_hit)
+                        action.hit.forEach(consequence => {
+                            if ("apply_damage" === consequence.type) {
+                                const resolved = resolve_all_unresolved_number_values(new IntFormulaFromTokens(consequence.value, this).get_all_number_values())
+                                target.receive_damage(add_all_resolved_number_values(resolved))
+                                this.action_log.add_new_action_log(`${target.data.name} was dealt `, resolved, ` damage.`)
+                            } else {
+                                throw Error("action not implemented " + consequence.type)
+                            }
+                        })
+                    else
+                        target.display_miss()
                 }
                 if (action.effect)
                     action.effect.forEach(consequence => {
@@ -167,8 +178,6 @@ export class PlayerTurnHandler {
         button.innerText = action.name
         return button
     }
-
-
 }
 
 class AvailableTargets {
@@ -197,77 +206,6 @@ class AvailableTargets {
     }
 }
 
-class IntFormulaFromTokens {
-    private readonly player_control: PlayerTurnHandler
-    private readonly number_values: Array<NumberValue>
-
-    constructor(tokens: Array<Token>, player_control: PlayerTurnHandler) {
-        this.player_control = player_control
-        this.number_values = tokens.map(this.parse_token)
-    }
-
-    parse_token = (token: Token) => {
-        if (token.type === "number") return {value: token.value}
-        if (token.type === "keyword") return {value: this.parse_keyword_token(token)}
-        if (token.type === "dice") return {min: 1, max: token.faces}
-        throw Error(`token type invalid: ${token}`)
-    }
-
-    parse_keyword_token = (token: KeywordToken) => {
-        assert(token.type === "keyword", () => `token is not of keword type: ${token}`)
-        const creature = this.parse_keyword(token.value)
-        return this.parse_creature_property(creature, token.property)
-    }
-
-    parse_keyword = (keyword: string) => {
-        if (keyword === "owner") return this.player_control.get_selected_creature()
-        throw Error(`Invalid keyword ${keyword}`)
-    }
-
-    parse_creature_property = (creature: Creature, property: string | undefined) => {
-        if (property === undefined) throw Error(`property can't be undefined here`)
-        if (property === "movement") return creature.data.movement
-        throw Error(`Invalid property ${property}`)
-    }
-
-    get_resolved_number_values = (): Array<ResolvedNumberValue> => {
-        assert(this.number_values.every(x => is_resolved_number_value(x)), () => "found unresolved number values")
-        return this.number_values as Array<ResolvedNumberValue>
-    }
-
-    get_all_number_values = (): Array<NumberValue> => {
-        return this.number_values
-    }
-}
-
-type NumberValue = ResolvedNumberValue | UnresolvedNumberValue
-
-type ResolvedNumberValue = {
-    value: number
-}
-
-type UnresolvedNumberValue = {
-    min: number
-    max: number
-}
-
-const is_resolved_number_value = (value: NumberValue): value is ResolvedNumberValue => value.hasOwnProperty("value")
-
 function add_preview_card_handlers({}) {
 
-}
-
-const add_all_resolved_number_values = (number_values: Array<ResolvedNumberValue>) => {
-    return number_values.reduce((result, x) => x.value + result, 0)
-}
-
-const resolve_all_unresolved_number_values = (number_values: Array<NumberValue>): Array<ResolvedNumberValue> => {
-    return number_values.map(x => is_resolved_number_value(x) ? x : {value: get_random_number(x)})
-}
-
-const get_random_number= ({min, max}: {min: number, max: number}) => {
-    assert(min <= max, () => "min can not be lower than max")
-    const result = Math.floor(Math.random() * (max - min + 1)) + min
-    assert(min <= result && result <= max, () => `result of random needs to be bewteen mind and max, was ${result}`)
-    return result
 }

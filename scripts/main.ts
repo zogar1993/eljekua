@@ -1,4 +1,4 @@
-import {BattleGrid} from "battlegrid/BattleGrid";
+import {BattleGrid, Creature} from "battlegrid/BattleGrid";
 import {VisualSquareCreator} from "battlegrid/squares/SquareVisual";
 import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
 import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
@@ -22,12 +22,6 @@ visual_square_creator.addOnSquareClickEvent(({position}) => {
     }
 })
 
-const bob = {name: "bob", position: {x: 1, y: 2}, image: `url("/public/mech.webp")`, movement: 5, hp: 7, max_hp: 10}
-const maik = {name: "maik", position: {x: 2, y: 5}, image: `url("/public/mech.webp")`, movement: 2, hp: 10, max_hp: 10}
-
-battle_grid.create_creature(bob)
-battle_grid.create_creature(maik)
-
 const ATTRIBUTES = {
     STRENGTH: "str",
     CONSTITUTION: "con",
@@ -37,5 +31,32 @@ const ATTRIBUTES = {
     CHARISMA: "cha",
 } as const
 
+const bob = {
+    name: "Bob",
+    position: {x: 1, y: 2},
+    image: `url("/public/mech.webp")`,
+    movement: 5,
+    hp: 7,
+    max_hp: 10,
+    level: 2,
+    attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"]
+}
+const maik = {
+    name: "Maik",
+    position: {x: 2, y: 5},
+    image: `url("/public/mech.webp")`,
+    movement: 2,
+    hp: 10,
+    max_hp: 10,
+    level: 1,
+    attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"]
+}
+
+battle_grid.create_creature(bob)
+battle_grid.create_creature(maik)
+
 type Attribute = typeof ATTRIBUTES[keyof typeof ATTRIBUTES]
+
+
+
 

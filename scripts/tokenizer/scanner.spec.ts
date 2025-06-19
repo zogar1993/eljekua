@@ -1,4 +1,4 @@
-import {tokenize} from 'formulas/tokenize';
+import {tokenize} from './tokenize';
 
 test('number literal', () => expect(tokenize("0")).toEqual([{type: "number", value: 0}]));
 

@@ -96,6 +96,8 @@ export type Square = {
 
 export type CreatureData = {
     name: string
+    level: number
+    attributes: Record<"str" | "con" | "dex" | "int" | "wis" | "cha", number>
     position: Position
     image: string
     movement: number
@@ -122,5 +124,9 @@ export class Creature {
     receive_damage(value: number) {
         this.data.hp -= value
         this.visual.receive_damage({hp: this.data.hp, damage: value})
+    }
+
+    display_miss() {
+        this.visual.display_miss()
     }
 }

@@ -21,7 +21,7 @@ export const power: Power = {
                 operator: "+",
                 right: 2
             },
-            defense: "reflex",
+            defense_code: "reflex",
             hit: [
                 {
                     type: "apply_condition",
