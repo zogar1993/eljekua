@@ -2,8 +2,8 @@
   "name": "ts-html-app",
   "version": "1.0.0",
   "scripts": {
-    "build": "esbuild main.ts --bundle --outfile=bundle.js --format=esm",
-    "watch": "esbuild main.ts --bundle --outfile=bundle.js --format=esm --watch",
+    "build": "esbuild main.ts --bundle --outfile=dist/bundle.js --format=esm",
+    "watch": "esbuild main.ts --bundle --outfile=dist/bundle.js --format=esm --watch",
     "dev": "concurrently -k \"pnpm:watch\" \"pnpm:start\"",
     "start": "live-server --open=./index.html --watch=./",
     "test": "jest"
