@@ -19,7 +19,7 @@ const shift: Power = {
         {
             type: "shift",
             target: "owner",
-            destination: "target"
+            destination: "primary_target"
         }
     ]
 }
@@ -42,7 +42,7 @@ const movement: Power = {
         {
             type: "move",
             target: "owner",
-            destination: "target"
+            destination: "primary_target"
         }
     ]
 }
@@ -66,8 +66,48 @@ const melee_basic_attack: Power = {
     hit: [
         {
             type: "apply_damage",
-            value: tokenize("d4+owner.str_mod")
+            value: tokenize("[1W]+owner.str_mod")
         }
+    ]
+}
+
+const cleave: Power = {
+    name: "Cleave",
+    description: "You hit one enemy, then cleave into another.",
+    type: {
+        action: "standard",
+        cooldown: "at-will",
+        attack: true,
+    },
+    targeting: {
+        type: "melee",
+        target_type: "enemy",
+        amount: 1
+    },
+    attack: {
+        attack: "str",
+        defense: "ac",
+    },
+    hit: [
+        {
+            type: "select_target",
+            targeting: {
+                type: "adjacent",
+                target_type: "enemy",
+                amount: 1,
+                exclude: ["primary_target"]
+            },
+            target_label: "secondary_target"
+        },
+        {
+            type: "apply_damage",
+            value: tokenize("[1W]+owner.str_mod")
+        },
+        {
+            type: "apply_damage",
+            value: tokenize("owner.str_mod"),
+            target: "secondary_target",
+        },
     ]
 }
 

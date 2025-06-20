@@ -14,8 +14,8 @@ export const tokenize = (text: string): Array<Token> => {
 
         if (is_numeric_character(char))
             result.push(tokenize_number(scanner))
-        else if (char === "d" && is_numeric_character(scanner.peekTwo())) {
-            result.push(tokenize_dice(scanner))
+        else if (char === "[") {
+            result.push(tokenize_roll(scanner))
         } else if (is_non_numeric_character(char))
             result.push(tokenize_text(scanner))
         else
@@ -74,25 +74,41 @@ const tokenize_text = (scanner: Scanner): KeywordToken => {
     return keyword
 }
 
-const tokenize_dice = (scanner: Scanner): DiceToken => {
-    let d = scanner.next()
+const tokenize_roll = (scanner: Scanner): DiceToken | WeaponToken => {
+    assert(scanner.peek() === "[", () => `dice token must start with '[', instead found '${scanner.peek()}'`)
+    scanner.consume()
 
-    assert(d === "d", () => `tokenizing a dice must start with d, found '${d}' instead`)
+    const amount = scanner.next()
 
-    const number = scanner.next() + (is_numeric_character(scanner.peek()) ? scanner.next() : "")
+    assert(is_numeric_character(amount), () => `expected number for amount, instead found '${amount}'`)
 
-    assert(["4", "6", "8", "10", "12", "20"].includes(number), () => `dice value needs to be number in the following options [4, 6, 8, 10, 12, 20], found '${number}'.`)
+    const type = scanner.next()
 
-    const faces = Number(number) as DiceToken["faces"]
+    if (type === "d") {
+        const number = scanner.next() + (is_numeric_character(scanner.peek()) ? scanner.next() : "")
 
-    return {
-        type: "dice",
-        amount: 1,
-        faces,
+        assert(["4", "6", "8", "10", "12", "20"].includes(number), () => `dice value needs to be number in the following options [4, 6, 8, 10, 12, 20], found '${number}'.`)
+        assert(scanner.next() === "]", () => `dice token must start with ']', instead found '${scanner.peek()}'`)
+
+        const faces = Number(number) as DiceToken["faces"]
+
+        return {
+            type: "dice",
+            amount: Number(amount),
+            faces,
+        }
+    } else if (type === "W") {
+        assert(scanner.next() === "]", () => `dice token must start with ']', instead found '${scanner.peek()}'`)
+        return {
+            type: "weapon",
+            amount: Number(amount)
+        }
+    } else {
+        throw Error(`type ${type} not permitted when tokenizing dice`)
     }
 }
 
-export type Token = NumberLiteralToken | KeywordToken | DiceToken
+export type Token = NumberLiteralToken | KeywordToken | DiceToken | WeaponToken
 
 export type NumberLiteralToken = {
     type: "number"
@@ -109,8 +125,14 @@ export type KeywordToken = {
 
 export type DiceToken = {
     type: "dice"
-    amount?: number
+    amount: number
     faces: 4 | 6 | 8 | 10 | 12 | 20
+    negative?: boolean
+}
+
+export type WeaponToken = {
+    type: "weapon"
+    amount: number
     negative?: boolean
 }
 

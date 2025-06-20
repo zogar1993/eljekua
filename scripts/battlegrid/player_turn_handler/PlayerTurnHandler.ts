@@ -51,13 +51,13 @@ export class PlayerTurnHandler {
         })
     }
 
-
     is_available_target = (position: Position) => {
         if (this.available_targets === null) throw Error("available targets are not set")
         return this.available_targets.contains(position)
     }
 
     has_selected_creature = () => !!this.selected
+
     get_selected_creature = () => {
         if (this.selected === null) throw Error("Character cannot be null")
         return this.selected
@@ -135,6 +135,7 @@ export class PlayerTurnHandler {
         button.addEventListener("click", () => {
             const onClick = (position: Position) => {
                 const owner = this.get_selected_creature()
+
                 this.deselect()
 
                 if (action.attack && action.hit) {
@@ -186,7 +187,6 @@ export class PlayerTurnHandler {
                     const chance = (attack + 20 - defense + 1) * 5
 
                     target.display_hit_chance_on_hover({attack, defense, chance})
-                    //TODO remove the hover
                 })
             }
 
