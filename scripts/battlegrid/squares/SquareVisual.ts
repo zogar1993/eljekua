@@ -14,16 +14,14 @@ export class VisualSquareCreator {
         html_square.classList.add("board__square")
         html_board.appendChild(html_square)
 
-        const visual_square = {
-            clearIndicator: () => delete html_square.dataset["indicator"],
-            setIndicator: (value: "selected" | "available-target") => html_square.dataset["indicator"] = value
-        }
-
         html_square.addEventListener("click", () => this.onSquareClickHandlers.forEach(
             handler => handler({position: {x, y}})
         ))
 
-        return visual_square
+        return {
+            clearIndicator: () => delete html_square.dataset["indicator"],
+            setIndicator: (value: "selected" | "available-target") => html_square.dataset["indicator"] = value
+        }
     }
 
     addOnSquareClickEvent = (onClick: OnPositionClick) => {

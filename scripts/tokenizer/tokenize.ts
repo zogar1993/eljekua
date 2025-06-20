@@ -34,12 +34,12 @@ export const tokenize = (text: string): Array<Token> => {
 }
 
 const is_numeric_character = (char: string) => /^\d$/.test(char)
-const is_non_numeric_character = (char: string) => /^[a-z.]$/.test(char)
-const is_alpha_character = (char: string) => /^[a-z]$/.test(char)
+const is_non_numeric_character = (char: string) => /^[(a-z._]$/.test(char)
+const is_alpha_character = (char: string) => /^[a-z_]$/.test(char)
 const is_binary_operator = (char: string) => ["+", "-"].includes(char)
 
 const is_numeric_token = (char: string) => /^\d+$/.test(char)
-const is_non_numeric_token = (char: string) => /^[a-z]+$/.test(char)
+const is_non_numeric_token = (char: string) => /^[a-z_]+$/.test(char)
 
 const tokenize_number = (scanner: Scanner): NumberLiteralToken => {
     let value = scanner.next()

@@ -61,12 +61,12 @@ const melee_basic_attack: Power = {
     },
     attack: {
         attack: "str",
-        defense_code: "ac",
+        defense: "ac",
     },
     hit: [
         {
             type: "apply_damage",
-            value: tokenize("d4")
+            value: tokenize("d4+owner.str_mod")
         }
     ]
 }

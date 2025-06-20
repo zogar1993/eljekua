@@ -89,7 +89,7 @@ export class PlayerTurnHandler {
 
     get_in_range({targeting, origin}: { targeting: Power["targeting"], origin: Position }) {
         if (targeting.type === "movement") {
-            const distance = new IntFormulaFromTokens(targeting.distance, this).get_resolved_number_values()
+            const distance = new IntFormulaFromTokens(targeting.distance, this.get_selected_creature()).get_resolved_number_values()
             return this.battle_grid.get_move_area({
                 origin,
                 distance: add_all_resolved_number_values(distance)
@@ -134,10 +134,11 @@ export class PlayerTurnHandler {
 
         button.addEventListener("click", () => {
             const onClick = (position: Position) => {
+                const owner = this.get_selected_creature()
+                this.deselect()
+
                 if (action.attack && action.hit) {
-                    const owner = this.get_selected_creature()
                     const target = this.battle_grid.get_creature_by_position(position)
-                    this.deselect()
 
                     const d20_result = roll_d(20)
 
@@ -150,7 +151,7 @@ export class PlayerTurnHandler {
                     if (is_hit)
                         action.hit.forEach(consequence => {
                             if ("apply_damage" === consequence.type) {
-                                const resolved = resolve_all_unresolved_number_values(new IntFormulaFromTokens(consequence.value, this).get_all_number_values())
+                                const resolved = resolve_all_unresolved_number_values(new IntFormulaFromTokens(consequence.value, owner).get_all_number_values())
                                 target.receive_damage(add_all_resolved_number_values(resolved))
                                 this.action_log.add_new_action_log(`${target.data.name} was dealt `, resolved, ` damage.`)
                             } else {
@@ -163,14 +164,14 @@ export class PlayerTurnHandler {
                 if (action.effect)
                     action.effect.forEach(consequence => {
                         if (["move", "shift"].includes(consequence.type)) {
-                            const creature = this.get_selected_creature()
-                            this.deselect()
 
-                            this.battle_grid.place_character({creature, position})
+                            this.battle_grid.place_character({creature: owner, position})
                         } else {
                             throw Error("action not implemented " + consequence.type)
                         }
                     })
+
+                //TODO can be better
                 this.battle_grid.get_all_creatures().forEach(creature => creature.remove_hit_chance_on_hover())
             }
             this.set_available_targets({squares: valid_targets, onClick})

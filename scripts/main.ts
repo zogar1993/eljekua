@@ -3,7 +3,7 @@ import {VisualSquareCreator} from "battlegrid/squares/SquareVisual";
 import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
 import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 import {ActionLog} from "action_log/ActionLog";
-import {OnPositionClick, Position} from "battlegrid/Position";
+import {OnPositionClick} from "battlegrid/Position";
 import {Creature} from "battlegrid/creatures/Creature";
 
 const visual_square_creator = new VisualSquareCreator()
@@ -12,7 +12,7 @@ const action_log = new ActionLog()
 const battle_grid = new BattleGrid({visual_square_creator, visual_creature_creator})
 const player_turn_handler = new PlayerTurnHandler(battle_grid, action_log)
 
-const onClick: OnPositionClick = ({position}: {position: Position}) => {
+const onClick: OnPositionClick = ({position}) => {
     if (player_turn_handler.has_selected_creature()) {
         if (player_turn_handler.is_available_target(position))
             player_turn_handler.target(position)
