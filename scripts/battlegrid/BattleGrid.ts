@@ -68,7 +68,7 @@ export class BattleGrid {
     }
 
 
-    place_character({position, creature}: { position: Position, creature: Creature }) {
+    place_creature({position, creature}: { position: Position, creature: Creature }) {
         creature.move_to(position)
     }
 

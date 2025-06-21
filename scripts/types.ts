@@ -12,8 +12,8 @@ export type Power = {
     attack?: {
         attack: "str"
         defense: "ac"
+        hit: Array<Effect>
     }
-    hit?: Array<Effect>
     effect?: Array<Effect>
 }
 
@@ -34,7 +34,7 @@ type Effect =
     {
         type: "apply_damage"
         value: Array<Token>
-        target?: string
+        target: string
     } |
     {
         type: "select_target"

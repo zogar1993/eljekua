@@ -62,13 +62,14 @@ const melee_basic_attack: Power = {
     attack: {
         attack: "str",
         defense: "ac",
+        hit: [
+            {
+                type: "apply_damage",
+                value: tokenize("[1W]+owner.str_mod"),
+                target: "primary_target"
+            }
+        ]
     },
-    hit: [
-        {
-            type: "apply_damage",
-            value: tokenize("[1W]+owner.str_mod")
-        }
-    ]
 }
 
 const cleave: Power = {
@@ -87,28 +88,30 @@ const cleave: Power = {
     attack: {
         attack: "str",
         defense: "ac",
-    },
-    hit: [
-        {
-            type: "select_target",
-            targeting: {
-                type: "adjacent",
-                target_type: "enemy",
-                amount: 1,
-                exclude: ["primary_target"]
+        hit: [
+            {
+                type: "select_target",
+                targeting: {
+                    type: "adjacent",
+                    target_type: "enemy",
+                    amount: 1,
+                    exclude: ["primary_target"]
+                },
+                target_label: "secondary_target"
             },
-            target_label: "secondary_target"
-        },
-        {
-            type: "apply_damage",
-            value: tokenize("[1W]+owner.str_mod")
-        },
-        {
-            type: "apply_damage",
-            value: tokenize("owner.str_mod"),
-            target: "secondary_target",
-        },
-    ]
+            {
+                type: "apply_damage",
+                value: tokenize("[1W]+owner.str_mod"),
+                target: "primary_target"
+            },
+            {
+                type: "apply_damage",
+                value: tokenize("owner.str_mod"),
+                target: "secondary_target",
+                condition: "secondary_target",
+            },
+        ]
+    },
 }
 
 export const BASIC_MOVEMENT_ACTIONS = [movement, shift]

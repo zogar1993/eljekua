@@ -134,41 +134,81 @@ export class PlayerTurnHandler {
 
         button.addEventListener("click", () => {
             const onClick = (position: Position) => {
-                const owner = this.get_selected_creature()
+                const context = new ActivePowerContext()
+                context.set_variable({name: "owner", value: this.get_selected_creature(), type: "creature"})
+                if (action.targeting.target_type === "terrain")
+                    context.set_variable({name: "primary_target", value: position, type: "position"})
+                else
+                    context.set_variable({
+                        name: "primary_target",
+                        value: this.battle_grid.get_creature_by_position(position),
+                        type: "creature"
+                    })
 
                 this.deselect()
 
-                if (action.attack && action.hit) {
-                    const target = this.battle_grid.get_creature_by_position(position)
+
+                if (action.attack) {
 
                     const d20_result = roll_d(20)
 
-                    const attack = [...get_attack({creature: owner, attribute_code: "str"}), d20_result]
-                    const defense = get_defense({creature: target, defense_code: "ac"})
+                    const attacker = context.get_creature("owner")
+                    const defender = context.get_creature("primary_target")
+
+                    const attack = [...get_attack({
+                        creature: attacker,
+                        attribute_code: action.attack.attack
+                    }), d20_result]
+                    const defense = get_defense({creature: defender, defense_code: action.attack.defense})
                     const is_hit = add_all_resolved_number_values(attack) >= add_all_resolved_number_values(defense)
 
-                    this.action_log.add_new_action_log(`${owner.data.name}'s ${action.name} (`, attack, `) ${is_hit ? "hits" : "misses"} against ${target.data.name}'s AC (`, defense, `).`)
+                    this.action_log.add_new_action_log(`${attacker.data.name}'s ${action.name} (`, attack, `) ${is_hit ? "hits" : "misses"} against ${defender.data.name}'s AC (`, defense, `).`)
 
-                    if (is_hit)
-                        action.hit.forEach(consequence => {
-                            if ("apply_damage" === consequence.type) {
-                                const resolved = resolve_all_unresolved_number_values(new IntFormulaFromTokens(consequence.value, owner).get_all_number_values())
-                                target.receive_damage(add_all_resolved_number_values(resolved))
-                                this.action_log.add_new_action_log(`${target.data.name} was dealt `, resolved, ` damage.`)
-                            } else {
-                                throw Error("action not implemented " + consequence.type)
+                    if (is_hit) {
+                        action.attack.hit.forEach(consequence => {
+                            switch (consequence.type) {
+                                case "apply_damage": {
+                                    const target = context.get_creature(consequence.target)
+                                    const resolved = resolve_all_unresolved_number_values(new IntFormulaFromTokens(consequence.value, attacker).get_all_number_values())
+                                    target.receive_damage(add_all_resolved_number_values(resolved))
+                                    this.action_log.add_new_action_log(`${target.data.name} was dealt `, resolved, ` damage.`)
+                                    break
+                                }
+                                case "select_target": {
+
+
+                                    this.set_available_targets({squares: valid_targets, onClick})
+                                    break
+                                }
+                                default:
+                                    throw Error("action not implemented " + consequence.type)
                             }
                         })
-                    else
-                        target.display_miss()
+
+                    } else
+                        defender.display_miss()
                 }
                 if (action.effect)
                     action.effect.forEach(consequence => {
+                        switch (consequence.type) {
+                            case "move": {
+                                const creature = context.get_creature(consequence.target)
+                                const destination = context.get_position(consequence.destination)
+                                this.battle_grid.place_creature({creature, position: destination})
+                                break
+                            }
+                            case "shift": {
+                                const creature = context.get_creature(consequence.target)
+                                const destination = context.get_position(consequence.destination)
+                                this.battle_grid.place_creature({creature, position: destination})
+                                break
+                            }
+                            default:
+                                throw Error("action not implemented " + consequence.type)
+                        }
                         if (["move", "shift"].includes(consequence.type)) {
-
-                            this.battle_grid.place_character({creature: owner, position})
                         } else {
-                            throw Error("action not implemented " + consequence.type)
+
                         }
                     })
 
@@ -221,6 +261,31 @@ class AvailableTargets {
 
     contains(position: Position) {
         return this.squares.some(({position: {x, y}}) => position.x === x && position.y === y)
+    }
+}
+
+type ActivePowerVariable =
+    { type: "creature", value: Creature } |
+    { type: "position", value: Position }
+
+class ActivePowerContext {
+    private variables: Map<string, ActivePowerVariable> = new Map()
+    set_variable = ({name, ...variable}: { name: string } & ActivePowerVariable) => {
+        this.variables.set(name, variable)
+    }
+
+    get_creature = (name: string): Creature => {
+        const variable = this.variables.get(name)
+        if (!variable) throw Error(`variable ${name} not found in context`)
+        if (variable.type !== "creature") throw Error(`variable ${name} expected to be a 'creature', but its a '${variable.type}'`)
+        return variable.value
+    }
+
+    get_position = (name: string): Position => {
+        const variable = this.variables.get(name)
+        if (!variable) throw Error(`variable ${name} not found in context`)
+        if (variable.type !== "position") throw Error(`variable ${name} expected to be a 'position', but its a '${variable.type}'`)
+        return variable.value
     }
 }
 
