@@ -1,5 +1,3 @@
-import {Token} from "tokenizer/tokenize";
-
 export type Power = {
     name: string
     description?: string
@@ -9,31 +7,29 @@ export type Power = {
         attack: boolean
     }
     targeting: Targeting,
-    attack?: {
+    roll?: {
         attack: "str"
         defense: "ac"
-        hit: Array<Effect>
+        hit: Array<IRConsequence>
     }
-    effect?: Array<Effect>
+    effect?: Array<IRConsequence>
 }
 
 type Targeting = {
-    type: "movement",
-    distance: Array<Token>,
     target_type: "terrain" | "enemy"
     terrain_prerequisite?: "unoccupied"
     amount: 1
+} & ({
+    type: "melee weapon" | "adjacent",
 } | {
-    type: "melee",
-    target_type: "terrain" | "enemy"
-    terrain_prerequisite?: "unoccupied"
-    amount: 1
-}
+    type: "movement"
+    distance: string,
+})
 
-type Effect =
+export type IRConsequence =
     {
         type: "apply_damage"
-        value: Array<Token>
+        value: string
         target: string
     } |
     {
@@ -42,7 +38,7 @@ type Effect =
             type: "adjacent"
             target_type: "enemy"
             amount: 1,
-            exclude: ["primary_target"]
+            exclude?: ["primary_target"]
         },
         target_label: "secondary_target"
     } |

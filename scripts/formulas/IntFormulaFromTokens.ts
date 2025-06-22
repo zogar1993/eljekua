@@ -2,13 +2,14 @@ import {get_random_number} from "randomness/dice";
 import {KeywordToken, Token} from "tokenizer/tokenize";
 import {assert} from "assert";
 import {Creature} from "battlegrid/creatures/Creature";
+import {ActivePowerContext} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 
 export class IntFormulaFromTokens {
     private readonly owner: Creature
     private readonly number_values: Array<NumberValue>
 
-    constructor(tokens: Array<Token>, owner: Creature) {
-        this.owner = owner
+    constructor(tokens: Array<Token>, context: ActivePowerContext) {
+        this.owner = context.get_creature("owner")
         this.number_values = tokens.map(this.parse_token)
     }
 

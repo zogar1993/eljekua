@@ -6,7 +6,7 @@ export const power: Power = {
     level: 1,
     class: "Cleric",
     range: {
-        type: "melee",
+        type: "melee weapon",
         range: 5
     },
     target: {
