@@ -203,39 +203,40 @@ const tide_of_iron = {
                 condition: "owner.size+1>=target.size",
                 consequences_true: [
                     {
-                        type: "option",
+                        type: "question_yes_no",
                         question: "Push?",
-                        answers: [
+                        consequences_yes: [
                             {
-                                text: "Yes",
-                                consequences: [
-                                    {
-                                        type: "save_position",
-                                        target: "primary_target",
-                                        label: "primary_target_original_position"
-                                    },
-                                    {
-                                        type: "push",
-                                        value: 1,
-                                        target: "primary_target"
-                                    },
-                                    {
-                                        type: "condition",
-                                        condition: "primary_target.position!=primary_target_last_position"
-
-                                    }
-                                ]
+                                type: "save_position",
+                                target: "primary_target",
+                                label: "primary_target_original_position"
                             },
                             {
-                                text: "No",
-                                consequences: []
-                            }
+                                type: "push",
+                                value: 1,
+                                target: "primary_target"
+                            },
+                            {
+                                type: "condition",
+                                condition: "primary_target.position!=primary_target_last_position&&$distance(owner.position,primary_target_last_position)==1",
+                                consequences_true: [
+                                    {
+                                        type: "question_yes_no",
+                                        question: "Follow?",
+                                        consequences_yes: [
+                                            {
+                                                type: "shift",
+                                                target: "owner",
+                                                destination: "primary_target_last_position"
+                                            }
+                                        ]
+                                    },
+                                ]
+                            },
                         ]
-//                "and you can push the target 1 square if it is no larger than one size category larger than you. You can then shift 1 square into the space that the target left."
                     }
                 ]
             },
-
         ],
     },
 }
@@ -380,4 +381,4 @@ const transform_generic_consequence = (consequence: IRConsequence): Consequence 
 }
 
 export const BASIC_MOVEMENT_ACTIONS = [movement, shift].map(transform_power_ir_into_vm_representation)
-export const BASIC_ATTACK_ACTIONS = [melee_basic_attack].map(transform_power_ir_into_vm_representation)
+export const BASIC_ATTACK_ACTIONS = [melee_basic_attack, cleave].map(transform_power_ir_into_vm_representation)

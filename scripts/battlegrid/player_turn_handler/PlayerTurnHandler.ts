@@ -33,7 +33,6 @@ export class PlayerTurnHandler {
         this.selected = creature
         const cell = this.battle_grid.get_square(creature.data.position)
         cell.visual.setIndicator("selected")
-        this.build_actions_menu()
     }
 
     target(position: Position) {
@@ -68,7 +67,6 @@ export class PlayerTurnHandler {
         if (this.selected === null) throw Error("Character cannot be null")
         return this.selected
     }
-
 
     build_actions_menu() {
         const cancel = document.createElement("button");
@@ -106,9 +104,11 @@ export class PlayerTurnHandler {
             })
         } else if (targeting.type === "melee weapon") {
             return this.battle_grid.get_melee({origin})
+        } else if (targeting.type === "adjacent") {
+            return this.battle_grid.get_adyacent({origin})
         }
 
-        throw `Range "${targeting}" not supported`
+        throw `Range "${JSON.stringify(targeting)}" not supported`
     }
 
     filter_targets({targeting, position}: { targeting: ConsequenceSelectTarget["targeting"], position: Position }) {
@@ -156,6 +156,7 @@ export class PlayerTurnHandler {
 
                 switch (consequence.type) {
                     case "select_target": {
+                        this.select(context.get_creature("owner"))
                         const valid_targets = [...this.get_in_range({
                             targeting: consequence.targeting,
                             origin: this.get_selected_creature().data.position,
@@ -170,10 +171,10 @@ export class PlayerTurnHandler {
                             this.deselect()
 
                             if (consequence.targeting.target_type === "terrain")
-                                context.set_variable({name: "primary_target", value: position, type: "position"})
+                                context.set_variable({name: consequence.targeting.label, value: position, type: "position"})
                             else
                                 context.set_variable({
-                                    name: "primary_target",
+                                    name: consequence.targeting.label,
                                     value: this.battle_grid.get_creature_by_position(position),
                                     type: "creature"
                                 })
@@ -227,7 +228,6 @@ export class PlayerTurnHandler {
                     default:
                         throw Error("action not implemented " + JSON.stringify(consequence))
                 }
-
             }
         }
 
@@ -236,7 +236,7 @@ export class PlayerTurnHandler {
                 evaluate_consequences()
 
                 //TODO can be better
-                this.battle_grid.get_all_creatures().forEach(creature => creature.remove_hit_chance_on_hover())
+               // this.battle_grid.get_all_creatures().forEach(creature => creature.remove_hit_chance_on_hover())
 
 
                 /* TODO re add chance

@@ -20,6 +20,7 @@ const onClick: OnPositionClick = ({position}) => {
         if (battle_grid.is_terrain_occupied(position)) {
             const creature = battle_grid.get_creature_by_position(position)
             player_turn_handler.select(creature)
+            player_turn_handler.build_actions_menu()
         }
     }
 }
@@ -56,12 +57,19 @@ const maik = {
     level: 1,
     attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"]
 }
+const yeims = {
+    name: "Yeims",
+    position: {x: 2, y: 6},
+    image: `url("/public/mech.webp")`,
+    movement: 2,
+    hp_current: 10,
+    hp_max: 10,
+    level: 1,
+    attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"]
+}
 
 battle_grid.create_creature(bob)
 battle_grid.create_creature(maik)
+battle_grid.create_creature(yeims)
 
 type Attribute = typeof ATTRIBUTES[keyof typeof ATTRIBUTES]
-
-
-
-
