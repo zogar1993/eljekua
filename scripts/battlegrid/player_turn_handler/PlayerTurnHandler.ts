@@ -3,9 +3,6 @@ import {Position} from "battlegrid/Position";
 import {
     BASIC_ATTACK_ACTIONS,
     BASIC_MOVEMENT_ACTIONS,
-    Consequence,
-    ConsequenceSelectTarget,
-    PowerVM
 } from "powers/basic";
 import {ActionLog} from "action_log/ActionLog";
 import {
@@ -17,6 +14,8 @@ import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
 import {get_attack, get_defense} from "character_sheet/character_sheet";
 import {assert} from "assert";
+import {Consequence, ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
+import {resolve_tokens_to_boolean} from "formulas/BooleanFormulaFromTokens";
 
 export class PlayerTurnHandler {
     private action_log: ActionLog
@@ -156,10 +155,9 @@ export class PlayerTurnHandler {
 
                 switch (consequence.type) {
                     case "select_target": {
-                        this.select(context.get_creature("owner"))
                         const valid_targets = [...this.get_in_range({
                             targeting: consequence.targeting,
-                            origin: this.get_selected_creature().data.position,
+                            origin: context.get_creature("owner").data.position,
                             context
                         })]
                             .filter(square => this.filter_targets({
@@ -167,23 +165,39 @@ export class PlayerTurnHandler {
                                 position: square.position
                             }))
 
-                        const onClick = (position: Position) => {
-                            this.deselect()
+                        const excluded = valid_targets.filter(
+                            target => !consequence.targeting.exclude.some(
+                                excluded => context.get_creature(excluded).data.position.x === target.position.x &&
+                                    context.get_creature(excluded).data.position.y === target.position.y
+                            )
+                        )
 
-                            if (consequence.targeting.target_type === "terrain")
-                                context.set_variable({name: consequence.targeting.label, value: position, type: "position"})
-                            else
-                                context.set_variable({
-                                    name: consequence.targeting.label,
-                                    value: this.battle_grid.get_creature_by_position(position),
-                                    type: "creature"
-                                })
+                        if (excluded.length > 0) {
+                            this.select(context.get_creature("owner"))
 
-                            evaluate_consequences()
+                            const onClick = (position: Position) => {
+                                this.deselect()
+
+                                if (consequence.targeting.target_type === "terrain")
+                                    context.set_variable({
+                                        name: consequence.targeting.label,
+                                        value: position,
+                                        type: "position"
+                                    })
+                                else
+                                    context.set_variable({
+                                        name: consequence.targeting.label,
+                                        value: this.battle_grid.get_creature_by_position(position),
+                                        type: "creature"
+                                    })
+
+                                evaluate_consequences()
+                            }
+
+                            this.set_available_targets({squares: excluded, onClick})
+                            return
                         }
-
-                        this.set_available_targets({squares: valid_targets, onClick})
-                        return
+                        break
                     }
                     case "attack_roll": {
                         const d20_result = roll_d(20)
@@ -225,6 +239,12 @@ export class PlayerTurnHandler {
                         this.battle_grid.place_creature({creature, position: destination})
                         break
                     }
+                    case "condition": {
+                        const condition = resolve_tokens_to_boolean({token: consequence.condition, context})
+                        if (condition)
+                            context.add_consequences(consequence.consequences_true)
+                        break
+                    }
                     default:
                         throw Error("action not implemented " + JSON.stringify(consequence))
                 }
@@ -236,7 +256,7 @@ export class PlayerTurnHandler {
                 evaluate_consequences()
 
                 //TODO can be better
-               // this.battle_grid.get_all_creatures().forEach(creature => creature.remove_hit_chance_on_hover())
+                // this.battle_grid.get_all_creatures().forEach(creature => creature.remove_hit_chance_on_hover())
 
 
                 /* TODO re add chance
@@ -326,6 +346,10 @@ export class ActivePowerContext {
 
     has_consequences = (): boolean => {
         return this.consequences.length > 0
+    }
+
+    has_variable = (name: string): boolean => {
+        return this.variables.has(name)
     }
 
     add_consequences = (consequences: Array<Consequence>): void => {

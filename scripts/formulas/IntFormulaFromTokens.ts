@@ -8,9 +8,12 @@ export class IntFormulaFromTokens {
     private readonly owner: Creature
     private readonly number_values: Array<NumberValue>
 
-    constructor(tokens: Array<Token>, context: ActivePowerContext) {
+    constructor(token: Token, context: ActivePowerContext) {
         this.owner = context.get_creature("owner")
-        this.number_values = tokens.map(this.parse_token)
+        if (token.type === "function" && token.name === "sum")
+            this.number_values = token.parameters.map(this.parse_token)
+        else
+            this.number_values = [this.parse_token(token)]
     }
 
     parse_token = (token: Token): NumberValue => {

@@ -1,3 +1,5 @@
+import {Consequence} from "powers/basic";
+
 export type Power = {
     name: string
     description?: string
@@ -46,4 +48,8 @@ export type IRConsequence =
         type: "move" | "shift",
         target: "owner",
         destination: "primary_target"
-    }
+    } | {
+    type: "condition",
+    condition: string,
+    consequences_true: Array<IRConsequence>
+}
