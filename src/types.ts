@@ -65,7 +65,7 @@ type Movement = {
 }
 
 type Melee = {
-    type: "melee weapon"
+    type: "melee_weapon"
 }
 
 type Attribute = "strength" | "constitution" | "dexterity" | "intelligence" | "wisdom" | "charisma"

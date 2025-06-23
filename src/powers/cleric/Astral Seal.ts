@@ -1,7 +1,6 @@
-import type {Power} from "../../types";
 import {ALL_DEFENSES} from "../../types";
 
-export const power: Power = {
+export const power = {
     name: "Astral Seal",
     level: 1,
     class: "Cleric",

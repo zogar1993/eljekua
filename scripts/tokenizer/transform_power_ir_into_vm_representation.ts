@@ -41,7 +41,7 @@ export type ConsequenceSelectTarget = {
         type: "movement"
         distance: Token
     } | {
-        type: "adjacent" | "melee weapon"
+        type: "adjacent" | "melee_weapon"
     }),
 }
 

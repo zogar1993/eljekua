@@ -12,7 +12,7 @@ import {
 } from "formulas/IntFormulaFromTokens";
 import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
-import {get_attack, get_defense} from "character_sheet/character_sheet";
+import {get_defense} from "character_sheet/character_sheet";
 import {assert} from "assert";
 import {Consequence, ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
 import {resolve_tokens_to_boolean} from "formulas/BooleanFormulaFromTokens";
@@ -101,7 +101,7 @@ export class PlayerTurnHandler {
                 origin,
                 distance: add_all_resolved_number_values(distance)
             })
-        } else if (targeting.type === "melee weapon") {
+        } else if (targeting.type === "melee_weapon") {
             return this.battle_grid.get_melee({origin})
         } else if (targeting.type === "adjacent") {
             return this.battle_grid.get_adyacent({origin})

@@ -55,7 +55,7 @@ const melee_basic_attack: Power = {
         attack: true,
     },
     targeting: {
-        type: "melee weapon",
+        type: "melee_weapon",
         target_type: "enemy",
         amount: 1
     },
@@ -81,7 +81,7 @@ const sure_strike: Power = {
         attack: true,
     },
     targeting: {
-        type: "melee weapon",
+        type: "melee_weapon",
         target_type: "enemy",
         amount: 1
     },
@@ -107,7 +107,7 @@ const cleave: Power = {
         attack: true,
     },
     targeting: {
-        type: "melee weapon",
+        type: "melee_weapon",
         target_type: "enemy",
         amount: 1
     },
@@ -154,7 +154,7 @@ const reaping_strike = {
         attack: true,
     },
     targeting: {
-        type: "melee weapon",
+        type: "melee_weapon",
         target_type: "enemy",
         amount: 1
     },
@@ -203,7 +203,7 @@ const tide_of_iron = {
         `$equipped(owner,"shield")`
     ],
     targeting: {
-        type: "melee weapon",
+        type: "melee_weapon",
         target_type: "enemy",
         amount: 1
     },
@@ -258,6 +258,58 @@ const tide_of_iron = {
         ],
     },
 }
+
+const magic_missile = {
+    name: "Magic Missile",
+    type: {
+        action: "standard",
+        cooldown: "at-will",
+        attack: true,
+    },
+    targeting: {
+        type: "ranged",
+        target_type: "creature",
+        amount: 1
+    },
+    effect: [
+        {
+            type: "apply_damage",
+            value: "$sum(2,owner.int_mod)",
+            target: "primary_target",
+            types: "force"
+        }
+    ]
+}
+
+const sly_flourish = {
+    name: "Sly Flourish",
+    type: {
+        action: "standard",
+        cooldown: "at-will",
+        attack: true,
+    },
+    targeting: {
+        type: "melee_or_ranged_weapon",
+        target_type: "creature",
+        amount: 1
+    },
+    roll: {
+        attack: "dex",
+        defense: "ac",
+        hit: [
+            {
+                type: "apply_damage",
+                value: "$sum([1W],owner.dex_mod,owner.cha_mod)",
+                target: "primary_target"
+            },
+        ]
+    },
+}
+
+
+//holy strike
+//furious smash
+//sly flourish
 
 export const BASIC_MOVEMENT_ACTIONS = [movement, shift].map(transform_power_ir_into_vm_representation)
 export const BASIC_ATTACK_ACTIONS = [melee_basic_attack, cleave, sure_strike].map(transform_power_ir_into_vm_representation)

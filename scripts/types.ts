@@ -20,7 +20,7 @@ type Targeting = {
     terrain_prerequisite?: "unoccupied"
     amount: 1
 } & ({
-    type: "melee weapon" | "adjacent",
+    type: "melee_weapon" | "adjacent",
 } | {
     type: "movement"
     distance: string,
