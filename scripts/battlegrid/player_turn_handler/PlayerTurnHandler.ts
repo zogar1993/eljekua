@@ -142,13 +142,6 @@ export class PlayerTurnHandler {
                 button.setAttribute("disabled", "")
         }
 
-        /*
-                const action_preview = document.querySelector("#action_preview")!
-                button.addEventListener("mouseenter", () => {
-                    action_preview.textContent = ""
-                })
-         */
-
         const evaluate_consequences = () => {
             while (context.has_consequences()) {
                 const consequence = context.next_consequence()
@@ -352,8 +345,4 @@ export class ActivePowerContext {
     add_consequences = (consequences: Array<Consequence>): void => {
         this.consequences = [...consequences, ...this.consequences]
     }
-}
-
-function add_preview_card_handlers({}) {
-
 }

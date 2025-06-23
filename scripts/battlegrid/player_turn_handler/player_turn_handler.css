@@ -26,10 +26,3 @@
 #actions_menu button:hover {
     background-color: hotpink;
 }
-
-#action_preview {
-    position: absolute;
-    left: 100%;
-    border: 4px black solid;
-    padding: 4px;
-}
