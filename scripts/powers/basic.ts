@@ -72,7 +72,7 @@ const melee_basic_attack: Power = {
     },
 }
 
-const sure_strike = {
+const sure_strike: Power = {
     name: "Sure Strike",
     description: "You trade power for precision.",
     type: {
@@ -86,7 +86,7 @@ const sure_strike = {
         amount: 1
     },
     roll: {
-        attack: "str+2",
+        attack: "$sum(str,2)",
         defense: "ac",
         hit: [
             {
@@ -260,4 +260,4 @@ const tide_of_iron = {
 }
 
 export const BASIC_MOVEMENT_ACTIONS = [movement, shift].map(transform_power_ir_into_vm_representation)
-export const BASIC_ATTACK_ACTIONS = [melee_basic_attack, cleave].map(transform_power_ir_into_vm_representation)
+export const BASIC_ATTACK_ACTIONS = [melee_basic_attack, cleave, sure_strike].map(transform_power_ir_into_vm_representation)

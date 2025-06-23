@@ -48,7 +48,7 @@ export type ConsequenceSelectTarget = {
 
 export type ConsequenceAttackRoll = {
     type: "attack_roll"
-    attack: "str" | "con" | "dex" | "int" | "wis" | "cha"
+    attack: Token
     defense: string
     hit: Array<Consequence>
 }
@@ -105,11 +105,15 @@ const transform_primary_targeting = (targeting: Power["targeting"]): Consequence
 const transform_roll = (roll: Required<Power>["roll"]): ConsequenceAttackRoll => {
     return {
         type: "attack_roll",
-        attack: roll.attack,
+        attack: tokenize(standardize_roll_attributes(roll.attack)),
         defense: roll.defense,
         hit: roll.hit.map(transform_generic_consequence)
     }
 }
+
+const attributes = ["str", "con", "dex", "int", "wis", "cha"] as const
+const standardize_roll_attributes = (text: string) =>
+    attributes.reduce((text, attribute) => text.replaceAll(attribute, `owner.${attribute}_mod_lvl`), text)
 
 const transform_generic_consequence = (consequence: IRConsequence): Consequence => {
     switch (consequence.type) {

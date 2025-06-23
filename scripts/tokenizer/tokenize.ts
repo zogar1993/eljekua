@@ -6,7 +6,6 @@ export const tokenize = (text: string): Token => {
     const token = tokenize_any(scanner)
     assert(scanner.is_at_end(), () => `expected end of formula but found more text on ${text}`)
     return token
-
 }
 
 const is_numeric_character = (char: string) => /^\d$/.test(char)
@@ -51,9 +50,9 @@ const tokenize_text = (scanner: Scanner): KeywordToken => {
     const keyword: KeywordToken = {type: "keyword", value}
 
     if (scanner.peek() === ".") {
-        scanner.consume()
+        scanner.consume(".")
 
-        //this is a bit ugly, make it better
+        //todo this is a bit ugly, make it better
         let value = scanner.next()
         while (is_alpha_character(scanner.peek()))
             value += scanner.next()
@@ -65,8 +64,7 @@ const tokenize_text = (scanner: Scanner): KeywordToken => {
 }
 
 const tokenize_roll = (scanner: Scanner): DiceToken | WeaponToken => {
-    assert(scanner.peek() === "[", () => `dice token must start with '[', instead found '${scanner.peek()}'`)
-    scanner.consume()
+    scanner.consume("[")
 
     const amount = scanner.next()
 
@@ -99,18 +97,16 @@ const tokenize_roll = (scanner: Scanner): DiceToken | WeaponToken => {
 }
 
 const tokenize_function = (scanner: Scanner): FunctionToken => {
-    let value = scanner.next()
-    assert(value === '$', () => `Expected function to start with '$'`)
+    scanner.consume("$")
 
     let name = ""
     while (is_alpha_character(scanner.peek()))
         name += scanner.next()
 
     assert(["sum", "exists"].includes(name), () => `function name '${name}' does not exist. Tokenizing ${scanner.text}`)
-    scanner.assert_consume("(")
+    scanner.consume("(")
 
     const parameters = []
-
     const MAX_PARAMS_ALLOWED = 8
     let current_params = 0
     while (current_params < MAX_PARAMS_ALLOWED) {
@@ -118,10 +114,10 @@ const tokenize_function = (scanner: Scanner): FunctionToken => {
         const param = tokenize_any(scanner)
         parameters.push(param)
         if (scanner.peek() === ")") break
-        scanner.assert_consume(",")
+        scanner.consume(",")
     }
 
-    scanner.consume()
+    scanner.consume(")")
 
     return {
         type: "function",
@@ -159,3 +155,4 @@ export type FunctionToken = {
     name: string
     parameters: Array<Token>
 }
+

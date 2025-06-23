@@ -1,5 +1,3 @@
-import {Consequence} from "powers/basic";
-
 export type Power = {
     name: string
     description?: string
@@ -10,8 +8,8 @@ export type Power = {
     }
     targeting: Targeting,
     roll?: {
-        attack: "str"
-        defense: "ac"
+        attack: string
+        defense: string
         hit: Array<IRConsequence>
     }
     effect?: Array<IRConsequence>

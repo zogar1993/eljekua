@@ -205,10 +205,7 @@ export class PlayerTurnHandler {
                         const attacker = context.get_creature("owner")
                         const defender = context.get_creature("primary_target")
 
-                        const attack = [...get_attack({
-                            creature: attacker,
-                            attribute_code: consequence.attack
-                        }), d20_result]
+                        const attack = [...new IntFormulaFromTokens(consequence.attack, context).get_resolved_number_values(), d20_result]
                         const defense = get_defense({creature: defender, defense_code: consequence.defense})
                         const is_hit = add_all_resolved_number_values(attack) >= add_all_resolved_number_values(defense)
 

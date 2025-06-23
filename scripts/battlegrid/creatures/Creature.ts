@@ -37,15 +37,26 @@ export class Creature {
     get_resolved_property = (property: string): ResolvedNumberValue => {
         if (property === "movement") return {value: this.data.movement, description: "movement"}
         if (property === "str_mod") return this.resolve_attribute_mod("str")
+        if (property === "str_mod_lvl") return this.resolve_attribute_mod_plus_half_level("str")
         throw Error(`Invalid property ${property}`)
     }
 
     resolve_half_level = (): ResolvedNumberValue => ({
-        value: Math.floor(this.data.level / 2),
+        value: this.half_level(),
         description: "half level"
     })
     resolve_attribute_mod = (attribute_code: keyof Creature["data"]["attributes"]): ResolvedNumberValue => ({
-        value: Math.floor((this.data.attributes[attribute_code] - 10) / 2),
+        value: this.attribute_mod(attribute_code),
         description: `${attribute_code} mod`
     })
+    resolve_attribute_mod_plus_half_level = (attribute_code: keyof Creature["data"]["attributes"]): ResolvedNumberValue => ({
+        value: this.attribute_mod(attribute_code) + this.half_level(),
+        description: `${attribute_code} mod lvl`
+    })
+
+    private half_level = () =>
+        Math.floor(this.data.level / 2)
+
+    private attribute_mod = (attribute_code: keyof Creature["data"]["attributes"]) =>
+        Math.floor((this.data.attributes[attribute_code] - 10) / 2)
 }
