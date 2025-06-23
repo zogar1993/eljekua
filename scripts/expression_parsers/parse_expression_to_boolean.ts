@@ -2,7 +2,7 @@ import {Token} from "tokenizer/tokenize";
 import {assert} from "assert";
 import {ActivePowerContext} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 
-export const resolve_tokens_to_boolean = ({token, context}: {token: Token, context: ActivePowerContext}): boolean => {
+export const parse_expression_to_boolean = ({token, context}: {token: Token, context: ActivePowerContext}): boolean => {
     if(token.type === "function") {
         if (token.name === "exists") {
             assert(token.parameters.length === 1, () => "exists function needs exactly one parameter")

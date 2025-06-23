@@ -1,4 +1,4 @@
-import {add_all_resolved_number_values, ResolvedNumberValue} from "formulas/IntFormulaFromTokens";
+import {add_all_resolved_number_values, ResolvedNumberValue} from "expression_parsers/parse_expression_to_number_values";
 import {assert} from "assert";
 
 export class ActionLog {

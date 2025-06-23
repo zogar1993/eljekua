@@ -1,5 +1,5 @@
 import {assert} from "assert";
-import {ResolvedNumberValue} from "formulas/IntFormulaFromTokens";
+import {ResolvedNumberValue} from "expression_parsers/parse_expression_to_number_values";
 
 export const roll_d = (faces: number): ResolvedNumberValue => {
     return {

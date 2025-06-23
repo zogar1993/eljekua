@@ -1,4 +1,4 @@
-import {ResolvedNumberValue} from "formulas/IntFormulaFromTokens";
+import {ResolvedNumberValue} from "expression_parsers/parse_expression_to_number_values";
 import {Creature} from "battlegrid/creatures/Creature";
 
 const RESOLVED_BASE_10 = Object.freeze({value: 10, description: "base"})

@@ -7,15 +7,16 @@ import {
 import {ActionLog} from "action_log/ActionLog";
 import {
     add_all_resolved_number_values,
-    IntFormulaFromTokens,
-    resolve_all_unresolved_number_values
-} from "formulas/IntFormulaFromTokens";
+    resolve_all_unresolved_number_values,
+    parse_expression_to_number_values,
+    parse_expression_to_resolved_number_values
+} from "expression_parsers/parse_expression_to_number_values";
 import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
 import {get_defense} from "character_sheet/character_sheet";
 import {assert} from "assert";
 import {Consequence, ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
-import {resolve_tokens_to_boolean} from "formulas/BooleanFormulaFromTokens";
+import {parse_expression_to_boolean} from "expression_parsers/parse_expression_to_boolean";
 
 export class PlayerTurnHandler {
     private action_log: ActionLog
@@ -96,7 +97,8 @@ export class PlayerTurnHandler {
         context: ActivePowerContext
     }) {
         if (targeting.type === "movement") {
-            const distance = new IntFormulaFromTokens(targeting.distance, context).get_resolved_number_values()
+            const distance = parse_expression_to_resolved_number_values({token: targeting.distance, context})
+
             return this.battle_grid.get_move_area({
                 origin,
                 distance: add_all_resolved_number_values(distance)
@@ -198,7 +200,7 @@ export class PlayerTurnHandler {
                         const attacker = context.get_creature("owner")
                         const defender = context.get_creature("primary_target")
 
-                        const attack = [...new IntFormulaFromTokens(consequence.attack, context).get_resolved_number_values(), d20_result]
+                        const attack = [...parse_expression_to_resolved_number_values({token: consequence.attack, context}), d20_result]
                         const defense = get_defense({creature: defender, defense_code: consequence.defense})
                         const is_hit = add_all_resolved_number_values(attack) >= add_all_resolved_number_values(defense)
 
@@ -212,7 +214,7 @@ export class PlayerTurnHandler {
                     }
                     case "apply_damage": {
                         const target = context.get_creature(consequence.target)
-                        const resolved = resolve_all_unresolved_number_values(new IntFormulaFromTokens(consequence.value, context).get_all_number_values())
+                        const resolved = resolve_all_unresolved_number_values(parse_expression_to_number_values({token: consequence.value, context}))
                         target.receive_damage(add_all_resolved_number_values(resolved))
                         this.action_log.add_new_action_log(`${target.data.name} was dealt `, resolved, ` damage.`)
                         break
@@ -230,7 +232,7 @@ export class PlayerTurnHandler {
                         break
                     }
                     case "condition": {
-                        const condition = resolve_tokens_to_boolean({token: consequence.condition, context})
+                        const condition = parse_expression_to_boolean({token: consequence.condition, context})
                         if (condition)
                             context.add_consequences(consequence.consequences_true)
                         break

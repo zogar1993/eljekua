@@ -1,7 +1,7 @@
 import {CreatureVisual} from "battlegrid/creatures/CreatureVisual";
 import {Position} from "battlegrid/Position";
 import {CreatureData} from "battlegrid/creatures/CreatureData";
-import {ResolvedNumberValue} from "formulas/IntFormulaFromTokens";
+import {ResolvedNumberValue} from "expression_parsers/parse_expression_to_number_values";
 
 export class Creature {
     private visual: CreatureVisual
