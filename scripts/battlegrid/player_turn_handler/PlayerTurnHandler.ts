@@ -107,6 +107,9 @@ export class PlayerTurnHandler {
             return this.battle_grid.get_melee({origin})
         } else if (targeting.type === "adjacent") {
             return this.battle_grid.get_adyacent({origin})
+        } else if (targeting.type === "ranged") {
+            const distance = parse_expression_to_resolved_number_values({token: targeting.distance, context})
+            return this.battle_grid.get_in_range({origin, distance: add_all_resolved_number_values(distance)})
         }
 
         throw `Range "${JSON.stringify(targeting)}" not supported`
@@ -117,8 +120,10 @@ export class PlayerTurnHandler {
             return !this.battle_grid.is_terrain_occupied(position)
         if (targeting.target_type === "enemy")
             return this.battle_grid.is_terrain_occupied(position)
+        if (targeting.target_type === "creature")
+            return this.battle_grid.is_terrain_occupied(position)
 
-        throw `Target "${targeting.type}" not supported`
+        throw `Target "${targeting.target_type}" not supported`
     }
 
     build_action_button(action: PowerVM) {

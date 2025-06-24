@@ -259,7 +259,7 @@ const tide_of_iron = {
     },
 }
 
-const magic_missile = {
+const magic_missile: Power = {
     name: "Magic Missile",
     type: {
         action: "standard",
@@ -269,14 +269,15 @@ const magic_missile = {
     targeting: {
         type: "ranged",
         target_type: "creature",
-        amount: 1
+        amount: 1,
+        distance: "20"
     },
     effect: [
         {
             type: "apply_damage",
             value: "$sum(2,owner.int_mod)",
             target: "primary_target",
-            types: "force"
+            damage_types: ["force"]
         }
     ]
 }
@@ -312,4 +313,4 @@ const sly_flourish = {
 //sly flourish
 
 export const BASIC_MOVEMENT_ACTIONS = [movement, shift].map(transform_power_ir_into_vm_representation)
-export const BASIC_ATTACK_ACTIONS = [melee_basic_attack, cleave, sure_strike].map(transform_power_ir_into_vm_representation)
+export const BASIC_ATTACK_ACTIONS = [melee_basic_attack, cleave, sure_strike, magic_missile].map(transform_power_ir_into_vm_representation)

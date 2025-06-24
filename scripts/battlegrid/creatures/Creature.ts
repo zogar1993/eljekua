@@ -35,9 +35,11 @@ export class Creature {
     }
 
     get_resolved_property = (property: string): ResolvedNumberValue => {
+        const attributes = ["str", "con", "dex", "int", "wis", "cha"]
         if (property === "movement") return {value: this.data.movement, description: "movement"}
-        if (property === "str_mod") return this.resolve_attribute_mod("str")
-        if (property === "str_mod_lvl") return this.resolve_attribute_mod_plus_half_level("str")
+        //TODO clean up the attribute mess
+        if (attributes.some(attribute => `${attribute}_mod` === property)) return this.resolve_attribute_mod(property.slice(0, 3) as any)
+        if (attributes.some(attribute => `${attribute}_mod_lvl` === property)) return this.resolve_attribute_mod_plus_half_level(property.slice(0, 3) as any)
         throw Error(`Invalid property ${property}`)
     }
 

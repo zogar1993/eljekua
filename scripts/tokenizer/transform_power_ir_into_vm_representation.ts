@@ -34,12 +34,12 @@ export type ConsequenceSelectTarget = {
     type: "select_target"
     //TODO unbox
     targeting: {
-        target_type: "enemy" | "terrain"
+        target_type: "enemy" | "terrain" | "creature"
         amount: 1,
         exclude: Array<string>
         label: string
     } & ({
-        type: "movement"
+        type: "movement" | "ranged"
         distance: Token
     } | {
         type: "adjacent" | "melee_weapon"
@@ -77,7 +77,7 @@ export type Consequence =
 
 const transform_primary_targeting = (targeting: Power["targeting"]): ConsequenceSelectTarget => {
 //TODO make this cleaner
-    if (targeting.type === "movement") {
+    if (targeting.type === "movement" || targeting.type === "ranged") {
         return {
             type: "select_target",
             targeting: {

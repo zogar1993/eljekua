@@ -16,13 +16,13 @@ export type Power = {
 }
 
 type Targeting = {
-    target_type: "terrain" | "enemy"
+    target_type: "terrain" | "enemy" | "creature"
     terrain_prerequisite?: "unoccupied"
     amount: 1
 } & ({
     type: "melee_weapon" | "adjacent",
 } | {
-    type: "movement"
+    type: "movement" | "ranged"
     distance: string,
 })
 
@@ -31,6 +31,7 @@ export type IRConsequence =
         type: "apply_damage"
         value: string
         target: string
+        damage_types?: Array<string>
     } |
     {
         type: "select_target"
