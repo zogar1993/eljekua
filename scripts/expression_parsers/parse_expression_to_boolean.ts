@@ -1,6 +1,6 @@
-import {Token} from "tokenizer/tokenize";
 import {assert} from "assert";
 import {ActivePowerContext} from "battlegrid/player_turn_handler/PlayerTurnHandler";
+import {Token} from "tokenizer/tokens/AnyToken";
 
 export const parse_expression_to_boolean = ({token, context}: {token: Token, context: ActivePowerContext}): boolean => {
     if(token.type === "function") {

@@ -1,8 +1,9 @@
 import {get_random_number} from "randomness/dice";
-import {KeywordToken, Token} from "tokenizer/tokenize";
 import {assert} from "assert";
 import {Creature} from "battlegrid/creatures/Creature";
 import {ActivePowerContext} from "battlegrid/player_turn_handler/PlayerTurnHandler";
+import {KeywordToken} from "tokenizer/tokens/KeywordToken";
+import {Token} from "tokenizer/tokens/AnyToken";
 
 export const parse_expression_to_number_values = ({token, context}: {
     token: Token,

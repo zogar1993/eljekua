@@ -1,4 +1,5 @@
 import {assert} from "assert";
+import {is_numeric_character} from "tokenizer/regexes";
 
 export class Scanner {
     readonly text: string
@@ -22,10 +23,23 @@ export class Scanner {
         this.index++
     }
 
+    get_text_while = (condition: (char: string) => boolean) => {
+        this.assert_not_at_end()
+        let value = ""
+        while (condition(this.peek()))
+            value += this.next()
+        assert(value !== "", () => `While tokenizing ${this.text} fabricated an empty text from text_while`)
+        return value
+    }
+
     is_at_end = () => this.index >= this.text.length
 
     assert_peek = (expectation: string) => {
-        assert(!this.is_at_end(), () => `While tokenizing ${this.text} expected ${expectation} but found end of text at index ${this.index}`)
+        this.assert_not_at_end()
         assert(expectation === this.peek(), () => `While tokenizing ${this.text} expected ${expectation} but found ${this.peek()} at index ${this.index}`)
+    }
+
+    assert_not_at_end = () => {
+        assert(!this.is_at_end(), () => `While tokenizing ${this.text} found premature end of text`)
     }
 }

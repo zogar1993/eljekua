@@ -1,5 +1,6 @@
-import {Token, tokenize} from "tokenizer/tokenize";
+import {tokenize} from "tokenizer/tokenize";
 import {IRConsequence, Power} from "types";
+import {Token} from "tokenizer/tokens/AnyToken";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
