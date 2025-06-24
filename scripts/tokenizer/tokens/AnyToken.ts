@@ -4,6 +4,7 @@ import {DiceToken, tokenize_roll, WeaponToken} from "tokenizer/tokens/DiceToken"
 import {FunctionToken, tokenize_function} from "tokenizer/tokens/FunctionToken";
 import {Scanner} from "tokenizer/scanner";
 import {is_non_numeric_character, is_numeric_character} from "tokenizer/regexes";
+import {StringToken, tokenize_string} from "tokenizer/tokens/StringToken";
 
 export const tokenize_any = (scanner: Scanner): Token => {
     const char = scanner.peek()
@@ -16,8 +17,10 @@ export const tokenize_any = (scanner: Scanner): Token => {
         return tokenize_keyword(scanner)
     else if (char === "$")
         return tokenize_function(scanner)
+    else if (char === `"`)
+        return tokenize_string(scanner)
     else
         throw Error(`unexpected character found while tokenizing ${scanner.text}, can't parse "${scanner.peek()}"`)
 }
 
-export type Token = NumberLiteralToken | KeywordToken | DiceToken | WeaponToken | FunctionToken
+export type Token = NumberLiteralToken | KeywordToken | DiceToken | WeaponToken | FunctionToken | StringToken

@@ -205,7 +205,10 @@ export class PlayerTurnHandler {
                         const attacker = context.get_creature("owner")
                         const defender = context.get_creature("primary_target")
 
-                        const attack = [...parse_expression_to_resolved_number_values({token: consequence.attack, context}), d20_result]
+                        const attack = [...parse_expression_to_resolved_number_values({
+                            token: consequence.attack,
+                            context
+                        }), d20_result]
                         const defense = get_defense({creature: defender, defense_code: consequence.defense})
                         const is_hit = add_all_resolved_number_values(attack) >= add_all_resolved_number_values(defense)
 
@@ -213,15 +216,28 @@ export class PlayerTurnHandler {
 
                         if (is_hit)
                             context.add_consequences(consequence.hit)
-                        else
+                        else {
                             defender.display_miss()
+                            context.add_consequences(consequence.miss)
+                        }
                         break
                     }
                     case "apply_damage": {
                         const target = context.get_creature(consequence.target)
-                        const resolved = resolve_all_unresolved_number_values(parse_expression_to_number_values({token: consequence.value, context}))
-                        target.receive_damage(add_all_resolved_number_values(resolved))
-                        this.action_log.add_new_action_log(`${target.data.name} was dealt `, resolved, ` damage.`)
+                        const resolved = resolve_all_unresolved_number_values(parse_expression_to_number_values({
+                            token: consequence.value,
+                            context
+                        }))
+
+                        const result = add_all_resolved_number_values(resolved)
+                        const modified_result = consequence.half_damage ? Math.floor(result / 2) : result;
+                        target.receive_damage(modified_result)
+                        this.action_log.add_new_action_log(`${target.data.name} was dealt `, {
+                            type: "damage",
+                            halved: consequence.half_damage,
+                            result: modified_result,
+                            breakdown: resolved
+                        }, `${consequence.half_damage ? " half" : ""} damage.`)
                         break
                     }
                     case "move": {
@@ -240,6 +256,8 @@ export class PlayerTurnHandler {
                         const condition = parse_expression_to_boolean({token: consequence.condition, context})
                         if (condition)
                             context.add_consequences(consequence.consequences_true)
+                        else
+                            context.add_consequences(consequence.consequences_false)
                         break
                     }
                     default:

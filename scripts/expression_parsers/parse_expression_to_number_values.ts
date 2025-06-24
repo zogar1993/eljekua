@@ -30,10 +30,11 @@ const parse_token = ({token, context}: {
     token: Token,
     context: ActivePowerContext
 }): NumberValue => {
-    if (token.type === "number") return {value: token.value}
+    if (token.type === "number") return {value: token.value, description: "number"}
     if (token.type === "keyword") return parse_keyword_token({token, context})
     if (token.type === "dice") return {min: 1, max: token.faces}
     if (token.type === "weapon") return {min: 1, max: 4}
+    if (token.type === "function") return {min: 1, max: 4}
     throw Error(`token type invalid: ${JSON.stringify(token)}`)
 }
 

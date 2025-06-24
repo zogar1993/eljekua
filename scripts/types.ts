@@ -11,6 +11,7 @@ export type Power = {
         attack: string
         defense: string
         hit: Array<IRConsequence>
+        miss?: Array<IRConsequence>
     }
     effect?: Array<IRConsequence>
 }
@@ -31,6 +32,7 @@ export type IRConsequence =
         type: "apply_damage"
         value: string
         target: string
+        half_damage?: boolean
         damage_types?: Array<string>
     } |
     {
@@ -51,4 +53,5 @@ export type IRConsequence =
     type: "condition",
     condition: string,
     consequences_true: Array<IRConsequence>
+    consequences_false?: Array<IRConsequence>
 }

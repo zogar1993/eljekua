@@ -49,12 +49,14 @@ export type ConsequenceAttackRoll = {
     attack: Token
     defense: string
     hit: Array<Consequence>
+    miss: Array<Consequence>
 }
 
 export type ConsequenceOption = {
     type: "condition",
     condition: Token,
     consequences_true: Array<Consequence>
+    consequences_false: Array<Consequence>
 }
 
 export type Consequence =
@@ -62,6 +64,8 @@ export type Consequence =
         type: "apply_damage"
         value: Token
         target: string
+        half_damage: boolean
+        damage_types: Array<string>
     } |
     ConsequenceSelectTarget |
     ConsequenceAttackRoll |
@@ -101,7 +105,8 @@ const transform_roll = (roll: Required<Power>["roll"]): ConsequenceAttackRoll =>
         type: "attack_roll",
         attack: tokenize(standardize_roll_attributes(roll.attack)),
         defense: roll.defense,
-        hit: roll.hit.map(transform_generic_consequence)
+        hit: roll.hit.map(transform_generic_consequence),
+        miss: roll.miss ? roll.miss.map(transform_generic_consequence) : []
     }
 }
 
@@ -115,7 +120,9 @@ const transform_generic_consequence = (consequence: IRConsequence): Consequence 
             return {
                 type: "apply_damage",
                 value: tokenize(consequence.value),
-                target: consequence.target
+                target: consequence.target,
+                damage_types: consequence.damage_types ?? [],
+                half_damage: consequence.half_damage ?? false
             }
         case "select_target":
             return {
@@ -142,7 +149,8 @@ const transform_generic_consequence = (consequence: IRConsequence): Consequence 
             return {
                 type: "condition",
                 condition: tokenize(consequence.condition),
-                consequences_true: consequence.consequences_true.map(transform_generic_consequence)
+                consequences_true: consequence.consequences_true.map(transform_generic_consequence),
+                consequences_false: consequence.consequences_false ? consequence.consequences_false.map(transform_generic_consequence) : []
             }
         }
         default:

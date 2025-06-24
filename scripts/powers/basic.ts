@@ -145,7 +145,7 @@ const cleave: Power = {
     },
 }
 
-const reaping_strike = {
+const reaping_strike: Power = {
     name: "Reaping Strike",
     description: "You punctuate your scything attacks with wicked jabs and small cutting blows that slip through your enemy's defenses.",
     type: {
@@ -164,7 +164,7 @@ const reaping_strike = {
         hit: [
             {
                 type: "apply_damage",
-                value: "[1W]+owner.str_mod",
+                value: "$sum([1W],owner.str_mod)",
                 target: "primary_target"
             },
         ],
@@ -175,15 +175,16 @@ const reaping_strike = {
                 consequences_true: [
                     {
                         type: "apply_damage",
-                        value: `str_mod`,
+                        value: `owner.str_mod`,
                         target: "primary_target"
                     },
                 ],
                 consequences_false: [
                     {
                         type: "apply_damage",
-                        value: `$half(str_mod)`,
-                        target: "primary_target"
+                        value: `owner.str_mod`,
+                        target: "primary_target",
+                        half_damage: true
                     },
                 ]
             },
@@ -313,4 +314,4 @@ const sly_flourish = {
 //sly flourish
 
 export const BASIC_MOVEMENT_ACTIONS = [movement, shift].map(transform_power_ir_into_vm_representation)
-export const BASIC_ATTACK_ACTIONS = [melee_basic_attack, cleave, sure_strike, magic_missile].map(transform_power_ir_into_vm_representation)
+export const BASIC_ATTACK_ACTIONS = [melee_basic_attack, cleave, sure_strike, magic_missile, reaping_strike].map(transform_power_ir_into_vm_representation)

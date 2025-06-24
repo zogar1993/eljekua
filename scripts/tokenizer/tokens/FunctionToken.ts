@@ -9,7 +9,7 @@ export const tokenize_function = (scanner: Scanner): FunctionToken => {
 
     const name = scanner.get_text_while(is_text_character)
 
-    assert(["sum", "exists"].includes(name), () => `function name '${name}' does not exist. Tokenizing ${scanner.text}`)
+    assert(["sum", "exists", "equipped"].includes(name), () => `function name '${name}' does not exist. Tokenizing ${scanner.text}`)
     scanner.consume("(")
 
     const parameters = []

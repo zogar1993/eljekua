@@ -56,6 +56,8 @@ export class Creature {
         description: `${attribute_code} mod lvl`
     })
 
+    has_equipped = (weapon_type: string) => false
+
     private half_level = () =>
         Math.floor(this.data.level / 2)
 
