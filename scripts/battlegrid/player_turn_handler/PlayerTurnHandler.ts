@@ -92,22 +92,22 @@ export class PlayerTurnHandler {
 
 
     get_in_range({targeting, origin, context}: {
-        targeting: ConsequenceSelectTarget["targeting"],
+        targeting: ConsequenceSelectTarget,
         origin: Position,
         context: ActivePowerContext
     }) {
-        if (targeting.type === "movement") {
+        if (targeting.targeting_type === "movement") {
             const distance = parse_expression_to_resolved_number_values({token: targeting.distance, context})
 
             return this.battle_grid.get_move_area({
                 origin,
                 distance: add_all_resolved_number_values(distance)
             })
-        } else if (targeting.type === "melee_weapon") {
+        } else if (targeting.targeting_type === "melee_weapon") {
             return this.battle_grid.get_melee({origin})
-        } else if (targeting.type === "adjacent") {
+        } else if (targeting.targeting_type === "adjacent") {
             return this.battle_grid.get_adyacent({origin})
-        } else if (targeting.type === "ranged") {
+        } else if (targeting.targeting_type === "ranged") {
             const distance = parse_expression_to_resolved_number_values({token: targeting.distance, context})
             return this.battle_grid.get_in_range({origin, distance: add_all_resolved_number_values(distance)})
         }
@@ -115,7 +115,7 @@ export class PlayerTurnHandler {
         throw `Range "${JSON.stringify(targeting)}" not supported`
     }
 
-    filter_targets({targeting, position}: { targeting: ConsequenceSelectTarget["targeting"], position: Position }) {
+    filter_targets({targeting, position}: { targeting: ConsequenceSelectTarget, position: Position }) {
         if (targeting.target_type === "terrain")
             return !this.battle_grid.is_terrain_occupied(position)
         if (targeting.target_type === "enemy")
@@ -136,12 +136,12 @@ export class PlayerTurnHandler {
 
         if (first_consequence.type === "select_target") {
             const valid_targets = [...this.get_in_range({
-                targeting: first_consequence.targeting,
+                targeting: first_consequence,
                 origin: this.get_selected_creature().data.position,
                 context
             })]
                 .filter(square => this.filter_targets({
-                    targeting: first_consequence.targeting,
+                    targeting: first_consequence,
                     position: square.position
                 }))
 
@@ -156,17 +156,17 @@ export class PlayerTurnHandler {
                 switch (consequence.type) {
                     case "select_target": {
                         const valid_targets = [...this.get_in_range({
-                            targeting: consequence.targeting,
+                            targeting: consequence,
                             origin: context.get_creature("owner").data.position,
                             context
                         })]
                             .filter(square => this.filter_targets({
-                                targeting: consequence.targeting,
+                                targeting: consequence,
                                 position: square.position
                             }))
 
                         const excluded = valid_targets.filter(
-                            target => !consequence.targeting.exclude.some(
+                            target => !consequence.exclude.some(
                                 excluded => context.get_creature(excluded).data.position.x === target.position.x &&
                                     context.get_creature(excluded).data.position.y === target.position.y
                             )
@@ -178,15 +178,15 @@ export class PlayerTurnHandler {
                             const onClick = (position: Position) => {
                                 this.deselect()
 
-                                if (consequence.targeting.target_type === "terrain")
+                                if (consequence.target_type === "terrain")
                                     context.set_variable({
-                                        name: consequence.targeting.label,
+                                        name: consequence.label,
                                         value: position,
                                         type: "position"
                                     })
                                 else
                                     context.set_variable({
-                                        name: consequence.targeting.label,
+                                        name: consequence.label,
                                         value: this.battle_grid.get_creature_by_position(position),
                                         type: "creature"
                                     })

@@ -32,19 +32,16 @@ export type PowerVM = {
 
 export type ConsequenceSelectTarget = {
     type: "select_target"
-    //TODO unbox
-    targeting: {
-        target_type: "enemy" | "terrain" | "creature"
-        amount: 1,
-        exclude: Array<string>
-        label: string
-    } & ({
-        type: "movement" | "ranged"
-        distance: Token
-    } | {
-        type: "adjacent" | "melee_weapon"
-    }),
-}
+    target_type: "enemy" | "terrain" | "creature"
+    amount: 1,
+    exclude: Array<string>
+    label: string
+} & ({
+    targeting_type: "movement" | "ranged"
+    distance: Token
+} | {
+    targeting_type: "adjacent" | "melee_weapon"
+})
 
 
 export type ConsequenceAttackRoll = {
@@ -80,25 +77,21 @@ const transform_primary_targeting = (targeting: Power["targeting"]): Consequence
     if (targeting.type === "movement" || targeting.type === "ranged") {
         return {
             type: "select_target",
-            targeting: {
-                type: targeting.type,
-                target_type: targeting.target_type,
-                amount: targeting.amount,
-                label: PRIMARY_TARGET_LABEL,
-                exclude: [],
-                distance: tokenize(targeting.distance)
-            }
+            targeting_type: targeting.type,
+            target_type: targeting.target_type,
+            amount: targeting.amount,
+            label: PRIMARY_TARGET_LABEL,
+            exclude: [],
+            distance: tokenize(targeting.distance)
         }
     } else {
         return {
             type: "select_target",
-            targeting: {
-                type: targeting.type,
-                target_type: targeting.target_type,
-                amount: targeting.amount,
-                label: PRIMARY_TARGET_LABEL,
-                exclude: []
-            }
+            targeting_type: targeting.type,
+            target_type: targeting.target_type,
+            amount: targeting.amount,
+            label: PRIMARY_TARGET_LABEL,
+            exclude: []
         }
     }
 }
@@ -127,13 +120,11 @@ const transform_generic_consequence = (consequence: IRConsequence): Consequence 
         case "select_target":
             return {
                 type: "select_target",
-                targeting: {
-                    type: consequence.targeting.type,
-                    target_type: consequence.targeting.target_type,
-                    amount: consequence.targeting.amount,
-                    label: consequence.target_label,
-                    exclude: consequence.targeting.exclude ?? [],
-                }
+                targeting_type: consequence.targeting.type,
+                target_type: consequence.targeting.target_type,
+                amount: consequence.targeting.amount,
+                label: consequence.target_label,
+                exclude: consequence.targeting.exclude ?? [],
             }
         case "move":
             return {
