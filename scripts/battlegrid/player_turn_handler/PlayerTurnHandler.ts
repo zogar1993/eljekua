@@ -212,7 +212,7 @@ export class PlayerTurnHandler {
                         const defense = get_defense({creature: defender, defense_code: consequence.defense})
                         const is_hit = add_all_resolved_number_values(attack) >= add_all_resolved_number_values(defense)
 
-                        this.action_log.add_new_action_log(`${attacker.data.name}'s ${action.name} (`, attack, `) ${is_hit ? "hits" : "misses"} against ${defender.data.name}'s AC (`, defense, `).`)
+                        this.action_log.add_new_action_log(`${attacker.data.name}'s ${action.name} (`, attack, `) ${is_hit ? "hits" : "misses"} against ${defender.data.name}'s ${consequence.defense} (`, defense, `).`)
 
                         if (is_hit)
                             context.add_consequences(consequence.hit)

@@ -291,7 +291,7 @@ const sly_flourish = {
         attack: true,
     },
     targeting: {
-        type: "melee_or_ranged_weapon",
+        type: "melee_weapon_or_ranged_weapon",
         target_type: "creature",
         amount: 1
     },
@@ -308,10 +308,35 @@ const sly_flourish = {
     },
 }
 
+const piercing_strike: Power = {
+    name: "Piercing Strike",
+    description: "You drive your weapon past your foe's guard and into a tender spot.",
+    type: {
+        action: "standard",
+        cooldown: "at-will",
+        attack: true,
+    },
+    targeting: {
+        type: "melee_weapon",
+        target_type: "creature",
+        amount: 1
+    },
+    roll: {
+        attack: "dex",
+        defense: "reflex",
+        hit: [
+            {
+                type: "apply_damage",
+                value: "$sum([1W],owner.dex_mod)",
+                target: "primary_target"
+            },
+        ]
+    },
+}
+
 
 //holy strike
 //furious smash
-//sly flourish
 
 export const BASIC_MOVEMENT_ACTIONS = [movement, shift].map(transform_power_ir_into_vm_representation)
-export const BASIC_ATTACK_ACTIONS = [melee_basic_attack, cleave, sure_strike, magic_missile, reaping_strike].map(transform_power_ir_into_vm_representation)
+export const BASIC_ATTACK_ACTIONS = [melee_basic_attack, cleave, sure_strike, magic_missile, reaping_strike, piercing_strike].map(transform_power_ir_into_vm_representation)
