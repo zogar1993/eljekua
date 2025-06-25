@@ -65,7 +65,7 @@ const melee_basic_attack: Power = {
         hit: [
             {
                 type: "apply_damage",
-                value: "$sum([1W],owner.str_mod)",
+                value: "$add({1W},owner.str_mod)",
                 target: "primary_target"
             }
         ]
@@ -86,12 +86,12 @@ const sure_strike: Power = {
         amount: 1
     },
     roll: {
-        attack: "$sum(str,2)",
+        attack: "$add(str,2)",
         defense: "ac",
         hit: [
             {
                 type: "apply_damage",
-                value: "[1W]",
+                value: "{1W}",
                 target: "primary_target"
             },
         ]
@@ -127,7 +127,7 @@ const cleave: Power = {
             },
             {
                 type: "apply_damage",
-                value: "$sum([1W],owner.str_mod)",
+                value: "$add({1W},owner.str_mod)",
                 target: "primary_target"
             },
             {
@@ -164,7 +164,7 @@ const reaping_strike: Power = {
         hit: [
             {
                 type: "apply_damage",
-                value: "$sum([1W],owner.str_mod)",
+                value: "$add({1W},owner.str_mod)",
                 target: "primary_target"
             },
         ],
@@ -192,7 +192,7 @@ const reaping_strike: Power = {
     },
 }
 
-const tide_of_iron = {
+const tide_of_iron: Power = {
     name: "Tide of Iron",
     description: "You punctuate your scything attacks with wicked jabs and small cutting blows that slip through your enemy's defenses.",
     type: {
@@ -214,12 +214,12 @@ const tide_of_iron = {
         hit: [
             {
                 type: "apply_damage",
-                value: "$sum([1W],owner.str_mod)",
+                value: "$add({1W},owner.str_mod)",
                 target: "primary_target"
             },
             {
                 type: "condition",
-                condition: "owner.size+1>=target.size",
+                condition: "$greater_or_equals($add(owner.size,1),target.size)",
                 consequences_true: [
                     {
                         type: "question_yes_no",
@@ -237,7 +237,7 @@ const tide_of_iron = {
                             },
                             {
                                 type: "condition",
-                                condition: "primary_target.position!=primary_target_last_position&&$distance(owner.position,primary_target_last_position)==1",
+                                condition: "$and($not_equals(primary_target.position,primary_target_last_position),$equals($movement_distance(owner.position,primary_target_last_position),1))",
                                 consequences_true: [
                                     {
                                         type: "question_yes_no",
@@ -276,7 +276,7 @@ const magic_missile: Power = {
     effect: [
         {
             type: "apply_damage",
-            value: "$sum(2,owner.int_mod)",
+            value: "$add(2,owner.int_mod)",
             target: "primary_target",
             damage_types: ["force"] //TODO add vulnerabilities and resistances
         }
@@ -301,7 +301,7 @@ const sly_flourish = {
         hit: [
             {
                 type: "apply_damage",
-                value: "$sum([1W],owner.dex_mod,owner.cha_mod)",
+                value: "$add({1W},owner.dex_mod,owner.cha_mod)",
                 target: "primary_target"
             },
         ]
@@ -327,7 +327,7 @@ const piercing_strike: Power = {
         hit: [
             {
                 type: "apply_damage",
-                value: "$sum([1W],owner.dex_mod)",
+                value: "$add({1W},owner.dex_mod)",
                 target: "primary_target"
             },
         ]

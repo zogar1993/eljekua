@@ -9,7 +9,7 @@ export const parse_expression_to_number_values = ({token, context}: {
     token: Token,
     context: ActivePowerContext
 }): Array<NumberValue> => {
-    return token.type === "function" && token.name === "sum" ?
+    return token.type === "function" && token.name === "add" ?
         token.parameters.map(parameter => parse_token({token: parameter, context})) :
         [parse_token({token, context})]
 }
@@ -18,7 +18,7 @@ export const parse_expression_to_resolved_number_values = ({token, context}: {
     token: Token,
     context: ActivePowerContext
 }): Array<ResolvedNumberValue> => {
-    const number_values = token.type === "function" && token.name === "sum" ?
+    const number_values = token.type === "function" && token.name === "add" ?
         token.parameters.map(parameter => parse_token({token: parameter, context})) :
         [parse_token({token, context})]
 

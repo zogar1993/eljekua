@@ -11,7 +11,7 @@ export const tokenize_any = (scanner: Scanner): Token => {
 
     if (is_numeric_character(char))
         return tokenize_number(scanner)
-    else if (char === "[")
+    else if (char === "{")
         return tokenize_roll(scanner)
     else if (is_non_numeric_character(char))
         return tokenize_keyword(scanner)

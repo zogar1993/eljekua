@@ -3,7 +3,7 @@ import {assert} from "assert";
 import {is_numeric_character} from "tokenizer/regexes";
 
 export const tokenize_roll = (scanner: Scanner): DiceToken | WeaponToken => {
-    scanner.consume("[")
+    scanner.consume("{")
 
     const amount = scanner.next()
 
@@ -15,7 +15,7 @@ export const tokenize_roll = (scanner: Scanner): DiceToken | WeaponToken => {
         const number = scanner.get_text_while(is_numeric_character)
 
         assert(["4", "6", "8", "10", "12", "20"].includes(number), () => `dice value needs to be number in the following options [4, 6, 8, 10, 12, 20], found '${number}'.`)
-        scanner.consume("]")
+        scanner.consume("}")
 
         const faces = Number(number) as DiceToken["faces"]
 
@@ -25,7 +25,7 @@ export const tokenize_roll = (scanner: Scanner): DiceToken | WeaponToken => {
             faces,
         }
     } else if (type === "W") {
-        scanner.consume("]")
+        scanner.consume("}")
         return {
             type: "weapon",
             amount: Number(amount)

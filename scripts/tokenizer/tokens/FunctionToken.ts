@@ -1,7 +1,6 @@
 import {Scanner} from "tokenizer/scanner";
 import {is_text_character} from "tokenizer/regexes";
 import {assert} from "assert";
-
 import {Token, tokenize_any} from "tokenizer/tokens/AnyToken";
 
 export const tokenize_function = (scanner: Scanner): FunctionToken => {
@@ -9,7 +8,7 @@ export const tokenize_function = (scanner: Scanner): FunctionToken => {
 
     const name = scanner.get_text_while(is_text_character)
 
-    assert(["sum", "exists", "equipped"].includes(name), () => `function name '${name}' does not exist. Tokenizing ${scanner.text}`)
+    assert(["add", "exists", "equipped"].includes(name), () => `function name '${name}' does not exist. Tokenizing ${scanner.text}`)
     scanner.consume("(")
 
     const parameters = []
