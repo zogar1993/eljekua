@@ -1,4 +1,4 @@
-import {NumberLiteralToken, tokenize_number} from "tokenizer/tokens/NumberToken";
+import {NumberToken, tokenize_number} from "tokenizer/tokens/NumberToken";
 import {KeywordToken, tokenize_keyword} from "tokenizer/tokens/KeywordToken";
 import {DiceToken, tokenize_roll, WeaponToken} from "tokenizer/tokens/DiceToken";
 import {FunctionToken, tokenize_function} from "tokenizer/tokens/FunctionToken";
@@ -23,4 +23,4 @@ export const tokenize_any = (scanner: Scanner): Token => {
         throw Error(`unexpected character found while tokenizing ${scanner.text}, can't parse "${scanner.peek()}"`)
 }
 
-export type Token = NumberLiteralToken | KeywordToken | DiceToken | WeaponToken | FunctionToken | StringToken
+export type Token = NumberToken | KeywordToken | DiceToken | WeaponToken | FunctionToken | StringToken

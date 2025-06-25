@@ -9,7 +9,7 @@ import {
     add_all_resolved_number_values,
     resolve_all_unresolved_number_values,
     parse_expression_to_number_values,
-    parse_expression_to_resolved_number_values
+    parse_expression_to_resolved_number_values, preview_expression, ExpressionResult
 } from "expression_parsers/parse_expression_to_number_values";
 import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
@@ -205,12 +205,20 @@ export class PlayerTurnHandler {
                         const attacker = context.get_creature("owner")
                         const defender = context.get_creature("primary_target")
 
-                        const attack = [...parse_expression_to_resolved_number_values({
-                            token: consequence.attack,
-                            context
-                        }), d20_result]
+                        const attack_base = preview_expression({token: consequence.attack, context})
+                        if (attack_base.type !== "number_resolved") throw Error(`Attack formula did not evaluate to a resolved number`)
+
+                        const attack: ExpressionResult = {
+                            type: "number_resolved",
+                            value: attack_base.value + d20_result.value,
+                            params: [
+                                attack_base,
+                                {type: "number_resolved", value: d20_result.value, description: "d20"}
+                            ],
+                            description: "attack"
+                        }
                         const defense = get_defense({creature: defender, defense_code: consequence.defense})
-                        const is_hit = add_all_resolved_number_values(attack) >= add_all_resolved_number_values(defense)
+                        const is_hit = attack.value >= add_all_resolved_number_values(defense)
 
                         this.action_log.add_new_action_log(`${attacker.data.name}'s ${action.name} (`, attack, `) ${is_hit ? "hits" : "misses"} against ${defender.data.name}'s ${consequence.defense} (`, defense, `).`)
 

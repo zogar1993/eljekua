@@ -58,9 +58,9 @@ export class Creature {
 
     has_equipped = (weapon_type: string) => false
 
-    private half_level = () =>
+    half_level = () =>
         Math.floor(this.data.level / 2)
 
-    private attribute_mod = (attribute_code: keyof Creature["data"]["attributes"]) =>
+    attribute_mod = (attribute_code: keyof Creature["data"]["attributes"]) =>
         Math.floor((this.data.attributes[attribute_code] - 10) / 2)
 }
