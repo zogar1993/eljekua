@@ -6,14 +6,12 @@ import {
 } from "powers/basic";
 import {ActionLog} from "action_log/ActionLog";
 import {
-    add_all_resolved_number_values,
-    resolve_all_unresolved_number_values,
-    parse_expression_to_number_values,
-    parse_expression_to_resolved_number_values, preview_expression, ExpressionResult
+    preview_expression,
+    ExpressionResult,
+    resolve_number, is_number, ExpressionResultNumberResolved, preview_defense
 } from "expression_parsers/parse_expression_to_number_values";
 import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
-import {get_defense} from "character_sheet/character_sheet";
 import {assert} from "assert";
 import {Consequence, ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
 
@@ -96,19 +94,20 @@ export class PlayerTurnHandler {
         context: ActivePowerContext
     }) {
         if (targeting.targeting_type === "movement") {
-            const distance = parse_expression_to_resolved_number_values({token: targeting.distance, context})
+            const distance = preview_expression({token: targeting.distance, context})
 
-            return this.battle_grid.get_move_area({
-                origin,
-                distance: add_all_resolved_number_values(distance)
-            })
+            if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
+
+            return this.battle_grid.get_move_area({origin, distance: distance.value})
         } else if (targeting.targeting_type === "melee_weapon") {
             return this.battle_grid.get_melee({origin})
         } else if (targeting.targeting_type === "adjacent") {
             return this.battle_grid.get_adyacent({origin})
         } else if (targeting.targeting_type === "ranged") {
-            const distance = parse_expression_to_resolved_number_values({token: targeting.distance, context})
-            return this.battle_grid.get_in_range({origin, distance: add_all_resolved_number_values(distance)})
+            const distance = preview_expression({token: targeting.distance, context})
+
+            if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
+            return this.battle_grid.get_in_range({origin, distance: distance.value})
         }
 
         throw `Range "${JSON.stringify(targeting)}" not supported`
@@ -202,7 +201,7 @@ export class PlayerTurnHandler {
                         const d20_result = roll_d(20)
 
                         const attacker = context.get_creature("owner")
-                        const defender = context.get_creature("primary_target")
+                        const defender = context.get_creature(consequence.defender)
 
                         const attack_base = preview_expression({token: consequence.attack, context})
                         if (attack_base.type !== "number_resolved") throw Error(`Attack formula did not evaluate to a resolved number`)
@@ -216,8 +215,10 @@ export class PlayerTurnHandler {
                             ],
                             description: "attack"
                         }
-                        const defense = get_defense({creature: defender, defense_code: consequence.defense})
-                        const is_hit = attack.value >= add_all_resolved_number_values(defense)
+
+                        const defense = preview_defense({defender, defense_code: consequence.defense})
+                        if (defense.type !== "number_resolved") throw Error(`Defense formula did not evaluate to a resolved number`)
+                        const is_hit = attack.value >= defense.value
 
                         this.action_log.add_new_action_log(`${attacker.data.name}'s ${action.name} (`, attack, `) ${is_hit ? "hits" : "misses"} against ${defender.data.name}'s ${consequence.defense} (`, defense, `).`)
 
@@ -231,20 +232,24 @@ export class PlayerTurnHandler {
                     }
                     case "apply_damage": {
                         const target = context.get_creature(consequence.target)
-                        const resolved = resolve_all_unresolved_number_values(parse_expression_to_number_values({
-                            token: consequence.value,
-                            context
-                        }))
 
-                        const result = add_all_resolved_number_values(resolved)
-                        const modified_result = consequence.half_damage ? Math.floor(result / 2) : result;
-                        target.receive_damage(modified_result)
-                        this.action_log.add_new_action_log(`${target.data.name} was dealt `, {
-                            type: "damage",
-                            halved: consequence.half_damage,
-                            result: modified_result,
-                            breakdown: resolved
-                        }, `${consequence.half_damage ? " half" : ""} damage.`)
+                        const damage = preview_expression({token: consequence.value, context})
+
+                        if (!is_number(damage)) throw Error(`Defense formula did not evaluate to a resolved number`)
+
+                        const resolved = resolve_number(damage)
+
+                        const result = resolved.value
+
+                        const modified_result: ExpressionResultNumberResolved = consequence.half_damage ? {
+                            type: "number_resolved",
+                            value: Math.floor(result / 2),
+                            params: [resolved],
+                            description: "half damage"
+                        } : resolved
+
+                        target.receive_damage(modified_result.value)
+                        this.action_log.add_new_action_log(`${target.data.name} was dealt `, modified_result, `${consequence.half_damage ? " half" : ""} damage.`)
                         break
                     }
                     case "move": {
@@ -262,7 +267,7 @@ export class PlayerTurnHandler {
                     case "condition": {
                         const condition = preview_expression({token: consequence.condition, context})
 
-                        if(condition.type !== "boolean") throw Error("Condition can only be boolean")
+                        if (condition.type !== "boolean") throw Error("Condition can only be boolean")
 
                         if (condition.value)
                             context.add_consequences(consequence.consequences_true)

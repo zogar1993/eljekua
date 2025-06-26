@@ -9,76 +9,25 @@ import {NumberToken} from "tokenizer/tokens/NumberToken";
 import {StringToken} from "tokenizer/tokens/StringToken";
 import {DiceToken, WeaponToken} from "tokenizer/tokens/DiceToken";
 
-export const parse_expression_to_number_values = ({token, context}: {
-    token: Token,
-    context: ActivePowerContext
-}): Array<NumberValue> => {
-    return token.type === "function" && token.name === "add" ?
-        token.parameters.map(parameter => parse_token({token: parameter, context})) :
-        [parse_token({token, context})]
-}
-
-export const parse_expression_to_resolved_number_values = ({token, context}: {
-    token: Token,
-    context: ActivePowerContext
-}): Array<ResolvedNumberValue> => {
-    const number_values = token.type === "function" && token.name === "add" ?
-        token.parameters.map(parameter => parse_token({token: parameter, context})) :
-        [parse_token({token, context})]
-
-    assert(number_values.every(x => is_resolved_number_value(x)), () => "found unresolved number values")
-    return number_values as Array<ResolvedNumberValue>
-}
-
-const parse_token = ({token, context}: {
-    token: Token,
-    context: ActivePowerContext
-}): NumberValue => {
-    if (token.type === "number") return {value: token.value, description: "number"}
-    if (token.type === "keyword") return parse_keyword_token({token, context})
-    if (token.type === "dice") return {min: 1, max: token.faces}
-    if (token.type === "weapon") return {min: 1, max: 4}
-    if (token.type === "function") return {min: 1, max: 4}
-    throw Error(`token type invalid: ${JSON.stringify(token)}`)
-}
-
-const parse_keyword_token = ({token, context}: {
-    token: KeywordToken,
-    context: ActivePowerContext
-}) => {
-    const creature = context.get_creature(token.value)
-    return parse_creature_property(creature, token.property)
-}
-
-const parse_creature_property = (creature: Creature, property: string | undefined) => {
-    if (property === undefined) throw Error(`property can't be undefined here`)
-    return creature.get_resolved_property(property)
-}
-
-export type NumberValue = ResolvedNumberValue | UnresolvedNumberValue
-
-export type ResolvedNumberValue = {
-    value: number
-    description?: string
-}
-
-export type UnresolvedNumberValue = {
-    min: number
-    max: number
-}
-
-const is_resolved_number_value = (value: NumberValue): value is ResolvedNumberValue => value.hasOwnProperty("value")
-
-export const add_all_resolved_number_values = (number_values: Array<ResolvedNumberValue>) => {
-    return number_values.reduce((result, x) => x.value + result, 0)
-}
-
-export const resolve_all_unresolved_number_values = (number_values: Array<NumberValue>): Array<ResolvedNumberValue> => {
-    return number_values.map(x => is_resolved_number_value(x) ? x : {value: get_random_number(x), description: `d4`})
-}
-
-
 type PreviewExpressionProps<T extends Token> = { token: T, context: ActivePowerContext }
+
+export const resolve_number = (number: ExpressionResultNumber): ExpressionResultNumberResolved => {
+    if (is_number_resolved(number)) return number
+    if (number.params === undefined)
+        return {
+            type: "number_resolved",
+            value: get_random_number(number),
+            description: number.description
+        }
+    const resolved_parts = number.params.map(part => is_number(part) ? resolve_number(part) : part)
+    return {
+        type: "number_resolved",
+        value: resolved_parts.reduce((result, part) => is_number(part) ? part.value + result : result, 0),
+        description: number.description,
+        params: resolved_parts
+    }
+}
+
 export const preview_expression = ({token, context}: PreviewExpressionProps<Token>): ExpressionResult => {
     switch (token.type) {
         case "function":
@@ -124,18 +73,58 @@ const preview_creature_property = ({creature, property}: {
     //TODO clean up the attribute mess
     //TODO clean up the creature functions mess
     if (attributes.some(attribute => `${attribute}_mod` === property))
+        return preview_creature_attribute_mod(creature, property.slice(0, 3) as any)
+    if (attributes.some(attribute => `${attribute}_mod_lvl` === property)) {
+        const parts = [
+            preview_creature_half_level(creature),
+            preview_creature_attribute_mod(creature, property.slice(0, 3) as any)
+        ]
         return {
-            value: creature.attribute_mod(property.slice(0, 3) as any),
-            description: property
+            value: parts.reduce((result, part) => part.value + result, 0),
+            description: property,
+            params: parts
         }
-    if (attributes.some(attribute => `${attribute}_mod_lvl` === property))
-        return {
-            value: creature.attribute_mod(property.slice(0, 3) as any) + creature.half_level(),
-            description: property
-        }
-    throw Error(`Invalid property ${property}`)
+    }
 
+    throw Error(`Invalid property ${property}`)
 }
+
+const preview_creature_half_level = (creature: Creature): ExpressionResultNumberResolved => ({
+    type: "number_resolved",
+    value: creature.half_level(),
+    description: "half level"
+})
+
+const preview_creature_attribute_mod = (creature: Creature, attribute: keyof Creature["data"]["attributes"]): ExpressionResultNumberResolved => ({
+    type: "number_resolved",
+    value: creature.attribute_mod(attribute),
+    description: `${attribute}_mod`
+})
+
+export const preview_defense = ({defender, defense_code}: {defender: Creature, defense_code: string}): ExpressionResultNumberResolved => {
+    if (["ac", "fortitude", "reflex", "will"].includes(defense_code)) {
+        const parts: Array<ExpressionResultNumberResolved> = [
+            RESOLVED_BASE_10,
+            preview_creature_half_level(defender),
+            preview_creature_attribute_mod(defender, defender.data.attributes["dex"] > defender.data.attributes["int"] ? "dex" : "int")
+        ]
+        return {
+            type: "number_resolved",
+            value: parts.reduce((result, param) => param.value + result, 0),
+            params: parts,
+            description: "defense"
+        }
+    }
+
+    throw Error(`Invalid defense ${defense_code}`)
+}
+
+
+const RESOLVED_BASE_10: ExpressionResultNumberResolved = Object.freeze({
+    type: "number_resolved",
+    value: 10,
+    description: "base"
+})
 
 const preview_dice = ({token}: PreviewExpressionProps<DiceToken>): ExpressionResultNumberUnresolved => {
     return {
@@ -184,8 +173,7 @@ const preview_function = ({token, context}: PreviewExpressionProps<FunctionToken
                     value: context.has_variable(parameter.value),
                     description: `exists ${parameter.value}`,
                 }
-            }
-            else
+            } else
                 throw Error("exists only works on keywords")
 
         }
@@ -232,7 +220,7 @@ const preview_add_function = ({token, context}: PreviewExpressionProps<FunctionT
             params: params,
             description: "+"
         }
-
+    console.log(params)
     throw Error(`not all params evaluate to numbers on add function`)
 }
 
@@ -287,8 +275,8 @@ const are_all_numbers_unresolved = (values: Array<ExpressionResult>): values is 
 const is_number_resolved = (value: ExpressionResult): value is ExpressionResultNumberResolved =>
     value.type === "number_resolved"
 
-const is_number_unresolved = (value: ExpressionResult): value is ExpressionResultNumberResolved =>
-    value.type === "number_resolved"
+const is_number_unresolved = (value: ExpressionResult): value is ExpressionResultNumberUnresolved =>
+    value.type === "number_unresolved"
 
-const is_number = (value: ExpressionResult): value is ExpressionResultNumberResolved =>
+export const is_number = (value: ExpressionResult): value is ExpressionResultNumber =>
     is_number_resolved(value) || is_number_unresolved(value)

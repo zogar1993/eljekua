@@ -7,7 +7,7 @@ const PRIMARY_TARGET_LABEL = "primary_target"
 export const transform_power_ir_into_vm_representation = (power: Power): PowerVM => {
     const consequences: Array<Consequence> = [
         transform_primary_targeting(power.targeting),
-        ...(power.roll ? [transform_roll(power.roll)] : []),
+        ...(power.roll ? [transform_primary_roll(power.roll)] : []),
         ...(power.effect ? power.effect.map(transform_generic_consequence) : [])
     ]
     return {
@@ -48,6 +48,7 @@ export type ConsequenceAttackRoll = {
     type: "attack_roll"
     attack: Token
     defense: string
+    defender: string
     hit: Array<Consequence>
     miss: Array<Consequence>
 }
@@ -100,18 +101,19 @@ const transform_primary_targeting = (targeting: Power["targeting"]): Consequence
     }
 }
 
-const transform_roll = (roll: Required<Power>["roll"]): ConsequenceAttackRoll => {
+const transform_primary_roll = (roll: Required<Power>["roll"]): ConsequenceAttackRoll => {
     return {
         type: "attack_roll",
-        attack: tokenize(standardize_roll_attributes(roll.attack)),
+        attack: tokenize(standardize_attack(roll.attack)),
         defense: roll.defense,
+        defender: PRIMARY_TARGET_LABEL,
         hit: roll.hit.map(transform_generic_consequence),
         miss: roll.miss ? roll.miss.map(transform_generic_consequence) : []
     }
 }
 
 const attributes = ["str", "con", "dex", "int", "wis", "cha"] as const
-const standardize_roll_attributes = (text: string) =>
+const standardize_attack = (text: string) =>
     attributes.reduce((text, attribute) => text.replaceAll(attribute, `owner.${attribute}_mod_lvl`), text)
 
 const transform_generic_consequence = (consequence: IRConsequence): Consequence => {
