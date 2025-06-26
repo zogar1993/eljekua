@@ -202,15 +202,15 @@ const preview_add_function = ({token, context}: PreviewExpressionProps<FunctionT
 
 export type ExpressionResult = ExpressionResultNumber | ExpressionResultString
 
-type ExpressionResultString = {
+export type ExpressionResultString = {
     type: "string",
     value: string
     description: string
 }
 
-type ExpressionResultNumber = ExpressionResultNumberUnresolved | ExpressionResultNumberResolved
+export type ExpressionResultNumber = ExpressionResultNumberUnresolved | ExpressionResultNumberResolved
 
-type ExpressionResultNumberUnresolved = {
+export type ExpressionResultNumberUnresolved = {
     type: "number_unresolved"
     min: number
     max: number
@@ -218,7 +218,7 @@ type ExpressionResultNumberUnresolved = {
     params?: Array<ExpressionResult>
 }
 
-type ExpressionResultNumberResolved = {
+export type ExpressionResultNumberResolved = {
     type: "number_resolved"
     value: number
     description: string

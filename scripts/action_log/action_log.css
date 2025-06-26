@@ -13,9 +13,13 @@
     top: 100%;
     left: 0;
     background-color: white;
-    padding: 4px;
+    padding: 8px;
     border: 1px black solid;
     position: absolute;
-    width: 100px;
+    width: 150px;
     z-index: 1;
+}
+
+.action-log-details__sub-details {
+    padding-left: 8px;
 }

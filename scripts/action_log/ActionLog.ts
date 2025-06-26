@@ -1,6 +1,7 @@
 import {
     add_all_resolved_number_values,
     ExpressionResult,
+    ExpressionResultNumberResolved,
     ResolvedNumberValue
 } from "expression_parsers/parse_expression_to_number_values";
 import {assert} from "assert";
@@ -63,21 +64,36 @@ export class ActionLog {
                     } else {
                         const span = document.createElement("span")
                         span.className = "action-log__value"
+
+                        const show_line = (result: ExpressionResultNumberResolved, container: HTMLDivElement) => {
+
+                            const line = document.createElement("div")
+                            line.className = "action-log-details__line"
+                            line.append(`${result.description}: ${result.value}`)
+                            container.appendChild(line)
+                        }
+                        const add_sub_parts = (result: ExpressionResultNumberResolved, container: HTMLDivElement) => {
+                            if (result.params) {
+                                const sub_details = document.createElement("div")
+                                sub_details.className = "action-log-details__sub-details"
+                                container.appendChild(sub_details)
+
+                                result.params.map(resolved => {
+                                    if (resolved.type === "number_resolved") {
+                                        add_sub_parts(resolved, sub_details)
+                                    }
+                                })
+                            }
+                            show_line(result, container)
+                        }
+
                         if (part.type === "number_resolved") {
                             span.append(`${part.value}`)
                             action_log_entry.appendChild(span)
 
                             const details = document.createElement("div")
                             details.className = "action-log-details"
-                            part.params?.map(resolved => {
-                                if (resolved.type === "number_resolved") {
-                                    const line = document.createElement("div")
-                                    line.className = "action-log-details__line"
-                                    line.append(`${resolved.description}: ${resolved.value}`)
-                                    details.appendChild(line)
-                                }
-                            });
-
+                            add_sub_parts(part, details)
                             span.appendChild(details)
                         }
                     }
