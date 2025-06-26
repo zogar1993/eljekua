@@ -1,5 +1,5 @@
-import {BattleGrid, Square} from "battlegrid/BattleGrid";
-import {Position} from "battlegrid/Position";
+import {BattleGrid} from "battlegrid/BattleGrid";
+import {OnPositionClick, Position} from "battlegrid/Position";
 import {
     BASIC_ATTACK_ACTIONS,
     BASIC_MOVEMENT_ACTIONS,
@@ -8,78 +8,167 @@ import {ActionLog} from "action_log/ActionLog";
 import {
     preview_expression,
     ExpressionResult,
-    resolve_number, is_number, ExpressionResultNumberResolved, preview_defense
-} from "expression_parsers/parse_expression_to_number_values";
+    resolve_number,
+    is_number,
+    ExpressionResultNumberResolved,
+    preview_defense
+} from "expression_parsers/preview_expression";
 import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
 import {assert} from "assert";
 import {Consequence, ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
 
+type PlayerTurnHandlerContextSelect = PlayerTurnHandlerContextSelectPosition | PlayerTurnHandlerContextSelectOption
+
+type PlayerTurnHandlerContextSelectPosition = {
+    type: "position_select"
+    currently_selected: Creature
+    available_targets: Array<Position>
+    on_click: (position: Position) => void
+}
+
+type PlayerTurnHandlerContextSelectOption = {
+    type: "option_select"
+    currently_selected: Creature
+    available_options: Array<ButtonOption>
+}
+
+type ButtonOption = {
+    text: string,
+    onClick: () => void
+    disabled?: boolean,
+}
+
 export class PlayerTurnHandler {
     private action_log: ActionLog
     private battle_grid: BattleGrid
-    private available_targets: AvailableTargets | null = null
-    private selected: null | Creature = null
+
+    private selection_context: PlayerTurnHandlerContextSelect | null = null
 
     constructor(battle_grid: BattleGrid, action_log: ActionLog) {
         this.battle_grid = battle_grid
         this.action_log = action_log
     }
 
+    set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => {
+        this.deselect()
+
+        this.selection_context = {
+            type: "position_select",
+            ...context
+        }
+
+        this.select(context.currently_selected)
+
+        const squares = context.available_targets.map(this.battle_grid.get_square)
+        squares.forEach(({visual}) => visual.setIndicator("available-target"))
+    }
+
+    set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => {
+        this.deselect()
+
+        this.selection_context = {
+            type: "option_select",
+            ...context
+        }
+
+        this.select(context.currently_selected)
+
+        const actions_menu = document.querySelector("#actions_menu")!
+
+        context.available_options.forEach(option => {
+            const button = document.createElement("button");
+            button.innerText = option.text
+            if (option.disabled)
+                button.setAttribute("disabled", "")
+
+            button.addEventListener("click", () => {
+                    this.clear_actions_menu()
+                    option.onClick()
+
+                    //TODO can be better
+                    // this.battle_grid.get_all_creatures().forEach(creature => creature.remove_hit_chance_on_hover())
+
+
+                    /* TODO re add chance
+                            if (action.roll) {
+                                valid_targets.forEach(square => {
+                                    const owner = this.get_selected_creature()
+                                    const target = this.battle_grid.get_creature_by_position(square.position)
+
+                                    const attack = add_all_resolved_number_values(get_attack({creature: owner, attribute_code: "str"}))
+                                    const defense = add_all_resolved_number_values(get_defense({creature: target, defense_code: "ac"}))
+                                    const chance = (attack + 20 - defense + 1) * 5
+
+                                    target.display_hit_chance_on_hover({attack, defense, chance})
+                                })
+                            }
+                    */
+                }
+            )
+            actions_menu.appendChild(button)
+        })
+    }
+
+    onClick: OnPositionClick = ({position}) => {
+        if (this.has_selected_creature()) {
+            if (this.is_available_target(position))
+                this.target(position)
+        } else {
+            if (this.battle_grid.is_terrain_occupied(position)) {
+                const creature = this.battle_grid.get_creature_by_position(position)
+
+                this.set_awaiting_option_selection({
+                    currently_selected: creature,
+                    available_options: this.build_actions_menu(creature)
+                })
+            }
+        }
+    }
+
     select(creature: Creature) {
-        this.selected = creature
         const cell = this.battle_grid.get_square(creature.data.position)
         cell.visual.setIndicator("selected")
     }
 
     target(position: Position) {
-        if (this.available_targets === null) throw Error("available targets are not set")
-        this.available_targets?.onClick(position)
+        if (this.selection_context?.type !== "position_select") throw Error("available targets are not set")
+        this.selection_context.on_click(position)
     }
 
     deselect() {
-        const square = this.battle_grid.get_square(this.get_selected_creature().data.position)
+        if (this.selection_context === null) return
+        const square = this.battle_grid.get_square(this.selection_context.currently_selected.data.position)
         square.visual.clearIndicator()
-        this.selected = null
 
-        this.available_targets?.destroy()
-    }
+        if (this.selection_context.type === "position_select") {
+            const squares = this.selection_context.available_targets.map(this.battle_grid.get_square)
+            squares.forEach(square => square.visual.clearIndicator())
+        }
 
-    set_available_targets({squares, onClick}: { squares: Array<Square>, onClick: (position: Position) => void }) {
-        this.available_targets = new AvailableTargets({
-            squares,
-            onClick,
-            onDestroy: () => this.available_targets = null
-        })
+        this.selection_context = null
     }
 
     is_available_target = (position: Position) => {
-        if (this.available_targets === null) throw Error("available targets are not set")
-        return this.available_targets.contains(position)
+        if (this.selection_context?.type !== "position_select") throw Error("available targets are not set")
+        return this.selection_context.available_targets.some(p => positions_equal(p, position))
     }
 
-    has_selected_creature = () => !!this.selected
+    has_selected_creature = () => this.selection_context !== null
 
-    get_selected_creature = () => {
-        if (this.selected === null) throw Error("Character cannot be null")
-        return this.selected
-    }
-
-    build_actions_menu() {
-        const cancel = document.createElement("button");
-        cancel.addEventListener("click", () => {
-            this.deselect()
-            this.clear_actions_menu()
-        })
-        cancel.innerText = "Cancel"
-
-        const movement_action_buttons = BASIC_MOVEMENT_ACTIONS.map(power => this.build_action_button(power))
-        const basic_attack_actions = BASIC_ATTACK_ACTIONS.map(power => this.build_action_button(power))
-
-        const actions_menu = document.querySelector("#actions_menu")!
-        movement_action_buttons.forEach(button => actions_menu.appendChild(button))
-        basic_attack_actions.forEach(button => actions_menu.appendChild(button))
-        actions_menu.appendChild(cancel)
+    build_actions_menu(creature: Creature): Array<ButtonOption> {
+        return [
+            ...BASIC_MOVEMENT_ACTIONS.map(power => this.build_action_button(power, creature)),
+            ...BASIC_ATTACK_ACTIONS.map(power => this.build_action_button(power, creature)),
+            ...creature.data.powers.map(power => this.build_action_button(power, creature)),
+            {
+                text: "Cancel",
+                onClick: () => {
+                    this.deselect()
+                    this.clear_actions_menu()
+                }
+            }
+        ]
     }
 
     clear_actions_menu() {
@@ -124,28 +213,25 @@ export class PlayerTurnHandler {
         throw `Target "${targeting.target_type}" not supported`
     }
 
-    build_action_button(action: PowerVM) {
-        const button = document.createElement("button");
+    get_valid_targets = ({consequence, context, creature}: {
+        consequence: ConsequenceSelectTarget
+        context: ActivePowerContext
+        creature: Creature
+    }) => (
+        [...this.get_in_range({
+            targeting: consequence,
+            origin: creature.data.position,
+            context
+        })]
+            .filter(square => this.filter_targets({
+                targeting: consequence,
+                position: square.position
+            }))
+    )
 
+    build_action_button(action: PowerVM, creature: Creature): ButtonOption {
         const context = new ActivePowerContext(action.consequences)
-        context.set_variable({name: "owner", value: this.get_selected_creature(), type: "creature"})
-
-        const first_consequence = action.consequences[0]
-
-        if (first_consequence.type === "select_target") {
-            const valid_targets = [...this.get_in_range({
-                targeting: first_consequence,
-                origin: this.get_selected_creature().data.position,
-                context
-            })]
-                .filter(square => this.filter_targets({
-                    targeting: first_consequence,
-                    position: square.position
-                }))
-
-            if (valid_targets.length === 0)
-                button.setAttribute("disabled", "")
-        }
+        context.set_variable({name: "owner", value: creature, type: "creature"})
 
         const evaluate_consequences = () => {
             while (context.has_consequences()) {
@@ -153,27 +239,16 @@ export class PlayerTurnHandler {
 
                 switch (consequence.type) {
                     case "select_target": {
-                        const valid_targets = [...this.get_in_range({
-                            targeting: consequence,
-                            origin: context.get_creature("owner").data.position,
-                            context
-                        })]
-                            .filter(square => this.filter_targets({
-                                targeting: consequence,
-                                position: square.position
-                            }))
+                        const valid_targets = this.get_valid_targets({consequence, context, creature})
 
-                        const excluded = valid_targets.filter(
+                        const filtered = valid_targets.filter(
                             target => !consequence.exclude.some(
-                                excluded => context.get_creature(excluded).data.position.x === target.position.x &&
-                                    context.get_creature(excluded).data.position.y === target.position.y
+                                excluded => positions_equal(context.get_creature(excluded).data.position, target.position)
                             )
                         )
 
-                        if (excluded.length > 0) {
-                            this.select(context.get_creature("owner"))
-
-                            const onClick = (position: Position) => {
+                        if (filtered.length > 0) {
+                            const on_click = (position: Position) => {
                                 this.deselect()
 
                                 if (consequence.target_type === "terrain")
@@ -192,7 +267,11 @@ export class PlayerTurnHandler {
                                 evaluate_consequences()
                             }
 
-                            this.set_available_targets({squares: excluded, onClick})
+                            this.set_awaiting_position_selection({
+                                currently_selected: context.get_creature("owner"),
+                                available_targets: filtered.map(x => x.position),
+                                on_click
+                            })
                             return
                         }
                         break
@@ -281,59 +360,20 @@ export class PlayerTurnHandler {
             }
         }
 
-        button.addEventListener("click", () => {
-                this.clear_actions_menu()
-                evaluate_consequences()
+        const first_consequence = action.consequences[0]
 
-                //TODO can be better
-                // this.battle_grid.get_all_creatures().forEach(creature => creature.remove_hit_chance_on_hover())
+        const result: ButtonOption = {
+            text: action.name,
+            disabled: false,
+            onClick: evaluate_consequences
+        }
 
+        if (first_consequence.type === "select_target") {
+            const valid_targets = this.get_valid_targets({consequence: first_consequence, context, creature})
+            result.disabled = valid_targets.length === 0
+        }
 
-                /* TODO re add chance
-                        if (action.roll) {
-                            valid_targets.forEach(square => {
-                                const owner = this.get_selected_creature()
-                                const target = this.battle_grid.get_creature_by_position(square.position)
-
-                                const attack = add_all_resolved_number_values(get_attack({creature: owner, attribute_code: "str"}))
-                                const defense = add_all_resolved_number_values(get_defense({creature: target, defense_code: "ac"}))
-                                const chance = (attack + 20 - defense + 1) * 5
-
-                                target.display_hit_chance_on_hover({attack, defense, chance})
-                            })
-                        }
-                */
-            }
-        )
-
-        button.innerText = action.name
-        return button
-    }
-}
-
-class AvailableTargets {
-    onClick: (position: Position) => void
-    onDestroy: () => void
-    squares: Array<Square> = []
-
-    constructor({squares, onClick, onDestroy}: {
-        squares: Array<Square>,
-        onClick: (position: Position) => void,
-        onDestroy: () => void
-    }) {
-        this.squares = squares
-        this.onClick = onClick
-        this.onDestroy = onDestroy
-        this.squares.forEach(({visual}) => visual.setIndicator("available-target"))
-    }
-
-    destroy() {
-        this.squares.forEach(square => square.visual.clearIndicator())
-        this.onDestroy()
-    }
-
-    contains(position: Position) {
-        return this.squares.some(({position: {x, y}}) => position.x === x && position.y === y)
+        return result
     }
 }
 
@@ -385,4 +425,8 @@ export class ActivePowerContext {
     add_consequences = (consequences: Array<Consequence>): void => {
         this.consequences = [...consequences, ...this.consequences]
     }
+}
+
+const positions_equal = (position1: Position, position2: Position) => {
+    return position1.x === position2.x && position1.y === position2.y
 }

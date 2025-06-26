@@ -1,8 +1,9 @@
 import {assert} from "assert";
-import {ResolvedNumberValue} from "expression_parsers/parse_expression_to_number_values";
+import {ExpressionResultNumberResolved} from "expression_parsers/preview_expression";
 
-export const roll_d = (faces: number): ResolvedNumberValue => {
+export const roll_d = (faces: number): ExpressionResultNumberResolved => {
     return {
+        type: "number_resolved",
         value: get_random_number({min: 1, max: faces}),
         description: `d${faces}`
     }

@@ -1,7 +1,7 @@
 import {
     ExpressionResult,
     ExpressionResultNumberResolved,
-} from "expression_parsers/parse_expression_to_number_values";
+} from "expression_parsers/preview_expression";
 
 export class ActionLog {
     add_new_action_log = (...text: Array<string | ExpressionResult>) => {
