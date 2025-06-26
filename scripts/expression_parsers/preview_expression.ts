@@ -8,6 +8,7 @@ import {FunctionToken} from "tokenizer/tokens/FunctionToken";
 import {NumberToken} from "tokenizer/tokens/NumberToken";
 import {StringToken} from "tokenizer/tokens/StringToken";
 import {DiceToken, WeaponToken} from "tokenizer/tokens/DiceToken";
+import {Position} from "battlegrid/Position";
 
 type PreviewExpressionProps<T extends Token> = { token: T, context: ActivePowerContext }
 
@@ -46,19 +47,38 @@ export const preview_expression = ({token, context}: PreviewExpressionProps<Toke
 }
 
 const preview_keyword = ({token, context}: PreviewExpressionProps<KeywordToken>): ExpressionResult => {
-    const creature = context.get_creature(token.value)
+    const variable = context.get_variable(token.value)
 
-    if (token.property)
+    if (variable.type === "position")
         return {
-            type: "number_resolved",
-            ...preview_creature_property({creature, property: token.property}),
+            type: "position",
+            value: variable.value,
+            description: token.value
         }
-    else
-        return {
-            type: "creature",
-            value: creature,
-            description: creature.data.name
-        }
+
+    if (variable.type === "creature") {
+        const creature = variable.value
+
+        if (token.property) {
+            if (token.property === "position")
+                return {
+                    type: "position",
+                    value: creature.data.position,
+                    description: `${creature.data.name}'s position`
+                }
+            return {
+                type: "number_resolved",
+                ...preview_creature_property({creature, property: token.property}),
+            }
+        } else
+            return {
+                type: "creature",
+                value: creature,
+                description: creature.data.name
+            }
+    }
+
+    throw Error("variable type not supported")
 }
 
 const preview_creature_property = ({creature, property}: {
@@ -101,7 +121,10 @@ const preview_creature_attribute_mod = (creature: Creature, attribute: keyof Cre
     description: `${attribute}_mod`
 })
 
-export const preview_defense = ({defender, defense_code}: {defender: Creature, defense_code: string}): ExpressionResultNumberResolved => {
+export const preview_defense = ({defender, defense_code}: {
+    defender: Creature,
+    defense_code: string
+}): ExpressionResultNumberResolved => {
     if (["ac", "fortitude", "reflex", "will"].includes(defense_code)) {
         const parts: Array<ExpressionResultNumberResolved> = [
             RESOLVED_BASE_10,
@@ -196,6 +219,26 @@ const preview_function = ({token, context}: PreviewExpressionProps<FunctionToken
                 params: [creature, text]
             }
         }
+        case "not_equals": {
+            assert(token.parameters.length === 2, () => "equipped function needs exactly two parameter")
+
+            const parameter1 = preview_expression({token: token.parameters[0], context})
+            const parameter2 = preview_expression({token: token.parameters[1], context})
+
+            if (parameter1.type === "position" && parameter2.type === "position") {
+                const position1 = parameter1.value
+                const position2 = parameter2.value
+                const are_equal = position1.x === position2.x && position1.y === position2.y
+
+                return {
+                    type: "boolean",
+                    value: !are_equal,
+                    description: "not_equals",
+                    params: [parameter1, parameter2]
+                }
+            }
+            throw Error(`not_equals parameters dont match, got ${parameter1.type} and ${parameter2.type}`)
+        }
         default:
             throw Error(`function name ${token.name} not supported`)
     }
@@ -220,7 +263,6 @@ const preview_add_function = ({token, context}: PreviewExpressionProps<FunctionT
             params: params,
             description: "+"
         }
-    console.log(params)
     throw Error(`not all params evaluate to numbers on add function`)
 }
 
@@ -229,10 +271,17 @@ export type ExpressionResult =
     | ExpressionResultString
     | ExpressionResultBoolean
     | ExpressionResultCreature
+    | ExpressionResultPosition
 
 export type ExpressionResultString = {
     type: "string",
     value: string
+    description: string
+}
+
+export type ExpressionResultPosition = {
+    type: "position",
+    value: Position
     description: string
 }
 

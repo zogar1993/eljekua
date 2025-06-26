@@ -6,6 +6,7 @@ export type Power = {
         cooldown: "at-will" | "encounter" | "daily"
         attack: boolean
     }
+    prerequisites?: Array<string>,
     targeting: Targeting,
     roll?: {
         attack: string
@@ -48,10 +49,21 @@ export type IRConsequence =
     {
         type: "move" | "shift",
         target: "owner",
-        destination: "primary_target"
+        destination: string
     } | {
     type: "condition",
     condition: string,
     consequences_true: Array<IRConsequence>
     consequences_false?: Array<IRConsequence>
+} | {
+    type: "options",
+    options: Array<{text: string, consequences: Array<IRConsequence>}>
+} | {
+    type: "save_position",
+    target: string,
+    label: string
+} | {
+    type: "push",
+    amount: number,
+    target: string
 }

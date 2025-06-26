@@ -191,7 +191,7 @@ export class PlayerTurnHandler {
         } else if (targeting.targeting_type === "melee_weapon") {
             return this.battle_grid.get_melee({origin})
         } else if (targeting.targeting_type === "adjacent") {
-            return this.battle_grid.get_adyacent({origin})
+            return this.battle_grid.get_adjacent({origin})
         } else if (targeting.targeting_type === "ranged") {
             const distance = preview_expression({token: targeting.distance, context})
 
@@ -343,6 +343,51 @@ export class PlayerTurnHandler {
                         this.battle_grid.place_creature({creature, position: destination})
                         break
                     }
+                    case "push": {
+                        const atacker = context.get_creature("owner")
+                        const defender = context.get_creature(consequence.target)
+
+                        //TODO contemplate push length
+                        const alternatives = this.battle_grid.get_push_positions({
+                            attacker_origin: atacker.data.position,
+                            defender_origin: defender.data.position,
+                            amount: 1
+                        })
+
+                        if (alternatives.length > 0) {
+                            this.set_awaiting_position_selection({
+                                currently_selected: context.get_creature("owner"),
+                                available_targets: alternatives.map(x => x.position),
+                                on_click: (position) => {
+                                    this.deselect()
+                                    this.battle_grid.place_creature({creature: defender, position})
+                                    evaluate_consequences()
+                                }
+                            })
+                        }
+
+                        return;
+                    }
+                    case "save_position": {
+                        const target = context.get_creature(consequence.target)
+                        context.set_variable({type: "position", name: consequence.label, value: target.data.position})
+                        break
+                    }
+                    case "options": {
+                        this.set_awaiting_option_selection({
+                            currently_selected: context.get_creature("owner"),
+                            available_options: consequence.options.map(option => ({
+                                    text: option.text,
+                                    onClick: () => {
+                                        this.deselect()
+                                        context.add_consequences(option.consequences)
+                                        evaluate_consequences()
+                                    }
+                                })
+                            )
+                        })
+                        break;
+                    }
                     case "condition": {
                         const condition = preview_expression({token: consequence.condition, context})
 
@@ -424,6 +469,12 @@ export class ActivePowerContext {
 
     add_consequences = (consequences: Array<Consequence>): void => {
         this.consequences = [...consequences, ...this.consequences]
+    }
+
+    get_variable = (name: string) => {
+        const variable = this.variables.get(name)
+        if (!variable) throw Error(`variable ${name} not found in context`)
+        return variable
     }
 }
 

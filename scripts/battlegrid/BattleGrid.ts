@@ -79,7 +79,7 @@ export class BattleGrid {
             }
     }
 
-    * get_adyacent({origin}: { origin: Position }) {
+    * get_adjacent({origin}: { origin: Position }) {
         const distance = 1
         const lower_x = Math.max(0, origin.x - distance)
         const upper_x = Math.min(this.BOARD_WIDTH - 1, origin.x + distance)
@@ -90,6 +90,19 @@ export class BattleGrid {
                 if (origin.x === x && origin.y === y) continue
                 yield this.get_square({x, y})
             }
+    }
+
+    get_push_positions({attacker_origin, defender_origin, amount}: {
+        attacker_origin: Position,
+        defender_origin: Position,
+        amount: number
+    }) {
+        //TODO contemplate bigger pushes
+        const adjacent = this.get_adjacent({origin: defender_origin})
+        const distance_between_positions = (a: Position, b: Position) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
+        const initial_distance = distance_between_positions(attacker_origin, defender_origin)
+        const unoccupied = [...adjacent].filter(x => !this.is_terrain_occupied(x.position))
+        return unoccupied.filter(square => distance_between_positions(square.position, attacker_origin) > initial_distance)
     }
 
 

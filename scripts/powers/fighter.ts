@@ -121,7 +121,104 @@ const reaping_strike: Power = {
     },
 }
 
-const tide_of_iron = {
+const tide_of_iron: Power = {
+    name: "Tide of Iron",
+    description: "You punctuate your scything attacks with wicked jabs and small cutting blows that slip through your enemy's defenses.",
+    type: {
+        action: "standard",
+        cooldown: "at-will",
+        attack: true,
+    },
+    prerequisites: [
+        `$equipped(owner,"shield")`
+    ],
+    targeting: {
+        type: "melee_weapon",
+        target_type: "enemy",
+        amount: 1
+    },
+    roll: {
+        attack: "str",
+        defense: "ac",
+        hit: [
+            {
+                type: "apply_damage",
+                value: "$add({1W},owner.str_mod)",
+                target: "primary_target"
+            },
+            {
+                type: "options",
+                options: [
+                    {
+                        text: "Push",
+                        consequences: [
+                            {
+                                type: "save_position",
+                                target: "primary_target",
+                                label: "primary_target_original_position"
+                            },
+                            {
+                                type: "push",
+                                amount: 1,
+                                target: "primary_target"
+                            },
+                            {
+                                type: "condition",
+                                condition: "$not_equals(primary_target.position,primary_target_original_position)",
+                                consequences_true: [
+                                    {
+                                        type: "options",
+                                        options: [
+                                            {
+                                                text: "Follow",
+                                                consequences: [
+                                                    {
+                                                        type: "shift",
+                                                        target: "owner",
+                                                        destination: "primary_target_original_position"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                text: "Don't Follow",
+                                                consequences: []
+                                            }
+                                        ]
+                                    },
+                                ]
+                            },
+                        ]
+                    },
+                    {
+                        text: "Don't Push",
+                        consequences: []
+                    }
+                ],
+                // {
+                //     type: "condition",
+                //     condition: "$not_equals(primary_target.position,primary_target_last_position)",
+                //     consequences_true: [
+                //         {
+                //             type: "options",
+                //             options: [
+                //
+                //             ]
+                //             consequences_true: [
+                //                 {
+                //                     type: "shift",
+                //                     target: "owner",
+                //                     destination: "primary_target_last_position"
+                //                 }
+                //             ]
+                //         },
+                //     ]
+                // },
+            }
+        ]
+    },
+}
+
+const tide_of_iron_true = {
     name: "Tide of Iron",
     description: "You punctuate your scything attacks with wicked jabs and small cutting blows that slip through your enemy's defenses.",
     type: {
@@ -153,7 +250,7 @@ const tide_of_iron = {
                     {
                         type: "question_yes_no",
                         question: "Push?",
-                        consequences_yes: [
+                        consequences_true: [
                             {
                                 type: "save_position",
                                 target: "primary_target",
@@ -161,7 +258,7 @@ const tide_of_iron = {
                             },
                             {
                                 type: "push",
-                                value: 1,
+                                amount: 1,
                                 target: "primary_target"
                             },
                             {
@@ -171,7 +268,7 @@ const tide_of_iron = {
                                     {
                                         type: "question_yes_no",
                                         question: "Follow?",
-                                        consequences_yes: [
+                                        consequences_true: [
                                             {
                                                 type: "shift",
                                                 target: "owner",
@@ -189,4 +286,4 @@ const tide_of_iron = {
     },
 }
 
-export const FIGHTER_POWERS = [sure_strike, cleave, reaping_strike].map(transform_power_ir_into_vm_representation)
+export const FIGHTER_POWERS = [sure_strike, cleave, reaping_strike, tide_of_iron].map(transform_power_ir_into_vm_representation)

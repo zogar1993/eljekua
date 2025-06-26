@@ -75,7 +75,18 @@ export type Consequence =
         type: "move" | "shift"
         target: string
         destination: string
-    }
+    } | {
+    type: "options",
+    options: Array<{text: string, consequences: Array<Consequence>}>,
+} | {
+    type: "save_position",
+    target: string,
+    label: string
+} | {
+    type: "push",
+    amount: Token,
+    target: string
+}
 
 const transform_primary_targeting = (targeting: Power["targeting"]): ConsequenceSelectTarget => {
 //TODO make this cleaner
@@ -147,14 +158,33 @@ const transform_generic_consequence = (consequence: IRConsequence): Consequence 
                 target: consequence.target,
                 destination: consequence.destination
             }
-        case "condition": {
+        case "condition":
             return {
                 type: "condition",
                 condition: tokenize(consequence.condition),
                 consequences_true: consequence.consequences_true.map(transform_generic_consequence),
                 consequences_false: consequence.consequences_false ? consequence.consequences_false.map(transform_generic_consequence) : []
             }
-        }
+        case "options":
+            return {
+                type: "options",
+                options: consequence.options.map(option => ({
+                    text: option.text,
+                    consequences: option.consequences.map(transform_generic_consequence)
+                }))
+            }
+        case "save_position":
+            return {
+                type: "save_position",
+                label: consequence.label,
+                target: consequence.target
+            }
+        case "push":
+            return {
+                type: "push",
+                amount: tokenize(consequence.amount),
+                target: consequence.target
+            }
         default:
             throw Error(`consequence invalid ${JSON.stringify(consequence)}`)
     }
