@@ -99,12 +99,17 @@ export const preview_expression = ({token, context}: PreviewExpressionProps<Toke
 const preview_keyword = ({token, context}: PreviewExpressionProps<KeywordToken>): ExpressionResult => {
     const creature = context.get_creature(token.value)
 
-    if (!token.property) throw Error("creature without a property is not valid")
-
-    return {
-        type: "number_resolved",
-        ...preview_creature_property({creature, property: token.property}),
-    }
+    if (token.property)
+        return {
+            type: "number_resolved",
+            ...preview_creature_property({creature, property: token.property}),
+        }
+    else
+        return {
+            type: "creature",
+            value: creature,
+            description: creature.data.name
+        }
 }
 
 const preview_creature_property = ({creature, property}: {
@@ -170,8 +175,39 @@ const preview_function = ({token, context}: PreviewExpressionProps<FunctionToken
     switch (token.name) {
         case "add":
             return preview_add_function({token, context})
-        case "exists":
-        case "equipped":
+        case "exists": {
+            assert(token.parameters.length === 1, () => "exists function needs exactly one parameter")
+            const parameter = token.parameters[0]
+            if (parameter.type === "keyword") {
+                return {
+                    type: "boolean",
+                    value: context.has_variable(parameter.value),
+                    description: `exists ${parameter.value}`,
+                }
+            }
+            else
+                throw Error("exists only works on keywords")
+
+        }
+        case "equipped": {
+            assert(token.parameters.length === 2, () => "equipped function needs exactly two parameter")
+
+            const parameter1 = token.parameters[0]
+            if (parameter1.type !== "keyword") throw Error("first parameter must be a keyword")
+            const creature = preview_keyword({token: parameter1, context})
+            if (creature.type !== "creature") throw Error("first parameter must evaluate to a creature")
+
+            const parameter2 = token.parameters[1]
+            if (parameter2.type !== "string") throw Error("second parameter must be a string")
+            const text = preview_string({token: parameter2, context})
+
+            return {
+                type: "boolean",
+                value: creature.value.has_equipped(text.value),
+                description: "equipped",
+                params: [creature, text]
+            }
+        }
         default:
             throw Error(`function name ${token.name} not supported`)
     }
@@ -200,7 +236,11 @@ const preview_add_function = ({token, context}: PreviewExpressionProps<FunctionT
     throw Error(`not all params evaluate to numbers on add function`)
 }
 
-export type ExpressionResult = ExpressionResultNumber | ExpressionResultString
+export type ExpressionResult =
+    ExpressionResultNumber
+    | ExpressionResultString
+    | ExpressionResultBoolean
+    | ExpressionResultCreature
 
 export type ExpressionResultString = {
     type: "string",
@@ -221,6 +261,19 @@ export type ExpressionResultNumberUnresolved = {
 export type ExpressionResultNumberResolved = {
     type: "number_resolved"
     value: number
+    description: string
+    params?: Array<ExpressionResult>
+}
+
+export type ExpressionResultCreature = {
+    type: "creature"
+    value: Creature
+    description: string
+}
+
+export type ExpressionResultBoolean = {
+    type: "boolean"
+    value: boolean
     description: string
     params?: Array<ExpressionResult>
 }

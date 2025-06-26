@@ -16,7 +16,6 @@ import {Creature} from "battlegrid/creatures/Creature";
 import {get_defense} from "character_sheet/character_sheet";
 import {assert} from "assert";
 import {Consequence, ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
-import {parse_expression_to_boolean} from "expression_parsers/parse_expression_to_boolean";
 
 export class PlayerTurnHandler {
     private action_log: ActionLog
@@ -261,8 +260,11 @@ export class PlayerTurnHandler {
                         break
                     }
                     case "condition": {
-                        const condition = parse_expression_to_boolean({token: consequence.condition, context})
-                        if (condition)
+                        const condition = preview_expression({token: consequence.condition, context})
+
+                        if(condition.type !== "boolean") throw Error("Condition can only be boolean")
+
+                        if (condition.value)
                             context.add_consequences(consequence.consequences_true)
                         else
                             context.add_consequences(consequence.consequences_false)
