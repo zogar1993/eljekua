@@ -4,7 +4,7 @@ import {ExpressionResultNumberResolved} from "expression_parsers/preview_express
 export const roll_d = (faces: number): ExpressionResultNumberResolved => {
     return {
         type: "number_resolved",
-        value: 19,//get_random_number({min: 1, max: faces}),
+        value: get_random_number({min: 1, max: faces}),
         description: `d${faces}`
     }
 }
