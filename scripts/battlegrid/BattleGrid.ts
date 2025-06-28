@@ -39,7 +39,7 @@ export class BattleGrid {
         const upper_y = Math.min(this.BOARD_HEIGHT - 1, origin.y + radius)
         for (let x = lower_x; x <= upper_x; x++)
             for (let y = lower_y; y <= upper_y; y++)
-                yield this.get_square({x, y})
+                yield {x, y}
     }
 
     * get_move_area({origin, distance}: { origin: Position, distance: number }) {
@@ -50,7 +50,7 @@ export class BattleGrid {
         for (let x = lower_x; x <= upper_x; x++)
             for (let y = lower_y; y <= upper_y; y++) {
                 if (origin.x === x && origin.y === y) continue
-                yield this.get_square({x, y})
+                yield {x, y}
             }
     }
 
@@ -62,7 +62,7 @@ export class BattleGrid {
         for (let x = lower_x; x <= upper_x; x++)
             for (let y = lower_y; y <= upper_y; y++) {
                 if (origin.x === x && origin.y === y) continue
-                yield this.get_square({x, y})
+                yield {x, y}
             }
     }
 
@@ -75,7 +75,7 @@ export class BattleGrid {
         for (let x = lower_x; x <= upper_x; x++)
             for (let y = lower_y; y <= upper_y; y++) {
                 if (origin.x === x && origin.y === y) continue
-                yield this.get_square({x, y})
+                yield {x, y}
             }
     }
 
@@ -88,7 +88,7 @@ export class BattleGrid {
         for (let x = lower_x; x <= upper_x; x++)
             for (let y = lower_y; y <= upper_y; y++) {
                 if (origin.x === x && origin.y === y) continue
-                yield this.get_square({x, y})
+                yield {x, y}
             }
     }
 
@@ -101,8 +101,8 @@ export class BattleGrid {
         const adjacent = this.get_adjacent({origin: defender_origin})
         const distance_between_positions = (a: Position, b: Position) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
         const initial_distance = distance_between_positions(attacker_origin, defender_origin)
-        const unoccupied = [...adjacent].filter(x => !this.is_terrain_occupied(x.position))
-        return unoccupied.filter(square => distance_between_positions(square.position, attacker_origin) > initial_distance)
+        const unoccupied = [...adjacent].filter(x => !this.is_terrain_occupied(x))
+        return unoccupied.filter(position => distance_between_positions(position, attacker_origin) > initial_distance)
     }
 
 

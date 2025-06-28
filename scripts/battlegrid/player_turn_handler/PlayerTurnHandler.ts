@@ -223,9 +223,9 @@ export class PlayerTurnHandler {
             origin: creature.data.position,
             context
         })]
-            .filter(square => this.filter_targets({
+            .filter(position => this.filter_targets({
                 targeting: consequence,
-                position: square.position
+                position
             }))
     )
 
@@ -243,7 +243,7 @@ export class PlayerTurnHandler {
 
                         const filtered = valid_targets.filter(
                             target => !consequence.exclude.some(
-                                excluded => positions_equal(context.get_creature(excluded).data.position, target.position)
+                                excluded => positions_equal(context.get_creature(excluded).data.position, target)
                             )
                         )
 
@@ -269,7 +269,7 @@ export class PlayerTurnHandler {
 
                             this.set_awaiting_position_selection({
                                 currently_selected: context.get_creature("owner"),
-                                available_targets: filtered.map(x => x.position),
+                                available_targets: filtered,
                                 on_click
                             })
                             return
@@ -357,7 +357,7 @@ export class PlayerTurnHandler {
                         if (alternatives.length > 0) {
                             this.set_awaiting_position_selection({
                                 currently_selected: context.get_creature("owner"),
-                                available_targets: alternatives.map(x => x.position),
+                                available_targets: alternatives,
                                 on_click: (position) => {
                                     this.deselect()
                                     this.battle_grid.place_creature({creature: defender, position})
