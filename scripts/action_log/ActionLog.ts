@@ -1,10 +1,10 @@
 import {
-    ExpressionResult,
-    ExpressionResultNumberResolved,
+    AstNode,
+    AstNodeNumberResolved,
 } from "expression_parsers/preview_expression";
 
 export class ActionLog {
-    add_new_action_log = (...text: Array<string | ExpressionResult>) => {
+    add_new_action_log = (...text: Array<string | AstNode>) => {
         const action_log = document.querySelector("#action_log")!
 
         const action_log_entry = document.createElement("div");
@@ -17,14 +17,14 @@ export class ActionLog {
                     const span = document.createElement("span")
                     span.className = "action-log__value"
 
-                    const show_line = (result: ExpressionResultNumberResolved, container: HTMLDivElement) => {
+                    const show_line = (result: AstNodeNumberResolved, container: HTMLDivElement) => {
 
                         const line = document.createElement("div")
                         line.className = "action-log-details__line"
                         line.append(`${result.description}: ${result.value}`)
                         container.appendChild(line)
                     }
-                    const add_sub_parts = (result: ExpressionResultNumberResolved, container: HTMLDivElement) => {
+                    const add_sub_parts = (result: AstNodeNumberResolved, container: HTMLDivElement) => {
                         if (result.params) {
                             const sub_details = document.createElement("div")
                             sub_details.className = "action-log-details__sub-details"
@@ -56,6 +56,6 @@ export class ActionLog {
     }
 }
 
-const is_typed = (entry: string | ExpressionResult): entry is ExpressionResult => {
+const is_typed = (entry: string | AstNode): entry is AstNode => {
     return entry.hasOwnProperty("type")
 }

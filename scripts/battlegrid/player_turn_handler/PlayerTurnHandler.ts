@@ -1,22 +1,19 @@
 import {BattleGrid} from "battlegrid/BattleGrid";
 import {OnPositionClick, Position, positions_equal} from "battlegrid/Position";
-import {
-    BASIC_ATTACK_ACTIONS,
-    BASIC_MOVEMENT_ACTIONS,
-} from "powers/basic";
+import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS,} from "powers/basic";
 import {ActionLog} from "action_log/ActionLog";
 import {
-    preview_expression,
-    ExpressionResult,
-    resolve_number,
+    AstNode,
+    AstNodeNumberResolved,
     is_number,
-    ExpressionResultNumberResolved,
-    preview_defense
+    preview_defense,
+    preview_expression,
+    resolve_number
 } from "expression_parsers/preview_expression";
 import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
-import {assert} from "assert";
-import {Consequence, ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
+import {ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
+import {ActivePowerContext} from "battlegrid/player_turn_handler/ActivePowerContext";
 
 type PlayerTurnHandlerContextSelect = PlayerTurnHandlerContextSelectPosition | PlayerTurnHandlerContextSelectOption
 
@@ -285,7 +282,7 @@ export class PlayerTurnHandler {
                         const attack_base = preview_expression({token: consequence.attack, context})
                         if (attack_base.type !== "number_resolved") throw Error(`Attack formula did not evaluate to a resolved number`)
 
-                        const attack: ExpressionResult = {
+                        const attack: AstNode = {
                             type: "number_resolved",
                             value: attack_base.value + d20_result.value,
                             params: [
@@ -320,7 +317,7 @@ export class PlayerTurnHandler {
 
                         const result = resolved.value
 
-                        const modified_result: ExpressionResultNumberResolved = consequence.half_damage ? {
+                        const modified_result: AstNodeNumberResolved = consequence.half_damage ? {
                             type: "number_resolved",
                             value: Math.floor(result / 2),
                             params: [resolved],
@@ -419,61 +416,5 @@ export class PlayerTurnHandler {
         }
 
         return result
-    }
-}
-
-type ActivePowerVariable =
-    { type: "creature", value: Creature } |
-    { type: "position", value: Position }
-
-export class ActivePowerContext {
-    private variables: Map<string, ActivePowerVariable> = new Map()
-    private consequences: Array<Consequence> = []
-
-    constructor(consequences: Array<Consequence>) {
-        this.consequences = consequences
-    }
-
-    set_variable = ({name, ...variable}: { name: string } & ActivePowerVariable) => {
-        this.variables.set(name, variable)
-    }
-
-    get_creature = (name: string): Creature => {
-        const variable = this.variables.get(name)
-        if (!variable) throw Error(`variable ${name} not found in context`)
-        if (variable.type !== "creature") throw Error(`variable ${name} expected to be a 'creature', but its a '${variable.type}'`)
-        return variable.value
-    }
-
-    get_position = (name: string): Position => {
-        const variable = this.variables.get(name)
-        if (!variable) throw Error(`variable ${name} not found in context`)
-        if (variable.type !== "position") throw Error(`variable ${name} expected to be a 'position', but its a '${variable.type}'`)
-        return variable.value
-    }
-
-    next_consequence = (): Consequence => {
-        assert(this.consequences.length > 0, () => "no consequences left when calling next consequence")
-        const [next, ...consequences] = this.consequences
-        this.consequences = consequences
-        return next
-    }
-
-    has_consequences = (): boolean => {
-        return this.consequences.length > 0
-    }
-
-    has_variable = (name: string): boolean => {
-        return this.variables.has(name)
-    }
-
-    add_consequences = (consequences: Array<Consequence>): void => {
-        this.consequences = [...consequences, ...this.consequences]
-    }
-
-    get_variable = (name: string) => {
-        const variable = this.variables.get(name)
-        if (!variable) throw Error(`variable ${name} not found in context`)
-        return variable
     }
 }
