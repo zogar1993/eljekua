@@ -1,5 +1,5 @@
 import {BattleGrid} from "battlegrid/BattleGrid";
-import {OnPositionClick, Position} from "battlegrid/Position";
+import {OnPositionClick, Position, positions_equal} from "battlegrid/Position";
 import {
     BASIC_ATTACK_ACTIONS,
     BASIC_MOVEMENT_ACTIONS,
@@ -218,11 +218,11 @@ export class PlayerTurnHandler {
         context: ActivePowerContext
         creature: Creature
     }) => (
-        [...this.get_in_range({
+        this.get_in_range({
             targeting: consequence,
             origin: creature.data.position,
             context
-        })]
+        })
             .filter(position => this.filter_targets({
                 targeting: consequence,
                 position
@@ -476,8 +476,4 @@ export class ActivePowerContext {
         if (!variable) throw Error(`variable ${name} not found in context`)
         return variable
     }
-}
-
-const positions_equal = (position1: Position, position2: Position) => {
-    return position1.x === position2.x && position1.y === position2.y
 }
