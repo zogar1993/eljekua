@@ -1,5 +1,4 @@
 import {assert} from "assert";
-import {is_numeric_character} from "tokenizer/regexes";
 
 export class Scanner {
     readonly text: string

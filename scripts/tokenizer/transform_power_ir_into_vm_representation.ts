@@ -1,5 +1,5 @@
 import {tokenize} from "tokenizer/tokenize";
-import {IRConsequence, Power} from "types";
+import {IRConsequence, is_explicit_targeting, Power} from "types";
 import {Token} from "tokenizer/tokens/AnyToken";
 import {ATTRIBUTE_CODES} from "character_sheet/attributes";
 
@@ -31,19 +31,28 @@ export type PowerVM = {
     consequences: Array<Consequence>
 }
 
-export type ConsequenceSelectTarget = {
+export type ConsequenceSelectTarget =
+    ConsequenceSelectTargetExplicitDistance |
+    ConsequenceSelectTargetImplicitDistance
+
+export type ConsequenceSelectTargetExplicitDistance = {
     type: "select_target"
+    targeting_type: "movement" | "ranged"
     target_type: "enemy" | "terrain" | "creature"
     amount: 1,
     exclude: Array<string>
     label: string
-} & ({
-    targeting_type: "movement" | "ranged"
     distance: Token
-} | {
-    targeting_type: "adjacent" | "melee_weapon"
-})
+}
 
+export type ConsequenceSelectTargetImplicitDistance = {
+    type: "select_target"
+    targeting_type: "adjacent" | "melee_weapon"
+    target_type: "enemy" | "terrain" | "creature"
+    amount: 1,
+    exclude: Array<string>
+    label: string
+}
 
 export type ConsequenceAttackRoll = {
     type: "attack_roll"
@@ -61,37 +70,49 @@ export type ConsequenceOption = {
     consequences_false: Array<Consequence>
 }
 
-export type Consequence =
-    {
-        type: "apply_damage"
-        value: Token
-        target: string
-        half_damage: boolean
-        damage_types: Array<string>
-    } |
-    ConsequenceSelectTarget |
-    ConsequenceAttackRoll |
-    ConsequenceOption |
-    {
-        type: "move" | "shift"
-        target: string
-        destination: string
-    } | {
+export type ConsequenceApplyDamage = {
+    type: "apply_damage"
+    value: Token
+    target: string
+    half_damage: boolean
+    damage_types: Array<string>
+}
+
+export type ConsequenceMovement = {
+    type: "move" | "shift"
+    target: string
+    destination: string
+}
+
+export type ConsequenceOptions = {
     type: "options",
-    options: Array<{text: string, consequences: Array<Consequence>}>,
-} | {
+    options: Array<{ text: string, consequences: Array<Consequence> }>,
+}
+
+export type ConsequenceSavePosition = {
     type: "save_position",
     target: string,
     label: string
-} | {
+}
+
+export type ConsequencePush = {
     type: "push",
     amount: Token,
     target: string
 }
 
+export type Consequence =
+    ConsequenceApplyDamage |
+    ConsequenceSelectTarget |
+    ConsequenceAttackRoll |
+    ConsequenceOption |
+    ConsequenceMovement |
+    ConsequenceOptions |
+    ConsequenceSavePosition |
+    ConsequencePush
+
 const transform_primary_targeting = (targeting: Power["targeting"]): ConsequenceSelectTarget => {
-//TODO make this cleaner
-    if (targeting.type === "movement" || targeting.type === "ranged") {
+    if (is_explicit_targeting(targeting)) {
         return {
             type: "select_target",
             targeting_type: targeting.type,

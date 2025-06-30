@@ -9,4 +9,3 @@ export const tokenize = (value: string | number): Token => {
     assert(scanner.is_at_end(), () => `expected end of formula but found more text on ${text}`)
     return token
 }
-
