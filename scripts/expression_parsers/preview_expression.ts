@@ -1,5 +1,4 @@
 import {get_random_number} from "randomness/dice";
-import {assert} from "assert";
 import {Creature} from "battlegrid/creatures/Creature";
 import {KeywordToken} from "tokenizer/tokens/KeywordToken";
 import {Token} from "tokenizer/tokens/AnyToken";
@@ -9,6 +8,7 @@ import {StringToken} from "tokenizer/tokens/StringToken";
 import {DiceToken, WeaponToken} from "tokenizer/tokens/DiceToken";
 import {Position} from "battlegrid/Position";
 import {ActivePowerContext} from "battlegrid/player_turn_handler/ActivePowerContext";
+import {ATTRIBUTE_CODES} from "character_sheet/attributes";
 
 type PreviewExpressionProps<T extends Token> = { token: T, context: ActivePowerContext }
 
@@ -171,16 +171,14 @@ const preview_creature_property = ({creature, property}: {
     creature: Creature,
     property: string
 }): Omit<AstNodeNumberResolved, "type"> => {
-    const attributes = ["str", "con", "dex", "int", "wis", "cha"]
     if (property === "movement") return {
         value: creature.data.movement,
         description: "movement"
     }
-    //TODO clean up the attribute mess
     //TODO clean up the creature functions mess
-    if (attributes.some(attribute => `${attribute}_mod` === property))
+    if (ATTRIBUTE_CODES.some(attribute => `${attribute}_mod` === property))
         return preview_creature_attribute_mod(creature, property.slice(0, 3) as any)
-    if (attributes.some(attribute => `${attribute}_mod_lvl` === property)) {
+    if (ATTRIBUTE_CODES.some(attribute => `${attribute}_mod_lvl` === property)) {
         const parts = [
             preview_creature_half_level(creature),
             preview_creature_attribute_mod(creature, property.slice(0, 3) as any)
@@ -301,8 +299,10 @@ const is_number_unresolved = (value: AstNode): value is AstNodeNumberUnresolved 
 export const is_number = (value: AstNode): value is AstNodeNumber =>
     is_number_resolved(value) || is_number_unresolved(value)
 
-const assert_parameters_amount_equals = (token: FunctionToken, amount: number) =>
-    assert(token.parameters.length === amount, () => "equipped function needs exactly two parameter")
+const assert_parameters_amount_equals = (token: FunctionToken, amount: number) => {
+    if (token.parameters.length === amount) return
+    throw Error("equipped function needs exactly two parameter")
+}
 
 const NODE = {
     as_creature: (node: AstNode): AstNodeCreature => {

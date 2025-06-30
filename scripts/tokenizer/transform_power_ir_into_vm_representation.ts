@@ -1,6 +1,7 @@
 import {tokenize} from "tokenizer/tokenize";
 import {IRConsequence, Power} from "types";
 import {Token} from "tokenizer/tokens/AnyToken";
+import {ATTRIBUTE_CODES} from "character_sheet/attributes";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
@@ -123,9 +124,8 @@ const transform_primary_roll = (roll: Required<Power>["roll"]): ConsequenceAttac
     }
 }
 
-const attributes = ["str", "con", "dex", "int", "wis", "cha"] as const
 const standardize_attack = (text: string) =>
-    attributes.reduce((text, attribute) => text.replaceAll(attribute, `owner.${attribute}_mod_lvl`), text)
+    ATTRIBUTE_CODES.reduce((text, attribute) => text.replaceAll(attribute, `owner.${attribute}_mod_lvl`), text)
 
 const transform_generic_consequence = (consequence: IRConsequence): Consequence => {
     switch (consequence.type) {
