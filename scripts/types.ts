@@ -17,16 +17,25 @@ export type Power = {
     effect?: Array<IRConsequence>
 }
 
-type Targeting = {
+type Targeting = TargetingDistanceImplicit | TargetingDistanceExplicit
+
+type TargetingDistanceImplicit = {
     target_type: "terrain" | "enemy" | "creature"
     terrain_prerequisite?: "unoccupied"
     amount: 1
-} & ({
     type: "melee_weapon" | "adjacent",
-} | {
+}
+
+type TargetingDistanceExplicit = {
+    target_type: "terrain" | "enemy" | "creature"
+    terrain_prerequisite?: "unoccupied"
+    amount: 1
     type: "movement" | "ranged"
     distance: string,
-})
+}
+
+export const is_explicit_targeting = (target: Targeting): target is TargetingDistanceExplicit =>
+    target.type === "movement" || target.type === "ranged"
 
 export type IRConsequence =
     {
