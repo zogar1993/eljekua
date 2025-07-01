@@ -1,6 +1,6 @@
 import {Consequence} from "tokenizer/transform_power_ir_into_vm_representation";
 import {Creature} from "battlegrid/creatures/Creature";
-import {Position} from "battlegrid/Position";
+import {Path, Position} from "battlegrid/Position";
 import {assert} from "assert";
 
 export class ActivePowerContext {
@@ -26,6 +26,13 @@ export class ActivePowerContext {
         const variable = this.variables.get(name)
         if (!variable) throw Error(`variable ${name} not found in context`)
         if (variable.type !== "position") throw Error(`variable ${name} expected to be a 'position', but its a '${variable.type}'`)
+        return variable.value
+    }
+
+    get_path = (name: string): Path => {
+        const variable = this.variables.get(name)
+        if (!variable) throw Error(`variable ${name} not found in context`)
+        if (variable.type !== "path") throw Error(`variable ${name} expected to be a 'path', but its a '${variable.type}'`)
         return variable.value
     }
 
@@ -55,8 +62,8 @@ export class ActivePowerContext {
     }
 }
 
-type ActivePowerVariable = VariableTypeCreature | VariableTypePosition
+type ActivePowerVariable = VariableTypeCreature | VariableTypePosition | VariableTypePath
 
 type VariableTypeCreature = { type: "creature", value: Creature }
-
 type VariableTypePosition = { type: "position", value: Position }
+type VariableTypePath = { type: "path", value: Path }

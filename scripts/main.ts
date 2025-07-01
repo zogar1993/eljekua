@@ -17,6 +17,9 @@ const player_turn_handler = new PlayerTurnHandler(battle_grid, action_log)
 visual_creature_creator.addOnCreatureClickEvent(player_turn_handler.onClick)
 visual_square_creator.addOnSquareClickEvent(player_turn_handler.onClick)
 
+visual_creature_creator.addOnCreatureHoverEvent(player_turn_handler.onHover)
+visual_square_creator.addOnSquareHoverEvent(player_turn_handler.onHover)
+
 const ATTRIBUTES = {
     STRENGTH: "str",
     CONSTITUTION: "con",

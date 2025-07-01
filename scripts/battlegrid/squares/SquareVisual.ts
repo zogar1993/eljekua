@@ -1,4 +1,4 @@
-import {OnPositionClick} from "battlegrid/Position";
+import {OnPositionEvent} from "battlegrid/Position";
 
 export type SquareVisual = {
     clearIndicator: () => void
@@ -6,7 +6,8 @@ export type SquareVisual = {
 }
 
 export class VisualSquareCreator {
-    onSquareClickHandlers: Array<OnPositionClick> = []
+    onClickHandlers: Array<OnPositionEvent> = []
+    onHoverHandlers: Array<OnPositionEvent> = []
 
     create({x, y}: { x: number, y: number }) {
         const html_board = document.querySelector(".board")!
@@ -14,7 +15,11 @@ export class VisualSquareCreator {
         html_square.classList.add("board__square")
         html_board.appendChild(html_square)
 
-        html_square.addEventListener("click", () => this.onSquareClickHandlers.forEach(
+        html_square.addEventListener("click", () => this.onClickHandlers.forEach(
+            handler => handler({position: {x, y}})
+        ))
+
+        html_square.addEventListener("mouseenter", () => this.onHoverHandlers.forEach(
             handler => handler({position: {x, y}})
         ))
 
@@ -24,7 +29,11 @@ export class VisualSquareCreator {
         }
     }
 
-    addOnSquareClickEvent = (onClick: OnPositionClick) => {
-        this.onSquareClickHandlers.push(onClick)
+    addOnSquareClickEvent = (onClick: OnPositionEvent) => {
+        this.onClickHandlers.push(onClick)
+    }
+
+    addOnSquareHoverEvent = (onHover: OnPositionEvent) => {
+        this.onHoverHandlers.push(onHover)
     }
 }

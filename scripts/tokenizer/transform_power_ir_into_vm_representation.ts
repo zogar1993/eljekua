@@ -38,7 +38,7 @@ export type ConsequenceSelectTarget =
 export type ConsequenceSelectTargetExplicitDistance = {
     type: "select_target"
     targeting_type: "movement" | "ranged"
-    target_type: "enemy" | "terrain" | "creature"
+    target_type: "enemy" | "terrain" | "creature" | "path"
     amount: 1,
     exclude: Array<string>
     label: string
@@ -48,7 +48,7 @@ export type ConsequenceSelectTargetExplicitDistance = {
 export type ConsequenceSelectTargetImplicitDistance = {
     type: "select_target"
     targeting_type: "adjacent" | "melee_weapon"
-    target_type: "enemy" | "terrain" | "creature"
+    target_type: "enemy" | "terrain" | "creature" | "path"
     amount: 1,
     exclude: Array<string>
     label: string

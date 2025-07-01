@@ -11,7 +11,7 @@ const shift: Power = {
     targeting: {
         type: "movement",
         distance: "1",
-        target_type: "terrain",
+        target_type: "path",
         terrain_prerequisite: "unoccupied",
         amount: 1
     },
@@ -34,7 +34,7 @@ const movement: Power = {
     targeting: {
         type: "movement",
         distance: "owner.movement",
-        target_type: "terrain",
+        target_type: "path",
         terrain_prerequisite: "unoccupied",
         amount: 1
     },

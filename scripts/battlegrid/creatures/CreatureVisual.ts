@@ -1,4 +1,4 @@
-import {OnPositionClick, Position} from "battlegrid/Position";
+import {OnPositionEvent, Position} from "battlegrid/Position";
 import {CreatureData} from "battlegrid/creatures/CreatureData";
 
 export type CreatureVisual = {
@@ -10,7 +10,8 @@ export type CreatureVisual = {
 }
 
 export class VisualCreatureCreator {
-    onCreatureClickHandlers: Array<OnPositionClick> = []
+    onClickHandlers: Array<OnPositionEvent> = []
+    onHoverHandlers: Array<OnPositionEvent> = []
 
     create(data: CreatureData): CreatureVisual {
         const html_creature = document.createElement("div")
@@ -36,7 +37,11 @@ export class VisualCreatureCreator {
         const html_creatures = document.getElementById("creatures")!
         html_creatures.appendChild(html_creature)
 
-        html_creature.addEventListener("click", () => this.onCreatureClickHandlers.forEach(
+        html_creature.addEventListener("click", () => this.onClickHandlers.forEach(
+            handler => handler({position: data.position})
+        ))
+
+        html_creature.addEventListener("mouseenter", () => this.onHoverHandlers.forEach(
             handler => handler({position: data.position})
         ))
 
@@ -76,8 +81,12 @@ export class VisualCreatureCreator {
         }
     }
 
-    addOnCreatureClickEvent = (onClick: OnPositionClick) => {
-        this.onCreatureClickHandlers.push(onClick)
+    addOnCreatureClickEvent = (onClick: OnPositionEvent) => {
+        this.onClickHandlers.push(onClick)
+    }
+
+    addOnCreatureHoverEvent = (onHover: OnPositionEvent) => {
+        this.onHoverHandlers.push(onHover)
     }
 }
 

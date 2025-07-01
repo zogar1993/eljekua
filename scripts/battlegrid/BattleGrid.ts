@@ -1,8 +1,8 @@
 import {SquareVisual, VisualSquareCreator} from "battlegrid/squares/SquareVisual";
-import {CreatureVisual, VisualCreatureCreator} from "./creatures/CreatureVisual";
-import {Position, positions_equal} from "./Position";
 import {CreatureData} from "battlegrid/creatures/CreatureData";
 import {Creature} from "battlegrid/creatures/Creature";
+import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
+import {Path, Position, positions_equal} from "battlegrid/Position";
 
 export class BattleGrid {
     private BOARD_HEIGHT = 10
@@ -86,6 +86,47 @@ export class BattleGrid {
         return visited
     }
 
+    get_shortest_path = ({origin, destination}: { origin: Position, destination: Position }) => {
+        const visited: Array<Position> = [origin]
+        type WeightedPath = { path: Array<Position>, distance: number, moved: number, weight: number }
+        const initial_distance = distance_between_positions(origin, destination)
+        let paths: Array<WeightedPath> =
+            [{
+                path: [origin],
+                moved: 0,
+                distance: initial_distance,
+                weight: initial_distance
+            }]
+        const extend_path = ({old_path, position}: { old_path: WeightedPath, position: Position }): WeightedPath => {
+            const distance = distance_between_positions(position, destination)
+            const moved = old_path.moved + 1
+            return {path: [...old_path.path, position], distance, moved, weight: distance + moved}
+        }
+
+        while (paths.length > 0) {
+            const min_weight = Math.min(...paths.map(x => x.weight))
+            const current_path = paths.find(x => x.weight === min_weight)!
+
+            // remove the current path from the list, we only need its products, and we also avoid dead ends
+            paths = paths.filter(x => x !== current_path)
+
+            const head = current_path.path[current_path.path.length - 1]
+            const alternatives = this.get_adjacent({origin: head}).filter(x => visited.every(y => !positions_equal(x, y)))
+
+            const ending_position = alternatives.find(alternative => positions_equal(alternative, destination))
+            if (ending_position) return [...current_path.path, ending_position]
+
+            visited.push(...alternatives)
+
+            paths = [
+                ...alternatives.map(position => extend_path({old_path: current_path, position})),
+                ...paths
+            ]
+        }
+
+        throw Error(`Path not found from ${JSON.stringify(origin)} to ${JSON.stringify(destination)}`)
+    }
+
     get_melee({origin}: { origin: Position }): Array<Position> {
         const distance = 1
         const lower_x = Math.max(0, origin.x - distance)
@@ -123,7 +164,6 @@ export class BattleGrid {
     }) {
         //TODO contemplate bigger pushes
         const adjacent = this.get_adjacent({origin: defender_origin})
-        const distance_between_positions = (a: Position, b: Position) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
         const initial_distance = distance_between_positions(attacker_origin, defender_origin)
         const unoccupied = adjacent.filter(x => !this.is_terrain_occupied(x))
         return unoccupied.filter(position => distance_between_positions(position, attacker_origin) > initial_distance)
@@ -132,6 +172,16 @@ export class BattleGrid {
 
     place_creature({position, creature}: { position: Position, creature: Creature }) {
         creature.move_to(position)
+    }
+
+    move_creature({path, creature}: { path: Path, creature: Creature }) {
+        let offset = 0
+        for (const position of path) {
+            setTimeout(() => {
+                creature.move_to(position)
+            }, offset)
+            offset += 1000
+        }
     }
 
     get_creature_by_position(position: Position): Creature {
@@ -155,3 +205,5 @@ export type Square = {
     visual: SquareVisual,
     position: Position
 }
+
+const distance_between_positions = (a: Position, b: Position) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))

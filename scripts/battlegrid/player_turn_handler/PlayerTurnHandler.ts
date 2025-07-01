@@ -1,11 +1,11 @@
 import {BattleGrid} from "battlegrid/BattleGrid";
-import {OnPositionClick, Position, positions_equal} from "battlegrid/Position";
+import {OnPositionEvent, Position, positions_equal} from "battlegrid/Position";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS,} from "powers/basic";
 import {ActionLog} from "action_log/ActionLog";
 import {
     AstNode,
     AstNodeNumberResolved,
-    is_number, NODE,
+    NODE,
     preview_defense,
     token_to_node,
     resolve_number
@@ -15,13 +15,25 @@ import {Creature} from "battlegrid/creatures/Creature";
 import {ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
 import {ActivePowerContext} from "battlegrid/player_turn_handler/ActivePowerContext";
 
-type PlayerTurnHandlerContextSelect = PlayerTurnHandlerContextSelectPosition | PlayerTurnHandlerContextSelectOption
+type PlayerTurnHandlerContextSelect =
+    PlayerTurnHandlerContextSelectPosition
+    | PlayerTurnHandlerContextSelectOption
+    | PlayerTurnHandlerContextSelectPath
 
 type PlayerTurnHandlerContextSelectPosition = {
     type: "position_select"
     currently_selected: Creature
     available_targets: Array<Position>
     on_click: (position: Position) => void
+}
+
+type PlayerTurnHandlerContextSelectPath = {
+    type: "path_select"
+    currently_selected: Creature
+    available_targets: Array<Position>
+    current_path: Array<Position>
+    on_click: (position: Position) => void
+    on_hover: (position: Position) => void
 }
 
 type PlayerTurnHandlerContextSelectOption = {
@@ -52,6 +64,20 @@ export class PlayerTurnHandler {
 
         this.selection_context = {
             type: "position_select",
+            ...context
+        }
+
+        this.select(context.currently_selected)
+
+        const squares = context.available_targets.map(this.battle_grid.get_square)
+        squares.forEach(({visual}) => visual.setIndicator("available-target"))
+    }
+
+    set_awaiting_path_selection = (context: Omit<PlayerTurnHandlerContextSelectPath, "type">) => {
+        this.deselect()
+
+        this.selection_context = {
+            type: "path_select",
             ...context
         }
 
@@ -107,7 +133,7 @@ export class PlayerTurnHandler {
         })
     }
 
-    onClick: OnPositionClick = ({position}) => {
+    onClick: OnPositionEvent = ({position}) => {
         if (this.has_selected_creature()) {
             if (this.is_available_target(position))
                 this.target(position)
@@ -123,13 +149,20 @@ export class PlayerTurnHandler {
         }
     }
 
+    onHover: OnPositionEvent = ({position}) => {
+        if (this.selection_context?.type === "path_select") {
+            this.selection_context.on_hover(position)
+        }
+    }
+
     select(creature: Creature) {
         const cell = this.battle_grid.get_square(creature.data.position)
         cell.visual.setIndicator("selected")
     }
 
     target(position: Position) {
-        if (this.selection_context?.type !== "position_select") throw Error("available targets are not set")
+        if (this.selection_context?.type !== "position_select" && this.selection_context?.type !== "path_select")
+            throw Error("available targets are not set")
         this.selection_context.on_click(position)
     }
 
@@ -141,13 +174,17 @@ export class PlayerTurnHandler {
         if (this.selection_context.type === "position_select") {
             const squares = this.selection_context.available_targets.map(this.battle_grid.get_square)
             squares.forEach(square => square.visual.clearIndicator())
+        } else if (this.selection_context.type === "path_select") {
+            const squares = this.selection_context.available_targets.map(this.battle_grid.get_square)
+            squares.forEach(square => square.visual.clearIndicator())
         }
 
         this.selection_context = null
     }
 
     is_available_target = (position: Position) => {
-        if (this.selection_context?.type !== "position_select") throw Error("available targets are not set")
+        if (this.selection_context?.type !== "position_select" && this.selection_context?.type !== "path_select")
+            throw Error("available targets are not set")
         return this.selection_context.available_targets.some(p => positions_equal(p, position))
     }
 
@@ -202,6 +239,8 @@ export class PlayerTurnHandler {
     filter_targets({targeting, position}: { targeting: ConsequenceSelectTarget, position: Position }) {
         if (targeting.target_type === "terrain")
             return !this.battle_grid.is_terrain_occupied(position)
+        if (targeting.target_type === "path")
+            return !this.battle_grid.is_terrain_occupied(position)
         if (targeting.target_type === "enemy")
             return this.battle_grid.is_terrain_occupied(position)
         if (targeting.target_type === "creature")
@@ -245,30 +284,82 @@ export class PlayerTurnHandler {
                         )
 
                         if (filtered.length > 0) {
-                            const on_click = (position: Position) => {
-                                this.deselect()
-
-                                if (consequence.target_type === "terrain")
+                            if (consequence.target_type === "terrain") {
+                                const on_click = (position: Position) => {
                                     context.set_variable({
                                         name: consequence.label,
                                         value: position,
                                         type: "position"
                                     })
-                                else
+                                    this.deselect()
+                                    evaluate_consequences()
+                                }
+
+                                this.set_awaiting_position_selection({
+                                    currently_selected: context.get_creature("owner"),
+                                    available_targets: filtered,
+                                    on_click
+                                })
+                            } else if ((consequence.target_type === "creature" || consequence.target_type === "enemy")) {
+                                const on_click = (position: Position) => {
                                     context.set_variable({
                                         name: consequence.label,
                                         value: this.battle_grid.get_creature_by_position(position),
                                         type: "creature"
                                     })
+                                    this.deselect()
+                                    evaluate_consequences()
+                                }
 
-                                evaluate_consequences()
-                            }
+                                this.set_awaiting_position_selection({
+                                    currently_selected: context.get_creature("owner"),
+                                    available_targets: filtered,
+                                    on_click
+                                })
+                            } else if (consequence.target_type === "path") {
+                                const on_click = (position: Position) => {
+                                    if (this.selection_context?.type !== "path_select")
+                                        throw Error("selecting a path as a target requires selection_context to be set")
 
-                            this.set_awaiting_position_selection({
-                                currently_selected: context.get_creature("owner"),
-                                available_targets: filtered,
-                                on_click
-                            })
+                                    if (!positions_equal(position, this.selection_context.current_path[this.selection_context.current_path.length - 1]))
+                                        throw Error("position should be the end of the path")
+
+                                    context.set_variable({
+                                        name: consequence.label,
+                                        value: this.selection_context.current_path,
+                                        type: "path"
+                                    })
+                                    this.deselect()
+                                    evaluate_consequences()
+                                }
+
+                                const on_hover = (position: Position) => {
+                                    if (this.selection_context?.type !== "path_select")
+                                        throw Error("selecting a path as a target requires selection_context to be set")
+
+                                    const path = this.battle_grid.get_shortest_path({
+                                        origin: this.selection_context.currently_selected.data.position,
+                                        destination: position
+                                    })
+
+                                    this.set_awaiting_path_selection({
+                                        currently_selected: context.get_creature("owner"),
+                                        available_targets: filtered,
+                                        current_path: path,
+                                        on_click,
+                                        on_hover,
+                                    })
+                                }
+
+                                this.set_awaiting_path_selection({
+                                    currently_selected: context.get_creature("owner"),
+                                    available_targets: filtered,
+                                    current_path: [],
+                                    on_click,
+                                    on_hover,
+                                })
+                            } else throw Error(`target type ${consequence.target_type} not valid`)
+
                         }
                         break
                     }
@@ -329,14 +420,14 @@ export class PlayerTurnHandler {
                     }
                     case "move": {
                         const creature = context.get_creature(consequence.target)
-                        const destination = context.get_position(consequence.destination)
-                        this.battle_grid.place_creature({creature, position: destination})
+                        const path = context.get_path(consequence.destination)
+                        this.battle_grid.move_creature({creature, path})
                         break
                     }
                     case "shift": {
                         const creature = context.get_creature(consequence.target)
-                        const destination = context.get_position(consequence.destination)
-                        this.battle_grid.place_creature({creature, position: destination})
+                        const path = context.get_path(consequence.destination)
+                        this.battle_grid.move_creature({creature, path})
                         break
                     }
                     case "push": {

@@ -20,14 +20,14 @@ export type Power = {
 type Targeting = TargetingDistanceImplicit | TargetingDistanceExplicit
 
 type TargetingDistanceImplicit = {
-    target_type: "terrain" | "enemy" | "creature"
+    target_type: "terrain" | "enemy" | "creature" | "path"
     terrain_prerequisite?: "unoccupied"
     amount: 1
     type: "melee_weapon" | "adjacent",
 }
 
 type TargetingDistanceExplicit = {
-    target_type: "terrain" | "enemy" | "creature"
+    target_type: "terrain" | "enemy" | "creature" | "path"
     terrain_prerequisite?: "unoccupied"
     amount: 1
     type: "movement" | "ranged"
