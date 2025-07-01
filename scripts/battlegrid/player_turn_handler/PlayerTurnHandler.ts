@@ -231,7 +231,7 @@ export class PlayerTurnHandler {
         context.set_variable({name: "owner", value: creature, type: "creature"})
 
         const evaluate_consequences = () => {
-            while (context.has_consequences()) {
+            while (context.has_consequences() && !this.has_selected_creature()) {
                 const consequence = context.next_consequence()
 
                 switch (consequence.type) {
@@ -269,7 +269,6 @@ export class PlayerTurnHandler {
                                 available_targets: filtered,
                                 on_click
                             })
-                            return
                         }
                         break
                     }
@@ -341,12 +340,12 @@ export class PlayerTurnHandler {
                         break
                     }
                     case "push": {
-                        const atacker = context.get_creature("owner")
+                        const attacker = context.get_creature("owner")
                         const defender = context.get_creature(consequence.target)
 
                         //TODO contemplate push length
                         const alternatives = this.battle_grid.get_push_positions({
-                            attacker_origin: atacker.data.position,
+                            attacker_origin: attacker.data.position,
                             defender_origin: defender.data.position,
                             amount: 1
                         })
@@ -362,8 +361,7 @@ export class PlayerTurnHandler {
                                 }
                             })
                         }
-
-                        return;
+                        break
                     }
                     case "save_position": {
                         const target = context.get_creature(consequence.target)
@@ -407,7 +405,10 @@ export class PlayerTurnHandler {
         const result: ButtonOption = {
             text: action.name,
             disabled: false,
-            onClick: evaluate_consequences
+            onClick: () => {
+                this.deselect()
+                evaluate_consequences()
+            }
         }
 
         if (first_consequence.type === "select_target") {
