@@ -29,7 +29,7 @@ export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => 
     }
 }
 
-export const preview_expression = ({token, context}: PreviewExpressionProps<Token>): AstNode => {
+export const token_to_node = ({token, context}: PreviewExpressionProps<Token>): AstNode => {
     switch (token.type) {
         case "function":
             return preview_function({token, context})
@@ -62,7 +62,7 @@ const preview_function = ({token, context}: PreviewExpressionProps<FunctionToken
 }
 
 const preview_add_function = ({token, context}: PreviewExpressionProps<FunctionToken>): AstNodeNumber => {
-    const params = token.parameters.map(parameter => preview_expression({token: parameter, context}))
+    const params = token.parameters.map(parameter => token_to_node({token: parameter, context}))
 
     if (are_all_numbers_unresolved(params))
         return {
@@ -113,8 +113,8 @@ const preview_equipped_function = ({
 const preview_not_equals_function = ({token, context}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 2)
 
-    const parameter1 = preview_expression({token: token.parameters[0], context})
-    const parameter2 = preview_expression({token: token.parameters[1], context})
+    const parameter1 = token_to_node({token: token.parameters[0], context})
+    const parameter2 = token_to_node({token: token.parameters[1], context})
 
     if (parameter1.type === "position" && parameter2.type === "position") {
         const position1 = parameter1.value
@@ -304,11 +304,24 @@ const assert_parameters_amount_equals = (token: FunctionToken, amount: number) =
     throw Error("equipped function needs exactly two parameter")
 }
 
-const NODE = {
+export const NODE = {
     as_creature: (node: AstNode): AstNodeCreature => {
         if (node.type === "creature") return node
         throw Error(`Cannot cast node to "creature"`)
-    }
+    },
+    as_number: (node: AstNode): AstNodeNumber => {
+        if (node.type === "number_resolved") return node
+        if (node.type === "number_unresolved") return node
+        throw Error(`Cannot cast node to "number"`)
+    },
+    as_number_resolved: (node: AstNode): AstNodeNumberResolved => {
+        if (node.type === "number_resolved") return node
+        throw Error(`Cannot cast node to "number_resolved"`)
+    },
+    as_boolean: (node: AstNode): AstNodeBoolean => {
+        if (node.type === "boolean") return node
+        throw Error(`Cannot cast node to "boolean"`)
+    },
 }
 
 const TOKEN = {

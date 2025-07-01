@@ -1,5 +1,5 @@
 import {assert} from "assert";
-import {AstNodeNumberResolved} from "expression_parsers/preview_expression";
+import {AstNodeNumberResolved} from "expression_parsers/token_to_node";
 
 export const roll_d = (faces: number): AstNodeNumberResolved => {
     return {

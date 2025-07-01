@@ -5,11 +5,11 @@ import {ActionLog} from "action_log/ActionLog";
 import {
     AstNode,
     AstNodeNumberResolved,
-    is_number,
+    is_number, NODE,
     preview_defense,
-    preview_expression,
+    token_to_node,
     resolve_number
-} from "expression_parsers/preview_expression";
+} from "expression_parsers/token_to_node";
 import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
 import {ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
@@ -180,7 +180,7 @@ export class PlayerTurnHandler {
         context: ActivePowerContext
     }) {
         if (targeting.targeting_type === "movement") {
-            const distance = preview_expression({token: targeting.distance, context})
+            const distance = token_to_node({token: targeting.distance, context})
 
             if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
 
@@ -190,7 +190,7 @@ export class PlayerTurnHandler {
         } else if (targeting.targeting_type === "adjacent") {
             return this.battle_grid.get_adjacent({origin})
         } else if (targeting.targeting_type === "ranged") {
-            const distance = preview_expression({token: targeting.distance, context})
+            const distance = token_to_node({token: targeting.distance, context})
 
             if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
             return this.battle_grid.get_in_range({origin, distance: distance.value})
@@ -278,8 +278,7 @@ export class PlayerTurnHandler {
                         const attacker = context.get_creature("owner")
                         const defender = context.get_creature(consequence.defender)
 
-                        const attack_base = preview_expression({token: consequence.attack, context})
-                        if (attack_base.type !== "number_resolved") throw Error(`Attack formula did not evaluate to a resolved number`)
+                        const attack_base = NODE.as_number_resolved(token_to_node({token: consequence.attack, context}))
 
                         const attack: AstNode = {
                             type: "number_resolved",
@@ -291,8 +290,11 @@ export class PlayerTurnHandler {
                             description: "attack"
                         }
 
-                        const defense = preview_defense({defender, defense_code: consequence.defense})
-                        if (defense.type !== "number_resolved") throw Error(`Defense formula did not evaluate to a resolved number`)
+                        const defense = NODE.as_number_resolved(preview_defense({
+                            defender,
+                            defense_code: consequence.defense
+                        }))
+
                         const is_hit = attack.value >= defense.value
 
                         this.action_log.add_new_action_log(`${attacker.data.name}'s ${action.name} (`, attack, `) ${is_hit ? "hits" : "misses"} against ${defender.data.name}'s ${consequence.defense} (`, defense, `).`)
@@ -308,9 +310,7 @@ export class PlayerTurnHandler {
                     case "apply_damage": {
                         const target = context.get_creature(consequence.target)
 
-                        const damage = preview_expression({token: consequence.value, context})
-
-                        if (!is_number(damage)) throw Error(`Defense formula did not evaluate to a resolved number`)
+                        const damage = NODE.as_number(token_to_node({token: consequence.value, context}))
 
                         const resolved = resolve_number(damage)
 
@@ -384,14 +384,8 @@ export class PlayerTurnHandler {
                         break;
                     }
                     case "condition": {
-                        const condition = preview_expression({token: consequence.condition, context})
-
-                        if (condition.type !== "boolean") throw Error("Condition can only be boolean")
-
-                        if (condition.value)
-                            context.add_consequences(consequence.consequences_true)
-                        else
-                            context.add_consequences(consequence.consequences_false)
+                        const condition = NODE.as_boolean(token_to_node({token: consequence.condition, context}))
+                        context.add_consequences(condition.value ? consequence.consequences_true : consequence.consequences_false)
                         break
                     }
                     default:
