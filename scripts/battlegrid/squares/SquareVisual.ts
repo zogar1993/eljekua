@@ -2,7 +2,7 @@ import {OnPositionEvent} from "battlegrid/Position";
 
 export type SquareVisual = {
     clearIndicator: () => void
-    setIndicator: (value: "selected" | "available-target") => void
+    setIndicator: (value: "selected" | "available-target" | "current-path") => void
 }
 
 export class VisualSquareCreator {
@@ -25,7 +25,7 @@ export class VisualSquareCreator {
 
         return {
             clearIndicator: () => delete html_square.dataset["indicator"],
-            setIndicator: (value: "selected" | "available-target") => html_square.dataset["indicator"] = value
+            setIndicator: (value: "selected" | "available-target" | "current-path") => html_square.dataset["indicator"] = value
         }
     }
 

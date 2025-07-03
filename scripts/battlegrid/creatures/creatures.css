@@ -14,7 +14,9 @@
     align-items: flex-end;
     padding-bottom: 4px;
 
-    transition: 1000ms top, 1000ms left;
+    transition:
+        var(--creature__position-animation-duration, 0ms) top,
+        var(--creature__position-animation-duration, 0ms) left;
 }
 
 .creature__image {

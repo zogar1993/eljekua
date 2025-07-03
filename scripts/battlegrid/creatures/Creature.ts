@@ -1,9 +1,9 @@
 import {CreatureVisual} from "battlegrid/creatures/CreatureVisual";
-import {Position} from "battlegrid/Position";
 import {CreatureData} from "battlegrid/creatures/CreatureData";
+import {AnimationQueue} from "AnimationQueue";
 
 export class Creature {
-    private visual: CreatureVisual
+    visual: CreatureVisual
     data: CreatureData
 
     constructor({data, visual}: { data: CreatureData, visual: CreatureVisual }) {
@@ -11,18 +11,9 @@ export class Creature {
         this.visual = visual
     }
 
-    move_to(position: Position) {
-        this.data.position = position
-        this.visual.place_at(position)
-    }
-
     receive_damage(value: number) {
         this.data.hp_current -= value
-        this.visual.receive_damage({hp: this.data.hp_current, damage: value})
-    }
-
-    display_miss() {
-        this.visual.display_miss()
+        AnimationQueue.add_animation(() => this.visual.receive_damage({hp: this.data.hp_current, damage: value}))
     }
 
     display_hit_chance_on_hover = ({attack, defense, chance}: { attack: number, defense: number, chance: number }) => {

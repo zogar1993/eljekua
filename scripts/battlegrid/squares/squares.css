@@ -42,3 +42,11 @@
 .board__square[data-indicator=available-target]:hover::after {
     background-color: cadetblue;
 }
+
+.board__square[data-indicator=current-path]::after {
+    background-color: lightpink;
+}
+
+.board__square[data-indicator=current-path]:hover::after {
+    background-color: pink;
+}

@@ -3,8 +3,9 @@ import {CreatureData} from "battlegrid/creatures/CreatureData";
 
 export type CreatureVisual = {
     place_at: (position: Position) => void
-    receive_damage: ({hp, damage}: {hp: number, damage: number}) => void
-    display_miss: () => void
+    move_one_square: (position: Position) => number
+    receive_damage: ({hp, damage}: {hp: number, damage: number}) => number
+    display_miss: () => number
     display_hit_chance_on_hover: ({attack, defense, chance}: {attack: number, defense: number, chance: number}) => void
     remove_hit_chance_on_hover: () => void
 }
@@ -50,6 +51,12 @@ export class VisualCreatureCreator {
                 html_creature.style.setProperty("--creature_position-x", `${position.x}`)
                 html_creature.style.setProperty("--creature_position-y", `${position.y}`)
             },
+            move_one_square: (position: Position) => {
+                html_creature.style.setProperty("--creature_position-x", `${position.x}`)
+                html_creature.style.setProperty("--creature_position-y", `${position.y}`)
+                html_creature.style.setProperty("--creature__position-animation-duration", `${MOVEMENT_ANIMATION_DURATION}ms`)
+                return MOVEMENT_ANIMATION_DURATION
+            },
             receive_damage: ({hp, damage}: {hp: number, damage: number}) => {
                 html_creature.style.setProperty("--creature__lifebar_current-hp", `${hp}`)
 
@@ -59,6 +66,7 @@ export class VisualCreatureCreator {
                 html_creature.appendChild(fading_number)
 
                 setTimeout(() => fading_number.remove(), FADING_TEXT_ANIMATION_DURATION)
+                return FADING_TEXT_ANIMATION_DURATION / 2
             },
             display_miss: () => {
                 const fading_miss = document.createElement("div")
@@ -67,6 +75,7 @@ export class VisualCreatureCreator {
                 html_creature.appendChild(fading_miss)
 
                 setTimeout(() => fading_miss.remove(), FADING_TEXT_ANIMATION_DURATION)
+                return FADING_TEXT_ANIMATION_DURATION / 2
             },
             display_hit_chance_on_hover: ({attack, defense, chance}: {attack: number, defense: number, chance: number}) => {
                 const hit_chance = document.createElement("div")
@@ -91,3 +100,4 @@ export class VisualCreatureCreator {
 }
 
 const FADING_TEXT_ANIMATION_DURATION = 1500
+const MOVEMENT_ANIMATION_DURATION = 500

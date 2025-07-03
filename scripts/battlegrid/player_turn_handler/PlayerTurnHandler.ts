@@ -14,6 +14,7 @@ import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
 import {ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
 import {ActivePowerContext} from "battlegrid/player_turn_handler/ActivePowerContext";
+import {AnimationQueue} from "AnimationQueue";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -85,6 +86,9 @@ export class PlayerTurnHandler {
 
         const squares = context.available_targets.map(this.battle_grid.get_square)
         squares.forEach(({visual}) => visual.setIndicator("available-target"))
+
+        const path = context.current_path.map(this.battle_grid.get_square)
+        path.forEach(({visual}) => visual.setIndicator("current-path"))
     }
 
     set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => {
@@ -177,6 +181,8 @@ export class PlayerTurnHandler {
         } else if (this.selection_context.type === "path_select") {
             const squares = this.selection_context.available_targets.map(this.battle_grid.get_square)
             squares.forEach(square => square.visual.clearIndicator())
+            const path = this.selection_context.current_path.map(this.battle_grid.get_square)
+            path.forEach(square => square.visual.clearIndicator())
         }
 
         this.selection_context = null
@@ -210,7 +216,6 @@ export class PlayerTurnHandler {
         buttons.forEach(button => button.remove())
     }
 
-
     get_in_range({targeting, origin, context}: {
         targeting: ConsequenceSelectTarget,
         origin: Position,
@@ -225,7 +230,7 @@ export class PlayerTurnHandler {
         } else if (targeting.targeting_type === "melee_weapon") {
             return this.battle_grid.get_melee({origin})
         } else if (targeting.targeting_type === "adjacent") {
-            return this.battle_grid.get_adjacent({origin})
+            return this.battle_grid.get_adjacent({position: origin})
         } else if (targeting.targeting_type === "ranged") {
             const distance = token_to_node({token: targeting.distance, context})
 
@@ -336,6 +341,8 @@ export class PlayerTurnHandler {
                                 const on_hover = (position: Position) => {
                                     if (this.selection_context?.type !== "path_select")
                                         throw Error("selecting a path as a target requires selection_context to be set")
+                                    if (this.selection_context.available_targets.every(x => !positions_equal(x, position)))
+                                        return
 
                                     const path = this.battle_grid.get_shortest_path({
                                         origin: this.selection_context.currently_selected.data.position,
@@ -393,7 +400,7 @@ export class PlayerTurnHandler {
                         if (is_hit)
                             context.add_consequences(consequence.hit)
                         else {
-                            defender.display_miss()
+                            AnimationQueue.add_animation(defender.visual.display_miss)
                             context.add_consequences(consequence.miss)
                         }
                         break
@@ -420,14 +427,31 @@ export class PlayerTurnHandler {
                     }
                     case "move": {
                         const creature = context.get_creature(consequence.target)
-                        const path = context.get_path(consequence.destination)
-                        this.battle_grid.move_creature({creature, path})
+                        let path = context.get_path(consequence.destination).slice(1)
+
+                        while (path.length > 0) {
+                            // const position = creature.data.position
+                            // const potential_attackers = this.battle_grid.get_adjacent({position})
+                            //     .filter(this.battle_grid.is_terrain_occupied)
+                            //     .map(this.battle_grid.get_creature_by_position)
+
+                            // if (potential_attackers.length === 0) {
+                            //     this.battle_grid.move_creature_one_square({creature, position: path[0]})
+                            //     path = path.slice(1)
+                            // } else {
+                            //
+                            // }
+                                this.battle_grid.move_creature_one_square({creature, position: path[0]})
+                                path = path.slice(1)
+                        }
+
                         break
                     }
                     case "shift": {
                         const creature = context.get_creature(consequence.target)
                         const path = context.get_path(consequence.destination)
-                        this.battle_grid.move_creature({creature, path})
+                        for (const position of path)
+                            this.battle_grid.move_creature_one_square({creature, position})
                         break
                     }
                     case "push": {

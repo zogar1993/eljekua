@@ -2,12 +2,14 @@ import {SquareVisual, VisualSquareCreator} from "battlegrid/squares/SquareVisual
 import {CreatureData} from "battlegrid/creatures/CreatureData";
 import {Creature} from "battlegrid/creatures/Creature";
 import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
-import {Path, Position, positions_equal} from "battlegrid/Position";
+import {Position, positions_equal} from "battlegrid/Position";
+import {AnimationQueue} from "AnimationQueue";
 
 export class BattleGrid {
     private BOARD_HEIGHT = 10
     private BOARD_WIDTH = 10
     private creatures: Array<Creature> = []
+
 
     board: Array<Array<Square>>
     visual_creature_creator: VisualCreatureCreator
@@ -67,7 +69,7 @@ export class BattleGrid {
             const new_ring: Array<Position> = []
 
             for (const anchor of last_ring) {
-                const new_ring_candidates = this.get_adjacent({origin: anchor})
+                const new_ring_candidates = this.get_adjacent({position: anchor})
 
                 for (const new_ring_candidate of new_ring_candidates) {
                     if (this.is_terrain_occupied(new_ring_candidate)) continue
@@ -126,7 +128,9 @@ export class BattleGrid {
             paths = paths.filter(x => x !== current_path)
 
             const head = current_path.path[current_path.path.length - 1]
-            const alternatives = this.get_adjacent({origin: head}).filter(x => visited.every(y => !positions_equal(x, y)))
+            const alternatives = this.get_adjacent({position: head})
+                .filter(x => visited.every(y => !positions_equal(x, y)))
+                .filter(x => !this.is_terrain_occupied(x))
 
             const ending_position = alternatives.find(alternative => positions_equal(alternative, destination))
             if (ending_position) return [...current_path.path, ending_position]
@@ -157,17 +161,17 @@ export class BattleGrid {
         return result
     }
 
-    get_adjacent({origin}: { origin: Position }) {
+    get_adjacent({position}: { position: Position }) {
         const distance = 1
-        const lower_x = Math.max(0, origin.x - distance)
-        const upper_x = Math.min(this.BOARD_WIDTH - 1, origin.x + distance)
-        const lower_y = Math.max(0, origin.y - distance)
-        const upper_y = Math.min(this.BOARD_HEIGHT - 1, origin.y + distance)
+        const lower_x = Math.max(0, position.x - distance)
+        const upper_x = Math.min(this.BOARD_WIDTH - 1, position.x + distance)
+        const lower_y = Math.max(0, position.y - distance)
+        const upper_y = Math.min(this.BOARD_HEIGHT - 1, position.y + distance)
 
         const result = [];
         for (let x = lower_x; x <= upper_x; x++)
             for (let y = lower_y; y <= upper_y; y++)
-                if (origin.x !== x || origin.y !== y)
+                if (position.x !== x || position.y !== y)
                     result.push({x, y});
         return result
     }
@@ -178,7 +182,7 @@ export class BattleGrid {
         amount: number
     }) {
         //TODO contemplate bigger pushes
-        const adjacent = this.get_adjacent({origin: defender_origin})
+        const adjacent = this.get_adjacent({position: defender_origin})
         const initial_distance = distance_between_positions(attacker_origin, defender_origin)
         const unoccupied = adjacent.filter(x => !this.is_terrain_occupied(x))
         return unoccupied.filter(position => distance_between_positions(position, attacker_origin) > initial_distance)
@@ -186,29 +190,23 @@ export class BattleGrid {
 
 
     place_creature({position, creature}: { position: Position, creature: Creature }) {
-        creature.move_to(position)
+        creature.data.position = position
+        creature.visual.place_at(position)
     }
 
-    move_creature({path, creature}: { path: Path, creature: Creature }) {
-        //TODO this should disable
-        let offset = 0
-        for (const position of path) {
-            setTimeout(() => {
-                creature.move_to(position)
-            }, offset)
-            offset += 1000
-        }
+    move_creature_one_square({position, creature}: { position: Position, creature: Creature }) {
+        creature.data.position = position
+        AnimationQueue.add_animation(() => creature.visual.move_one_square(position))
     }
 
-    get_creature_by_position(position: Position): Creature {
-        const creature = this.creatures.find(c => c.data.position.x === position.x && c.data.position.y === position.y)
+    get_creature_by_position = (position: Position): Creature => {
+        const creature = this.creatures.find(creature => positions_equal(creature.data.position, position))
         if (!creature) throw Error(`creature not found for cell ${position}`)
         return creature
     }
 
-    is_terrain_occupied(position: Position) {
-        return this.creatures.some(c => c.data.position.x === position.x && c.data.position.y === position.y)
-    }
+    is_terrain_occupied = (position: Position) =>
+        this.creatures.some(creature => positions_equal(creature.data.position, position))
 
     create_creature = (data: CreatureData) => {
         const visual = this.visual_creature_creator.create(data)
