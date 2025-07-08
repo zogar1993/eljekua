@@ -16,6 +16,7 @@ import {Consequence, ConsequenceSelectTarget, PowerVM} from "tokenizer/transform
 import {ActivePowerContext} from "battlegrid/player_turn_handler/ActivePowerContext";
 import {AnimationQueue} from "AnimationQueue";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
+import {get_move_area} from "battlegrid/ranges/get_move_area";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -225,7 +226,7 @@ export class PlayerTurnHandler {
     }) {
         if (targeting.targeting_type === "movement") {
             const distance = NODE.as_number_resolved(token_to_node({token: targeting.distance, context}))
-            return this.battle_grid.get_move_area({origin, distance: distance.value})
+            return get_move_area({origin, distance: distance.value, battle_grid: this.battle_grid})
         } else if (targeting.targeting_type === "melee_weapon") {
             return this.battle_grid.get_melee({origin})
         } else if (targeting.targeting_type === "adjacent") {

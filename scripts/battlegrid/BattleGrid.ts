@@ -6,10 +6,24 @@ import {Position, positions_equal} from "battlegrid/Position";
 import {AnimationQueue} from "AnimationQueue";
 
 export class BattleGrid {
-    private BOARD_HEIGHT = 10
-    private BOARD_WIDTH = 10
+    readonly BOARD_HEIGHT = 10
+    readonly BOARD_WIDTH = 10
     private creatures: Array<Creature> = []
 
+    get_adjacent({position}: { position: Position }) {
+        const distance = 1
+        const lower_x = Math.max(0, position.x - distance)
+        const upper_x = Math.min(this.BOARD_WIDTH - 1, position.x + distance)
+        const lower_y = Math.max(0, position.y - distance)
+        const upper_y = Math.min(this.BOARD_HEIGHT - 1, position.y + distance)
+
+        const result = [];
+        for (let x = lower_x; x <= upper_x; x++)
+            for (let y = lower_y; y <= upper_y; y++)
+                if (position.x !== x || position.y !== y)
+                    result.push({x, y});
+        return result
+    }
 
     board: Array<Array<Square>>
     visual_creature_creator: VisualCreatureCreator
@@ -57,35 +71,6 @@ export class BattleGrid {
                 if (origin.x !== x || origin.y !== y)
                     result.push({x, y});
         return result
-    }
-
-    get_move_area({origin, distance}: { origin: Position, distance: number }): Array<Position> {
-        const visited = [origin]
-        let last_ring = [origin]
-
-        let movement_left = distance
-
-        while (movement_left > 0) {
-            const new_ring: Array<Position> = []
-
-            for (const anchor of last_ring) {
-                const new_ring_candidates = this.get_adjacent({position: anchor})
-
-                for (const new_ring_candidate of new_ring_candidates) {
-                    if (this.is_terrain_occupied(new_ring_candidate)) continue
-                    if (visited.some(position => positions_equal(position, new_ring_candidate))) continue
-                    if (new_ring.some(position => positions_equal(position, new_ring_candidate))) continue
-                    new_ring.push(new_ring_candidate)
-                    visited.push(new_ring_candidate)
-                }
-            }
-
-            last_ring = new_ring
-
-            movement_left--
-        }
-
-        return visited
     }
 
     get_shortest_path = ({origin, destination}: { origin: Position, destination: Position }) => {
@@ -157,21 +142,6 @@ export class BattleGrid {
         for (let x = lower_x; x <= upper_x; x++)
             for (let y = lower_y; y <= upper_y; y++)
                 if (origin.x !== x || origin.y !== y)
-                    result.push({x, y});
-        return result
-    }
-
-    get_adjacent({position}: { position: Position }) {
-        const distance = 1
-        const lower_x = Math.max(0, position.x - distance)
-        const upper_x = Math.min(this.BOARD_WIDTH - 1, position.x + distance)
-        const lower_y = Math.max(0, position.y - distance)
-        const upper_y = Math.min(this.BOARD_HEIGHT - 1, position.y + distance)
-
-        const result = [];
-        for (let x = lower_x; x <= upper_x; x++)
-            for (let y = lower_y; y <= upper_y; y++)
-                if (position.x !== x || position.y !== y)
                     result.push({x, y});
         return result
     }
