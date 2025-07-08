@@ -12,9 +12,10 @@ import {
 } from "expression_parsers/token_to_node";
 import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
-import {ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Consequence, ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
 import {ActivePowerContext} from "battlegrid/player_turn_handler/ActivePowerContext";
 import {AnimationQueue} from "AnimationQueue";
+import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -52,6 +53,7 @@ type ButtonOption = {
 export class PlayerTurnHandler {
     private action_log: ActionLog
     private battle_grid: BattleGrid
+    private turn_context = new TurnContext()
 
     private selection_context: PlayerTurnHandlerContextSelect | null = null
 
@@ -222,10 +224,7 @@ export class PlayerTurnHandler {
         context: ActivePowerContext
     }) {
         if (targeting.targeting_type === "movement") {
-            const distance = token_to_node({token: targeting.distance, context})
-
-            if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
-
+            const distance = NODE.as_number_resolved(token_to_node({token: targeting.distance, context}))
             return this.battle_grid.get_move_area({origin, distance: distance.value})
         } else if (targeting.targeting_type === "melee_weapon") {
             return this.battle_grid.get_melee({origin})
@@ -271,12 +270,13 @@ export class PlayerTurnHandler {
     )
 
     build_action_button(action: PowerVM, creature: Creature): ButtonOption {
-        const context = new ActivePowerContext(action.consequences)
-        context.set_variable({name: "owner", value: creature, type: "creature"})
-
         const evaluate_consequences = () => {
-            while (context.has_consequences() && !this.has_selected_creature()) {
-                const consequence = context.next_consequence()
+            while (!this.has_selected_creature()) {
+                const consequence = this.turn_context.next_consequence()
+
+                // Reached the end of all consequences
+                if (consequence === null) return
+                const context = this.turn_context.get_current_context()
 
                 switch (consequence.type) {
                     case "select_target": {
@@ -427,22 +427,50 @@ export class PlayerTurnHandler {
                     }
                     case "move": {
                         const creature = context.get_creature(consequence.target)
-                        let path = context.get_path(consequence.destination).slice(1)
+                        let path = context.get_path(consequence.destination)
 
-                        while (path.length > 0) {
-                            // const position = creature.data.position
-                            // const potential_attackers = this.battle_grid.get_adjacent({position})
-                            //     .filter(this.battle_grid.is_terrain_occupied)
-                            //     .map(this.battle_grid.get_creature_by_position)
+                        for (let i = 0; i < path.length - 1; i++) {
+                            const current_position = path[i]
+                            const potential_attackers = this.battle_grid.get_adjacent({position: current_position})
+                                .filter(this.battle_grid.is_terrain_occupied)
+                                .map(this.battle_grid.get_creature_by_position)
+                                .filter(this.turn_context.has_opportunity_action)
 
-                            // if (potential_attackers.length === 0) {
-                            //     this.battle_grid.move_creature_one_square({creature, position: path[0]})
-                            //     path = path.slice(1)
-                            // } else {
-                            //
-                            // }
-                                this.battle_grid.move_creature_one_square({creature, position: path[0]})
-                                path = path.slice(1)
+                            if (potential_attackers.length === 0) {
+                                const new_position = path[i + 1]
+                                this.battle_grid.move_creature_one_square({creature, position: new_position})
+                            } else {
+                                for (const attacker of potential_attackers) {
+                                    const opportunity_attack_context = new ActivePowerContext(
+                                        add_option_for_oportunity_attack(remove_first_targeting(BASIC_ATTACK_ACTIONS[0].consequences))
+                                    )
+                                    opportunity_attack_context.set_variable({
+                                        name: "owner",
+                                        value: attacker,
+                                        type: "creature"
+                                    })
+                                    opportunity_attack_context.set_variable({
+                                        name: "primary_target",
+                                        value: creature,
+                                        type: "creature"
+                                    })
+                                    this.turn_context.add_power_context(opportunity_attack_context)
+                                    //TODO this should be better
+                                    this.turn_context.expend_opportunity_action(attacker)
+                                }
+
+                                context.add_consequences([{
+                                    type: "move",
+                                    target: consequence.target,
+                                    destination: consequence.destination
+                                }])
+                                context.set_variable({
+                                    type: "path",
+                                    name: consequence.destination,
+                                    value: path.slice(i)
+                                })
+                                break
+                            }
                         }
 
                         break
@@ -511,11 +539,16 @@ export class PlayerTurnHandler {
 
         const first_consequence = action.consequences[0]
 
+        const context = new ActivePowerContext(action.consequences)
+        context.set_variable({name: "owner", value: creature, type: "creature"})
+
         const result: ButtonOption = {
             text: action.name,
             disabled: false,
             onClick: () => {
                 this.deselect()
+                //TODO make this better
+                this.turn_context.add_power_context(context)
                 evaluate_consequences()
             }
         }
@@ -527,4 +560,24 @@ export class PlayerTurnHandler {
 
         return result
     }
+}
+
+//TODO make it tidier
+const remove_first_targeting = (consequences: Array<Consequence>) => {
+    if (consequences[0].type === "select_target")
+        return consequences.slice(1)
+    throw Error("targeting needed for removing it")
+}
+
+//TODO make it tidier
+const add_option_for_oportunity_attack = (consequences: Array<Consequence>): Array<Consequence> => {
+    return [
+        {
+            type: "options",
+            options: [
+                {text: "Opportunity Attack", consequences},
+                {text: "Ignore", consequences: []},
+            ],
+        }
+    ]
 }
