@@ -17,6 +17,7 @@ import {ActivePowerContext} from "battlegrid/player_turn_handler/ActivePowerCont
 import {AnimationQueue} from "AnimationQueue";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 import {get_move_area} from "battlegrid/ranges/get_move_area";
+import {get_adjacent} from "battlegrid/ranges/get_adyacent";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -230,7 +231,7 @@ export class PlayerTurnHandler {
         } else if (targeting.targeting_type === "melee_weapon") {
             return this.battle_grid.get_melee({origin})
         } else if (targeting.targeting_type === "adjacent") {
-            return this.battle_grid.get_adjacent({position: origin})
+            return get_adjacent({position: origin, battle_grid: this.battle_grid})
         } else if (targeting.targeting_type === "ranged") {
             const distance = token_to_node({token: targeting.distance, context})
 
@@ -432,7 +433,7 @@ export class PlayerTurnHandler {
 
                         for (let i = 0; i < path.length - 1; i++) {
                             const current_position = path[i]
-                            const potential_attackers = this.battle_grid.get_adjacent({position: current_position})
+                            const potential_attackers = get_adjacent({position: current_position, battle_grid: this.battle_grid})
                                 .filter(this.battle_grid.is_terrain_occupied)
                                 .map(this.battle_grid.get_creature_by_position)
                                 .filter(this.turn_context.has_opportunity_action)

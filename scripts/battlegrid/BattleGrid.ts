@@ -4,30 +4,20 @@ import {Creature} from "battlegrid/creatures/Creature";
 import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
 import {Position, positions_equal} from "battlegrid/Position";
 import {AnimationQueue} from "AnimationQueue";
+import {get_adjacent} from "battlegrid/ranges/get_adyacent";
 
 export class BattleGrid {
     readonly BOARD_HEIGHT = 10
     readonly BOARD_WIDTH = 10
     private creatures: Array<Creature> = []
 
-    get_adjacent({position}: { position: Position }) {
-        const distance = 1
-        const lower_x = Math.max(0, position.x - distance)
-        const upper_x = Math.min(this.BOARD_WIDTH - 1, position.x + distance)
-        const lower_y = Math.max(0, position.y - distance)
-        const upper_y = Math.min(this.BOARD_HEIGHT - 1, position.y + distance)
-
-        const result = [];
-        for (let x = lower_x; x <= upper_x; x++)
-            for (let y = lower_y; y <= upper_y; y++)
-                if (position.x !== x || position.y !== y)
-                    result.push({x, y});
-        return result
-    }
-
     board: Array<Array<Square>>
     visual_creature_creator: VisualCreatureCreator
-    get_square = ({x, y}: { x: number, y: number }) => this.board[y][x]
+    get_square = ({x, y}: Position) => {
+        if (x < 0 || x >= this.BOARD_WIDTH || y < 0 || y >= this.BOARD_HEIGHT)
+            throw (`position {x:${x}, y:${y}} is out of the battle grid dimensions (width:${this.BOARD_WIDTH}, height:${this.BOARD_HEIGHT})`)
+        return this.board[y][x]
+    }
 
     constructor({
                     visual_square_creator,
@@ -45,8 +35,6 @@ export class BattleGrid {
             }
         )
     }
-
-    get_all_creatures = () => this.creatures;
 
     get_area_burst({origin, radius}: { origin: Position, radius: number }): Array<Position> {
         const lower_x = Math.max(0, origin.x - radius)
@@ -113,7 +101,7 @@ export class BattleGrid {
             paths = paths.filter(x => x !== current_path)
 
             const head = current_path.path[current_path.path.length - 1]
-            const alternatives = this.get_adjacent({position: head})
+            const alternatives = get_adjacent({position: head, battle_grid: this})
                 .filter(x => visited.every(y => !positions_equal(x, y)))
                 .filter(x => !this.is_terrain_occupied(x))
 
@@ -152,7 +140,7 @@ export class BattleGrid {
         amount: number
     }) {
         //TODO contemplate bigger pushes
-        const adjacent = this.get_adjacent({position: defender_origin})
+        const adjacent = get_adjacent({position: defender_origin, battle_grid: this})
         const initial_distance = distance_between_positions(attacker_origin, defender_origin)
         const unoccupied = adjacent.filter(x => !this.is_terrain_occupied(x))
         return unoccupied.filter(position => distance_between_positions(position, attacker_origin) > initial_distance)
