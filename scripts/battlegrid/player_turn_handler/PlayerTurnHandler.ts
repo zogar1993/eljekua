@@ -18,6 +18,7 @@ import {interpret_condition} from "battlegrid/player_turn_handler/consequence_in
 import {interpret_save_position} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_save_position";
 import {interpret_shift} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_shift";
 import {interpret_atack_roll} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_atack_roll";
+import {interpret_select_target} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_select_target";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -57,7 +58,7 @@ export class PlayerTurnHandler {
     private battle_grid: BattleGrid
     private turn_context = new TurnContext()
 
-    private selection_context: PlayerTurnHandlerContextSelect | null = null
+    selection_context: PlayerTurnHandlerContextSelect | null = null
 
     constructor(battle_grid: BattleGrid, action_log: ActionLog) {
         this.battle_grid = battle_grid
@@ -267,94 +268,9 @@ export class PlayerTurnHandler {
             const context = this.turn_context.get_current_context()
 
             switch (consequence.type) {
-                case "select_target": {
-                    const valid_targets = this.get_valid_targets({consequence, context})
-
-                    const filtered = valid_targets.filter(
-                        target => !consequence.exclude.some(
-                            excluded => positions_equal(context.get_creature(excluded).data.position, target)
-                        )
-                    )
-
-                    if (filtered.length > 0) {
-                        if (consequence.target_type === "terrain") {
-                            const on_click = (position: Position) => {
-                                context.set_variable({
-                                    name: consequence.label,
-                                    value: position,
-                                    type: "position"
-                                })
-                                this.deselect()
-                            }
-
-                            this.set_awaiting_position_selection({
-                                currently_selected: context.get_creature("owner"),
-                                available_targets: filtered,
-                                on_click
-                            })
-                        } else if ((consequence.target_type === "creature" || consequence.target_type === "enemy")) {
-                            const on_click = (position: Position) => {
-                                context.set_variable({
-                                    name: consequence.label,
-                                    value: this.battle_grid.get_creature_by_position(position),
-                                    type: "creature"
-                                })
-                                this.deselect()
-                            }
-
-                            this.set_awaiting_position_selection({
-                                currently_selected: context.get_creature("owner"),
-                                available_targets: filtered,
-                                on_click
-                            })
-                        } else if (consequence.target_type === "path") {
-                            const on_click = (position: Position) => {
-                                if (this.selection_context?.type !== "path_select")
-                                    throw Error("selecting a path as a target requires selection_context to be set")
-
-                                if (!positions_equal(position, this.selection_context.current_path[this.selection_context.current_path.length - 1]))
-                                    throw Error("position should be the end of the path")
-
-                                context.set_variable({
-                                    name: consequence.label,
-                                    value: this.selection_context.current_path,
-                                    type: "path"
-                                })
-                                this.deselect()
-                            }
-
-                            const on_hover = (position: Position) => {
-                                if (this.selection_context?.type !== "path_select")
-                                    throw Error("selecting a path as a target requires selection_context to be set")
-                                if (this.selection_context.available_targets.every(x => !positions_equal(x, position)))
-                                    return
-
-                                const path = this.battle_grid.get_shortest_path({
-                                    origin: this.selection_context.currently_selected.data.position,
-                                    destination: position
-                                })
-
-                                this.set_awaiting_path_selection({
-                                    currently_selected: context.get_creature("owner"),
-                                    available_targets: filtered,
-                                    current_path: path,
-                                    on_click,
-                                    on_hover,
-                                })
-                            }
-
-                            this.set_awaiting_path_selection({
-                                currently_selected: context.get_creature("owner"),
-                                available_targets: filtered,
-                                current_path: [],
-                                on_click,
-                                on_hover,
-                            })
-                        } else throw Error(`target type ${consequence.target_type} not valid`)
-
-                    }
+                case "select_target":
+                    interpret_select_target({consequence, context, player_turn_handler: this, battle_grid: this.battle_grid})
                     break
-                }
                 case "attack_roll": {
                     interpret_atack_roll({consequence, context, action_log: this.action_log})
                     break
