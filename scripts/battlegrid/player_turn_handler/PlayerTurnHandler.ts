@@ -116,6 +116,7 @@ export class PlayerTurnHandler {
             button.addEventListener("click", () => {
                     this.clear_actions_menu()
                     option.on_click()
+                    this.evaluate_consequences()
 
                     //TODO can be better
                     // this.battle_grid.get_all_creatures().forEach(creature => creature.remove_hit_chance_on_hover())
@@ -471,7 +472,6 @@ export class PlayerTurnHandler {
                                 on_click: () => {
                                     this.deselect()
                                     context.add_consequences(option.consequences)
-                                    this.evaluate_consequences()
                                 }
                             })
                         )
@@ -502,7 +502,6 @@ export class PlayerTurnHandler {
                 this.deselect()
                 //TODO make this better
                 this.turn_context.add_power_context(context)
-                this.evaluate_consequences()
             }
         }
 
