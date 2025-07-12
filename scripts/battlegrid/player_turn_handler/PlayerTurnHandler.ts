@@ -3,18 +3,14 @@ import {OnPositionEvent, Position, positions_equal} from "battlegrid/Position";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS,} from "powers/basic";
 import {ActionLog} from "action_log/ActionLog";
 import {
-    AstNode,
     AstNodeNumberResolved,
     NODE,
-    preview_defense,
     token_to_node,
     resolve_number
 } from "expression_parsers/token_to_node";
-import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
 import {Consequence, ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
-import {AnimationQueue} from "AnimationQueue";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 import {get_move_area} from "battlegrid/ranges/get_move_area";
 import {get_adjacent} from "battlegrid/ranges/get_adyacent";
@@ -149,7 +145,7 @@ export class PlayerTurnHandler {
         if (this.selection_context?.type === "position_select" || this.selection_context?.type === "path_select") {
             if (this.selection_context.available_targets.some(p => positions_equal(p, position))) {
                 this.selection_context.on_click(position)
-
+                this.evaluate_consequences()
             }
         } else {
             if (this.battle_grid.is_terrain_occupied(position)) {
@@ -288,7 +284,6 @@ export class PlayerTurnHandler {
                                     type: "position"
                                 })
                                 this.deselect()
-                                this.evaluate_consequences()
                             }
 
                             this.set_awaiting_position_selection({
@@ -304,7 +299,6 @@ export class PlayerTurnHandler {
                                     type: "creature"
                                 })
                                 this.deselect()
-                                this.evaluate_consequences()
                             }
 
                             this.set_awaiting_position_selection({
@@ -326,7 +320,6 @@ export class PlayerTurnHandler {
                                     type: "path"
                                 })
                                 this.deselect()
-                                this.evaluate_consequences()
                             }
 
                             const on_hover = (position: Position) => {
@@ -461,7 +454,6 @@ export class PlayerTurnHandler {
                             on_click: (position) => {
                                 this.deselect()
                                 this.battle_grid.place_creature({creature: defender, position})
-                                this.evaluate_consequences()
                             }
                         })
                     }
