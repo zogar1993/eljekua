@@ -21,6 +21,7 @@ import {interpret_atack_roll} from "battlegrid/player_turn_handler/consequence_i
 import {interpret_select_target} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_select_target";
 import {interpret_apply_damage} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_apply_damage";
 import {interpret_move} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_move";
+import {interpret_push} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_push";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -290,26 +291,7 @@ export class PlayerTurnHandler {
                     break
                 }
                 case "push": {
-                    const attacker = context.get_creature("owner")
-                    const defender = context.get_creature(consequence.target)
-
-                    //TODO contemplate push length
-                    const alternatives = this.battle_grid.get_push_positions({
-                        attacker_origin: attacker.data.position,
-                        defender_origin: defender.data.position,
-                        amount: 1
-                    })
-
-                    if (alternatives.length > 0) {
-                        this.set_awaiting_position_selection({
-                            currently_selected: context.get_creature("owner"),
-                            available_targets: alternatives,
-                            on_click: (position) => {
-                                this.deselect()
-                                this.battle_grid.place_creature({creature: defender, position})
-                            }
-                        })
-                    }
+                    interpret_push({consequence, context, battle_grid: this.battle_grid, player_turn_handler: this})
                     break
                 }
                 case "save_position": {
