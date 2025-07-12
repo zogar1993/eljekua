@@ -19,6 +19,7 @@ import {interpret_save_position} from "battlegrid/player_turn_handler/consequenc
 import {interpret_shift} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_shift";
 import {interpret_atack_roll} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_atack_roll";
 import {interpret_select_target} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_select_target";
+import {interpret_apply_damage} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_apply_damage";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -276,23 +277,7 @@ export class PlayerTurnHandler {
                     break
                 }
                 case "apply_damage": {
-                    const target = context.get_creature(consequence.target)
-
-                    const damage = NODE.as_number(token_to_node({token: consequence.value, context}))
-
-                    const resolved = resolve_number(damage)
-
-                    const result = resolved.value
-
-                    const modified_result: AstNodeNumberResolved = consequence.half_damage ? {
-                        type: "number_resolved",
-                        value: Math.floor(result / 2),
-                        params: [resolved],
-                        description: "half damage"
-                    } : resolved
-
-                    target.receive_damage(modified_result.value)
-                    this.action_log.add_new_action_log(`${target.data.name} was dealt `, modified_result, `${consequence.half_damage ? " half" : ""} damage.`)
+                    interpret_apply_damage({consequence, context, action_log: this.action_log})
                     break
                 }
                 case "move": {
