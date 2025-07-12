@@ -1,11 +1,11 @@
-import {ActivePowerContext} from "battlegrid/player_turn_handler/ActivePowerContext";
+import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {Creature} from "battlegrid/creatures/Creature";
 
 export class TurnContext {
-    power_contexts: Array<ActivePowerContext> = []
+    power_contexts: Array<PowerContext> = []
     expended_opportunity_actions: Array<Creature> = []
 
-    add_power_context = (context: ActivePowerContext) => {
+    add_power_context = (context: PowerContext) => {
         this.power_contexts.push(context)
     }
 

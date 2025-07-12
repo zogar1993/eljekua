@@ -7,10 +7,10 @@ import {NumberToken} from "tokenizer/tokens/NumberToken";
 import {StringToken} from "tokenizer/tokens/StringToken";
 import {DiceToken, WeaponToken} from "tokenizer/tokens/DiceToken";
 import {Position} from "battlegrid/Position";
-import {ActivePowerContext} from "battlegrid/player_turn_handler/ActivePowerContext";
+import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {ATTRIBUTE_CODES} from "character_sheet/attributes";
 
-type PreviewExpressionProps<T extends Token> = { token: T, context: ActivePowerContext }
+type PreviewExpressionProps<T extends Token> = { token: T, context: PowerContext }
 
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number

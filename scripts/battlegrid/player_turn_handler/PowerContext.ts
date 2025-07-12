@@ -3,12 +3,14 @@ import {Creature} from "battlegrid/creatures/Creature";
 import {Path, Position} from "battlegrid/Position";
 import {assert} from "assert";
 
-export class ActivePowerContext {
+export class PowerContext {
     private variables: Map<string, ActivePowerVariable> = new Map()
     private consequences: Array<Consequence> = []
+    readonly power_name
 
-    constructor(consequences: Array<Consequence>) {
+    constructor(consequences: Array<Consequence>, power_name: string) {
         this.consequences = consequences
+        this.power_name = power_name
     }
 
     set_variable = ({name, ...variable}: { name: string } & ActivePowerVariable) => {

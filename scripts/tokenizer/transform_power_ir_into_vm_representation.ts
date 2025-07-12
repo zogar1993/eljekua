@@ -63,7 +63,7 @@ export type ConsequenceAttackRoll = {
     miss: Array<Consequence>
 }
 
-export type ConsequenceOption = {
+export type ConsequenceCondition = {
     type: "condition",
     condition: Token,
     consequences_true: Array<Consequence>
@@ -105,7 +105,7 @@ export type Consequence =
     ConsequenceApplyDamage |
     ConsequenceSelectTarget |
     ConsequenceAttackRoll |
-    ConsequenceOption |
+    ConsequenceCondition |
     ConsequenceMovement |
     ConsequenceOptions |
     ConsequenceSavePosition |
