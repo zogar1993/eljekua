@@ -22,6 +22,7 @@ import {interpret_select_target} from "battlegrid/player_turn_handler/consequenc
 import {interpret_apply_damage} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_apply_damage";
 import {interpret_move} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_move";
 import {interpret_push} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_push";
+import {interpret_options} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_options";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -299,17 +300,7 @@ export class PlayerTurnHandler {
                     break
                 }
                 case "options": {
-                    this.set_awaiting_option_selection({
-                        currently_selected: context.get_creature("owner"),
-                        available_options: consequence.options.map(option => ({
-                                text: option.text,
-                                on_click: () => {
-                                    this.deselect()
-                                    context.add_consequences(option.consequences)
-                                }
-                            })
-                        )
-                    })
+                    interpret_options({consequence, context, player_turn_handler: this})
                     break;
                 }
                 case "condition": {
