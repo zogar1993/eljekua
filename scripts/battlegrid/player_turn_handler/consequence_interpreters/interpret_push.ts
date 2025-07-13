@@ -1,14 +1,14 @@
-import {ConsequencePush, ConsequenceSavePosition} from "tokenizer/transform_power_ir_into_vm_representation";
-import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
-import {BattleGrid} from "battlegrid/BattleGrid";
-import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
+import {ConsequencePush} from "tokenizer/transform_power_ir_into_vm_representation";
+import {
+    InterpretConsequenceProps
+} from "battlegrid/player_turn_handler/consequence_interpreters/InterpretConsequenceProps";
 
-export const interpret_push = ({consequence, context, player_turn_handler, battle_grid}: {
-    consequence: ConsequencePush,
-    context: PowerContext,
-    battle_grid: BattleGrid,
-    player_turn_handler: PlayerTurnHandler
-}) => {
+export const interpret_push = ({
+                                   consequence,
+                                   context,
+                                   player_turn_handler,
+                                   battle_grid
+                               }: InterpretConsequenceProps<ConsequencePush>) => {
     const attacker = context.get_creature("owner")
     const defender = context.get_creature(consequence.target)
 

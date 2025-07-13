@@ -2,27 +2,14 @@ import {BattleGrid} from "battlegrid/BattleGrid";
 import {OnPositionEvent, Position, positions_equal} from "battlegrid/Position";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS,} from "powers/basic";
 import {ActionLog} from "action_log/ActionLog";
-import {
-    AstNodeNumberResolved,
-    NODE,
-    token_to_node,
-    resolve_number
-} from "expression_parsers/token_to_node";
+import {NODE, token_to_node} from "expression_parsers/token_to_node";
 import {Creature} from "battlegrid/creatures/Creature";
-import {Consequence, ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
+import {ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 import {get_move_area} from "battlegrid/ranges/get_move_area";
 import {get_adjacent} from "battlegrid/ranges/get_adyacent";
-import {interpret_condition} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_condition";
-import {interpret_save_position} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_save_position";
-import {interpret_shift} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_shift";
-import {interpret_atack_roll} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_atack_roll";
-import {interpret_select_target} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_select_target";
-import {interpret_apply_damage} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_apply_damage";
-import {interpret_move} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_move";
-import {interpret_push} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_push";
-import {interpret_options} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_options";
+import {interpret_consequence} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_consequence";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -72,10 +59,7 @@ export class PlayerTurnHandler {
     set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => {
         this.deselect()
 
-        this.selection_context = {
-            type: "position_select",
-            ...context
-        }
+        this.selection_context = {type: "position_select", ...context}
 
         this.select(context.currently_selected)
 
@@ -271,45 +255,13 @@ export class PlayerTurnHandler {
             if (consequence === null) return
             const context = this.turn_context.get_current_context()
 
-            switch (consequence.type) {
-                case "select_target":
-                    interpret_select_target({consequence, context, player_turn_handler: this, battle_grid: this.battle_grid})
-                    break
-                case "attack_roll": {
-                    interpret_atack_roll({consequence, context, action_log: this.action_log})
-                    break
-                }
-                case "apply_damage": {
-                    interpret_apply_damage({consequence, context, action_log: this.action_log})
-                    break
-                }
-                case "move": {
-                    interpret_move({consequence, context, battle_grid: this.battle_grid, player_turn_handler: this})
-                    break
-                }
-                case "shift": {
-                    interpret_shift({consequence, context, battle_grid: this.battle_grid})
-                    break
-                }
-                case "push": {
-                    interpret_push({consequence, context, battle_grid: this.battle_grid, player_turn_handler: this})
-                    break
-                }
-                case "save_position": {
-                    interpret_save_position({consequence, context})
-                    break
-                }
-                case "options": {
-                    interpret_options({consequence, context, player_turn_handler: this})
-                    break;
-                }
-                case "condition": {
-                    interpret_condition({consequence, context})
-                    break
-                }
-                default:
-                    throw Error("action not implemented " + JSON.stringify(consequence))
-            }
+            interpret_consequence({
+                consequence,
+                context,
+                player_turn_handler: this,
+                battle_grid: this.battle_grid,
+                action_log: this.action_log
+            })
         }
     }
 

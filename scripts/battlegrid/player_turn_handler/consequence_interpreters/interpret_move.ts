@@ -2,15 +2,11 @@ import {get_adjacent} from "battlegrid/ranges/get_adyacent";
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {BASIC_ATTACK_ACTIONS} from "powers/basic";
 import {Consequence, ConsequenceMovement} from "tokenizer/transform_power_ir_into_vm_representation";
-import {BattleGrid} from "battlegrid/BattleGrid";
-import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
+import {
+    InterpretConsequenceProps
+} from "battlegrid/player_turn_handler/consequence_interpreters/InterpretConsequenceProps";
 
-export const interpret_move = ({consequence, context, battle_grid, player_turn_handler}: {
-    consequence: ConsequenceMovement,
-    context: PowerContext,
-    battle_grid: BattleGrid,
-    player_turn_handler: PlayerTurnHandler
-}) => {
+export const interpret_move = ({consequence, context, battle_grid, player_turn_handler}: InterpretConsequenceProps<ConsequenceMovement>) => {
     const creature = context.get_creature(consequence.target)
     let path = context.get_path(consequence.destination)
 

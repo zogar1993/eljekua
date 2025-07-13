@@ -1,0 +1,13 @@
+import {Consequence} from "tokenizer/transform_power_ir_into_vm_representation";
+import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
+import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
+import {BattleGrid} from "battlegrid/BattleGrid";
+import {ActionLog} from "action_log/ActionLog";
+
+export type InterpretConsequenceProps<T extends Consequence> = {
+    consequence: T
+    context: PowerContext
+    player_turn_handler: PlayerTurnHandler
+    battle_grid: BattleGrid
+    action_log: ActionLog
+}

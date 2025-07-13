@@ -2,14 +2,11 @@ import {roll_d} from "randomness/dice";
 import {AstNode, NODE, preview_defense, token_to_node} from "expression_parsers/token_to_node";
 import {AnimationQueue} from "AnimationQueue";
 import {ConsequenceAttackRoll} from "tokenizer/transform_power_ir_into_vm_representation";
-import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
-import {ActionLog} from "action_log/ActionLog";
+import {
+    InterpretConsequenceProps
+} from "battlegrid/player_turn_handler/consequence_interpreters/InterpretConsequenceProps";
 
-export const interpret_atack_roll = ({consequence, context, action_log}: {
-    consequence: ConsequenceAttackRoll,
-    context: PowerContext,
-    action_log: ActionLog
-}) => {
+export const interpret_attack_roll = ({consequence, context, action_log}: InterpretConsequenceProps<ConsequenceAttackRoll>) => {
     const d20_result = roll_d(20)
 
     const attacker = context.get_creature("owner")
