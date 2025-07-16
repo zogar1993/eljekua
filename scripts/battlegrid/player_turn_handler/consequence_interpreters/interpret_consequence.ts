@@ -11,6 +11,10 @@ import {Consequence} from "tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretConsequenceProps
 } from "battlegrid/player_turn_handler/consequence_interpreters/InterpretConsequenceProps";
+import {
+    interpret_save_resolved_number
+} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_save_resolved_number";
+import {interpret_copy_variable} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_copy_variable";
 
 export const interpret_consequence = (props: InterpretConsequenceProps<Consequence>) => {
     const {consequence} = props
@@ -35,6 +39,12 @@ export const interpret_consequence = (props: InterpretConsequenceProps<Consequen
             break
         case "save_position":
             interpret_save_position({...props, consequence})
+            break
+        case "save_resolved_number":
+            interpret_save_resolved_number({...props, consequence})
+            break
+        case "copy_variable":
+            interpret_copy_variable({...props, consequence})
             break
         case "options":
             interpret_options({...props, consequence})

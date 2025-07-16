@@ -16,6 +16,8 @@ export class VisualCreatureCreator {
 
     create(data: CreatureData): CreatureVisual {
         const html_creature = document.createElement("div")
+
+        html_creature.setAttribute("id", data.name.toLowerCase())
         html_creature.classList.add("creature")
         html_creature.style.setProperty("--creature__image", data.image)
 

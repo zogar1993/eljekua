@@ -14,8 +14,8 @@ const action_log = new ActionLog()
 const battle_grid = new BattleGrid({visual_square_creator, visual_creature_creator})
 const player_turn_handler = new PlayerTurnHandler(battle_grid, action_log)
 
-visual_creature_creator.addOnCreatureClickEvent(player_turn_handler.onClick)
-visual_square_creator.addOnSquareClickEvent(player_turn_handler.onClick)
+visual_creature_creator.addOnCreatureClickEvent(player_turn_handler.on_click)
+visual_square_creator.addOnSquareClickEvent(player_turn_handler.on_click)
 
 visual_creature_creator.addOnCreatureHoverEvent(player_turn_handler.onHover)
 visual_square_creator.addOnSquareHoverEvent(player_turn_handler.onHover)

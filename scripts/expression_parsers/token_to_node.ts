@@ -164,6 +164,10 @@ const preview_keyword = ({token, context}: PreviewExpressionProps<KeywordToken>)
             }
     }
 
+    if (variable.type === "resolved_number") {
+        return variable.value
+    }
+
     throw Error("variable type not supported")
 }
 

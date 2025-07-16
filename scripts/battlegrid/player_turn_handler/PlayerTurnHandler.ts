@@ -15,6 +15,7 @@ type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
     | PlayerTurnHandlerContextSelectOption
     | PlayerTurnHandlerContextSelectPath
+    | PlayerTurnHandlerContextSelectAreaBurst
 
 type PlayerTurnHandlerContextSelectPosition = {
     type: "position_select"
@@ -28,6 +29,16 @@ type PlayerTurnHandlerContextSelectPath = {
     currently_selected: Creature
     available_targets: Array<Position>
     current_path: Array<Position>
+    on_click: (position: Position) => void
+    on_hover: (position: Position) => void
+}
+
+type PlayerTurnHandlerContextSelectAreaBurst = {
+    type: "area_burst_select"
+    currently_selected: Creature
+    available_targets: Array<Position>
+    affected_area: Array<Position>
+    affected_targets: Array<Position>
     on_click: (position: Position) => void
     on_hover: (position: Position) => void
 }
@@ -84,6 +95,23 @@ export class PlayerTurnHandler {
         path.forEach(({visual}) => visual.setIndicator("current-path"))
     }
 
+    set_awaiting_area_burst_selection = (context: Omit<PlayerTurnHandlerContextSelectAreaBurst, "type">) => {
+        this.deselect()
+
+        this.selection_context = {
+            type: "area_burst_select",
+            ...context
+        }
+
+        this.select(context.currently_selected)
+
+        const squares = context.available_targets.map(this.battle_grid.get_square)
+        squares.forEach(({visual}) => visual.setIndicator("available-target"))
+
+        const area = context.affected_area.map(this.battle_grid.get_square)
+        area.forEach(({visual}) => visual.setIndicator("area"))
+    }
+
     set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => {
         this.deselect()
 
@@ -131,8 +159,8 @@ export class PlayerTurnHandler {
         })
     }
 
-    onClick: OnPositionEvent = ({position}) => {
-        if (this.selection_context?.type === "position_select" || this.selection_context?.type === "path_select") {
+    on_click: OnPositionEvent = ({position}) => {
+        if (this.selection_context?.type === "position_select" || this.selection_context?.type === "path_select" || this.selection_context?.type === "area_burst_select") {
             if (this.selection_context.available_targets.some(p => positions_equal(p, position))) {
                 this.selection_context.on_click(position)
                 this.evaluate_consequences()
@@ -151,6 +179,8 @@ export class PlayerTurnHandler {
 
     onHover: OnPositionEvent = ({position}) => {
         if (this.selection_context?.type === "path_select") {
+            this.selection_context.on_hover(position)
+        } else if (this.selection_context?.type === "area_burst_select") {
             this.selection_context.on_hover(position)
         }
     }
@@ -173,6 +203,13 @@ export class PlayerTurnHandler {
             squares.forEach(square => square.visual.clearIndicator())
             const path = this.selection_context.current_path.map(this.battle_grid.get_square)
             path.forEach(square => square.visual.clearIndicator())
+        } else if (this.selection_context.type === "area_burst_select") {
+            const squares = this.selection_context.available_targets.map(this.battle_grid.get_square)
+            squares.forEach(square => square.visual.clearIndicator())
+            const area = this.selection_context.affected_area.map(this.battle_grid.get_square)
+            area.forEach(square => square.visual.clearIndicator())
+            const targets = this.selection_context.affected_targets.map(this.battle_grid.get_square)
+            targets.forEach(square => square.visual.clearIndicator())
         }
 
         this.selection_context = null
@@ -212,7 +249,7 @@ export class PlayerTurnHandler {
             return this.battle_grid.get_melee({origin})
         } else if (targeting.targeting_type === "adjacent") {
             return get_adjacent({position: origin, battle_grid: this.battle_grid})
-        } else if (targeting.targeting_type === "ranged") {
+        } else if (targeting.targeting_type === "ranged" || targeting.targeting_type === "area_burst") {
             const distance = token_to_node({token: targeting.distance, context})
 
             if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
@@ -235,17 +272,18 @@ export class PlayerTurnHandler {
         throw `Target "${targeting.target_type}" not supported`
     }
 
-    get_valid_targets = ({consequence, context}: { consequence: ConsequenceSelectTarget, context: PowerContext }) => (
-        this.get_in_range({
+    get_valid_targets = ({consequence, context}: { consequence: ConsequenceSelectTarget, context: PowerContext }) => {
+        const in_range = this.get_in_range({
             targeting: consequence,
             origin: context.get_creature("owner").data.position,
             context
         })
-            .filter(position => this.filter_targets({
-                targeting: consequence,
-                position
-            }))
-    )
+        if (consequence.targeting_type === "area_burst") return in_range
+        return in_range.filter(position => this.filter_targets({
+            targeting: consequence,
+            position
+        }))
+    }
 
     evaluate_consequences = () => {
         while (!this.has_selected_creature()) {
@@ -266,7 +304,7 @@ export class PlayerTurnHandler {
     }
 
     build_action_button(action: PowerVM, creature: Creature): ButtonOption {
-
+//TODO this fails if we select another character while options are displayed
         const first_consequence = action.consequences[0]
 
         const context = new PowerContext(action.consequences, action.name)

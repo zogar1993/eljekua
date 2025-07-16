@@ -12,6 +12,56 @@ export const interpret_select_target = ({
                                         }: InterpretConsequenceProps<ConsequenceSelectTarget>) => {
     const valid_targets = player_turn_handler.get_valid_targets({consequence, context})
 
+    if (consequence.targeting_type === "area_burst") {
+        const on_click = (position: Position) => {
+                if (player_turn_handler.selection_context?.type !== "area_burst_select")
+                    throw Error("selecting a area burst as a target requires selection_context to be set")
+
+                if (player_turn_handler.selection_context.available_targets.every(target => !positions_equal(target, position)))
+                    return
+
+                const targets = player_turn_handler.selection_context.affected_targets
+
+                context.set_variable({
+                    name: consequence.label,
+                    value: targets.map(battle_grid.get_creature_by_position),
+                    type: "creatures"
+                })
+                player_turn_handler.deselect()
+            }
+
+            const on_hover = (position: Position) => {
+                if (player_turn_handler.selection_context?.type !== "area_burst_select")
+                    throw Error("area burst on hover requires the area burst selection context to be set")
+                if (player_turn_handler.selection_context.available_targets.every(x => !positions_equal(x, position)))
+                    return
+
+                const area = [...battle_grid.get_in_range({
+                    origin: position,
+                    distance: consequence.radius
+                }), position]
+
+                player_turn_handler.set_awaiting_area_burst_selection({
+                    currently_selected: context.get_creature("owner"),
+                    available_targets: valid_targets,
+                    affected_targets: area.filter(battle_grid.is_terrain_occupied),
+                    affected_area: area,
+                    on_click,
+                    on_hover,
+                })
+            }
+
+            player_turn_handler.set_awaiting_area_burst_selection({
+                currently_selected: context.get_creature("owner"),
+                available_targets: valid_targets,
+                affected_targets: [],
+                affected_area: [],
+                on_click,
+                on_hover,
+            })
+            return
+    }
+
     const filtered = valid_targets.filter(
         target => !consequence.exclude.some(
             excluded => positions_equal(context.get_creature(excluded).data.position, target)

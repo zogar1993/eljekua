@@ -50,3 +50,11 @@
 .board__square[data-indicator=current-path]:hover::after {
     background-color: pink;
 }
+
+.board__square[data-indicator=area]::after {
+    background-color: yellow;
+}
+
+.board__square[data-indicator=area]:hover::after {
+    background-color: lightyellow;
+}

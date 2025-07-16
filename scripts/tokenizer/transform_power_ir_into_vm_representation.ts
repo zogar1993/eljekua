@@ -1,5 +1,5 @@
 import {tokenize} from "tokenizer/tokenize";
-import {IRConsequence, is_explicit_targeting, Power} from "types";
+import {IRConsequence, is_area_burst, is_explicit_targeting, Power} from "types";
 import {Token} from "tokenizer/tokens/AnyToken";
 import {ATTRIBUTE_CODES} from "character_sheet/attributes";
 
@@ -33,7 +33,8 @@ export type PowerVM = {
 
 export type ConsequenceSelectTarget =
     ConsequenceSelectTargetExplicitDistance |
-    ConsequenceSelectTargetImplicitDistance
+    ConsequenceSelectTargetImplicitDistance |
+    ConsequenceSelectTargetAreaBurst
 
 export type ConsequenceSelectTargetExplicitDistance = {
     type: "select_target"
@@ -54,11 +55,23 @@ export type ConsequenceSelectTargetImplicitDistance = {
     label: string
 }
 
+export type ConsequenceSelectTargetAreaBurst = {
+    type: "select_target"
+    targeting_type: "area_burst"
+    target_type: "enemy" | "terrain" | "creature" | "path"
+    amount: "all",
+    exclude: Array<string>
+    label: string
+    distance: Token
+    radius: number
+}
+
 export type ConsequenceAttackRoll = {
     type: "attack_roll"
     attack: Token
     defense: string
     defender: string
+    before_consequences: Array<Consequence>
     hit: Array<Consequence>
     miss: Array<Consequence>
 }
@@ -95,10 +108,22 @@ export type ConsequenceSavePosition = {
     label: string
 }
 
+export type ConsequenceSaveResolvedNumber = {
+    type: "save_resolved_number",
+    value: Token,
+    label: string
+}
+
 export type ConsequencePush = {
     type: "push",
     amount: Token,
     target: string
+}
+
+export type ConsequenceCopyVariable = {
+    type: "copy_variable",
+    origin: string,
+    destination: string
 }
 
 export type Consequence =
@@ -109,7 +134,9 @@ export type Consequence =
     ConsequenceMovement |
     ConsequenceOptions |
     ConsequenceSavePosition |
-    ConsequencePush
+    ConsequenceSaveResolvedNumber |
+    ConsequencePush |
+    ConsequenceCopyVariable
 
 const transform_primary_targeting = (targeting: Power["targeting"]): ConsequenceSelectTarget => {
     if (is_explicit_targeting(targeting)) {
@@ -121,6 +148,17 @@ const transform_primary_targeting = (targeting: Power["targeting"]): Consequence
             label: PRIMARY_TARGET_LABEL,
             exclude: [],
             distance: tokenize(targeting.distance)
+        }
+    } else if (is_area_burst(targeting)) {
+        return {
+            type: "select_target",
+            targeting_type: targeting.type,
+            target_type: targeting.target_type,
+            amount: targeting.amount,
+            label: PRIMARY_TARGET_LABEL,
+            exclude: [],
+            distance: tokenize(targeting.distance),
+            radius: targeting.radius
         }
     } else {
         return {
@@ -140,8 +178,9 @@ const transform_primary_roll = (roll: Required<Power>["roll"]): ConsequenceAttac
         attack: tokenize(standardize_attack(roll.attack)),
         defense: roll.defense,
         defender: PRIMARY_TARGET_LABEL,
+        before_consequences: roll.before_consequences?.map(transform_generic_consequence) || [],
         hit: roll.hit.map(transform_generic_consequence),
-        miss: roll.miss ? roll.miss.map(transform_generic_consequence) : []
+        miss: roll.miss?.map(transform_generic_consequence) || []
     }
 }
 
@@ -199,6 +238,12 @@ const transform_generic_consequence = (consequence: IRConsequence): Consequence 
                 type: "save_position",
                 label: consequence.label,
                 target: consequence.target
+            }
+        case "save_resolved_number":
+            return {
+                type: "save_resolved_number",
+                label: consequence.label,
+                value: tokenize(consequence.value)
             }
         case "push":
             return {

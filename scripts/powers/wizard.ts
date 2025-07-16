@@ -24,4 +24,40 @@ const magic_missile: Power = {
     ]
 }
 
-export const WIZARD_POWERS = [magic_missile].map(transform_power_ir_into_vm_representation)
+const scorching_burst: Power = {
+    name: "Scorching Burst",
+    description: "You create a vertical column of golden flames that burns all within.",
+    type: {
+        action: "standard",
+        cooldown: "at-will",
+        attack: true,
+    },
+    targeting: {
+        type: "area_burst",
+        target_type: "creature",
+        amount: "all",
+        distance: 10,
+        radius: 1
+    },
+    roll: {
+        attack: "int",
+        defense: "reflex",
+        before_consequences: [
+            {
+                type: "save_resolved_number",
+                value: "$add({1d6},owner.int_mod)",
+                label: "primary_damage"
+            }
+        ],
+        hit: [
+            {
+                type: "apply_damage",
+                value: "primary_damage",
+                target: "primary_target",
+                damage_types: ["fire"]
+            },
+        ]
+    },
+}
+
+export const WIZARD_POWERS = [magic_missile, scorching_burst].map(transform_power_ir_into_vm_representation)

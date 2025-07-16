@@ -2,6 +2,7 @@ import {Consequence} from "tokenizer/transform_power_ir_into_vm_representation";
 import {Creature} from "battlegrid/creatures/Creature";
 import {Path, Position} from "battlegrid/Position";
 import {assert} from "assert";
+import {AstNodeNumberResolved} from "expression_parsers/token_to_node";
 
 export class PowerContext {
     private variables: Map<string, ActivePowerVariable> = new Map()
@@ -22,6 +23,14 @@ export class PowerContext {
         if (!variable) throw Error(`variable ${name} not found in context`)
         if (variable.type !== "creature") throw Error(`variable ${name} expected to be a 'creature', but its a '${variable.type}'`)
         return variable.value
+    }
+
+    get_creatures = (name: string): Array<Creature> => {
+        const variable = this.variables.get(name)
+        if (!variable) throw Error(`variable ${name} not found in context`)
+        if (variable.type === "creature") return [variable.value]
+        if (variable.type === "creatures") return variable.value
+        throw Error(`variable ${name} expected to be a 'creature' or 'creatures', but its a '${variable.type}'`)
     }
 
     get_position = (name: string): Position => {
@@ -64,8 +73,15 @@ export class PowerContext {
     }
 }
 
-type ActivePowerVariable = VariableTypeCreature | VariableTypePosition | VariableTypePath
+type ActivePowerVariable =
+    VariableTypeCreature
+    | VariableTypePosition
+    | VariableTypePath
+    | VariableTypeCreatures
+    | VariableTypeResolvedNumber
 
 type VariableTypeCreature = { type: "creature", value: Creature }
+type VariableTypeCreatures = { type: "creatures", value: Array<Creature> }
 type VariableTypePosition = { type: "position", value: Position }
 type VariableTypePath = { type: "path", value: Path }
+type VariableTypeResolvedNumber = { type: "resolved_number", value: AstNodeNumberResolved }
