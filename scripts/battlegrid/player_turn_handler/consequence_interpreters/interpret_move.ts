@@ -6,7 +6,12 @@ import {
     InterpretConsequenceProps
 } from "battlegrid/player_turn_handler/consequence_interpreters/InterpretConsequenceProps";
 
-export const interpret_move = ({consequence, context, battle_grid, player_turn_handler}: InterpretConsequenceProps<ConsequenceMovement>) => {
+export const interpret_move = ({
+                                   consequence,
+                                   context,
+                                   battle_grid,
+                                   player_turn_handler
+                               }: InterpretConsequenceProps<ConsequenceMovement>) => {
     const creature = context.get_creature(consequence.target)
     let path = context.get_path(consequence.destination)
 
@@ -29,16 +34,8 @@ export const interpret_move = ({consequence, context, battle_grid, player_turn_h
                     add_option_for_opportunity_attack(remove_first_targeting(BASIC_ATTACK_ACTIONS[0].consequences)),
                     BASIC_ATTACK_ACTIONS[0].name
                 )
-                opportunity_attack_context.set_variable({
-                    name: "owner",
-                    value: attacker,
-                    type: "creature"
-                })
-                opportunity_attack_context.set_variable({
-                    name: "primary_target",
-                    value: creature,
-                    type: "creature"
-                })
+                opportunity_attack_context.set_creature({name: "owner", value: attacker})
+                opportunity_attack_context.set_creature({name: "primary_target", value: creature})
                 player_turn_handler.turn_context.add_power_context(opportunity_attack_context)
                 //TODO this should be better
                 player_turn_handler.turn_context.expend_opportunity_action(attacker)
@@ -49,11 +46,7 @@ export const interpret_move = ({consequence, context, battle_grid, player_turn_h
                 target: consequence.target,
                 destination: consequence.destination
             }])
-            context.set_variable({
-                type: "path",
-                name: consequence.destination,
-                value: path.slice(i)
-            })
+            context.set_path({name: consequence.destination, value: path.slice(i)})
             break
         }
     }

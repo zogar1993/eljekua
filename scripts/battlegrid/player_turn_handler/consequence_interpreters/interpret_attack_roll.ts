@@ -23,7 +23,7 @@ export const interpret_attack_roll = ({
 
     const new_consequences: Array<Consequence> = []
     new_consequences.push(...consequence.before_consequences)
-    context.set_variable({type: "creatures", value: defenders, name: `${consequence.defender}(all)`})
+    context.set_creatures({name: `${consequence.defender}(all)`, value: defenders})
 
     defenders.forEach((defender, i) => {
         const attack_base = NODE.as_number_resolved(token_to_node({token: consequence.attack, context}))
@@ -34,7 +34,7 @@ export const interpret_attack_roll = ({
         const is_hit = attack.value >= defense.value
 
         const defender_variable_name = `${consequence.defender}(${i + 1})`
-        context.set_variable({type: "creature", value: defender, name: defender_variable_name})
+        context.set_creature({name: defender_variable_name, value: defender})
         new_consequences.push(create_copy_variable_consequence(defender_variable_name, consequence.defender))
 
         if (is_hit)

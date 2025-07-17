@@ -5,7 +5,7 @@ import {assert} from "assert";
 import {AstNodeNumberResolved} from "expression_parsers/token_to_node";
 
 export class PowerContext {
-    private variables: Map<string, ActivePowerVariable> = new Map()
+    private variables: Map<string, VariableType> = new Map()
     private consequences: Array<Consequence> = []
     readonly power_name
 
@@ -14,8 +14,24 @@ export class PowerContext {
         this.power_name = power_name
     }
 
-    set_variable = ({name, ...variable}: { name: string } & ActivePowerVariable) => {
+    set_variable = ({name, ...variable}: { name: string } & VariableType) => {
         this.variables.set(name, variable)
+    }
+
+    set_creature = ({name, value}: { name: string, value: Creature }) => {
+        this.variables.set(name, {type: "creature", value})
+    }
+
+    set_creatures = ({name, value}: { name: string, value: Array<Creature> }) => {
+        this.variables.set(name, {type: "creatures", value})
+    }
+
+    set_path = ({name, value}: { name: string, value: Path }) => {
+        this.variables.set(name, {type: "path", value})
+    }
+
+    set_resolved_number = ({name, value}: { name: string, value: AstNodeNumberResolved }) => {
+        this.variables.set(name, {type: "resolved_number", value})
     }
 
     get_creature = (name: string): Creature => {
@@ -73,7 +89,7 @@ export class PowerContext {
     }
 }
 
-type ActivePowerVariable =
+type VariableType =
     VariableTypeCreature
     | VariableTypePosition
     | VariableTypePath

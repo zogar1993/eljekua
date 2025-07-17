@@ -9,5 +9,5 @@ export const interpret_save_resolved_number = ({
                                                    context
                                                }: InterpretConsequenceProps<ConsequenceSaveResolvedNumber>) => {
     const value = resolve_number(NODE.as_number(token_to_node({token: consequence.value, context})))
-    context.set_variable({type: "resolved_number", name: consequence.label, value})
+    context.set_resolved_number({name: consequence.label, value})
 }

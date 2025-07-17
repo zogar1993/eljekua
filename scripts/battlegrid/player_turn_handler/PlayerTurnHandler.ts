@@ -307,7 +307,7 @@ export class PlayerTurnHandler {
         const first_consequence = action.consequences[0]
 
         const context = new PowerContext(action.consequences, action.name)
-        context.set_variable({name: "owner", value: creature, type: "creature"})
+        context.set_creature({name: "owner", value: creature})
 
         const result: ButtonOption = {
             text: action.name,

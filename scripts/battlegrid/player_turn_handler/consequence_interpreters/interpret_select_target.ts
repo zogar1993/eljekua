@@ -14,52 +14,48 @@ export const interpret_select_target = ({
 
     if (consequence.targeting_type === "area_burst") {
         const on_click = (position: Position) => {
-                if (player_turn_handler.selection_context?.type !== "area_burst_select")
-                    throw Error("selecting a area burst as a target requires selection_context to be set")
+            if (player_turn_handler.selection_context?.type !== "area_burst_select")
+                throw Error("selecting a area burst as a target requires selection_context to be set")
 
-                if (player_turn_handler.selection_context.available_targets.every(target => !positions_equal(target, position)))
-                    return
+            if (player_turn_handler.selection_context.available_targets.every(target => !positions_equal(target, position)))
+                return
 
-                const targets = player_turn_handler.selection_context.affected_targets
+            const targets = player_turn_handler.selection_context.affected_targets
 
-                context.set_variable({
-                    name: consequence.label,
-                    value: targets.map(battle_grid.get_creature_by_position),
-                    type: "creatures"
-                })
-                player_turn_handler.deselect()
-            }
+            context.set_creatures({name: consequence.label, value: targets.map(battle_grid.get_creature_by_position)})
+            player_turn_handler.deselect()
+        }
 
-            const on_hover = (position: Position) => {
-                if (player_turn_handler.selection_context?.type !== "area_burst_select")
-                    throw Error("area burst on hover requires the area burst selection context to be set")
-                if (player_turn_handler.selection_context.available_targets.every(x => !positions_equal(x, position)))
-                    return
+        const on_hover = (position: Position) => {
+            if (player_turn_handler.selection_context?.type !== "area_burst_select")
+                throw Error("area burst on hover requires the area burst selection context to be set")
+            if (player_turn_handler.selection_context.available_targets.every(x => !positions_equal(x, position)))
+                return
 
-                const area = [...battle_grid.get_in_range({
-                    origin: position,
-                    distance: consequence.radius
-                }), position]
-
-                player_turn_handler.set_awaiting_area_burst_selection({
-                    currently_selected: context.get_creature("owner"),
-                    available_targets: valid_targets,
-                    affected_targets: area.filter(battle_grid.is_terrain_occupied),
-                    affected_area: area,
-                    on_click,
-                    on_hover,
-                })
-            }
+            const area = [...battle_grid.get_in_range({
+                origin: position,
+                distance: consequence.radius
+            }), position]
 
             player_turn_handler.set_awaiting_area_burst_selection({
                 currently_selected: context.get_creature("owner"),
                 available_targets: valid_targets,
-                affected_targets: [],
-                affected_area: [],
+                affected_targets: area.filter(battle_grid.is_terrain_occupied),
+                affected_area: area,
                 on_click,
                 on_hover,
             })
-            return
+        }
+
+        player_turn_handler.set_awaiting_area_burst_selection({
+            currently_selected: context.get_creature("owner"),
+            available_targets: valid_targets,
+            affected_targets: [],
+            affected_area: [],
+            on_click,
+            on_hover,
+        })
+        return
     }
 
     const filtered = valid_targets.filter(
@@ -86,11 +82,7 @@ export const interpret_select_target = ({
             })
         } else if ((consequence.target_type === "creature" || consequence.target_type === "enemy")) {
             const on_click = (position: Position) => {
-                context.set_variable({
-                    name: consequence.label,
-                    value: battle_grid.get_creature_by_position(position),
-                    type: "creature"
-                })
+                context.set_creature({name: consequence.label, value: battle_grid.get_creature_by_position(position)})
                 player_turn_handler.deselect()
             }
 
@@ -108,11 +100,7 @@ export const interpret_select_target = ({
                 if (!positions_equal(position, path[path.length - 1]))
                     throw Error("position should be the end of the path")
 
-                context.set_variable({
-                    name: consequence.label,
-                    value: path,
-                    type: "path"
-                })
+                context.set_path({name: consequence.label, value: path})
                 player_turn_handler.deselect()
             }
 
