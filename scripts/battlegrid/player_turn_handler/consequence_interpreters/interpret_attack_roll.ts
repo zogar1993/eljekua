@@ -11,7 +11,6 @@ export const interpret_attack_roll = ({
                                           context,
                                           action_log
                                       }: InterpretConsequenceProps<ConsequenceAttackRoll>) => {
-    const d20_result = roll_d(20)
 
     const attacker = context.get_creature("owner")
     const defenders = context.get_creatures(consequence.defender)
@@ -22,9 +21,10 @@ export const interpret_attack_roll = ({
 
     for (let i = 0; i < defenders.length; i++) {
         const defender = defenders[i]
-        //TODO attack is not correctly randomized for AoE
+
         const attack_base = NODE.as_number_resolved(token_to_node({token: consequence.attack, context}))
 
+        const d20_result = roll_d(20)
         const attack: AstNode = {
             type: "number_resolved",
             value: attack_base.value + d20_result.value,
@@ -41,6 +41,8 @@ export const interpret_attack_roll = ({
         }))
 
         const is_hit = attack.value >= defense.value
+
+        console.log(attack.value)
 
         action_log.add_new_action_log(`${attacker.data.name}'s ${context.power_name} (`, attack, `) ${is_hit ? "hits" : "misses"} against ${defender.data.name}'s ${consequence.defense} (`, defense, `).`)
 
