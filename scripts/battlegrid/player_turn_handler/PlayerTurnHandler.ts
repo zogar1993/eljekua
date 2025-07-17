@@ -165,7 +165,7 @@ export class PlayerTurnHandler {
                 this.selection_context.on_click(position)
                 this.evaluate_consequences()
             }
-        } else {
+        } else if (this.selection_context === null) {
             if (this.battle_grid.is_terrain_occupied(position)) {
                 const creature = this.battle_grid.get_creature_by_position(position)
 
@@ -304,7 +304,6 @@ export class PlayerTurnHandler {
     }
 
     build_action_button(action: PowerVM, creature: Creature): ButtonOption {
-//TODO this fails if we select another character while options are displayed
         const first_consequence = action.consequences[0]
 
         const context = new PowerContext(action.consequences, action.name)
