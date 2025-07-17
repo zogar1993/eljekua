@@ -278,7 +278,7 @@ export class PlayerTurnHandler {
             origin: context.get_creature("owner").data.position,
             context
         })
-        if (consequence.targeting_type === "area_burst") return in_range
+        if (consequence.targeting_type === "area_burst") return [context.get_creature("owner").data.position, ...in_range]
         return in_range.filter(position => this.filter_targets({
             targeting: consequence,
             position
