@@ -245,6 +245,7 @@ export type AstNode =
     | AstNodeBoolean
     | AstNodeCreature
     | AstNodePosition
+    | AstNodePositions
 
 export type AstNodeString = {
     type: "string",
@@ -288,6 +289,13 @@ export type AstNodeBoolean = {
     params?: Array<AstNode>
 }
 
+export type AstNodePositions = {
+    type: "positions"
+    value: Array<Position>
+    description: string
+    params?: Array<AstNode>
+}
+
 const are_all_numbers = (values: Array<AstNode>): values is Array<AstNodeNumber> =>
     values.every(is_number)
 
@@ -326,6 +334,14 @@ export const NODE = {
         if (node.type === "boolean") return node
         throw Error(`Cannot cast node to "boolean"`)
     },
+    as_position: (node: AstNode): AstNodePosition => {
+        if (node.type === "position") return node
+        throw Error(`Cannot cast node to "position"`)
+    },
+    as_positions: (node: AstNode): AstNodePositions => {
+        if (node.type === "positions") return node
+        throw Error(`Cannot cast node to "positions"`)
+    }
 }
 
 const TOKEN = {

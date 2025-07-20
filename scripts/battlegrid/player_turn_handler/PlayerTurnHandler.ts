@@ -268,7 +268,16 @@ export class PlayerTurnHandler {
         })
 
         if (consequence.targeting_type === "area_burst") return [context.get_creature("owner").data.position, ...in_range]
-        if (consequence.targeting_type === "movement") return in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
+        if (consequence.targeting_type === "movement") {
+            const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
+            if (consequence.destination_requirement) {
+                const node = token_to_node({token: consequence.destination_requirement, context})
+                const possibility = NODE.as_position(node)
+                //TODO this needs to change how it works when we add big fellows
+                return valid_targets.filter(position => positions_equal(position, possibility.value))
+            } else
+                return valid_targets
+        }
 
         const valid_targets = in_range.filter(position => {
             if (consequence.target_type === "terrain")

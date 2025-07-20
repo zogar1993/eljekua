@@ -226,6 +226,7 @@ export type ConsequenceSelectTargetMovement = {
     targeting_type: "movement"
     distance: Token
     target_label: string
+    destination_requirement: Token | null
 }
 
 const transform_select_target_ir = (ir: IRConsequenceSelectTarget): ConsequenceSelectTarget => {
@@ -245,6 +246,7 @@ const transform_select_target_ir = (ir: IRConsequenceSelectTarget): ConsequenceS
             targeting_type: ir.targeting_type,
             distance: tokenize(ir.distance),
             target_label: ir.target_label,
+            destination_requirement: ir.destination_requirement ? tokenize(ir.destination_requirement) : null
         }
     if (ir.targeting_type === "ranged")
         return {
