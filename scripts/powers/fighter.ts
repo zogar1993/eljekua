@@ -10,7 +10,7 @@ const sure_strike: Power = {
         attack: true,
     },
     targeting: {
-        type: "melee_weapon",
+        targeting_type: "melee_weapon",
         target_type: "enemy",
         amount: 1
     },
@@ -36,7 +36,7 @@ const cleave: Power = {
         attack: true,
     },
     targeting: {
-        type: "melee_weapon",
+        targeting_type: "melee_weapon",
         target_type: "enemy",
         amount: 1
     },
@@ -46,12 +46,10 @@ const cleave: Power = {
         hit: [
             {
                 type: "select_target",
-                targeting: {
-                    type: "adjacent",
-                    target_type: "enemy",
-                    amount: 1,
-                    exclude: ["primary_target"]
-                },
+                targeting_type: "adjacent",
+                target_type: "enemy",
+                amount: 1,
+                exclude: ["primary_target"],
                 target_label: "secondary_target"
             },
             {
@@ -83,7 +81,7 @@ const reaping_strike: Power = {
         attack: true,
     },
     targeting: {
-        type: "melee_weapon",
+        targeting_type: "melee_weapon",
         target_type: "enemy",
         amount: 1
     },
@@ -133,7 +131,7 @@ const tide_of_iron: Power = {
         `$equipped(owner,"shield")`
     ],
     targeting: {
-        type: "melee_weapon",
+        targeting_type: "melee_weapon",
         target_type: "enemy",
         amount: 1
     },
@@ -173,9 +171,16 @@ const tide_of_iron: Power = {
                                                 text: "Follow",
                                                 consequences: [
                                                     {
+                                                        type: "select_target",
+                                                        targeting_type: "movement",
+                                                        distance: 1,
+                                                        destination_requirement: "primary_target_original_position",
+                                                        target_label: "path_to_follow"
+                                                    },
+                                                    {
                                                         type: "shift",
                                                         target: "owner",
-                                                        destination: "primary_target_original_position"
+                                                        destination: "path_to_follow"
                                                     }
                                                 ]
                                             },
@@ -194,25 +199,6 @@ const tide_of_iron: Power = {
                         consequences: []
                     }
                 ],
-                // {
-                //     type: "condition",
-                //     condition: "$not_equals(primary_target.position,primary_target_last_position)",
-                //     consequences_true: [
-                //         {
-                //             type: "options",
-                //             options: [
-                //
-                //             ]
-                //             consequences_true: [
-                //                 {
-                //                     type: "shift",
-                //                     target: "owner",
-                //                     destination: "primary_target_last_position"
-                //                 }
-                //             ]
-                //         },
-                //     ]
-                // },
             }
         ]
     },

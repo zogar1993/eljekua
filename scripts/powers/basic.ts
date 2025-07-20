@@ -9,11 +9,8 @@ const shift: Power = {
         attack: false,
     },
     targeting: {
-        type: "movement",
-        distance: "1",
-        target_type: "path",
-        terrain_prerequisite: "unoccupied",
-        amount: 1
+        targeting_type: "movement",
+        distance: 1
     },
     effect: [
         {
@@ -32,11 +29,8 @@ const movement: Power = {
         attack: false,
     },
     targeting: {
-        type: "movement",
+        targeting_type: "movement",
         distance: "owner.movement",
-        target_type: "path",
-        terrain_prerequisite: "unoccupied",
-        amount: 1
     },
     effect: [
         {
@@ -55,7 +49,7 @@ const melee_basic_attack: Power = {
         attack: true,
     },
     targeting: {
-        type: "melee_weapon",
+        targeting_type: "melee_weapon",
         target_type: "enemy",
         amount: 1
     },

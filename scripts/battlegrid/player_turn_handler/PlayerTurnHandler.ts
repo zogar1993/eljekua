@@ -259,18 +259,6 @@ export class PlayerTurnHandler {
         throw `Range "${JSON.stringify(targeting)}" not supported`
     }
 
-    filter_targets({targeting, position}: { targeting: ConsequenceSelectTarget, position: Position }) {
-        if (targeting.target_type === "terrain")
-            return !this.battle_grid.is_terrain_occupied(position)
-        if (targeting.target_type === "path")
-            return !this.battle_grid.is_terrain_occupied(position)
-        if (targeting.target_type === "enemy")
-            return this.battle_grid.is_terrain_occupied(position)
-        if (targeting.target_type === "creature")
-            return this.battle_grid.is_terrain_occupied(position)
-
-        throw `Target "${targeting.target_type}" not supported`
-    }
 
     get_valid_targets = ({consequence, context}: { consequence: ConsequenceSelectTarget, context: PowerContext }) => {
         const in_range = this.get_in_range({
@@ -278,11 +266,26 @@ export class PlayerTurnHandler {
             origin: context.get_creature("owner").data.position,
             context
         })
+
         if (consequence.targeting_type === "area_burst") return [context.get_creature("owner").data.position, ...in_range]
-        return in_range.filter(position => this.filter_targets({
-            targeting: consequence,
-            position
-        }))
+        if (consequence.targeting_type === "movement") return in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
+
+        const valid_targets = in_range.filter(position => {
+            if (consequence.target_type === "terrain")
+                return !this.battle_grid.is_terrain_occupied(position)
+            if (consequence.target_type === "enemy")
+                return this.battle_grid.is_terrain_occupied(position)
+            if (consequence.target_type === "creature")
+                return this.battle_grid.is_terrain_occupied(position)
+
+            throw `Target "${consequence.target_type}" not supported`
+        })
+
+        return valid_targets.filter(
+            target => !consequence.exclude.some(
+                excluded => positions_equal(context.get_creature(excluded).data.position, target)
+            )
+        )
     }
 
     evaluate_consequences = () => {

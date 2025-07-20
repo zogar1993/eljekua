@@ -1,13 +1,17 @@
 import {tokenize} from "tokenizer/tokenize";
-import {IRConsequence, is_area_burst, is_explicit_targeting, Power} from "types";
+import {
+    IRConsequence, IRConsequenceSelectTarget,
+    Power
+} from "types";
 import {Token} from "tokenizer/tokens/AnyToken";
 import {ATTRIBUTE_CODES} from "character_sheet/attributes";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
 export const transform_power_ir_into_vm_representation = (power: Power): PowerVM => {
+    const formatted_targeting = {type: "select_target", target_label: PRIMARY_TARGET_LABEL, ...power.targeting}
     const consequences: Array<Consequence> = [
-        transform_primary_targeting(power.targeting),
+        transform_select_target_ir(formatted_targeting as IRConsequenceSelectTarget),
         ...(power.roll ? [transform_primary_roll(power.roll)] : []),
         ...(power.effect ? power.effect.map(transform_generic_consequence) : [])
     ]
@@ -29,41 +33,6 @@ export type PowerVM = {
         attack: boolean
     }
     consequences: Array<Consequence>
-}
-
-export type ConsequenceSelectTarget =
-    ConsequenceSelectTargetExplicitDistance |
-    ConsequenceSelectTargetImplicitDistance |
-    ConsequenceSelectTargetAreaBurst
-
-export type ConsequenceSelectTargetExplicitDistance = {
-    type: "select_target"
-    targeting_type: "movement" | "ranged"
-    target_type: "enemy" | "terrain" | "creature" | "path"
-    amount: 1,
-    exclude: Array<string>
-    label: string
-    distance: Token
-}
-
-export type ConsequenceSelectTargetImplicitDistance = {
-    type: "select_target"
-    targeting_type: "adjacent" | "melee_weapon"
-    target_type: "enemy" | "terrain" | "creature" | "path"
-    amount: 1,
-    exclude: Array<string>
-    label: string
-}
-
-export type ConsequenceSelectTargetAreaBurst = {
-    type: "select_target"
-    targeting_type: "area_burst"
-    target_type: "enemy" | "terrain" | "creature" | "path"
-    amount: "all",
-    exclude: Array<string>
-    label: string
-    distance: Token
-    radius: number
 }
 
 export type ConsequenceAttackRoll = {
@@ -138,40 +107,6 @@ export type Consequence =
     ConsequencePush |
     ConsequenceCopyVariable
 
-const transform_primary_targeting = (targeting: Power["targeting"]): ConsequenceSelectTarget => {
-    if (is_explicit_targeting(targeting)) {
-        return {
-            type: "select_target",
-            targeting_type: targeting.type,
-            target_type: targeting.target_type,
-            amount: targeting.amount,
-            label: PRIMARY_TARGET_LABEL,
-            exclude: [],
-            distance: tokenize(targeting.distance)
-        }
-    } else if (is_area_burst(targeting)) {
-        return {
-            type: "select_target",
-            targeting_type: targeting.type,
-            target_type: targeting.target_type,
-            amount: targeting.amount,
-            label: PRIMARY_TARGET_LABEL,
-            exclude: [],
-            distance: tokenize(targeting.distance),
-            radius: targeting.radius
-        }
-    } else {
-        return {
-            type: "select_target",
-            targeting_type: targeting.type,
-            target_type: targeting.target_type,
-            amount: targeting.amount,
-            label: PRIMARY_TARGET_LABEL,
-            exclude: []
-        }
-    }
-}
-
 const transform_primary_roll = (roll: Required<Power>["roll"]): ConsequenceAttackRoll => {
     return {
         type: "attack_roll",
@@ -198,14 +133,7 @@ const transform_generic_consequence = (consequence: IRConsequence): Consequence 
                 half_damage: consequence.half_damage ?? false
             }
         case "select_target":
-            return {
-                type: "select_target",
-                targeting_type: consequence.targeting.type,
-                target_type: consequence.targeting.target_type,
-                amount: consequence.targeting.amount,
-                label: consequence.target_label,
-                exclude: consequence.targeting.exclude ?? [],
-            }
+            return transform_select_target_ir(consequence)
         case "move":
             return {
                 type: "move",
@@ -255,3 +183,88 @@ const transform_generic_consequence = (consequence: IRConsequence): Consequence 
             throw Error(`consequence invalid ${JSON.stringify(consequence)}`)
     }
 }
+
+
+export type ConsequenceSelectTarget =
+    ConsequenceSelectTargetRanged |
+    ConsequenceSelectTargetMelee |
+    ConsequenceSelectTargetAreaBurst |
+    ConsequenceSelectTargetMovement
+
+export type ConsequenceSelectTargetRanged = {
+    type: "select_target",
+    targeting_type: "ranged"
+    target_type: "terrain" | "enemy" | "creature"
+    terrain_prerequisite?: "unoccupied"
+    amount: 1
+    distance: Token
+    target_label: string
+    exclude: Array<string>
+}
+
+export type ConsequenceSelectTargetMelee = {
+    type: "select_target"
+    targeting_type: "adjacent" | "melee_weapon"
+    target_type: "enemy"
+    amount: 1,
+    exclude: Array<string>
+    target_label: string
+}
+
+export type ConsequenceSelectTargetAreaBurst = {
+    type: "select_target",
+    targeting_type: "area_burst"
+    target_type: "creature"
+    amount: "all"
+    distance: Token
+    radius: number
+    target_label: string
+}
+
+export type ConsequenceSelectTargetMovement = {
+    type: "select_target"
+    targeting_type: "movement"
+    distance: Token
+    target_label: string
+}
+
+const transform_select_target_ir = (ir: IRConsequenceSelectTarget): ConsequenceSelectTarget => {
+    if (ir.targeting_type === "area_burst")
+        return {
+            type: "select_target",
+            targeting_type: ir.targeting_type,
+            target_type: ir.target_type,
+            amount: ir.amount,
+            target_label: ir.target_label,
+            distance: tokenize(ir.distance),
+            radius: ir.radius,
+        }
+    if (ir.targeting_type === "movement")
+        return {
+            type: "select_target",
+            targeting_type: ir.targeting_type,
+            distance: tokenize(ir.distance),
+            target_label: ir.target_label,
+        }
+    if (ir.targeting_type === "ranged")
+        return {
+            type: "select_target",
+            targeting_type: ir.targeting_type,
+            target_type: ir.target_type,
+            amount: ir.amount,
+            target_label: ir.target_label,
+            distance: tokenize(ir.distance),
+            exclude: ir.exclude || []
+        }
+    if (ir.targeting_type === "adjacent" || ir.targeting_type === "melee_weapon")
+        return {
+            type: "select_target",
+            targeting_type: ir.targeting_type,
+            target_type: ir.target_type,
+            amount: ir.amount,
+            target_label: ir.target_label,
+            exclude: ir.exclude || []
+        }
+    throw Error(`"${ir.targeting_type}" is not a valid "select_target" targeting_type`)
+}
+
