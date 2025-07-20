@@ -9,7 +9,7 @@ const magic_missile: Power = {
         attack: true,
     },
     targeting: {
-        type: "ranged",
+        targeting_type: "ranged",
         target_type: "creature",
         amount: 1,
         distance: "20"
@@ -33,7 +33,7 @@ const scorching_burst: Power = {
         attack: true,
     },
     targeting: {
-        type: "area_burst",
+        targeting_type: "area_burst",
         target_type: "creature",
         amount: "all",
         distance: 10,

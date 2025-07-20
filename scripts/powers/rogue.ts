@@ -35,7 +35,7 @@ const piercing_strike: Power = {
         attack: true,
     },
     targeting: {
-        type: "melee_weapon",
+        targeting_type: "melee_weapon",
         target_type: "creature",
         amount: 1
     },

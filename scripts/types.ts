@@ -1,5 +1,3 @@
-import {Token} from "tokenizer/tokens/AnyToken";
-
 export type Power = {
     name: string
     description?: string
@@ -20,37 +18,11 @@ export type Power = {
     effect?: Array<IRConsequence>
 }
 
-type Targeting = TargetingDistanceImplicit | TargetingDistanceExplicit | TargetingAreaBurst
-
-//TODO this does not scale well, fix later
-type TargetingDistanceImplicit = {
-    type: "melee_weapon" | "adjacent"
-    target_type: "terrain" | "enemy" | "creature" | "path"
-    terrain_prerequisite?: "unoccupied"
-    amount: 1
-}
-
-type TargetingDistanceExplicit = {
-    type: "movement" | "ranged"
-    target_type: "terrain" | "enemy" | "creature" | "path"
-    terrain_prerequisite?: "unoccupied"
-    amount: 1
-    distance: string
-}
-
-type TargetingAreaBurst = {
-    type: "area_burst"
-    target_type: "terrain" | "enemy" | "creature" | "path"
-    amount: "all"
-    distance: number
-    radius: number
-}
-
-export const is_explicit_targeting = (target: Targeting): target is TargetingDistanceExplicit =>
-    target.type === "movement" || target.type === "ranged"
-
-export const is_area_burst = (target: Targeting): target is TargetingAreaBurst =>
-    target.type === "area_burst"
+type Targeting =
+    Omit<IRConsequenceSelectTargetMelee, "type" | "target_label"> |
+    Omit<IRConsequenceSelectTargetMovement, "type" | "target_label"> |
+    Omit<IRConsequenceSelectTargetAreaBurst, "type" | "target_label"> |
+    Omit<IRConsequenceSelectTargetRanged, "type" | "target_label">
 
 export type IRConsequence =
     {
@@ -60,16 +32,7 @@ export type IRConsequence =
         half_damage?: boolean
         damage_types?: Array<string>
     } |
-    {
-        type: "select_target"
-        targeting: {
-            type: "adjacent"
-            target_type: "enemy"
-            amount: 1,
-            exclude?: ["primary_target"]
-        },
-        target_label: "secondary_target"
-    } |
+    IRConsequenceSelectTarget |
     {
         type: "move" | "shift",
         target: "owner",
@@ -81,7 +44,7 @@ export type IRConsequence =
     consequences_false?: Array<IRConsequence>
 } | {
     type: "options",
-    options: Array<{text: string, consequences: Array<IRConsequence>}>
+    options: Array<{ text: string, consequences: Array<IRConsequence> }>
 } | {
     type: "save_position",
     target: string,
@@ -94,4 +57,41 @@ export type IRConsequence =
     type: "save_resolved_number"
     value: string
     label: string
+}
+
+export type IRConsequenceSelectTarget =
+    { type: "select_target", target_label: string } &
+    (IRConsequenceSelectTargetMelee |
+        IRConsequenceSelectTargetMovement |
+        IRConsequenceSelectTargetRanged |
+        IRConsequenceSelectTargetAreaBurst)
+
+type IRConsequenceSelectTargetMelee = {
+    targeting_type: "adjacent" | "melee_weapon"
+    target_type: "enemy"
+    amount: 1,
+    exclude?: ["primary_target"]
+}
+
+type IRConsequenceSelectTargetMovement = {
+    targeting_type: "movement"
+    distance: string | number
+    destination_requirement?: string
+}
+
+type IRConsequenceSelectTargetRanged = {
+    targeting_type: "ranged"
+    target_type: "terrain" | "enemy" | "creature"
+    terrain_prerequisite?: "unoccupied"
+    amount: 1
+    distance: string | number
+    exclude?: ["primary_target"]
+}
+
+type IRConsequenceSelectTargetAreaBurst = {
+    targeting_type: "area_burst"
+    target_type: "creature"
+    amount: "all"
+    distance: number
+    radius: number
 }
