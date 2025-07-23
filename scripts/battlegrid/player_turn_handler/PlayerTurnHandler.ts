@@ -126,7 +126,7 @@ export class PlayerTurnHandler {
             button.innerText = option.text
             if (option.disabled)
                 button.setAttribute("disabled", "")
-
+//TODO hacer que los otros on_click tengan tambien esto de evaluar consecuencias?
             button.addEventListener("click", () => {
                     this.clear_actions_menu()
                     option.on_click()
@@ -258,11 +258,11 @@ export class PlayerTurnHandler {
     get_valid_targets = ({consequence, context}: { consequence: ConsequenceSelectTarget, context: PowerContext }) => {
         const in_range = this.get_in_range({
             targeting: consequence,
-            origin: context.get_creature("owner").data.position,
+            origin: context.owner().data.position,
             context
         })
 
-        if (consequence.targeting_type === "area_burst") return [context.get_creature("owner").data.position, ...in_range]
+        if (consequence.targeting_type === "area_burst") return [context.owner().data.position, ...in_range]
         if (consequence.targeting_type === "movement") {
             const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
             if (consequence.destination_requirement) {

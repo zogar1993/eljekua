@@ -18,7 +18,7 @@ export const interpret_attack_roll = ({
                                           context,
                                           action_log
                                       }: InterpretConsequenceProps<ConsequenceAttackRoll>) => {
-    const attacker = context.get_creature("owner")
+    const attacker = context.owner()
     const defenders = context.get_creatures(consequence.defender)
 
     const new_consequences: Array<Consequence> = []

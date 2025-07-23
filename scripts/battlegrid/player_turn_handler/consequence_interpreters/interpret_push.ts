@@ -9,7 +9,7 @@ export const interpret_push = ({
                                    player_turn_handler,
                                    battle_grid
                                }: InterpretConsequenceProps<ConsequencePush>) => {
-    const attacker = context.get_creature("owner")
+    const attacker = context.owner()
     const defender = context.get_creature(consequence.target)
 
     //TODO contemplate push length
