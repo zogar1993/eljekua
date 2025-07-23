@@ -8,7 +8,6 @@ export const interpret_options = ({context, consequence, player_turn_handler}: I
         available_options: consequence.options.map(option => ({
                 text: option.text,
                 on_click: () => {
-                    player_turn_handler.deselect()
                     context.add_consequences(option.consequences)
                 }
             })

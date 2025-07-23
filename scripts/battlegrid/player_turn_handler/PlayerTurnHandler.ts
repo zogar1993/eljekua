@@ -126,7 +126,7 @@ export class PlayerTurnHandler {
                 button.setAttribute("disabled", "")
 //TODO hacer que los otros on_click tengan tambien esto de evaluar consecuencias?
             button.addEventListener("click", () => {
-                    this.clear_actions_menu()
+                    this.deselect()
                     option.on_click()
                     this.evaluate_consequences()
 
@@ -187,6 +187,7 @@ export class PlayerTurnHandler {
 
     deselect() {
         if (this.selection_context === null) return
+
         const square = this.battle_grid.get_square(this.selection_context.currently_selected.data.position)
         square.visual.clearIndicator()
 
@@ -200,7 +201,7 @@ export class PlayerTurnHandler {
             this.clear_indicator_to_positions({positions: this.selection_context.affected_area})
             this.clear_indicator_to_positions({positions: this.selection_context.affected_targets})
         } else if (this.selection_context.type === "option_select") {
-            //TODO this seemed to work before, understand shenanigans for interpret option
+            this.clear_actions_menu()
         }
 
         this.selection_context = null
