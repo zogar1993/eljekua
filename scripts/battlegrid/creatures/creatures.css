@@ -19,6 +19,10 @@
         var(--creature__position-animation-duration, 0ms) left;
 }
 
+.creature * {
+    pointer-events: none;
+}
+
 .creature__image {
     width: 40px;
     aspect-ratio: 1;
