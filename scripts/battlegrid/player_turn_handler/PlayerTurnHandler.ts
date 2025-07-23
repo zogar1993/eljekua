@@ -62,8 +62,8 @@ type ButtonOption = {
 }
 
 export class PlayerTurnHandler {
-    private action_log: ActionLog
-    private battle_grid: BattleGrid
+    private readonly action_log: ActionLog
+    private readonly battle_grid: BattleGrid
     turn_context = new TurnContext()
 
     selection_context: PlayerTurnHandlerContextSelect | null = null
