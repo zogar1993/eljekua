@@ -10,7 +10,7 @@ export const interpret_move = ({
                                    consequence,
                                    context,
                                    battle_grid,
-                                   player_turn_handler
+                                   turn_context
                                }: InterpretConsequenceProps<ConsequenceMovement>) => {
     const creature = context.get_creature(consequence.target)
     let path = context.get_path(consequence.destination)
@@ -23,7 +23,7 @@ export const interpret_move = ({
         })
             .filter(battle_grid.is_terrain_occupied)
             .map(battle_grid.get_creature_by_position)
-            .filter(player_turn_handler.turn_context.has_opportunity_action)
+            .filter(turn_context.has_opportunity_action)
 
         if (potential_attackers.length === 0) {
             const new_position = path[i + 1]
@@ -31,12 +31,12 @@ export const interpret_move = ({
         } else {
             for (const attacker of potential_attackers) {
                 const consequences = add_option_for_opportunity_attack(remove_first_targeting(BASIC_ATTACK_ACTIONS[0].consequences))
-                const opportunity_attack_context = new PowerContext(consequences, BASIC_ATTACK_ACTIONS[0].name)
-                opportunity_attack_context.set_creature({name: "owner", value: attacker})
-                opportunity_attack_context.set_creature({name: "primary_target", value: creature})
-                player_turn_handler.turn_context.add_power_context(opportunity_attack_context)
+                const name = BASIC_ATTACK_ACTIONS[0].name
+                turn_context.add_power_context({name, consequences, owner: attacker})
+                turn_context.get_current_context().set_creature({name: "primary_target", value: creature})
+
                 //TODO this should be better
-                player_turn_handler.turn_context.expend_opportunity_action(attacker)
+                turn_context.expend_opportunity_action(attacker)
             }
 
             context.add_consequences([{

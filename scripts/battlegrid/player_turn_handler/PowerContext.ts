@@ -9,9 +9,14 @@ export class PowerContext {
     private consequences: Array<Consequence> = []
     readonly power_name
 
-    constructor(consequences: Array<Consequence>, power_name: string) {
+    constructor({name, consequences, owner}: {
+        name: string,
+        consequences: Array<Consequence>,
+        owner: Creature
+    }) {
         this.consequences = consequences
-        this.power_name = power_name
+        this.power_name = name
+        this.set_creature({name: "owner", value: owner})
     }
 
     owner = () => this.get_creature("owner")

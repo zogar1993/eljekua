@@ -7,12 +7,8 @@ import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 export const interpret_execute_power = ({
                                             consequence,
                                             context,
-                                            player_turn_handler
+                                            turn_context
                                         }: InterpretConsequenceProps<ConsequenceExecutePower>) => {
-    const power: PowerVM = context.get_power(consequence.power)
-
-    //TODO create power context internally from the turn context
-    const new_context = new PowerContext(power.consequences, power.name)
-    new_context.set_creature({name: "owner", value: context.owner()})
-    player_turn_handler.turn_context.add_power_context(new_context)
+    const {name, consequences} = context.get_power(consequence.power)
+    turn_context.add_power_context({name, consequences, owner: context.owner()})
 }

@@ -166,11 +166,8 @@ export class PlayerTurnHandler {
             if (this.battle_grid.is_terrain_occupied(position)) {
                 const creature = this.battle_grid.get_creature_by_position(position)
 
-                //TODO this is kinda awful
-                const context = new PowerContext([], "Action Selection")
-                context.set_variable({name: "owner", type: "creature", value: creature})
-                this.turn_context.add_power_context(context)
-                context.add_consequences([this.build_actions_menu(creature)])
+                this.turn_context.add_power_context({name: "Action Selection", consequences: [], owner: creature})
+                this.turn_context.get_current_context().add_consequences([this.build_actions_menu(creature)])
                 this.evaluate_consequences()
             }
         }
@@ -305,7 +302,8 @@ export class PlayerTurnHandler {
                 context,
                 player_turn_handler: this,
                 battle_grid: this.battle_grid,
-                action_log: this.action_log
+                action_log: this.action_log,
+                turn_context: this.turn_context
             })
         }
     }
@@ -321,6 +319,7 @@ export class PlayerTurnHandler {
 
         const power_name = action.name.replaceAll(" ", "_").toLowerCase()
 
+        //TODO Create consequence "Add powers"
         this.turn_context.get_current_context().set_variable({name: power_name, type: "power", value: action})
 
         return {

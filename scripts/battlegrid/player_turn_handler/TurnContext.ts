@@ -1,11 +1,17 @@
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {Creature} from "battlegrid/creatures/Creature";
+import {Consequence} from "tokenizer/transform_power_ir_into_vm_representation";
 
 export class TurnContext {
     power_contexts: Array<PowerContext> = []
     expended_opportunity_actions: Array<Creature> = []
 
-    add_power_context = (context: PowerContext) => {
+    add_power_context = ({name, consequences, owner}: {
+        name: string,
+        consequences: Array<Consequence>,
+        owner: Creature
+    }) => {
+        const context = new PowerContext({consequences, name, owner})
         this.power_contexts.push(context)
     }
 
