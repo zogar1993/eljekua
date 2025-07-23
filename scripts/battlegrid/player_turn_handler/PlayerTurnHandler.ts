@@ -111,11 +111,8 @@ export class PlayerTurnHandler {
     set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type" | "currently_selected">) => {
         this.deselect()
 
-        this.selection_context = {
-            type: "option_select",
-            currently_selected: this.turn_context.get_current_context().owner(),
-            ...context
-        }
+        const currently_selected = this.turn_context.get_current_context().owner()
+        this.selection_context = {type: "option_select", currently_selected, ...context}
 
         this.set_selected_indicator()
 
