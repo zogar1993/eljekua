@@ -68,8 +68,10 @@ export type ConsequenceMovement = {
 
 export type ConsequenceOptions = {
     type: "options",
-    options: Array<{ text: string, consequences: Array<Consequence> }>,
+    options: Array<ConsequenceOptionsItem>,
 }
+
+export type ConsequenceOptionsItem = { text: string, consequences: Array<Consequence> }
 
 export type ConsequenceSavePosition = {
     type: "save_position",
@@ -95,6 +97,11 @@ export type ConsequenceCopyVariable = {
     destination: string
 }
 
+export type ConsequenceExecutePower = {
+    type: "execute_power",
+    power: string
+}
+
 export type Consequence =
     ConsequenceApplyDamage |
     ConsequenceSelectTarget |
@@ -105,7 +112,8 @@ export type Consequence =
     ConsequenceSavePosition |
     ConsequenceSaveResolvedNumber |
     ConsequencePush |
-    ConsequenceCopyVariable
+    ConsequenceCopyVariable |
+    ConsequenceExecutePower
 
 const transform_primary_roll = (roll: Required<Power>["roll"]): ConsequenceAttackRoll => {
     return {

@@ -4,12 +4,18 @@ import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS,} from "powers/basic";
 import {ActionLog} from "action_log/ActionLog";
 import {NODE, token_to_node} from "expression_parsers/token_to_node";
 import {Creature} from "battlegrid/creatures/Creature";
-import {ConsequenceSelectTarget, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
+import {
+    ConsequenceOptions, ConsequenceOptionsItem,
+    ConsequenceSelectTarget,
+    PowerVM
+} from "tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 import {get_move_area} from "battlegrid/ranges/get_move_area";
 import {get_adjacent} from "battlegrid/ranges/get_adyacent";
 import {interpret_consequence} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_consequence";
+import {SquareVisual} from "battlegrid/squares/SquareVisual";
+import {tokenize} from "tokenizer/tokenize";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -67,60 +73,51 @@ export class PlayerTurnHandler {
         this.action_log = action_log
     }
 
-    set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => {
+    set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type" | "currently_selected">) => {
         this.deselect()
 
-        this.selection_context = {type: "position_select", ...context}
+        const currently_selected = this.turn_context.get_current_context().owner()
+        this.selection_context = {type: "position_select", currently_selected, ...context}
 
-        this.select(context.currently_selected)
+        this.set_selected_indicator()
 
-        const squares = context.available_targets.map(this.battle_grid.get_square)
-        squares.forEach(({visual}) => visual.setIndicator("available-target"))
+        this.set_indicator_to_positions({positions: context.available_targets, indicator: "available-target"})
     }
 
-    set_awaiting_path_selection = (context: Omit<PlayerTurnHandlerContextSelectPath, "type">) => {
+    set_awaiting_path_selection = (context: Omit<PlayerTurnHandlerContextSelectPath, "type" | "currently_selected">) => {
         this.deselect()
 
-        this.selection_context = {
-            type: "path_select",
-            ...context
-        }
+        const currently_selected = this.turn_context.get_current_context().owner()
+        this.selection_context = {type: "path_select", currently_selected, ...context}
 
-        this.select(context.currently_selected)
+        this.set_selected_indicator()
 
-        const squares = context.available_targets.map(this.battle_grid.get_square)
-        squares.forEach(({visual}) => visual.setIndicator("available-target"))
-
-        const path = context.current_path.map(this.battle_grid.get_square)
-        path.forEach(({visual}) => visual.setIndicator("current-path"))
+        this.set_indicator_to_positions({positions: context.available_targets, indicator: "available-target"})
+        this.set_indicator_to_positions({positions: context.current_path, indicator: "current-path"})
     }
 
-    set_awaiting_area_burst_selection = (context: Omit<PlayerTurnHandlerContextSelectAreaBurst, "type">) => {
+    set_awaiting_area_burst_selection = (context: Omit<PlayerTurnHandlerContextSelectAreaBurst, "type" | "currently_selected">) => {
         this.deselect()
 
-        this.selection_context = {
-            type: "area_burst_select",
-            ...context
-        }
+        const currently_selected = this.turn_context.get_current_context().owner()
+        this.selection_context = {type: "area_burst_select", currently_selected, ...context}
 
-        this.select(context.currently_selected)
+        this.set_selected_indicator()
 
-        const squares = context.available_targets.map(this.battle_grid.get_square)
-        squares.forEach(({visual}) => visual.setIndicator("available-target"))
-
-        const area = context.affected_area.map(this.battle_grid.get_square)
-        area.forEach(({visual}) => visual.setIndicator("area"))
+        this.set_indicator_to_positions({positions: context.available_targets, indicator: "available-target"})
+        this.set_indicator_to_positions({positions: context.affected_area, indicator: "area"})
     }
 
-    set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => {
+    set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type" | "currently_selected">) => {
         this.deselect()
 
         this.selection_context = {
             type: "option_select",
+            currently_selected: this.turn_context.get_current_context().owner(),
             ...context
         }
 
-        this.select(context.currently_selected)
+        this.set_selected_indicator()
 
         const actions_menu = document.querySelector("#actions_menu")!
 
@@ -169,10 +166,12 @@ export class PlayerTurnHandler {
             if (this.battle_grid.is_terrain_occupied(position)) {
                 const creature = this.battle_grid.get_creature_by_position(position)
 
-                this.set_awaiting_option_selection({
-                    currently_selected: creature,
-                    available_options: this.build_actions_menu(creature)
-                })
+                //TODO this is kinda awful
+                const context = new PowerContext([], "Action Selection")
+                context.set_variable({name: "owner", type: "creature", value: creature})
+                this.turn_context.add_power_context(context)
+                context.add_consequences([this.build_actions_menu(creature)])
+                this.evaluate_consequences()
             }
         }
     }
@@ -185,7 +184,8 @@ export class PlayerTurnHandler {
         }
     }
 
-    select(creature: Creature) {
+    set_selected_indicator() {
+        const creature = this.turn_context.get_current_context().owner()
         const cell = this.battle_grid.get_square(creature.data.position)
         cell.visual.setIndicator("selected")
     }
@@ -196,20 +196,16 @@ export class PlayerTurnHandler {
         square.visual.clearIndicator()
 
         if (this.selection_context.type === "position_select") {
-            const squares = this.selection_context.available_targets.map(this.battle_grid.get_square)
-            squares.forEach(square => square.visual.clearIndicator())
+            this.clear_indicator_to_positions({positions: this.selection_context.available_targets})
         } else if (this.selection_context.type === "path_select") {
-            const squares = this.selection_context.available_targets.map(this.battle_grid.get_square)
-            squares.forEach(square => square.visual.clearIndicator())
-            const path = this.selection_context.current_path.map(this.battle_grid.get_square)
-            path.forEach(square => square.visual.clearIndicator())
+            this.clear_indicator_to_positions({positions: this.selection_context.available_targets})
+            this.clear_indicator_to_positions({positions: this.selection_context.current_path})
         } else if (this.selection_context.type === "area_burst_select") {
-            const squares = this.selection_context.available_targets.map(this.battle_grid.get_square)
-            squares.forEach(square => square.visual.clearIndicator())
-            const area = this.selection_context.affected_area.map(this.battle_grid.get_square)
-            area.forEach(square => square.visual.clearIndicator())
-            const targets = this.selection_context.affected_targets.map(this.battle_grid.get_square)
-            targets.forEach(square => square.visual.clearIndicator())
+            this.clear_indicator_to_positions({positions: this.selection_context.available_targets})
+            this.clear_indicator_to_positions({positions: this.selection_context.affected_area})
+            this.clear_indicator_to_positions({positions: this.selection_context.affected_targets})
+        } else if (this.selection_context.type === "option_select") {
+            //TODO this seemed to work before, understand shenanigans for interpret option
         }
 
         this.selection_context = null
@@ -217,19 +213,18 @@ export class PlayerTurnHandler {
 
     has_selected_creature = () => this.selection_context !== null
 
-    build_actions_menu(creature: Creature): Array<ButtonOption> {
-        return [
-            ...BASIC_MOVEMENT_ACTIONS.map(power => this.build_action_button(power, creature)),
-            ...BASIC_ATTACK_ACTIONS.map(power => this.build_action_button(power, creature)),
-            ...creature.data.powers.map(power => this.build_action_button(power, creature)),
-            {
-                text: "Cancel",
-                on_click: () => {
-                    this.deselect()
-                    this.clear_actions_menu()
+    build_actions_menu = (creature: Creature): ConsequenceOptions => {
+        return {
+            type: "options",
+            options: [
+                ...creature.data.powers.map(power => this.build_action_button(power)),
+                {
+                    text: "Cancel",
+                    consequences: [],
                 }
-            }
-        ]
+            ]
+        }
+
     }
 
     clear_actions_menu() {
@@ -315,27 +310,44 @@ export class PlayerTurnHandler {
         }
     }
 
-    build_action_button(action: PowerVM, creature: Creature): ButtonOption {
-        const first_consequence = action.consequences[0]
+    build_action_button = (action: PowerVM): ConsequenceOptionsItem => {
+        // const first_consequence = action.consequences[0]
 
-        const context = new PowerContext(action.consequences, action.name)
-        context.set_creature({name: "owner", value: creature})
+//TODO add condition validation
+//         if (first_consequence.type === "select_target") {
+//             const valid_targets = this.get_valid_targets({consequence: first_consequence, context})
+//             result.disabled = valid_targets.length === 0
+//         }
 
-        const result: ButtonOption = {
+        const power_name = action.name.replaceAll(" ", "_").toLowerCase()
+
+        this.turn_context.get_current_context().set_variable({name: power_name, type: "power", value: action})
+
+        return {
             text: action.name,
-            disabled: false,
-            on_click: () => {
-                this.deselect()
-                //TODO make this better
-                this.turn_context.add_power_context(context)
-            }
+            consequences: [
+                {
+                    type: "execute_power",
+                    power: power_name
+                    //TODO this should be easier
+                }
+            ],
+            //condition: tokenize(`$has_valid_targets(${power_name})`)
         }
+    }
 
-        if (first_consequence.type === "select_target") {
-            const valid_targets = this.get_valid_targets({consequence: first_consequence, context})
-            result.disabled = valid_targets.length === 0
-        }
+    set_indicator_to_positions = ({positions, indicator}: {
+        positions: Array<Position>,
+        indicator: Parameters<SquareVisual["setIndicator"]>[0]
+    }) => {
+        const squares = positions.map(this.battle_grid.get_square)
+        squares.forEach(({visual}) => visual.setIndicator(indicator))
+    }
 
-        return result
+    clear_indicator_to_positions = ({positions}: {
+        positions: Array<Position>
+    }) => {
+        const squares = positions.map(this.battle_grid.get_square)
+        squares.forEach(({visual}) => visual.clearIndicator())
     }
 }

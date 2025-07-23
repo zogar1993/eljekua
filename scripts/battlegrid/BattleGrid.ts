@@ -5,6 +5,7 @@ import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
 import {Position, positions_equal} from "battlegrid/Position";
 import {AnimationQueue} from "AnimationQueue";
 import {get_adjacent} from "battlegrid/ranges/get_adyacent";
+import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "powers/basic";
 
 export class BattleGrid {
     readonly BOARD_HEIGHT = 10
@@ -146,7 +147,6 @@ export class BattleGrid {
         return unoccupied.filter(position => distance_between_positions(position, attacker_origin) > initial_distance)
     }
 
-
     place_creature({position, creature}: { position: Position, creature: Creature }) {
         creature.data.position = position
         creature.visual.place_at(position)
@@ -167,8 +167,9 @@ export class BattleGrid {
         this.creatures.some(creature => positions_equal(creature.data.position, position))
 
     create_creature = (data: CreatureData) => {
-        const visual = this.visual_creature_creator.create(data)
-        const creature = new Creature({data, visual})
+        const d = {...data, powers: [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS, ...data.powers]}
+        const visual = this.visual_creature_creator.create(d)
+        const creature = new Creature({data: d, visual})
         this.creatures.push(creature)
     }
 }

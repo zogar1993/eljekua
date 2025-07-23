@@ -20,12 +20,9 @@ export const interpret_select_target = ({
             if (player_turn_handler.selection_context.available_targets.every(target => !positions_equal(target, position)))
                 return
 
-            const targets = player_turn_handler.selection_context.affected_targets
+            const targets = player_turn_handler.selection_context.affected_targets.map(battle_grid.get_creature_by_position)
 
-            context.set_creatures({
-                name: consequence.target_label,
-                value: targets.map(battle_grid.get_creature_by_position)
-            })
+            context.set_creatures({name: consequence.target_label, value: targets})
             player_turn_handler.deselect()
         }
 
@@ -35,29 +32,23 @@ export const interpret_select_target = ({
             if (player_turn_handler.selection_context.available_targets.every(x => !positions_equal(x, position)))
                 return
 
-            const area = [...battle_grid.get_in_range({origin: position, distance: consequence.radius}), position]
+            const distance = consequence.radius
+            const affected_area = [...battle_grid.get_in_range({origin: position, distance}), position]
+            const affected_targets = affected_area.filter(battle_grid.is_terrain_occupied)
 
-            player_turn_handler.set_awaiting_area_burst_selection({
-                currently_selected: context.get_creature("owner"),
-                available_targets: valid_targets,
-                affected_targets: area.filter(battle_grid.is_terrain_occupied),
-                affected_area: area,
-                on_click,
-                on_hover,
-            })
+            player_turn_handler.set_awaiting_area_burst_selection({...selection_base, affected_targets, affected_area})
         }
 
-        player_turn_handler.set_awaiting_area_burst_selection({
-            currently_selected: context.get_creature("owner"),
+        const selection_base = {
             available_targets: valid_targets,
             affected_targets: [],
             affected_area: [],
             on_click,
             on_hover,
-        })
-        return
-    } else if (consequence.targeting_type === "movement") {
+        }
 
+        player_turn_handler.set_awaiting_area_burst_selection(selection_base)
+    } else if (consequence.targeting_type === "movement") {
         const on_click = (position: Position) => {
             if (player_turn_handler.selection_context?.type !== "path_select")
                 throw Error("selecting a path as a target requires selection_context to be set")
@@ -76,57 +67,36 @@ export const interpret_select_target = ({
             if (player_turn_handler.selection_context.available_targets.every(x => !positions_equal(x, position)))
                 return
 
-            const path = battle_grid.get_shortest_path({
-                origin: player_turn_handler.selection_context.currently_selected.data.position,
-                destination: position
-            })
+            const origin = player_turn_handler.selection_context.currently_selected.data.position
+            const path = battle_grid.get_shortest_path({origin, destination: position})
 
-            player_turn_handler.set_awaiting_path_selection({
-                currently_selected: context.get_creature("owner"),
-                available_targets: valid_targets,
-                current_path: path,
-                on_click,
-                on_hover,
-            })
+            player_turn_handler.set_awaiting_path_selection({...selection_base, current_path: path})
         }
 
-        player_turn_handler.set_awaiting_path_selection({
-            currently_selected: context.get_creature("owner"),
+        const selection_base = {
             available_targets: valid_targets,
             current_path: [],
             on_click,
             on_hover,
-        })
+        }
+
+        player_turn_handler.set_awaiting_path_selection(selection_base)
     } else {
         if (consequence.target_type === "terrain") {
             const on_click = (position: Position) => {
-                context.set_variable({
-                    name: consequence.target_label,
-                    value: position,
-                    type: "position"
-                })
+                context.set_variable({name: consequence.target_label, value: position, type: "position"})
                 player_turn_handler.deselect()
             }
 
-            player_turn_handler.set_awaiting_position_selection({
-                currently_selected: context.get_creature("owner"),
-                available_targets: valid_targets,
-                on_click
-            })
+            player_turn_handler.set_awaiting_position_selection({available_targets: valid_targets, on_click})
         } else if ((consequence.target_type === "creature" || consequence.target_type === "enemy")) {
             const on_click = (position: Position) => {
-                context.set_creature({
-                    name: consequence.target_label,
-                    value: battle_grid.get_creature_by_position(position)
-                })
+                const creature = battle_grid.get_creature_by_position(position)
+                context.set_creature({name: consequence.target_label, value: creature})
                 player_turn_handler.deselect()
             }
 
-            player_turn_handler.set_awaiting_position_selection({
-                currently_selected: context.get_creature("owner"),
-                available_targets: valid_targets,
-                on_click
-            })
+            player_turn_handler.set_awaiting_position_selection({available_targets: valid_targets, on_click})
         }
     }
 }

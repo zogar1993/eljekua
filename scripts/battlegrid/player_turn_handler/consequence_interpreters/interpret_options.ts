@@ -5,7 +5,6 @@ import {
 
 export const interpret_options = ({context, consequence, player_turn_handler}: InterpretConsequenceProps<ConsequenceOptions>) => {
     player_turn_handler.set_awaiting_option_selection({
-        currently_selected: context.get_creature("owner"),
         available_options: consequence.options.map(option => ({
                 text: option.text,
                 on_click: () => {

@@ -1,4 +1,4 @@
-import {Consequence} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Consequence, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
 import {Creature} from "battlegrid/creatures/Creature";
 import {Path, Position} from "battlegrid/Position";
 import {assert} from "assert";
@@ -13,6 +13,8 @@ export class PowerContext {
         this.consequences = consequences
         this.power_name = power_name
     }
+
+    owner = () => this.get_creature("owner")
 
     set_variable = ({name, ...variable}: { name: string } & VariableType) => {
         this.variables.set(name, variable)
@@ -32,6 +34,13 @@ export class PowerContext {
 
     set_resolved_number = ({name, value}: { name: string, value: AstNodeNumberResolved }) => {
         this.variables.set(name, {type: "resolved_number", value})
+    }
+
+    get_power = (name: string): PowerVM => {
+        const variable = this.variables.get(name)
+        if (!variable) throw Error(`variable ${name} not found in context`)
+        if (variable.type !== "power") throw Error(`variable ${name} expected to be a 'power', but its a '${variable.type}'`)
+        return variable.value
     }
 
     get_creature = (name: string): Creature => {
@@ -95,9 +104,11 @@ type VariableType =
     | VariableTypePath
     | VariableTypeCreatures
     | VariableTypeResolvedNumber
+    | VariableTypePower
 
 type VariableTypeCreature = { type: "creature", value: Creature }
 type VariableTypeCreatures = { type: "creatures", value: Array<Creature> }
 type VariableTypePosition = { type: "position", value: Position }
 type VariableTypePath = { type: "path", value: Path }
 type VariableTypeResolvedNumber = { type: "resolved_number", value: AstNodeNumberResolved }
+type VariableTypePower = { type: "power", value: PowerVM }

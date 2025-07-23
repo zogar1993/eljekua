@@ -30,10 +30,8 @@ export const interpret_move = ({
             battle_grid.move_creature_one_square({creature, position: new_position})
         } else {
             for (const attacker of potential_attackers) {
-                const opportunity_attack_context = new PowerContext(
-                    add_option_for_opportunity_attack(remove_first_targeting(BASIC_ATTACK_ACTIONS[0].consequences)),
-                    BASIC_ATTACK_ACTIONS[0].name
-                )
+                const consequences = add_option_for_opportunity_attack(remove_first_targeting(BASIC_ATTACK_ACTIONS[0].consequences))
+                const opportunity_attack_context = new PowerContext(consequences, BASIC_ATTACK_ACTIONS[0].name)
                 opportunity_attack_context.set_creature({name: "owner", value: attacker})
                 opportunity_attack_context.set_creature({name: "primary_target", value: creature})
                 player_turn_handler.turn_context.add_power_context(opportunity_attack_context)
