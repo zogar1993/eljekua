@@ -27,6 +27,7 @@ export class VisualCreatureCreator {
         html_creature.style.setProperty("--creature__lifebar_max-hp", `${data.hp_max}`)
         html_creature.style.setProperty("--creature__lifebar_current-hp", `${data.hp_current}`)
 
+        //TODO make animation not be clickable
         html_creature.style.setProperty("--fading-text_animation-duration", `${FADING_TEXT_ANIMATION_DURATION}ms`)
 
         const html_sprite = document.createElement("div")
