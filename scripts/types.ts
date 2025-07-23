@@ -68,7 +68,7 @@ export type IRConsequenceSelectTarget =
 
 type IRConsequenceSelectTargetMelee = {
     targeting_type: "adjacent" | "melee_weapon"
-    target_type: "enemy"
+    target_type: "enemy" | "creature"
     amount: 1,
     exclude?: ["primary_target"]
 }

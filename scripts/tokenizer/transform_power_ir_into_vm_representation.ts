@@ -213,7 +213,7 @@ export type ConsequenceSelectTargetRanged = {
 export type ConsequenceSelectTargetMelee = {
     type: "select_target"
     targeting_type: "adjacent" | "melee_weapon"
-    target_type: "enemy"
+    target_type: "enemy" | "creature"
     amount: 1,
     exclude: Array<string>
     target_label: string
