@@ -21,7 +21,6 @@ export const interpret_push = ({
 
     if (alternatives.length > 0) {
         player_turn_handler.set_awaiting_position_selection({
-            currently_selected: context.get_creature("owner"),
             available_targets: alternatives,
             on_click: (position) => {
                 player_turn_handler.deselect()
