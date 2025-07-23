@@ -72,8 +72,6 @@ export class PlayerTurnHandler {
     }
 
     set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type" | "currently_selected">) => {
-        this.deselect()
-
         const currently_selected = this.turn_context.get_current_context().owner()
         this.selection_context = {type: "position_select", currently_selected, ...context}
 
@@ -83,8 +81,6 @@ export class PlayerTurnHandler {
     }
 
     set_awaiting_path_selection = (context: Omit<PlayerTurnHandlerContextSelectPath, "type" | "currently_selected">) => {
-        this.deselect()
-
         const currently_selected = this.turn_context.get_current_context().owner()
         this.selection_context = {type: "path_select", currently_selected, ...context}
 
@@ -95,8 +91,6 @@ export class PlayerTurnHandler {
     }
 
     set_awaiting_area_burst_selection = (context: Omit<PlayerTurnHandlerContextSelectAreaBurst, "type" | "currently_selected">) => {
-        this.deselect()
-
         const currently_selected = this.turn_context.get_current_context().owner()
         this.selection_context = {type: "area_burst_select", currently_selected, ...context}
 
@@ -107,8 +101,6 @@ export class PlayerTurnHandler {
     }
 
     set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type" | "currently_selected">) => {
-        this.deselect()
-
         const currently_selected = this.turn_context.get_current_context().owner()
         this.selection_context = {type: "option_select", currently_selected, ...context}
 
@@ -124,10 +116,9 @@ export class PlayerTurnHandler {
             button.innerText = option.text
             if (option.disabled)
                 button.setAttribute("disabled", "")
-//TODO hacer que los otros on_click tengan tambien esto de evaluar consecuencias?
             button.addEventListener("click", () => {
-                    this.deselect()
                     option.on_click()
+                    this.deselect()
                     this.evaluate_consequences()
 
                     //TODO can be better
@@ -158,6 +149,7 @@ export class PlayerTurnHandler {
         if (this.selection_context?.type === "position_select" || this.selection_context?.type === "path_select" || this.selection_context?.type === "area_burst_select") {
             if (this.selection_context.available_targets.some(p => positions_equal(p, position))) {
                 this.selection_context.on_click(position)
+                this.deselect()
                 this.evaluate_consequences()
             }
         } else if (this.selection_context === null) {

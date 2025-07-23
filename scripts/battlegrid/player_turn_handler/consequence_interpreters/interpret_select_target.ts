@@ -23,7 +23,6 @@ export const interpret_select_target = ({
             const targets = player_turn_handler.selection_context.affected_targets.map(battle_grid.get_creature_by_position)
 
             context.set_creatures({name: consequence.target_label, value: targets})
-            player_turn_handler.deselect()
         }
 
         const on_hover = (position: Position) => {
@@ -58,7 +57,6 @@ export const interpret_select_target = ({
                 throw Error("position should be the end of the path")
 
             context.set_path({name: consequence.target_label, value: path})
-            player_turn_handler.deselect()
         }
 
         const on_hover = (position: Position) => {
@@ -85,7 +83,6 @@ export const interpret_select_target = ({
         if (consequence.target_type === "terrain") {
             const on_click = (position: Position) => {
                 context.set_variable({name: consequence.target_label, value: position, type: "position"})
-                player_turn_handler.deselect()
             }
 
             player_turn_handler.set_awaiting_position_selection({available_targets: valid_targets, on_click})
@@ -93,7 +90,6 @@ export const interpret_select_target = ({
             const on_click = (position: Position) => {
                 const creature = battle_grid.get_creature_by_position(position)
                 context.set_creature({name: consequence.target_label, value: creature})
-                player_turn_handler.deselect()
             }
 
             player_turn_handler.set_awaiting_position_selection({available_targets: valid_targets, on_click})
