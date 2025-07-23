@@ -1,5 +1,4 @@
 import {get_adjacent} from "battlegrid/ranges/get_adyacent";
-import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {BASIC_ATTACK_ACTIONS} from "powers/basic";
 import {Consequence, ConsequenceMovement} from "tokenizer/transform_power_ir_into_vm_representation";
 import {
