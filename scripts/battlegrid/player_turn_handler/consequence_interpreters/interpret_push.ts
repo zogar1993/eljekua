@@ -23,7 +23,7 @@ export const interpret_push = ({
         player_turn_handler.set_awaiting_position_selection({
             available_targets: alternatives,
             on_click: (position) => {
-                //TODO Add animation
+                //TODO 1 Add animation
                 battle_grid.place_creature({creature: defender, position})
             }
         })

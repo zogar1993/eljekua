@@ -140,7 +140,7 @@ export class BattleGrid {
         defender_origin: Position,
         amount: number
     }) {
-        //TODO contemplate bigger pushes
+        //TODO 1 contemplate bigger pushes
         const adjacent = get_adjacent({position: defender_origin, battle_grid: this})
         const initial_distance = distance_between_positions(attacker_origin, defender_origin)
         const unoccupied = adjacent.filter(x => !this.is_terrain_occupied(x))

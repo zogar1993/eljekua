@@ -4,6 +4,8 @@ import {ActionLog} from "action_log/ActionLog";
 import {NODE, token_to_node} from "expression_parsers/token_to_node";
 import {Creature} from "battlegrid/creatures/Creature";
 import {
+    Consequence,
+    ConsequenceAddPowers,
     ConsequenceOptions, ConsequenceOptionsItem,
     ConsequenceSelectTarget,
     PowerVM
@@ -106,7 +108,7 @@ export class PlayerTurnHandler {
 
         this.set_selected_indicator()
 
-        //TODO move this into characters
+        //TODO 0 move this into characters
         //currently_selected.visual.display_options(context.available_options)
 
         const actions_menu = document.querySelector("#actions_menu")!
@@ -155,9 +157,8 @@ export class PlayerTurnHandler {
         } else if (this.selection_context === null) {
             if (this.battle_grid.is_terrain_occupied(position)) {
                 const creature = this.battle_grid.get_creature_by_position(position)
-
-                this.turn_context.add_power_context({name: "Action Selection", consequences: [], owner: creature})
-                this.turn_context.get_current_context().add_consequences([this.build_actions_menu(creature)])
+                const consequences: Array<Consequence> = [{type: "add_powers", creature: "owner"}]
+                this.turn_context.add_power_context({name: "Action Selection", consequences, owner: creature})
                 this.evaluate_consequences()
             }
         }
@@ -200,20 +201,6 @@ export class PlayerTurnHandler {
     }
 
     has_selected_creature = () => this.selection_context !== null
-
-    build_actions_menu = (creature: Creature): ConsequenceOptions => {
-        return {
-            type: "options",
-            options: [
-                ...creature.data.powers.map(power => this.build_action_button(power)),
-                {
-                    text: "Cancel",
-                    consequences: [],
-                }
-            ]
-        }
-
-    }
 
     clear_actions_menu() {
         const buttons = document.querySelectorAll("#actions_menu > button")
@@ -296,33 +283,6 @@ export class PlayerTurnHandler {
                 action_log: this.action_log,
                 turn_context: this.turn_context
             })
-        }
-    }
-
-    build_action_button = (action: PowerVM): ConsequenceOptionsItem => {
-        // const first_consequence = action.consequences[0]
-
-//TODO add condition validation
-//         if (first_consequence.type === "select_target") {
-//             const valid_targets = this.get_valid_targets({consequence: first_consequence, context})
-//             result.disabled = valid_targets.length === 0
-//         }
-
-        const power_name = action.name.replaceAll(" ", "_").toLowerCase()
-
-        //TODO Create consequence "Add powers"
-        this.turn_context.get_current_context().set_variable({name: power_name, type: "power", value: action})
-
-        return {
-            text: action.name,
-            consequences: [
-                {
-                    type: "execute_power",
-                    power: power_name
-                    //TODO this should be easier
-                }
-            ],
-            //condition: tokenize(`$has_valid_targets(${power_name})`)
         }
     }
 

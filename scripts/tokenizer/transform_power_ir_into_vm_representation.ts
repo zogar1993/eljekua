@@ -97,6 +97,11 @@ export type ConsequenceCopyVariable = {
     destination: string
 }
 
+export type ConsequenceAddPowers = {
+    type: "add_powers",
+    creature: string
+}
+
 export type ConsequenceExecutePower = {
     type: "execute_power",
     power: string
@@ -113,6 +118,7 @@ export type Consequence =
     ConsequenceSaveResolvedNumber |
     ConsequencePush |
     ConsequenceCopyVariable |
+    ConsequenceAddPowers |
     ConsequenceExecutePower
 
 const transform_primary_roll = (roll: Required<Power>["roll"]): ConsequenceAttackRoll => {

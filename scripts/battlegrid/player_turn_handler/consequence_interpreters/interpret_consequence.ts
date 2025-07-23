@@ -16,6 +16,7 @@ import {
 } from "battlegrid/player_turn_handler/consequence_interpreters/interpret_save_resolved_number";
 import {interpret_copy_variable} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_copy_variable";
 import {interpret_execute_power} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_execute_power";
+import {interpret_add_powers} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_add_powers";
 
 export const interpret_consequence = (props: InterpretConsequenceProps<Consequence>) => {
     const {consequence} = props
@@ -52,6 +53,9 @@ export const interpret_consequence = (props: InterpretConsequenceProps<Consequen
             break;
         case "condition":
             interpret_condition({...props, consequence})
+            break
+        case "add_powers":
+            interpret_add_powers({...props, consequence})
             break
         case "execute_power":
             interpret_execute_power({...props, consequence})
