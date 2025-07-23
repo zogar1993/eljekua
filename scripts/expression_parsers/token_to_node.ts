@@ -171,6 +171,9 @@ const preview_keyword = ({token, context}: PreviewExpressionProps<KeywordToken>)
     throw Error("variable type not supported")
 }
 
+const ATTRIBUTE_MOD_CODES = ATTRIBUTE_CODES.map(attribute => `${attribute}_mod`)
+const ATTRIBUTE_MOD_CODES_LVL = ATTRIBUTE_CODES.map(attribute => `${attribute}_mod_lvl`)
+
 const preview_creature_property = ({creature, property}: {
     creature: Creature,
     property: string
@@ -179,10 +182,11 @@ const preview_creature_property = ({creature, property}: {
         value: creature.data.movement,
         description: "movement"
     }
-    //TODO clean up the creature functions mess
-    if (ATTRIBUTE_CODES.some(attribute => `${attribute}_mod` === property))
+
+    if (ATTRIBUTE_MOD_CODES.includes(property))
         return preview_creature_attribute_mod(creature, property.slice(0, 3) as any)
-    if (ATTRIBUTE_CODES.some(attribute => `${attribute}_mod_lvl` === property)) {
+
+    if (ATTRIBUTE_MOD_CODES_LVL.includes(property)) {
         const parts = [
             preview_creature_half_level(creature),
             preview_creature_attribute_mod(creature, property.slice(0, 3) as any)
