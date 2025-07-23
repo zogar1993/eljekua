@@ -116,6 +116,9 @@ export class PlayerTurnHandler {
 
         this.set_selected_indicator()
 
+        //TODO move this into characters
+        //currently_selected.visual.display_options(context.available_options)
+
         const actions_menu = document.querySelector("#actions_menu")!
 
         context.available_options.forEach(option => {
