@@ -3,13 +3,7 @@ import {OnPositionEvent, Position, positions_equal} from "battlegrid/Position";
 import {ActionLog} from "action_log/ActionLog";
 import {NODE, token_to_node} from "expression_parsers/token_to_node";
 import {Creature} from "battlegrid/creatures/Creature";
-import {
-    Consequence,
-    ConsequenceAddPowers,
-    ConsequenceOptions, ConsequenceOptionsItem,
-    ConsequenceSelectTarget,
-    PowerVM
-} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Consequence, ConsequenceSelectTarget} from "tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 import {get_move_area} from "battlegrid/ranges/get_move_area";
