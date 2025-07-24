@@ -140,11 +140,23 @@ export class BattleGrid {
         defender_origin: Position,
         amount: number
     }) {
-        //TODO 1 contemplate bigger pushes
-        const adjacent = get_adjacent({position: defender_origin, battle_grid: this})
-        const initial_distance = distance_between_positions(attacker_origin, defender_origin)
-        const unoccupied = adjacent.filter(x => !this.is_terrain_occupied(x))
-        return unoccupied.filter(position => distance_between_positions(position, attacker_origin) > initial_distance)
+        const visited: Array<Position> = [defender_origin]
+        let next_ring: Array<Position> = [defender_origin]
+        const result: Array<Position> = []
+
+        for (let i = 0; i < amount; i++) {
+            const evaluating = next_ring
+            for (const position of evaluating) {
+                const distance = distance_between_positions(position, attacker_origin)
+                const adjacent = get_adjacent({position, battle_grid: this}).filter(x => !this.is_terrain_occupied(x))
+                const exclude_visited = adjacent.filter(a => visited.every(v => !positions_equal(a, v)))
+                next_ring = exclude_visited.filter(x => distance_between_positions(x, attacker_origin) > distance)
+                result.push(...next_ring)
+            }
+        }
+
+        return result
+
     }
 
     move_creature_one_square({position, creature}: { position: Position, creature: Creature }) {
