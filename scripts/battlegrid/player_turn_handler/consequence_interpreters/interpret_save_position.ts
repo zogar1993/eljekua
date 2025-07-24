@@ -4,7 +4,6 @@ import {
 } from "battlegrid/player_turn_handler/consequence_interpreters/InterpretConsequenceProps";
 
 export const interpret_save_position = ({consequence, context}: InterpretConsequenceProps<ConsequenceSavePosition>) => {
-//TODO not working at the moment for Tide of Iron
     const target = context.get_creature(consequence.target)
     context.set_variable({type: "position", name: consequence.label, value: target.data.position})
 }
