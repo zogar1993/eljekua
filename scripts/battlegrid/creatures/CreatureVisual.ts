@@ -4,6 +4,7 @@ import {CreatureData} from "battlegrid/creatures/CreatureData";
 export type CreatureVisual = {
     place_at: (position: Position) => void
     move_one_square: (position: Position) => number
+    push_to: (position: Position) => number
     receive_damage: ({hp, damage}: {hp: number, damage: number}) => number
     display_miss: () => number
     display_hit_chance_on_hover: ({attack, defense, chance}: {attack: number, defense: number, chance: number}) => void
@@ -59,6 +60,12 @@ export class VisualCreatureCreator {
                 html_creature.style.setProperty("--creature__position-animation-duration", `${MOVEMENT_ANIMATION_DURATION}ms`)
                 return MOVEMENT_ANIMATION_DURATION
             },
+            push_to: (position: Position) => {
+                html_creature.style.setProperty("--creature_position-x", `${position.x}`)
+                html_creature.style.setProperty("--creature_position-y", `${position.y}`)
+                html_creature.style.setProperty("--creature__position-animation-duration", `${PUSH_ANIMATION_DURATION}ms`)
+                return PUSH_ANIMATION_DURATION
+            },
             receive_damage: ({hp, damage}: {hp: number, damage: number}) => {
                 html_creature.style.setProperty("--creature__lifebar_current-hp", `${hp}`)
 
@@ -103,3 +110,4 @@ export class VisualCreatureCreator {
 
 const FADING_TEXT_ANIMATION_DURATION = 1500
 const MOVEMENT_ANIMATION_DURATION = 500
+const PUSH_ANIMATION_DURATION = 500

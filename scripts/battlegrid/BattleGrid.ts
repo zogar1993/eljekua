@@ -147,14 +147,14 @@ export class BattleGrid {
         return unoccupied.filter(position => distance_between_positions(position, attacker_origin) > initial_distance)
     }
 
-    place_creature({position, creature}: { position: Position, creature: Creature }) {
-        creature.data.position = position
-        creature.visual.place_at(position)
-    }
-
     move_creature_one_square({position, creature}: { position: Position, creature: Creature }) {
         creature.data.position = position
         AnimationQueue.add_animation(() => creature.visual.move_one_square(position))
+    }
+
+    push_creature({position, creature}: { position: Position, creature: Creature }) {
+        creature.data.position = position
+        AnimationQueue.add_animation(() => creature.visual.push_to(position))
     }
 
     get_creature_by_position = (position: Position): Creature => {
