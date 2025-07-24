@@ -9,8 +9,13 @@ import {DiceToken, WeaponToken} from "tokenizer/tokens/DiceToken";
 import {Position} from "battlegrid/Position";
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {ATTRIBUTE_CODES} from "character_sheet/attributes";
+import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 
-type PreviewExpressionProps<T extends Token> = { token: T, context: PowerContext }
+type PreviewExpressionProps<T extends Token> = {
+    token: T,
+    context: PowerContext,
+    player_turn_handler: PlayerTurnHandler
+}
 
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number
@@ -29,40 +34,42 @@ export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => 
     }
 }
 
-export const token_to_node = ({token, context}: PreviewExpressionProps<Token>): AstNode => {
+export const token_to_node = ({token, ...props}: PreviewExpressionProps<Token>): AstNode => {
     switch (token.type) {
         case "function":
-            return preview_function({token, context})
+            return preview_function({token, ...props})
         case "number":
-            return preview_number({token, context})
+            return preview_number({token, ...props})
         case "string":
-            return preview_string({token, context})
+            return preview_string({token, ...props})
         case "weapon":
-            return preview_weapon({token, context})
+            return preview_weapon({token, ...props})
         case "dice":
-            return preview_dice({token, context})
+            return preview_dice({token, ...props})
         case "keyword":
-            return preview_keyword({token, context})
+            return preview_keyword({token, ...props})
     }
 }
 
-const preview_function = ({token, context}: PreviewExpressionProps<FunctionToken>): AstNode => {
+const preview_function = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNode => {
     switch (token.name) {
         case "add":
-            return preview_add_function({token, context})
+            return preview_add_function({token, ...props})
         case "exists":
-            return preview_exists_function({token, context})
+            return preview_exists_function({token, ...props})
         case "equipped":
-            return preview_equipped_function({token, context})
+            return preview_equipped_function({token, ...props})
         case "not_equals":
-            return preview_not_equals_function({token, context})
+            return preview_not_equals_function({token, ...props})
+        case "has_valid_targets":
+            return preview_has_valid_targets_function({token, ...props})
         default:
             throw Error(`function name ${token.name} not supported`)
     }
 }
 
-const preview_add_function = ({token, context}: PreviewExpressionProps<FunctionToken>): AstNodeNumber => {
-    const params = token.parameters.map(parameter => token_to_node({token: parameter, context}))
+const preview_add_function = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNodeNumber => {
+    const params = token.parameters.map(parameter => token_to_node({token: parameter, ...props}))
 
     if (are_all_numbers_unresolved(params))
         return {
@@ -94,13 +101,10 @@ const preview_exists_function = ({token, context}: PreviewExpressionProps<Functi
     }
 }
 
-const preview_equipped_function = ({
-                                       token,
-                                       context
-                                   }: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
+const preview_equipped_function = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 2)
-    const creature = NODE.as_creature(preview_keyword({token: TOKEN.as_keyword(token.parameters[0]), context}))
-    const text = preview_string({token: TOKEN.as_string(token.parameters[1]), context})
+    const creature = NODE.as_creature(preview_keyword({token: TOKEN.as_keyword(token.parameters[0]), ...props}))
+    const text = preview_string({token: TOKEN.as_string(token.parameters[1]), ...props})
 
     return {
         type: "boolean",
@@ -110,11 +114,38 @@ const preview_equipped_function = ({
     }
 }
 
-const preview_not_equals_function = ({token, context}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
+const preview_has_valid_targets_function = ({
+                                                token,
+                                                context,
+                                                player_turn_handler
+                                            }: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
+    assert_parameters_amount_equals(token, 1)
+
+    const power_name = TOKEN.as_keyword(token.parameters[0]).value
+    const power = context.get_power(power_name)
+
+    const first_consequence = power.consequences[0]
+
+    // If it does not need targets because it does not start with "select_target" we take as it's ok
+    let has_valid_targets = true
+    if (first_consequence.type === "select_target") {
+        const valid_targets = player_turn_handler.get_valid_targets({consequence: first_consequence, context})
+        has_valid_targets = valid_targets.length > 0
+    }
+
+    return {
+        type: "boolean",
+        value: has_valid_targets,
+        description: "has valid targets",
+        params: []
+    }
+}
+
+const preview_not_equals_function = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 2)
 
-    const parameter1 = token_to_node({token: token.parameters[0], context})
-    const parameter2 = token_to_node({token: token.parameters[1], context})
+    const parameter1 = token_to_node({token: token.parameters[0], ...props})
+    const parameter2 = token_to_node({token: token.parameters[1], ...props})
 
     if (parameter1.type === "position" && parameter2.type === "position") {
         const position1 = parameter1.value

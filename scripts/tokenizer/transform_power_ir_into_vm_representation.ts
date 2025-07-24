@@ -71,7 +71,7 @@ export type ConsequenceOptions = {
     options: Array<ConsequenceOptionsItem>,
 }
 
-export type ConsequenceOptionsItem = { text: string, consequences: Array<Consequence> }
+export type ConsequenceOptionsItem = { text: string, consequences: Array<Consequence>, condition?: Token}
 
 export type ConsequenceSavePosition = {
     type: "save_position",

@@ -4,10 +4,15 @@ import {
     InterpretConsequenceProps
 } from "battlegrid/player_turn_handler/consequence_interpreters/InterpretConsequenceProps";
 
-export const interpret_apply_damage = ({consequence, context, action_log}: InterpretConsequenceProps<ConsequenceApplyDamage>) => {
+export const interpret_apply_damage = ({
+                                           consequence,
+                                           context,
+                                           action_log,
+                                           player_turn_handler
+                                       }: InterpretConsequenceProps<ConsequenceApplyDamage>) => {
     const target = context.get_creature(consequence.target)
 
-    const damage = NODE.as_number(token_to_node({token: consequence.value, context}))
+    const damage = NODE.as_number(token_to_node({token: consequence.value, context, player_turn_handler}))
 
     const resolved = resolve_number(damage)
 

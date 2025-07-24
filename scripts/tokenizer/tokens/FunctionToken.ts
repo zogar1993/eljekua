@@ -32,7 +32,7 @@ export const tokenize_function = (scanner: Scanner): FunctionToken => {
     }
 }
 
-const FUNCTION_NAMES = ["add", "exists", "equipped", "greater_or_equals", "and", "not_equals"]
+const FUNCTION_NAMES = ["add", "exists", "equipped", "greater_or_equals", "and", "not_equals", "has_valid_targets"]
 
 export type FunctionToken = {
     type: "function"

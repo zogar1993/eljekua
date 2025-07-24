@@ -52,7 +52,7 @@ type PlayerTurnHandlerContextSelectOption = {
 type ButtonOption = {
     text: string,
     on_click: () => void
-    disabled?: boolean,
+    disabled: boolean,
 }
 
 export class PlayerTurnHandler {
@@ -207,14 +207,18 @@ export class PlayerTurnHandler {
         context: PowerContext
     }) {
         if (targeting.targeting_type === "movement") {
-            const distance = NODE.as_number_resolved(token_to_node({token: targeting.distance, context}))
+            const distance = NODE.as_number_resolved(token_to_node({
+                token: targeting.distance,
+                context,
+                player_turn_handler: this
+            }))
             return get_move_area({origin, distance: distance.value, battle_grid: this.battle_grid})
         } else if (targeting.targeting_type === "melee_weapon") {
             return this.battle_grid.get_melee({origin})
         } else if (targeting.targeting_type === "adjacent") {
             return get_adjacent({position: origin, battle_grid: this.battle_grid})
         } else if (targeting.targeting_type === "ranged" || targeting.targeting_type === "area_burst") {
-            const distance = token_to_node({token: targeting.distance, context})
+            const distance = token_to_node({token: targeting.distance, context, player_turn_handler: this})
 
             if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
             return this.battle_grid.get_in_range({origin, distance: distance.value})
@@ -235,7 +239,11 @@ export class PlayerTurnHandler {
         if (consequence.targeting_type === "movement") {
             const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
             if (consequence.destination_requirement) {
-                const node = token_to_node({token: consequence.destination_requirement, context})
+                const node = token_to_node({
+                    token: consequence.destination_requirement,
+                    context,
+                    player_turn_handler: this
+                })
                 const possibility = NODE.as_position(node)
                 //TODO this needs to change how it works when we add big fellows
                 return valid_targets.filter(position => positions_equal(position, possibility.value))

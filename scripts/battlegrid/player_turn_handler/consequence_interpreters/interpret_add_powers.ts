@@ -2,6 +2,7 @@ import {Consequence, ConsequenceAddPowers} from "tokenizer/transform_power_ir_in
 import {
     InterpretConsequenceProps
 } from "battlegrid/player_turn_handler/consequence_interpreters/InterpretConsequenceProps";
+import {tokenize} from "tokenizer/tokenize";
 
 export const interpret_add_powers = ({
                                          consequence,
@@ -23,7 +24,7 @@ export const interpret_add_powers = ({
                             power: power_name
                         }
                     ] as Array<Consequence>,
-                    //condition: tokenize(`$has_valid_targets(${power_name})`)
+                    condition: tokenize(`$has_valid_targets(${power_name})`)
                 }
             }),
             {
@@ -32,12 +33,4 @@ export const interpret_add_powers = ({
             }
         ]
     }])
-
-    // const first_consequence = action.consequences[0]
-
-//TODO 0 add condition validation
-//         if (first_consequence.type === "select_target") {
-//             const valid_targets = this.get_valid_targets({consequence: first_consequence, context})
-//             result.disabled = valid_targets.length === 0
-//         }
 }

@@ -16,7 +16,8 @@ import {ActionLog} from "action_log/ActionLog";
 export const interpret_attack_roll = ({
                                           consequence,
                                           context,
-                                          action_log
+                                          action_log,
+                                          player_turn_handler
                                       }: InterpretConsequenceProps<ConsequenceAttackRoll>) => {
     const attacker = context.owner()
     const defenders = context.get_creatures(consequence.defender)
@@ -26,7 +27,11 @@ export const interpret_attack_roll = ({
     context.set_creatures({name: `${consequence.defender}(all)`, value: defenders})
 
     defenders.forEach((defender, i) => {
-        const attack_base = NODE.as_number_resolved(token_to_node({token: consequence.attack, context}))
+        const attack_base = NODE.as_number_resolved(token_to_node({
+            token: consequence.attack,
+            context,
+            player_turn_handler
+        }))
         const attack = add_d20_roll_to_attack(attack_base)
 
         const defense = NODE.as_number_resolved(preview_defense({defender, defense_code: consequence.defense}))
