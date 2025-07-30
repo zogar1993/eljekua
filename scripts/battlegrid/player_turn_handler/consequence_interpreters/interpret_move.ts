@@ -38,11 +38,7 @@ export const interpret_move = ({
                 turn_context.expend_opportunity_action(attacker)
             }
 
-            context.add_consequences([{
-                type: "move",
-                target: consequence.target,
-                destination: consequence.destination
-            }])
+            context.add_consequences([{type: "move", target: consequence.target, destination: consequence.destination}])
             context.set_path({name: consequence.destination, value: path.slice(i)})
             break
         }

@@ -5,9 +5,15 @@ export type CreatureVisual = {
     place_at: (position: Position) => void
     move_one_square: (position: Position) => number
     push_to: (position: Position) => number
-    receive_damage: ({hp, damage}: {hp: number, damage: number}) => number
+    receive_damage: ({hp, damage}: { hp: number, damage: number }) => number
     display_miss: () => number
-    display_hit_chance_on_hover: ({attack, defense, chance}: {attack: number, defense: number, chance: number}) => void
+    display_options: (options: Array<ButtonOption>) => void
+    remove_options: () => void
+    display_hit_chance_on_hover: ({attack, defense, chance}: {
+        attack: number,
+        defense: number,
+        chance: number
+    }) => void
     remove_hit_chance_on_hover: () => void
 }
 
@@ -66,7 +72,7 @@ export class VisualCreatureCreator {
                 html_creature.style.setProperty("--creature__position-animation-duration", `${PUSH_ANIMATION_DURATION}ms`)
                 return PUSH_ANIMATION_DURATION
             },
-            receive_damage: ({hp, damage}: {hp: number, damage: number}) => {
+            receive_damage: ({hp, damage}: { hp: number, damage: number }) => {
                 html_creature.style.setProperty("--creature__lifebar_current-hp", `${hp}`)
 
                 const fading_number = document.createElement("div")
@@ -86,7 +92,11 @@ export class VisualCreatureCreator {
                 setTimeout(() => fading_miss.remove(), FADING_TEXT_ANIMATION_DURATION)
                 return FADING_TEXT_ANIMATION_DURATION / 2
             },
-            display_hit_chance_on_hover: ({attack, defense, chance}: {attack: number, defense: number, chance: number}) => {
+            display_hit_chance_on_hover: ({attack, defense, chance}: {
+                attack: number,
+                defense: number,
+                chance: number
+            }) => {
                 const hit_chance = document.createElement("div")
                 hit_chance.classList.add("hit-chance")
                 hit_chance.textContent = `${attack} vs ${defense}: ${chance}%`
@@ -95,6 +105,25 @@ export class VisualCreatureCreator {
             remove_hit_chance_on_hover: () => {
                 const hit_chance = html_creature.querySelector(".hit-chance")
                 hit_chance?.remove()
+            },
+            display_options: (options: Array<ButtonOption>) => {
+                const actions_menu = document.querySelector("#actions_menu")!
+
+                options.forEach(option => {
+                    const button = document.createElement("button");
+                    button.innerText = option.text
+
+                    if (option.disabled)
+                        button.setAttribute("disabled", "")
+
+                    button.addEventListener("click", option.on_click)
+
+                    actions_menu.appendChild(button)
+                })
+            },
+            remove_options: () => {
+                const buttons = document.querySelectorAll("#actions_menu > button")
+                buttons.forEach(button => button.remove())
             }
         }
     }
@@ -111,3 +140,9 @@ export class VisualCreatureCreator {
 const FADING_TEXT_ANIMATION_DURATION = 1500
 const MOVEMENT_ANIMATION_DURATION = 500
 const PUSH_ANIMATION_DURATION = 500
+
+export type ButtonOption = {
+    text: string,
+    on_click: () => void
+    disabled: boolean,
+}

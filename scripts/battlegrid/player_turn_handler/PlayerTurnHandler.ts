@@ -10,6 +10,7 @@ import {get_move_area} from "battlegrid/ranges/get_move_area";
 import {get_adjacent} from "battlegrid/ranges/get_adyacent";
 import {interpret_consequence} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_consequence";
 import {SquareVisual} from "battlegrid/squares/SquareVisual";
+import {ButtonOption} from "battlegrid/creatures/CreatureVisual";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -47,12 +48,6 @@ type PlayerTurnHandlerContextSelectOption = {
     type: "option_select"
     currently_selected: Creature
     available_options: Array<ButtonOption>
-}
-
-type ButtonOption = {
-    text: string,
-    on_click: () => void
-    disabled: boolean,
 }
 
 export class PlayerTurnHandler {
@@ -102,43 +97,34 @@ export class PlayerTurnHandler {
 
         this.set_selected_indicator()
 
-        //TODO 0 move this into characters
-        //currently_selected.visual.display_options(context.available_options)
+        const options = context.available_options.map(option => ({
+            ...option,
+            on_click: () => {
+                option.on_click()
+                this.deselect()
+                this.evaluate_consequences()
+            }
+        }))
+        currently_selected.visual.display_options(options)
 
-        const actions_menu = document.querySelector("#actions_menu")!
-
-        context.available_options.forEach(option => {
-            const button = document.createElement("button");
-            button.innerText = option.text
-            if (option.disabled)
-                button.setAttribute("disabled", "")
-            button.addEventListener("click", () => {
-                    option.on_click()
-                    this.deselect()
-                    this.evaluate_consequences()
-
-                    //TODO can be better
-                    // this.battle_grid.get_all_creatures().forEach(creature => creature.remove_hit_chance_on_hover())
+        //TODO 0 can be better
+        // this.battle_grid.get_all_creatures().forEach(creature => creature.remove_hit_chance_on_hover())
 
 
-                    /* TODO re add chance
-                            if (action.roll) {
-                                valid_targets.forEach(square => {
-                                    const owner = this.get_selected_creature()
-                                    const target = this.battle_grid.get_creature_by_position(square.position)
+        /* TODO 0 re add chance
+                if (action.roll) {
+                    valid_targets.forEach(square => {
+                        const owner = this.get_selected_creature()
+                        const target = this.battle_grid.get_creature_by_position(square.position)
 
-                                    const attack = add_all_resolved_number_values(get_attack({creature: owner, attribute_code: "str"}))
-                                    const defense = add_all_resolved_number_values(get_defense({creature: target, defense_code: "ac"}))
-                                    const chance = (attack + 20 - defense + 1) * 5
+                        const attack = add_all_resolved_number_values(get_attack({creature: owner, attribute_code: "str"}))
+                        const defense = add_all_resolved_number_values(get_defense({creature: target, defense_code: "ac"}))
+                        const chance = (attack + 20 - defense + 1) * 5
 
-                                    target.display_hit_chance_on_hover({attack, defense, chance})
-                                })
-                            }
-                    */
+                        target.display_hit_chance_on_hover({attack, defense, chance})
+                    })
                 }
-            )
-            actions_menu.appendChild(button)
-        })
+        */
     }
 
     on_click: OnPositionEvent = ({position}) => {
@@ -188,18 +174,13 @@ export class PlayerTurnHandler {
             this.clear_indicator_to_positions({positions: this.selection_context.affected_area})
             this.clear_indicator_to_positions({positions: this.selection_context.affected_targets})
         } else if (this.selection_context.type === "option_select") {
-            this.clear_actions_menu()
+            this.selection_context.currently_selected.visual.remove_options()
         }
 
         this.selection_context = null
     }
 
     has_selected_creature = () => this.selection_context !== null
-
-    clear_actions_menu() {
-        const buttons = document.querySelectorAll("#actions_menu > button")
-        buttons.forEach(button => button.remove())
-    }
 
     get_in_range({targeting, origin, context}: {
         targeting: ConsequenceSelectTarget,
