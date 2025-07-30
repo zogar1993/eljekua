@@ -144,7 +144,7 @@ export class PlayerTurnHandler {
         }
     }
 
-    onHover: OnPositionEvent = ({position}) => {
+    on_hover: OnPositionEvent = ({position}) => {
         if (this.selection_context?.type === "path_select") {
             this.selection_context.on_hover(position)
         } else if (this.selection_context?.type === "area_burst_select") {
