@@ -1,4 +1,4 @@
-import {get_random_number} from "randomness/dice";
+import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
 import {KeywordToken} from "tokenizer/tokens/KeywordToken";
 import {Token} from "tokenizer/tokens/AnyToken";
@@ -20,11 +20,7 @@ type PreviewExpressionProps<T extends Token> = {
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number
     if (number.params === undefined)
-        return {
-            type: "number_resolved",
-            value: get_random_number(number),
-            description: number.description
-        }
+        return roll_d(number.max) //TODO this is to be enhanced when randomness apart from dice is added
     const resolved_parts = number.params.map(part => is_number(part) ? resolve_number(part) : part)
     return {
         type: "number_resolved",

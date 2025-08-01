@@ -1,15 +1,41 @@
 import {assert} from "assert";
 import type {AstNodeNumberResolved} from "expression_parsers/token_to_node";
 
+(window as any).rig_dice_roll = (faces: number, result: number) => {
+    const rigs = rigged_rolls[faces]
+    if (rigs === undefined) throw Error(`You can only throw D&D dice, there is no 'd${faces}'`)
+    rigged_rolls[faces] = [...rigs, result]
+}
+
+const rigged_rolls: Record<number, Array<number>> =  {
+    4: [],
+    6: [],
+    8: [],
+    10: [],
+    12: [],
+    20: []
+}
+
+const get_rigged_roll = (faces: number) => {
+    const rigs = rigged_rolls[faces]
+    if (rigs === undefined) throw Error(`You can only throw D&D dice, there is no 'd${faces}'`)
+    if (rigs.length === 0) return null
+    const result = rigs[0]
+    rigged_rolls[faces] = rigs.slice(1)
+    return result
+}
+
 export const roll_d = (faces: number): AstNodeNumberResolved => {
+    const rigged_roll = get_rigged_roll(faces)
+
     return {
         type: "number_resolved",
-        value: get_random_number({min: 1, max: faces}),
+        value: rigged_roll === null ? get_random_number({min: 1, max: faces}) : rigged_roll,
         description: `d${faces}`
     }
 }
 
-export const get_random_number = ({min, max}: { min: number, max: number }) => {
+const get_random_number = ({min, max}: { min: number, max: number }) => {
     assert(min <= max, () => "min can not be lower than max")
     const result = Math.floor(random() * (max - min + 1)) + min
     assert(min <= result && result <= max, () => `result of random needs to be between mind and max, was ${result}`)
