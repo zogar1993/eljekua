@@ -77,6 +77,11 @@ export class PowerContext {
         return variable.value
     }
 
+    peek_consequence = (): Consequence => {
+        assert(this.consequences.length > 0, () => "no consequences left when calling peek consequence")
+        return this.consequences[0]
+    }
+
     next_consequence = (): Consequence => {
         assert(this.consequences.length > 0, () => "no consequences left when calling next consequence")
         const [next, ...consequences] = this.consequences

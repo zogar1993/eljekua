@@ -9,12 +9,12 @@ export type CreatureVisual = {
     display_miss: () => number
     display_options: (options: Array<ButtonOption>) => void
     remove_options: () => void
-    display_hit_chance_on_hover: ({attack, defense, chance}: {
+    display_hit_chance: ({attack, defense, chance}: {
         attack: number,
         defense: number,
         chance: number
     }) => void
-    remove_hit_chance_on_hover: () => void
+    remove_hit_chance: () => void
 }
 
 export class VisualCreatureCreator {
@@ -92,7 +92,7 @@ export class VisualCreatureCreator {
                 setTimeout(() => fading_miss.remove(), FADING_TEXT_ANIMATION_DURATION)
                 return FADING_TEXT_ANIMATION_DURATION / 2
             },
-            display_hit_chance_on_hover: ({attack, defense, chance}: {
+            display_hit_chance: ({attack, defense, chance}: {
                 attack: number,
                 defense: number,
                 chance: number
@@ -102,7 +102,7 @@ export class VisualCreatureCreator {
                 hit_chance.textContent = `${attack} vs ${defense}: ${chance}%`
                 html_creature.appendChild(hit_chance)
             },
-            remove_hit_chance_on_hover: () => {
+            remove_hit_chance: () => {
                 const hit_chance = html_creature.querySelector(".hit-chance")
                 hit_chance?.remove()
             },

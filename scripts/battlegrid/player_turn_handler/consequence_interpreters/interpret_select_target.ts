@@ -10,7 +10,7 @@ export const interpret_select_target = ({
                                             player_turn_handler,
                                             battle_grid
                                         }: InterpretConsequenceProps<ConsequenceSelectTarget>) => {
-    const valid_targets = player_turn_handler.get_valid_targets({consequence, context})
+    const available_targets = player_turn_handler.get_valid_targets({consequence, context})
 
     if (consequence.targeting_type === "area_burst") {
         const on_click = (position: Position) => {
@@ -38,13 +38,7 @@ export const interpret_select_target = ({
             player_turn_handler.set_awaiting_area_burst_selection({...selection_base, affected_targets, affected_area})
         }
 
-        const selection_base = {
-            available_targets: valid_targets,
-            affected_targets: [],
-            affected_area: [],
-            on_click,
-            on_hover,
-        }
+        const selection_base = {available_targets, affected_targets: [], affected_area: [], on_click, on_hover}
 
         player_turn_handler.set_awaiting_area_burst_selection(selection_base)
     } else if (consequence.targeting_type === "movement") {
@@ -71,12 +65,7 @@ export const interpret_select_target = ({
             player_turn_handler.set_awaiting_path_selection({...selection_base, current_path: path})
         }
 
-        const selection_base = {
-            available_targets: valid_targets,
-            current_path: [],
-            on_click,
-            on_hover,
-        }
+        const selection_base = {available_targets, current_path: [], on_click, on_hover}
 
         player_turn_handler.set_awaiting_path_selection(selection_base)
     } else {
@@ -85,14 +74,14 @@ export const interpret_select_target = ({
                 context.set_variable({name: consequence.target_label, value: position, type: "position"})
             }
 
-            player_turn_handler.set_awaiting_position_selection({available_targets: valid_targets, on_click})
+            player_turn_handler.set_awaiting_position_selection({available_targets, on_click})
         } else if ((consequence.target_type === "creature" || consequence.target_type === "enemy")) {
             const on_click = (position: Position) => {
                 const creature = battle_grid.get_creature_by_position(position)
                 context.set_creature({name: consequence.target_label, value: creature})
             }
 
-            player_turn_handler.set_awaiting_position_selection({available_targets: valid_targets, on_click})
+            player_turn_handler.set_awaiting_position_selection({available_targets, on_click})
         }
     }
 }

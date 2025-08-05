@@ -10,7 +10,7 @@ import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "powers/basic";
 export class BattleGrid {
     readonly BOARD_HEIGHT = 10
     readonly BOARD_WIDTH = 10
-    private creatures: Array<Creature> = []
+    readonly creatures: Array<Creature> = []
 
     board: Array<Array<Square>>
     visual_creature_creator: VisualCreatureCreator

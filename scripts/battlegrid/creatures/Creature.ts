@@ -17,11 +17,7 @@ export class Creature {
     }
 
     display_hit_chance_on_hover = ({attack, defense, chance}: { attack: number, defense: number, chance: number }) => {
-        this.visual.display_hit_chance_on_hover({attack, defense, chance})
-    }
-
-    remove_hit_chance_on_hover = () => {
-        this.visual.remove_hit_chance_on_hover()
+        this.visual.display_hit_chance({attack, defense, chance})
     }
 
     has_equipped = (weapon_type: string) => false

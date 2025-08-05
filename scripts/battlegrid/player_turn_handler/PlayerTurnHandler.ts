@@ -1,7 +1,7 @@
 import {BattleGrid} from "battlegrid/BattleGrid";
 import {OnPositionEvent, Position, positions_equal} from "battlegrid/Position";
 import {ActionLog} from "action_log/ActionLog";
-import {NODE, token_to_node} from "expression_parsers/token_to_node";
+import {NODE, preview_defense, token_to_node} from "expression_parsers/token_to_node";
 import {Creature} from "battlegrid/creatures/Creature";
 import {Consequence, ConsequenceSelectTarget} from "tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
@@ -23,6 +23,7 @@ type PlayerTurnHandlerContextSelectPosition = {
     currently_selected: Creature
     available_targets: Array<Position>
     on_click: (position: Position) => void
+    on_hover: (position: Position) => void
 }
 
 type PlayerTurnHandlerContextSelectPath = {
@@ -62,9 +63,10 @@ export class PlayerTurnHandler {
         this.action_log = action_log
     }
 
-    set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type" | "currently_selected">) => {
+    set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type" | "currently_selected" | "on_hover">) => {
         const currently_selected = this.turn_context.get_current_context().owner()
-        this.selection_context = {type: "position_select", currently_selected, ...context}
+        //TODO this should be better on_hover
+        this.selection_context = {type: "position_select", currently_selected, on_hover: () => {}, ...context}
 
         this.set_selected_indicator()
 
@@ -106,25 +108,6 @@ export class PlayerTurnHandler {
             }
         }))
         currently_selected.visual.display_options(options)
-
-        //TODO 0 can be better
-        // this.battle_grid.get_all_creatures().forEach(creature => creature.remove_hit_chance_on_hover())
-
-
-        /* TODO 0 re add chance
-                if (action.roll) {
-                    valid_targets.forEach(square => {
-                        const owner = this.get_selected_creature()
-                        const target = this.battle_grid.get_creature_by_position(square.position)
-
-                        const attack = add_all_resolved_number_values(get_attack({creature: owner, attribute_code: "str"}))
-                        const defense = add_all_resolved_number_values(get_defense({creature: target, defense_code: "ac"}))
-                        const chance = (attack + 20 - defense + 1) * 5
-
-                        target.display_hit_chance_on_hover({attack, defense, chance})
-                    })
-                }
-        */
     }
 
     on_click: OnPositionEvent = ({position}) => {
@@ -145,10 +128,35 @@ export class PlayerTurnHandler {
     }
 
     on_hover: OnPositionEvent = ({position}) => {
-        if (this.selection_context?.type === "path_select") {
+        if (this.selection_context?.type === "path_select" ||
+            this.selection_context?.type === "area_burst_select" ||
+            this.selection_context?.type === "position_select") {
             this.selection_context.on_hover(position)
-        } else if (this.selection_context?.type === "area_burst_select") {
-            this.selection_context.on_hover(position)
+
+            //TODO this is all very untidy
+            this.battle_grid.creatures.map(creature => creature.visual.remove_hit_chance())
+
+            const next_consequence = this.turn_context.get_current_context().peek_consequence()
+            const needs_roll = next_consequence.type === "attack_roll"
+                if (needs_roll) {
+                    this.selection_context.available_targets.forEach(position => {
+
+                        const attacker = next_consequence.attack
+                        const attack = NODE.as_number_resolved(token_to_node({
+                            token: attacker,
+                            //TODO doing this here seems redundant if we already have player turn handler
+                            context: this.turn_context.get_current_context(),
+                            player_turn_handler: this
+                        })).value
+
+                        const defender = this.battle_grid.get_creature_by_position(position)
+                        const defense = preview_defense({defender, defense_code: next_consequence.defense}).value
+
+                        const chance = (attack + 20 - defense + 1) * 5
+
+                        defender.display_hit_chance_on_hover({attack, defense, chance})
+                    })
+            }
         }
     }
 
@@ -166,6 +174,11 @@ export class PlayerTurnHandler {
 
         if (this.selection_context.type === "position_select") {
             this.clear_indicator_to_positions({positions: this.selection_context.available_targets})
+            //TODO this need to be made better
+            this.selection_context.available_targets
+                .filter(this.battle_grid.is_terrain_occupied)
+                .map(this.battle_grid.get_creature_by_position)
+                .forEach(creature => creature.visual.remove_hit_chance())
         } else if (this.selection_context.type === "path_select") {
             this.clear_indicator_to_positions({positions: this.selection_context.available_targets})
             this.clear_indicator_to_positions({positions: this.selection_context.current_path})
