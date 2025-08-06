@@ -7,6 +7,7 @@ import {Creature} from "battlegrid/creatures/Creature";
 import {ROGUE_POWERS} from "powers/rogue";
 import {FIGHTER_POWERS} from "powers/fighter";
 import {WIZARD_POWERS} from "powers/wizard";
+import type {CreatureData} from "battlegrid/creatures/CreatureData";
 
 const visual_square_creator = new VisualSquareCreator()
 const visual_creature_creator = new VisualCreatureCreator()
@@ -79,3 +80,7 @@ battle_grid.create_creature(bob)
 battle_grid.create_creature(maik)
 battle_grid.create_creature(yeims)
 battle_grid.create_creature(jenri)
+
+;(window as any).add_character = (data: CreatureData) => {
+    battle_grid.create_creature(data)
+}
