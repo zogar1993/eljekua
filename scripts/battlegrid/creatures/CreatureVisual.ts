@@ -55,21 +55,25 @@ export class VisualCreatureCreator {
             handler => handler({position: data.position})
         ))
 
+        const set_position_at = ({x, y}: Position) => {
+            html_creature.style.setProperty("--creature_position-x", `${x}`)
+            html_creature.style.setProperty("--creature_position-y", `${y}`)
+            html_creature.setAttribute("x", `${x}`)
+            html_creature.setAttribute("y", `${y}`)
+        }
+
         return {
             place_at: (position: Position) => {
-                html_creature.style.setProperty("--creature_position-x", `${position.x}`)
-                html_creature.style.setProperty("--creature_position-y", `${position.y}`)
+                set_position_at(position)
             },
             move_one_square: (position: Position) => {
-                html_creature.style.setProperty("--creature_position-x", `${position.x}`)
-                html_creature.style.setProperty("--creature_position-y", `${position.y}`)
                 html_creature.style.setProperty("--creature__position-animation-duration", `${MOVEMENT_ANIMATION_DURATION}ms`)
+                set_position_at(position)
                 return MOVEMENT_ANIMATION_DURATION
             },
             push_to: (position: Position) => {
-                html_creature.style.setProperty("--creature_position-x", `${position.x}`)
-                html_creature.style.setProperty("--creature_position-y", `${position.y}`)
                 html_creature.style.setProperty("--creature__position-animation-duration", `${PUSH_ANIMATION_DURATION}ms`)
+                set_position_at(position)
                 return PUSH_ANIMATION_DURATION
             },
             receive_damage: ({hp, damage}: { hp: number, damage: number }) => {
