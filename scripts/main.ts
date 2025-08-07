@@ -77,12 +77,14 @@ const ATTRIBUTES = {
         powers: ROGUE_POWERS
     }
 
-    battle_grid.create_creature(bob)
-    battle_grid.create_creature(maik)
-    battle_grid.create_creature(yeims)
-    battle_grid.create_creature(jenri)
+    player_turn_handler.add_creature(bob)
+    player_turn_handler.add_creature(maik)
+    player_turn_handler.add_creature(yeims)
+    player_turn_handler.add_creature(jenri)
+
+    player_turn_handler.start()
 }
 
 ;(window as any).add_character = (data: CreatureData) => {
-    battle_grid.create_creature(data)
+    player_turn_handler.add_creature(data)
 }

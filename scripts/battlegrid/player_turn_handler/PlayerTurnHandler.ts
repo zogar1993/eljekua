@@ -11,6 +11,8 @@ import {get_adjacent} from "battlegrid/ranges/get_adyacent";
 import {interpret_consequence} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_consequence";
 import {SquareVisual} from "battlegrid/squares/SquareVisual";
 import {ButtonOption} from "battlegrid/creatures/CreatureVisual";
+import {InitiativeOrder} from "initiative_order/InitiativeOrder";
+import {CreatureData} from "battlegrid/creatures/CreatureData";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -55,6 +57,8 @@ export class PlayerTurnHandler {
     private readonly action_log: ActionLog
     private readonly battle_grid: BattleGrid
     turn_context = new TurnContext()
+    initiative_order = new InitiativeOrder()
+    started = false
 
     selection_context: PlayerTurnHandlerContextSelect | null = null
 
@@ -66,7 +70,10 @@ export class PlayerTurnHandler {
     set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type" | "currently_selected" | "on_hover">) => {
         const currently_selected = this.turn_context.get_current_context().owner()
         //TODO this should be better on_hover
-        this.selection_context = {type: "position_select", currently_selected, on_hover: () => {}, ...context}
+        this.selection_context = {
+            type: "position_select", currently_selected, on_hover: () => {
+            }, ...context
+        }
 
         this.set_selected_indicator()
 
@@ -110,6 +117,17 @@ export class PlayerTurnHandler {
         currently_selected.visual.display_options(options)
     }
 
+    add_creature = (data: CreatureData) => {
+        const creature = this.battle_grid.create_creature(data)
+        this.initiative_order.add_creature(creature)
+    }
+
+    start = () => {
+        this.started = true
+        const creature = this.initiative_order.get_current_creature()
+        this.set_creature_as_current_turn(creature)
+    }
+
     on_click: OnPositionEvent = ({position}) => {
         if (this.selection_context?.type === "position_select" || this.selection_context?.type === "path_select" || this.selection_context?.type === "area_burst_select") {
             if (this.selection_context.available_targets.some(p => positions_equal(p, position))) {
@@ -118,13 +136,20 @@ export class PlayerTurnHandler {
                 this.evaluate_consequences()
             }
         } else if (this.selection_context === null) {
-            if (this.battle_grid.is_terrain_occupied(position)) {
-                const creature = this.battle_grid.get_creature_by_position(position)
-                const consequences: Array<Consequence> = [{type: "add_powers", creature: "owner"}]
-                this.turn_context.add_power_context({name: "Action Selection", consequences, owner: creature})
-                this.evaluate_consequences()
-            }
+            // TODO remove
+            // if (this.battle_grid.is_terrain_occupied(position)) {
+            //     const creature = this.battle_grid.get_creature_by_position(position)
+            //     const consequences: Array<Consequence> = [{type: "add_powers", creature: "owner"}]
+            //     this.turn_context.add_power_context({name: "Action Selection", consequences, owner: creature})
+            //     this.evaluate_consequences()
+            // }
         }
+    }
+
+    set_creature_as_current_turn(creature: Creature) {
+        const consequences: Array<Consequence> = [{type: "add_powers", creature: "owner"}]
+        this.turn_context.add_power_context({name: "Action Selection", consequences, owner: creature})
+        this.evaluate_consequences()
     }
 
     on_hover: OnPositionEvent = ({position}) => {
@@ -138,24 +163,24 @@ export class PlayerTurnHandler {
 
             const next_consequence = this.turn_context.get_current_context().peek_consequence()
             const needs_roll = next_consequence.type === "attack_roll"
-                if (needs_roll) {
-                    this.selection_context.available_targets.forEach(position => {
+            if (needs_roll) {
+                this.selection_context.available_targets.forEach(position => {
 
-                        const attacker = next_consequence.attack
-                        const attack = NODE.as_number_resolved(token_to_node({
-                            token: attacker,
-                            //TODO doing this here seems redundant if we already have player turn handler
-                            context: this.turn_context.get_current_context(),
-                            player_turn_handler: this
-                        })).value
+                    const attacker = next_consequence.attack
+                    const attack = NODE.as_number_resolved(token_to_node({
+                        token: attacker,
+                        //TODO doing this here seems redundant if we already have player turn handler
+                        context: this.turn_context.get_current_context(),
+                        player_turn_handler: this
+                    })).value
 
-                        const defender = this.battle_grid.get_creature_by_position(position)
-                        const defense = preview_defense({defender, defense_code: next_consequence.defense}).value
+                    const defender = this.battle_grid.get_creature_by_position(position)
+                    const defense = preview_defense({defender, defense_code: next_consequence.defense}).value
 
-                        const chance = (attack + 20 - defense + 1) * 5
+                    const chance = (attack + 20 - defense + 1) * 5
 
-                        defender.display_hit_chance_on_hover({attack, defense, chance})
-                    })
+                    defender.display_hit_chance_on_hover({attack, defense, chance})
+                })
             }
         }
     }
@@ -268,7 +293,13 @@ export class PlayerTurnHandler {
             const consequence = this.turn_context.next_consequence()
 
             // Reached the end of all consequences
-            if (consequence === null) return
+            if (consequence === null) {
+                this.initiative_order.next_turn()
+                const creature = this.initiative_order.get_current_creature()
+                this.set_creature_as_current_turn(creature)
+                return
+            }
+
             const context = this.turn_context.get_current_context()
 
             interpret_consequence({

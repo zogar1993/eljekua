@@ -183,6 +183,7 @@ export class BattleGrid {
         const visual = this.visual_creature_creator.create(d)
         const creature = new Creature({data: d, visual})
         this.creatures.push(creature)
+        return creature
     }
 }
 
