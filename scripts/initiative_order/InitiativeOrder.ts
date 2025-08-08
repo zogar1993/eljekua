@@ -1,29 +1,22 @@
 import {Creature} from "battlegrid/creatures/Creature";
 import type {AstNodeNumberResolved} from "expression_parsers/token_to_node";
 import {roll_d} from "randomness/dice";
+import {InitiativeOrderVisual} from "initiative_order/InitiativeOrderVisual";
 
 export class InitiativeOrder {
     initiative_order: Array<{ creature: Creature, initiative: AstNodeNumberResolved, visual: HTMLDivElement }> = []
+    visual_initiative_order: InitiativeOrderVisual
 
     private current_index = 0
 
+    constructor(visual: InitiativeOrderVisual) {
+        this.visual_initiative_order = visual
+    }
+
     add_creature = (creature: Creature) => {
         const initiative = roll_d(20)
-
-        //TODO decouple from logic
-        const html_initiative = document.createElement("div")
-
-        const html_initiative_name = document.createElement("span")
-        html_initiative_name.textContent = creature.data.name
-        html_initiative.appendChild(html_initiative_name)
-
-        const html_initiative_number = document.createElement("span")
-        html_initiative_number.textContent = ` ${initiative.value}`
-        html_initiative.appendChild(html_initiative_number)
-
-        html_initiative.setAttribute("creature-id", creature.data.name.toLowerCase())
-
-        this.initiative_order.push({creature, initiative, visual: html_initiative})
+        const visual = this.visual_initiative_order.create_creature({creature, initiative})
+        this.initiative_order.push({creature, initiative, visual})
     }
 
     get_current_creature = (): Creature => {
@@ -46,8 +39,7 @@ export class InitiativeOrder {
 
         this.initiative_order = this.initiative_order.sort((a, b) => a.initiative.value > b.initiative.value ? -1 : 1)
         this.initiative_order.forEach(initiative => {
-            const html_initiative_order = document.getElementById("initiative_order")!
-            html_initiative_order.appendChild(initiative.visual)
+            this.visual_initiative_order.add_creature({visual: initiative.visual})
         })
     }
 }

@@ -57,14 +57,19 @@ export class PlayerTurnHandler {
     private readonly action_log: ActionLog
     private readonly battle_grid: BattleGrid
     turn_context = new TurnContext()
-    initiative_order = new InitiativeOrder()
+    initiative_order: InitiativeOrder
     started = false
 
     selection_context: PlayerTurnHandlerContextSelect | null = null
 
-    constructor(battle_grid: BattleGrid, action_log: ActionLog) {
+    constructor({battle_grid, action_log, initiative_order}: {
+        battle_grid: BattleGrid,
+        action_log: ActionLog,
+        initiative_order: InitiativeOrder
+    }) {
         this.battle_grid = battle_grid
         this.action_log = action_log
+        this.initiative_order = initiative_order
     }
 
     set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type" | "currently_selected" | "on_hover">) => {

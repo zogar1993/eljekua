@@ -8,12 +8,17 @@ import {ROGUE_POWERS} from "powers/rogue";
 import {FIGHTER_POWERS} from "powers/fighter";
 import {WIZARD_POWERS} from "powers/wizard";
 import type {CreatureData} from "battlegrid/creatures/CreatureData";
+import {InitiativeOrder} from "initiative_order/InitiativeOrder";
+import {InitiativeOrderVisual} from "initiative_order/InitiativeOrderVisual";
 
 const visual_square_creator = new VisualSquareCreator()
 const visual_creature_creator = new VisualCreatureCreator()
+const visual_initiative_order = new InitiativeOrderVisual()
+
+const initiative_order = new InitiativeOrder(visual_initiative_order)
 const action_log = new ActionLog()
 const battle_grid = new BattleGrid({visual_square_creator, visual_creature_creator})
-const player_turn_handler = new PlayerTurnHandler(battle_grid, action_log)
+const player_turn_handler = new PlayerTurnHandler({battle_grid, action_log, initiative_order})
 
 visual_creature_creator.addOnCreatureClickEvent(player_turn_handler.on_click)
 visual_square_creator.addOnSquareClickEvent(player_turn_handler.on_click)
