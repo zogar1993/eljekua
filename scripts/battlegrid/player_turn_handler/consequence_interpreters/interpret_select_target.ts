@@ -12,6 +12,8 @@ export const interpret_select_target = ({
                                         }: InterpretConsequenceProps<ConsequenceSelectTarget>) => {
     const available_targets = player_turn_handler.get_valid_targets({consequence, context})
 
+    if (available_targets.length === 0) return
+
     if (consequence.targeting_type === "area_burst") {
         const on_click = (position: Position) => {
             if (player_turn_handler.selection_context?.type !== "area_burst_select")
