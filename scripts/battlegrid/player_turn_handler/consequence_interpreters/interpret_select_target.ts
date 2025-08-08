@@ -78,6 +78,14 @@ export const interpret_select_target = ({
 
             player_turn_handler.set_awaiting_position_selection({available_targets, on_click})
         } else if ((consequence.target_type === "creature" || consequence.target_type === "enemy")) {
+            if (available_targets.length === 1 && context.peek_consequence().type !== "attack_roll") {
+                context.set_creature({
+                    name: consequence.target_label,
+                    value: battle_grid.get_creature_by_position(available_targets[0])
+                })
+                return
+            }
+
             const on_click = (position: Position) => {
                 const creature = battle_grid.get_creature_by_position(position)
                 context.set_creature({name: consequence.target_label, value: creature})
