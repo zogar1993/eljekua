@@ -88,3 +88,7 @@ const ATTRIBUTES = {
 ;(window as any).add_character = (data: CreatureData) => {
     player_turn_handler.add_creature(data)
 }
+
+;(window as any).start = () => {
+    player_turn_handler.start()
+}

@@ -124,6 +124,7 @@ export class PlayerTurnHandler {
 
     start = () => {
         this.started = true
+        this.initiative_order.start()
         const creature = this.initiative_order.get_current_creature()
         this.set_creature_as_current_turn(creature)
     }
@@ -135,14 +136,6 @@ export class PlayerTurnHandler {
                 this.deselect()
                 this.evaluate_consequences()
             }
-        } else if (this.selection_context === null) {
-            // TODO remove
-            // if (this.battle_grid.is_terrain_occupied(position)) {
-            //     const creature = this.battle_grid.get_creature_by_position(position)
-            //     const consequences: Array<Consequence> = [{type: "add_powers", creature: "owner"}]
-            //     this.turn_context.add_power_context({name: "Action Selection", consequences, owner: creature})
-            //     this.evaluate_consequences()
-            // }
         }
     }
 
