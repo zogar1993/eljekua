@@ -32,4 +32,5 @@ export class TurnContext {
 
     expend_opportunity_action = (creature: Creature) => this.expended_opportunity_actions.push(creature)
     has_opportunity_action = (creature: Creature) => !this.expended_opportunity_actions.includes(creature)
+    refresh_opportunity_actions = () => this.expended_opportunity_actions = []
 }

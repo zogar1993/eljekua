@@ -70,6 +70,7 @@ export class PlayerTurnHandler {
         this.battle_grid = battle_grid
         this.action_log = action_log
         this.initiative_order = initiative_order
+        this.initiative_order.addOnTurnEndEvent(() => this.turn_context.refresh_opportunity_actions())
     }
 
     set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type" | "currently_selected" | "on_hover">) => {

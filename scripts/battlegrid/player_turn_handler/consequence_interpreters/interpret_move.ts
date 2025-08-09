@@ -34,7 +34,6 @@ export const interpret_move = ({
                 turn_context.add_power_context({name, consequences, owner: attacker})
                 turn_context.get_current_context().set_creature({name: "primary_target", value: creature})
 
-                //TODO this should be better when turns and rounds are added
                 turn_context.expend_opportunity_action(attacker)
             }
 
