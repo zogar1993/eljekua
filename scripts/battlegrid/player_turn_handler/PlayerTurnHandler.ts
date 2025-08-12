@@ -4,7 +4,7 @@ import {ActionLog} from "action_log/ActionLog";
 import {NODE, preview_defense, token_to_node} from "expression_parsers/token_to_node";
 import {Creature} from "battlegrid/creatures/Creature";
 import {Consequence, ConsequenceSelectTarget} from "tokenizer/transform_power_ir_into_vm_representation";
-import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
+import {PowerContext, VariableType} from "battlegrid/player_turn_handler/PowerContext";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 import {get_move_area} from "battlegrid/ranges/get_move_area";
 import {get_adjacent} from "battlegrid/ranges/get_adyacent";
@@ -17,39 +17,20 @@ import {CreatureData} from "battlegrid/creatures/CreatureData";
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
     | PlayerTurnHandlerContextSelectOption
-    | PlayerTurnHandlerContextSelectPath
-    | PlayerTurnHandlerContextSelectAreaBurst
 
-type PlayerTurnHandlerContextSelectPosition = {
+export type PlayerTurnHandlerContextSelectPosition = {
     type: "position_select"
-    currently_selected: Creature
-    available_targets: Array<Position>
-    on_click: (position: Position) => void
-    on_hover: (position: Position) => void
-}
-
-type PlayerTurnHandlerContextSelectPath = {
-    type: "path_select"
-    currently_selected: Creature
-    available_targets: Array<Position>
-    current_path: Array<Position>
-    on_click: (position: Position) => void
-    on_hover: (position: Position) => void
-}
-
-type PlayerTurnHandlerContextSelectAreaBurst = {
-    type: "area_burst_select"
-    currently_selected: Creature
-    available_targets: Array<Position>
-    affected_area: Array<Position>
-    affected_targets: Array<Position>
+    owner: Creature
+    clickable: Array<Position>
+    highlighted_area: Array<Position>
+    target: VariableType | null
     on_click: (position: Position) => void
     on_hover: (position: Position) => void
 }
 
 type PlayerTurnHandlerContextSelectOption = {
     type: "option_select"
-    currently_selected: Creature
+    owner: Creature
     available_options: Array<ButtonOption>
 }
 
@@ -73,42 +54,25 @@ export class PlayerTurnHandler {
         this.initiative_order.addOnTurnEndEvent(() => this.turn_context.refresh_opportunity_actions())
     }
 
-    set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type" | "currently_selected" | "on_hover">) => {
-        const currently_selected = this.turn_context.get_current_context().owner()
+    set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type" | "owner">) => {
+        const owner = this.turn_context.get_current_context().owner()
         //TODO this should be better on_hover
         this.selection_context = {
-            type: "position_select", currently_selected, on_hover: () => {
-            }, ...context
+            type: "position_select",
+            owner,
+            ...context
         }
 
         this.set_selected_indicator()
 
-        this.set_indicator_to_positions({positions: context.available_targets, indicator: "available-target"})
+        this.set_indicator_to_positions({positions: context.clickable, indicator: "available-target"})
+        this.set_indicator_to_positions({positions: context.highlighted_area, indicator: "current-path"})
+        //this.set_indicator_to_positions({positions: context.affected_area, indicator: "area"})
     }
 
-    set_awaiting_path_selection = (context: Omit<PlayerTurnHandlerContextSelectPath, "type" | "currently_selected">) => {
-        const currently_selected = this.turn_context.get_current_context().owner()
-        this.selection_context = {type: "path_select", currently_selected, ...context}
-
-        this.set_selected_indicator()
-
-        this.set_indicator_to_positions({positions: context.available_targets, indicator: "available-target"})
-        this.set_indicator_to_positions({positions: context.current_path, indicator: "current-path"})
-    }
-
-    set_awaiting_area_burst_selection = (context: Omit<PlayerTurnHandlerContextSelectAreaBurst, "type" | "currently_selected">) => {
-        const currently_selected = this.turn_context.get_current_context().owner()
-        this.selection_context = {type: "area_burst_select", currently_selected, ...context}
-
-        this.set_selected_indicator()
-
-        this.set_indicator_to_positions({positions: context.available_targets, indicator: "available-target"})
-        this.set_indicator_to_positions({positions: context.affected_area, indicator: "area"})
-    }
-
-    set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type" | "currently_selected">) => {
-        const currently_selected = this.turn_context.get_current_context().owner()
-        this.selection_context = {type: "option_select", currently_selected, ...context}
+    set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type" | "owner">) => {
+        const owner = this.turn_context.get_current_context().owner()
+        this.selection_context = {type: "option_select", owner, ...context}
 
         this.set_selected_indicator()
 
@@ -120,7 +84,7 @@ export class PlayerTurnHandler {
                 this.evaluate_consequences()
             }
         }))
-        currently_selected.visual.display_options(options)
+        owner.visual.display_options(options)
     }
 
     add_creature = (data: CreatureData) => {
@@ -136,8 +100,8 @@ export class PlayerTurnHandler {
     }
 
     on_click: OnPositionEvent = ({position}) => {
-        if (this.selection_context?.type === "position_select" || this.selection_context?.type === "path_select" || this.selection_context?.type === "area_burst_select") {
-            if (this.selection_context.available_targets.some(p => positions_equal(p, position))) {
+        if (this.selection_context?.type === "position_select") {
+            if (this.selection_context.clickable.some(p => positions_equal(p, position))) {
                 this.selection_context.on_click(position)
                 this.deselect()
                 this.evaluate_consequences()
@@ -152,9 +116,7 @@ export class PlayerTurnHandler {
     }
 
     on_hover: OnPositionEvent = ({position}) => {
-        if (this.selection_context?.type === "path_select" ||
-            this.selection_context?.type === "area_burst_select" ||
-            this.selection_context?.type === "position_select") {
+        if (this.selection_context?.type === "position_select") {
             this.selection_context.on_hover(position)
 
             //TODO this is all very untidy
@@ -163,7 +125,7 @@ export class PlayerTurnHandler {
             const next_consequence = this.turn_context.get_current_context().peek_consequence()
             const needs_roll = next_consequence.type === "attack_roll"
             if (needs_roll) {
-                this.selection_context.available_targets.forEach(position => {
+                get_target_creatures_from_selection(this.selection_context).forEach(defender => {
 
                     const attacker = next_consequence.attack
                     const attack = NODE.as_number_resolved(token_to_node({
@@ -173,7 +135,6 @@ export class PlayerTurnHandler {
                         player_turn_handler: this
                     })).value
 
-                    const defender = this.battle_grid.get_creature_by_position(position)
                     const defense = preview_defense({defender, defense_code: next_consequence.defense}).value
 
                     const chance = (attack + 20 - defense + 1) * 5
@@ -193,25 +154,18 @@ export class PlayerTurnHandler {
     deselect() {
         if (this.selection_context === null) return
 
-        const square = this.battle_grid.get_square(this.selection_context.currently_selected.data.position)
+        const square = this.battle_grid.get_square(this.selection_context.owner.data.position)
         square.visual.clearIndicator()
 
         if (this.selection_context.type === "position_select") {
-            this.clear_indicator_to_positions({positions: this.selection_context.available_targets})
-            //TODO this need to be made better
-            this.selection_context.available_targets
-                .filter(this.battle_grid.is_terrain_occupied)
-                .map(this.battle_grid.get_creature_by_position)
-                .forEach(creature => creature.visual.remove_hit_chance())
-        } else if (this.selection_context.type === "path_select") {
-            this.clear_indicator_to_positions({positions: this.selection_context.available_targets})
-            this.clear_indicator_to_positions({positions: this.selection_context.current_path})
-        } else if (this.selection_context.type === "area_burst_select") {
-            this.clear_indicator_to_positions({positions: this.selection_context.available_targets})
-            this.clear_indicator_to_positions({positions: this.selection_context.affected_area})
-            this.clear_indicator_to_positions({positions: this.selection_context.affected_targets})
+            this.clear_indicator_to_positions({positions: this.selection_context.clickable})
+            this.clear_indicator_to_positions({positions: this.selection_context.highlighted_area})
+
+            const creatures = get_target_creatures_from_selection(this.selection_context)
+
+            creatures.forEach(creature => creature.visual.remove_hit_chance())
         } else if (this.selection_context.type === "option_select") {
-            this.selection_context.currently_selected.visual.remove_options()
+            this.selection_context.owner.visual.remove_options()
         }
 
         this.selection_context = null
@@ -327,3 +281,10 @@ export class PlayerTurnHandler {
         squares.forEach(({visual}) => visual.clearIndicator())
     }
 }
+
+const get_target_creatures_from_selection = (selection: PlayerTurnHandlerContextSelectPosition) =>
+    selection.target?.type === "creature" ?
+        [selection.target.value] :
+        selection.target?.type === "creatures" ?
+            selection.target.value :
+            []

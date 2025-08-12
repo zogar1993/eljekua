@@ -108,7 +108,7 @@ export class PowerContext {
     }
 }
 
-type VariableType =
+export type VariableType =
     VariableTypeCreature
     | VariableTypePosition
     | VariableTypePath
