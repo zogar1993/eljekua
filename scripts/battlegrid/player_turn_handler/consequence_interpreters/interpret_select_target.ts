@@ -16,14 +16,32 @@ export const interpret_select_target = ({
     if (clickable.length === 0) return
 
     if (clickable.length === 1) {
-                //TODO make this apply to all
         if (context.peek_consequence().type !== "attack_roll") {
+            const position = clickable[0]
 
+            if (consequence.targeting_type === "area_burst") {
+                const distance = consequence.radius
+                const highlighted_area = [...battle_grid.get_in_range({origin: position, distance}), position]
+                const target_positions = highlighted_area.filter(battle_grid.is_terrain_occupied)
+                const targets = target_positions.map(battle_grid.get_creature_by_position)
 
-            context.set_creature({
-                name: consequence.target_label,
-                value: battle_grid.get_creature_by_position(clickable[0])
-            })
+                context.set_variable({name: consequence.target_label, type: "creatures", value: targets})
+            } else if (consequence.targeting_type === "movement") {
+                const origin = context.owner().data.position
+                const path = battle_grid.get_shortest_path({origin, destination: position})
+
+                context.set_variable({name: consequence.target_label, type: "path", value: path})
+            } else {
+                if (consequence.target_type === "terrain") {
+                    context.set_variable({name: consequence.target_label, type: "position", value: position})
+                } else if ((consequence.target_type === "creature" || consequence.target_type === "enemy")) {
+                    const creature = battle_grid.get_creature_by_position(position)
+                    context.set_variable({name: consequence.target_label, type: "creature", value: creature})
+                } else {
+                    throw Error(`consequence not valid: targeting_type '${consequence.targeting_type}' target_type '${consequence.target_type}'`)
+                }
+            }
+
             return
         }
 
@@ -48,7 +66,6 @@ export const interpret_select_target = ({
         }
 
         context.set_variable({name: consequence.target_label, ...selection.target})
-
     }
 
 
@@ -89,12 +106,14 @@ export const interpret_select_target = ({
                     target: {type: "position", value: position}
                 })
             } else if ((consequence.target_type === "creature" || consequence.target_type === "enemy")) {
+                const creature = battle_grid.get_creature_by_position(position)
                 player_turn_handler.set_awaiting_position_selection({
                     ...selection_base,
-                    target: {type: "creature", value: battle_grid.get_creature_by_position(position)}
+                    target: {type: "creature", value: creature}
                 })
+            } else {
+                throw Error(`consequence not valid: targeting_type '${consequence.targeting_type}' target_type '${consequence.target_type}'`)
             }
-            //TODO else blow up?
         }
     }
 
@@ -102,6 +121,4 @@ export const interpret_select_target = ({
         {clickable, highlighted_area: [], target: null, on_click, on_hover}
 
     player_turn_handler.set_awaiting_position_selection(selection_base)
-
-
 }

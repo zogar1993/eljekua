@@ -19,12 +19,22 @@ export const interpret_push = ({
         amount: NODE.as_number_resolved(token_to_node({token: consequence.amount, context, player_turn_handler})).value
     })
 
-    if (alternatives.length > 0) {
-        player_turn_handler.set_awaiting_position_selection({
-            available_targets: alternatives,
-            on_click: (position) => {
-                battle_grid.push_creature({creature: defender, position})
-            }
-        })
+    if (alternatives.length === 0) return
+
+    if (alternatives.length === 1) {
+        battle_grid.push_creature({creature: defender, position: alternatives[0]})
+        return
     }
+
+    //TODO rework push
+    player_turn_handler.set_awaiting_position_selection({
+        clickable: alternatives,
+        highlighted_area: [],
+        target: null,
+        on_click: (position) => {
+            battle_grid.push_creature({creature: defender, position})
+        },
+        on_hover: () => {
+        }
+    })
 }

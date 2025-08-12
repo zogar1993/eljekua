@@ -49,7 +49,7 @@ const ATTRIBUTES = {
     }
     const maik = {
         name: "Maik",
-        position: {x: 2, y: 5},
+        position: {x: 0, y: 1},
         image: `url("/public/wizard-staff.svg")`,
         movement: 2,
         hp_current: 10,
@@ -60,7 +60,7 @@ const ATTRIBUTES = {
     }
     const yeims = {
         name: "Yeims",
-        position: {x: 2, y: 6},
+        position: {x: 1, y: 0},
         image: `url("/public/crossbow.svg")`,
         movement: 10,
         hp_current: 10,
