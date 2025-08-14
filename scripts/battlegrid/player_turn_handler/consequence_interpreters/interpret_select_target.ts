@@ -27,6 +27,7 @@ export const interpret_select_target = ({
 
                 context.set_variable({name: consequence.target_label, type: "creatures", value: targets})
             } else if (consequence.targeting_type === "movement") {
+                // TODO automatic resolution for movement feels odd when its a movement action, but not when its a secondary action
                 const origin = context.owner().data.position
                 const path = battle_grid.get_shortest_path({origin, destination: position})
 
