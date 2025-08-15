@@ -60,7 +60,7 @@ const cleave: Power = {
             {
                 type: "condition",
                 condition: "$exists(secondary_target)",
-                consequences_true: [
+                instructions_true: [
                     {
                         type: "apply_damage",
                         value: "owner.str_mod",
@@ -99,14 +99,14 @@ const reaping_strike: Power = {
             {
                 type: "condition",
                 condition: `$equipped(owner,"two-handed")`,
-                consequences_true: [
+                instructions_true: [
                     {
                         type: "apply_damage",
                         value: `owner.str_mod`,
                         target: "primary_target"
                     },
                 ],
-                consequences_false: [
+                instructions_false: [
                     {
                         type: "apply_damage",
                         value: `owner.str_mod`,
@@ -149,7 +149,7 @@ const tide_of_iron: Power = {
                 options: [
                     {
                         text: "Push",
-                        consequences: [
+                        instructions: [
                             {
                                 type: "save_position",
                                 target: "primary_target",
@@ -163,13 +163,13 @@ const tide_of_iron: Power = {
                             {
                                 type: "condition",
                                 condition: "$not_equals(primary_target.position,primary_target_original_position)",
-                                consequences_true: [
+                                instructions_true: [
                                     {
                                         type: "options",
                                         options: [
                                             {
                                                 text: "Follow",
-                                                consequences: [
+                                                instructions: [
                                                     {
                                                         type: "select_target",
                                                         targeting_type: "movement",
@@ -186,7 +186,7 @@ const tide_of_iron: Power = {
                                             },
                                             {
                                                 text: "Don't Follow",
-                                                consequences: []
+                                                instructions: []
                                             }
                                         ]
                                     },
@@ -196,7 +196,7 @@ const tide_of_iron: Power = {
                     },
                     {
                         text: "Don't Push",
-                        consequences: []
+                        instructions: []
                     }
                 ],
             }
@@ -232,11 +232,11 @@ const tide_of_iron_true = {
             {
                 type: "condition",
                 condition: "$greater_or_equals($add(owner.size,1),target.size)",
-                consequences_true: [
+                instructions_true: [
                     {
                         type: "question_yes_no",
                         question: "Push?",
-                        consequences_true: [
+                        instructions_true: [
                             {
                                 type: "save_position",
                                 target: "primary_target",
@@ -250,11 +250,11 @@ const tide_of_iron_true = {
                             {
                                 type: "condition",
                                 condition: "$and($not_equals(primary_target.position,primary_target_last_position),$equals($movement_distance(owner.position,primary_target_last_position),1))",
-                                consequences_true: [
+                                instructions_true: [
                                     {
                                         type: "question_yes_no",
                                         question: "Follow?",
-                                        consequences_true: [
+                                        instructions_true: [
                                             {
                                                 type: "shift",
                                                 target: "owner",

@@ -11,20 +11,20 @@ export type Power = {
     roll?: {
         attack: string
         defense: string
-        before_consequences?: Array<IRConsequence>
-        hit: Array<IRConsequence>
-        miss?: Array<IRConsequence>
+        before_instructions?: Array<IRInstruction>
+        hit: Array<IRInstruction>
+        miss?: Array<IRInstruction>
     }
-    effect?: Array<IRConsequence>
+    effect?: Array<IRInstruction>
 }
 
 type Targeting =
-    Omit<IRConsequenceSelectTargetMelee, "type" | "target_label"> |
-    Omit<IRConsequenceSelectTargetMovement, "type" | "target_label"> |
-    Omit<IRConsequenceSelectTargetAreaBurst, "type" | "target_label"> |
-    Omit<IRConsequenceSelectTargetRanged, "type" | "target_label">
+    Omit<IRInstructionSelectTargetMelee, "type" | "target_label"> |
+    Omit<IRInstructionSelectTargetMovement, "type" | "target_label"> |
+    Omit<IRInstructionSelectTargetAreaBurst, "type" | "target_label"> |
+    Omit<IRInstructionSelectTargetRanged, "type" | "target_label">
 
-export type IRConsequence =
+export type IRInstruction =
     {
         type: "apply_damage"
         value: string
@@ -32,7 +32,7 @@ export type IRConsequence =
         half_damage?: boolean
         damage_types?: Array<string>
     } |
-    IRConsequenceSelectTarget |
+    IRInstructionSelectTarget |
     {
         type: "move" | "shift",
         target: "owner",
@@ -40,11 +40,11 @@ export type IRConsequence =
     } | {
     type: "condition",
     condition: string,
-    consequences_true: Array<IRConsequence>
-    consequences_false?: Array<IRConsequence>
+    instructions_true: Array<IRInstruction>
+    instructions_false?: Array<IRInstruction>
 } | {
     type: "options",
-    options: Array<{ text: string, consequences: Array<IRConsequence> }>
+    options: Array<{ text: string, instructions: Array<IRInstruction> }>
 } | {
     type: "save_position",
     target: string,
@@ -59,27 +59,27 @@ export type IRConsequence =
     label: string
 }
 
-export type IRConsequenceSelectTarget =
+export type IRInstructionSelectTarget =
     { type: "select_target", target_label: string } &
-    (IRConsequenceSelectTargetMelee |
-        IRConsequenceSelectTargetMovement |
-        IRConsequenceSelectTargetRanged |
-        IRConsequenceSelectTargetAreaBurst)
+    (IRInstructionSelectTargetMelee |
+        IRInstructionSelectTargetMovement |
+        IRInstructionSelectTargetRanged |
+        IRInstructionSelectTargetAreaBurst)
 
-type IRConsequenceSelectTargetMelee = {
+type IRInstructionSelectTargetMelee = {
     targeting_type: "adjacent" | "melee_weapon"
     target_type: "enemy" | "creature"
     amount: 1,
     exclude?: ["primary_target"]
 }
 
-type IRConsequenceSelectTargetMovement = {
+type IRInstructionSelectTargetMovement = {
     targeting_type: "movement"
     distance: string | number
     destination_requirement?: string
 }
 
-type IRConsequenceSelectTargetRanged = {
+type IRInstructionSelectTargetRanged = {
     targeting_type: "ranged"
     target_type: "terrain" | "enemy" | "creature"
     terrain_prerequisite?: "unoccupied"
@@ -88,7 +88,7 @@ type IRConsequenceSelectTargetRanged = {
     exclude?: ["primary_target"]
 }
 
-type IRConsequenceSelectTargetAreaBurst = {
+type IRInstructionSelectTargetAreaBurst = {
     targeting_type: "area_burst"
     target_type: "creature"
     amount: "all"

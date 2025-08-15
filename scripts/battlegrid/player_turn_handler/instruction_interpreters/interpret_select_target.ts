@@ -1,45 +1,45 @@
 import {Position, positions_equal} from "battlegrid/Position";
-import {ConsequenceSelectTarget} from "tokenizer/transform_power_ir_into_vm_representation";
+import {InstructionSelectTarget} from "tokenizer/transform_power_ir_into_vm_representation";
 import {
-    InterpretConsequenceProps
-} from "battlegrid/player_turn_handler/consequence_interpreters/InterpretConsequenceProps";
+    InterpretInstructionProps
+} from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {PlayerTurnHandlerContextSelectPosition} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 
 export const interpret_select_target = ({
-                                            consequence,
+                                            instruction,
                                             context,
                                             player_turn_handler,
                                             battle_grid
-                                        }: InterpretConsequenceProps<ConsequenceSelectTarget>) => {
-    const clickable = player_turn_handler.get_valid_targets({consequence, context})
+                                        }: InterpretInstructionProps<InstructionSelectTarget>) => {
+    const clickable = player_turn_handler.get_valid_targets({instruction, context})
 
     if (clickable.length === 0) return
 
     if (clickable.length === 1) {
-        if (context.peek_consequence().type !== "attack_roll") {
+        if (context.peek_instruction().type !== "attack_roll") {
             const position = clickable[0]
 
-            if (consequence.targeting_type === "area_burst") {
-                const distance = consequence.radius
+            if (instruction.targeting_type === "area_burst") {
+                const distance = instruction.radius
                 const highlighted_area = [...battle_grid.get_in_range({origin: position, distance}), position]
                 const target_positions = highlighted_area.filter(battle_grid.is_terrain_occupied)
                 const targets = target_positions.map(battle_grid.get_creature_by_position)
 
-                context.set_variable({name: consequence.target_label, type: "creatures", value: targets})
-            } else if (consequence.targeting_type === "movement") {
+                context.set_variable({name: instruction.target_label, type: "creatures", value: targets})
+            } else if (instruction.targeting_type === "movement") {
                 // TODO automatic resolution for movement feels odd when its a movement action, but not when its a secondary action
                 const origin = context.owner().data.position
                 const path = battle_grid.get_shortest_path({origin, destination: position})
 
-                context.set_variable({name: consequence.target_label, type: "path", value: path})
+                context.set_variable({name: instruction.target_label, type: "path", value: path})
             } else {
-                if (consequence.target_type === "terrain") {
-                    context.set_variable({name: consequence.target_label, type: "position", value: position})
-                } else if ((consequence.target_type === "creature" || consequence.target_type === "enemy")) {
+                if (instruction.target_type === "terrain") {
+                    context.set_variable({name: instruction.target_label, type: "position", value: position})
+                } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
                     const creature = battle_grid.get_creature_by_position(position)
-                    context.set_variable({name: consequence.target_label, type: "creature", value: creature})
+                    context.set_variable({name: instruction.target_label, type: "creature", value: creature})
                 } else {
-                    throw Error(`consequence not valid: targeting_type '${consequence.targeting_type}' target_type '${consequence.target_type}'`)
+                    throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
                 }
             }
 
@@ -66,7 +66,7 @@ export const interpret_select_target = ({
                 throw Error("position should be the end of the path")
         }
 
-        context.set_variable({name: consequence.target_label, ...selection.target})
+        context.set_variable({name: instruction.target_label, ...selection.target})
     }
 
 
@@ -80,8 +80,8 @@ export const interpret_select_target = ({
         if (selection.clickable.every(target => !positions_equal(target, position)))
             return
 
-        if (consequence.targeting_type === "area_burst") {
-            const distance = consequence.radius
+        if (instruction.targeting_type === "area_burst") {
+            const distance = instruction.radius
             const highlighted_area = [...battle_grid.get_in_range({origin: position, distance}), position]
             const target_positions = highlighted_area.filter(battle_grid.is_terrain_occupied)
             const targets = target_positions.map(battle_grid.get_creature_by_position)
@@ -91,7 +91,7 @@ export const interpret_select_target = ({
                 highlighted_area,
                 target: {type: "creatures", value: targets}
             })
-        } else if (consequence.targeting_type === "movement") {
+        } else if (instruction.targeting_type === "movement") {
             const origin = context.owner().data.position
             const path = battle_grid.get_shortest_path({origin, destination: position})
 
@@ -101,19 +101,19 @@ export const interpret_select_target = ({
                 target: {type: "path", value: path}
             })
         } else {
-            if (consequence.target_type === "terrain") {
+            if (instruction.target_type === "terrain") {
                 player_turn_handler.set_awaiting_position_selection({
                     ...selection_base,
                     target: {type: "position", value: position}
                 })
-            } else if ((consequence.target_type === "creature" || consequence.target_type === "enemy")) {
+            } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
                 const creature = battle_grid.get_creature_by_position(position)
                 player_turn_handler.set_awaiting_position_selection({
                     ...selection_base,
                     target: {type: "creature", value: creature}
                 })
             } else {
-                throw Error(`consequence not valid: targeting_type '${consequence.targeting_type}' target_type '${consequence.target_type}'`)
+                throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
             }
         }
     }

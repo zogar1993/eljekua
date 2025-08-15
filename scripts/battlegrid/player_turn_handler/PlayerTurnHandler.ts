@@ -3,12 +3,12 @@ import {OnPositionEvent, Position, positions_equal} from "battlegrid/Position";
 import {ActionLog} from "action_log/ActionLog";
 import {NODE, preview_defense, token_to_node} from "expression_parsers/token_to_node";
 import {Creature} from "battlegrid/creatures/Creature";
-import {Consequence, ConsequenceSelectTarget} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction, InstructionSelectTarget} from "tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext, VariableType} from "battlegrid/player_turn_handler/PowerContext";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 import {get_move_area} from "battlegrid/ranges/get_move_area";
 import {get_adjacent} from "battlegrid/ranges/get_adyacent";
-import {interpret_consequence} from "battlegrid/player_turn_handler/consequence_interpreters/interpret_consequence";
+import {interpret_instruction} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
 import {SquareVisual} from "battlegrid/squares/SquareVisual";
 import {ButtonOption} from "battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "initiative_order/InitiativeOrder";
@@ -81,7 +81,7 @@ export class PlayerTurnHandler {
             on_click: () => {
                 option.on_click()
                 this.deselect()
-                this.evaluate_consequences()
+                this.evaluate_instructions()
             }
         }))
         owner.visual.display_options(options)
@@ -104,15 +104,15 @@ export class PlayerTurnHandler {
             if (this.selection_context.clickable.some(p => positions_equal(p, position))) {
                 this.selection_context.on_click(position)
                 this.deselect()
-                this.evaluate_consequences()
+                this.evaluate_instructions()
             }
         }
     }
 
     set_creature_as_current_turn(creature: Creature) {
-        const consequences: Array<Consequence> = [{type: "add_powers", creature: "owner"}]
-        this.turn_context.add_power_context({name: "Action Selection", consequences, owner: creature})
-        this.evaluate_consequences()
+        const instructions: Array<Instruction> = [{type: "add_powers", creature: "owner"}]
+        this.turn_context.add_power_context({name: "Action Selection", instructions, owner: creature})
+        this.evaluate_instructions()
     }
 
     on_hover: OnPositionEvent = ({position}) => {
@@ -122,12 +122,12 @@ export class PlayerTurnHandler {
             //TODO this is all very untidy
             this.battle_grid.creatures.map(creature => creature.visual.remove_hit_chance())
 
-            const next_consequence = this.turn_context.get_current_context().peek_consequence()
-            const needs_roll = next_consequence.type === "attack_roll"
+            const next_instruction = this.turn_context.get_current_context().peek_instruction()
+            const needs_roll = next_instruction.type === "attack_roll"
             if (needs_roll) {
                 get_target_creatures_from_selection(this.selection_context).forEach(defender => {
 
-                    const attacker = next_consequence.attack
+                    const attacker = next_instruction.attack
                     const attack = NODE.as_number_resolved(token_to_node({
                         token: attacker,
                         //TODO doing this here seems redundant if we already have player turn handler
@@ -135,7 +135,7 @@ export class PlayerTurnHandler {
                         player_turn_handler: this
                     })).value
 
-                    const defense = preview_defense({defender, defense_code: next_consequence.defense}).value
+                    const defense = preview_defense({defender, defense_code: next_instruction.defense}).value
 
                     const chance = (attack + 20 - defense + 1) * 5
 
@@ -174,7 +174,7 @@ export class PlayerTurnHandler {
     has_selected_creature = () => this.selection_context !== null
 
     get_in_range({targeting, origin, context}: {
-        targeting: ConsequenceSelectTarget,
+        targeting: InstructionSelectTarget,
         origin: Position,
         context: PowerContext
     }) {
@@ -200,19 +200,19 @@ export class PlayerTurnHandler {
     }
 
 
-    get_valid_targets = ({consequence, context}: { consequence: ConsequenceSelectTarget, context: PowerContext }) => {
+    get_valid_targets = ({instruction, context}: { instruction: InstructionSelectTarget, context: PowerContext }) => {
         const in_range = this.get_in_range({
-            targeting: consequence,
+            targeting: instruction,
             origin: context.owner().data.position,
             context
         })
 
-        if (consequence.targeting_type === "area_burst") return [context.owner().data.position, ...in_range]
-        if (consequence.targeting_type === "movement") {
+        if (instruction.targeting_type === "area_burst") return [context.owner().data.position, ...in_range]
+        if (instruction.targeting_type === "movement") {
             const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
-            if (consequence.destination_requirement) {
+            if (instruction.destination_requirement) {
                 const node = token_to_node({
-                    token: consequence.destination_requirement,
+                    token: instruction.destination_requirement,
                     context,
                     player_turn_handler: this
                 })
@@ -224,29 +224,29 @@ export class PlayerTurnHandler {
         }
 
         const valid_targets = in_range.filter(position => {
-            if (consequence.target_type === "terrain")
+            if (instruction.target_type === "terrain")
                 return !this.battle_grid.is_terrain_occupied(position)
-            if (consequence.target_type === "enemy")
+            if (instruction.target_type === "enemy")
                 return this.battle_grid.is_terrain_occupied(position)
-            if (consequence.target_type === "creature")
+            if (instruction.target_type === "creature")
                 return this.battle_grid.is_terrain_occupied(position)
 
-            throw `Target "${consequence.target_type}" not supported`
+            throw `Target "${instruction.target_type}" not supported`
         })
 
         return valid_targets.filter(
-            target => !consequence.exclude.some(
+            target => !instruction.exclude.some(
                 excluded => positions_equal(context.get_creature(excluded).data.position, target)
             )
         )
     }
 
-    evaluate_consequences = () => {
+    evaluate_instructions = () => {
         while (!this.has_selected_creature()) {
-            const consequence = this.turn_context.next_consequence()
+            const instruction = this.turn_context.next_instruction()
 
-            // Reached the end of all consequences
-            if (consequence === null) {
+            // Reached the end of all instructions
+            if (instruction === null) {
                 this.initiative_order.next_turn()
                 const creature = this.initiative_order.get_current_creature()
                 this.set_creature_as_current_turn(creature)
@@ -255,8 +255,8 @@ export class PlayerTurnHandler {
 
             const context = this.turn_context.get_current_context()
 
-            interpret_consequence({
-                consequence,
+            interpret_instruction({
+                instruction,
                 context,
                 player_turn_handler: this,
                 battle_grid: this.battle_grid,

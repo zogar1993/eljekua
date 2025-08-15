@@ -1,27 +1,27 @@
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {Creature} from "battlegrid/creatures/Creature";
-import {Consequence} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction} from "tokenizer/transform_power_ir_into_vm_representation";
 
 export class TurnContext {
     power_contexts: Array<PowerContext> = []
     expended_opportunity_actions: Array<Creature> = []
 
-    add_power_context = ({name, consequences, owner}: {
+    add_power_context = ({name, instructions, owner}: {
         name: string,
-        consequences: Array<Consequence>,
+        instructions: Array<Instruction>,
         owner: Creature
     }) => {
-        const context = new PowerContext({consequences, name, owner})
+        const context = new PowerContext({instructions, name, owner})
         this.power_contexts.push(context)
     }
 
-    has_consequences = () => this.power_contexts.length > 0
+    has_instructions = () => this.power_contexts.length > 0
 
-    next_consequence = () => {
+    next_instruction = () => {
         while (this.power_contexts.length > 0) {
             const last = this.power_contexts[this.power_contexts.length - 1]
-            if (last.has_consequences())
-                return last.next_consequence()
+            if (last.has_instructions())
+                return last.next_instruction()
             this.power_contexts = this.power_contexts.slice(0, this.power_contexts.length - 1)
         }
 

@@ -1,16 +1,16 @@
-import {Consequence, ConsequenceAddPowers} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction, InstructionAddPowers} from "tokenizer/transform_power_ir_into_vm_representation";
 import {
-    InterpretConsequenceProps
-} from "battlegrid/player_turn_handler/consequence_interpreters/InterpretConsequenceProps";
+    InterpretInstructionProps
+} from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {tokenize} from "tokenizer/tokenize";
 
 export const interpret_add_powers = ({
-                                         consequence,
+                                         instruction,
                                          context,
-                                     }: InterpretConsequenceProps<ConsequenceAddPowers>) => {
-    const creature = context.get_creature(consequence.creature)
+                                     }: InterpretInstructionProps<InstructionAddPowers>) => {
+    const creature = context.get_creature(instruction.creature)
 
-    context.add_consequences([{
+    context.add_instructions([{
         type: "options",
         options: [
             ...creature.data.powers.map(power => {
@@ -18,18 +18,18 @@ export const interpret_add_powers = ({
                 context.set_variable({name: power_name, type: "power", value: power})
                 return {
                     text: power.name,
-                    consequences: [
+                    instructions: [
                         {
                             type: "execute_power",
                             power: power_name
                         }
-                    ] as Array<Consequence>,
+                    ] as Array<Instruction>,
                     condition: tokenize(`$has_valid_targets(${power_name})`)
                 }
             }),
             {
                 text: "Cancel",
-                consequences: [],
+                instructions: [],
             }
         ]
     }])

@@ -1,4 +1,4 @@
-import {Consequence, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
 import {Creature} from "battlegrid/creatures/Creature";
 import {Path, Position} from "battlegrid/Position";
 import {assert} from "assert";
@@ -6,15 +6,15 @@ import {AstNodeNumberResolved} from "expression_parsers/token_to_node";
 
 export class PowerContext {
     private variables: Map<string, VariableType> = new Map()
-    private consequences: Array<Consequence> = []
+    private instructions: Array<Instruction> = []
     readonly power_name
 
-    constructor({name, consequences, owner}: {
+    constructor({name, instructions, owner}: {
         name: string,
-        consequences: Array<Consequence>,
+        instructions: Array<Instruction>,
         owner: Creature
     }) {
-        this.consequences = consequences
+        this.instructions = instructions
         this.power_name = name
         this.set_creature({name: "owner", value: owner})
     }
@@ -77,28 +77,28 @@ export class PowerContext {
         return variable.value
     }
 
-    peek_consequence = (): Consequence => {
-        assert(this.consequences.length > 0, () => "no consequences left when calling peek consequence")
-        return this.consequences[0]
+    peek_instruction = (): Instruction => {
+        assert(this.instructions.length > 0, () => "no instructions left when calling peek instruction")
+        return this.instructions[0]
     }
 
-    next_consequence = (): Consequence => {
-        assert(this.consequences.length > 0, () => "no consequences left when calling next consequence")
-        const [next, ...consequences] = this.consequences
-        this.consequences = consequences
+    next_instruction = (): Instruction => {
+        assert(this.instructions.length > 0, () => "no instructions left when calling next instruction")
+        const [next, ...instructions] = this.instructions
+        this.instructions = instructions
         return next
     }
 
-    has_consequences = (): boolean => {
-        return this.consequences.length > 0
+    has_instructions = (): boolean => {
+        return this.instructions.length > 0
     }
 
     has_variable = (name: string): boolean => {
         return this.variables.has(name)
     }
 
-    add_consequences = (consequences: Array<Consequence>): void => {
-        this.consequences = [...consequences, ...this.consequences]
+    add_instructions = (instructions: Array<Instruction>): void => {
+        this.instructions = [...instructions, ...this.instructions]
     }
 
     get_variable = (name: string) => {

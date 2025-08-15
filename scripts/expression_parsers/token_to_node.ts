@@ -120,12 +120,12 @@ const preview_has_valid_targets_function = ({
     const power_name = TOKEN.as_keyword(token.parameters[0]).value
     const power = context.get_power(power_name)
 
-    const first_consequence = power.consequences[0]
+    const first_instruction = power.instructions[0]
 
     // If it does not need targets because it does not start with "select_target" we take as it's ok
     let has_valid_targets = true
-    if (first_consequence.type === "select_target") {
-        const valid_targets = player_turn_handler.get_valid_targets({consequence: first_consequence, context})
+    if (first_instruction.type === "select_target") {
+        const valid_targets = player_turn_handler.get_valid_targets({instruction: first_instruction, context})
         has_valid_targets = valid_targets.length > 0
     }
 

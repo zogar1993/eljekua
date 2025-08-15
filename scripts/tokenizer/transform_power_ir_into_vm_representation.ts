@@ -1,6 +1,6 @@
 import {tokenize} from "tokenizer/tokenize";
 import {
-    IRConsequence, IRConsequenceSelectTarget,
+    IRInstruction, IRInstructionSelectTarget,
     Power
 } from "types";
 import {Token} from "tokenizer/tokens/AnyToken";
@@ -10,16 +10,16 @@ const PRIMARY_TARGET_LABEL = "primary_target"
 
 export const transform_power_ir_into_vm_representation = (power: Power): PowerVM => {
     const formatted_targeting = {type: "select_target", target_label: PRIMARY_TARGET_LABEL, ...power.targeting}
-    const consequences: Array<Consequence> = [
-        transform_select_target_ir(formatted_targeting as IRConsequenceSelectTarget),
+    const instructions: Array<Instruction> = [
+        transform_select_target_ir(formatted_targeting as IRInstructionSelectTarget),
         ...(power.roll ? [transform_primary_roll(power.roll)] : []),
-        ...(power.effect ? power.effect.map(transform_generic_consequence) : [])
+        ...(power.effect ? power.effect.map(transform_generic_instruction) : [])
     ]
     return {
         name: power.name,
         description: power.description,
         type: power.type,
-        consequences: consequences
+        instructions: instructions
     }
 
 }
@@ -32,27 +32,27 @@ export type PowerVM = {
         cooldown: "at-will" | "encounter" | "daily"
         attack: boolean
     }
-    consequences: Array<Consequence>
+    instructions: Array<Instruction>
 }
 
-export type ConsequenceAttackRoll = {
+export type InstructionAttackRoll = {
     type: "attack_roll"
     attack: Token
     defense: string
     defender: string
-    before_consequences: Array<Consequence>
-    hit: Array<Consequence>
-    miss: Array<Consequence>
+    before_instructions: Array<Instruction>
+    hit: Array<Instruction>
+    miss: Array<Instruction>
 }
 
-export type ConsequenceCondition = {
+export type InstructionCondition = {
     type: "condition",
     condition: Token,
-    consequences_true: Array<Consequence>
-    consequences_false: Array<Consequence>
+    instructions_true: Array<Instruction>
+    instructions_false: Array<Instruction>
 }
 
-export type ConsequenceApplyDamage = {
+export type InstructionApplyDamage = {
     type: "apply_damage"
     value: Token
     target: string
@@ -60,152 +60,152 @@ export type ConsequenceApplyDamage = {
     damage_types: Array<string>
 }
 
-export type ConsequenceMovement = {
+export type InstructionMovement = {
     type: "move" | "shift"
     target: string
     destination: string
 }
 
-export type ConsequenceOptions = {
+export type InstructionOptions = {
     type: "options",
-    options: Array<ConsequenceOptionsItem>,
+    options: Array<InstructionOptionsItem>,
 }
 
-export type ConsequenceOptionsItem = { text: string, consequences: Array<Consequence>, condition?: Token}
+export type InstructionOptionsItem = { text: string, instructions: Array<Instruction>, condition?: Token}
 
-export type ConsequenceSavePosition = {
+export type InstructionSavePosition = {
     type: "save_position",
     target: string,
     label: string
 }
 
-export type ConsequenceSaveResolvedNumber = {
+export type InstructionSaveResolvedNumber = {
     type: "save_resolved_number",
     value: Token,
     label: string
 }
 
-export type ConsequencePush = {
+export type InstructionPush = {
     type: "push",
     amount: Token,
     target: string
 }
 
-export type ConsequenceCopyVariable = {
+export type InstructionCopyVariable = {
     type: "copy_variable",
     origin: string,
     destination: string
 }
 
-export type ConsequenceAddPowers = {
+export type InstructionAddPowers = {
     type: "add_powers",
     creature: string
 }
 
-export type ConsequenceExecutePower = {
+export type InstructionExecutePower = {
     type: "execute_power",
     power: string
 }
 
-export type Consequence =
-    ConsequenceApplyDamage |
-    ConsequenceSelectTarget |
-    ConsequenceAttackRoll |
-    ConsequenceCondition |
-    ConsequenceMovement |
-    ConsequenceOptions |
-    ConsequenceSavePosition |
-    ConsequenceSaveResolvedNumber |
-    ConsequencePush |
-    ConsequenceCopyVariable |
-    ConsequenceAddPowers |
-    ConsequenceExecutePower
+export type Instruction =
+    InstructionApplyDamage |
+    InstructionSelectTarget |
+    InstructionAttackRoll |
+    InstructionCondition |
+    InstructionMovement |
+    InstructionOptions |
+    InstructionSavePosition |
+    InstructionSaveResolvedNumber |
+    InstructionPush |
+    InstructionCopyVariable |
+    InstructionAddPowers |
+    InstructionExecutePower
 
-const transform_primary_roll = (roll: Required<Power>["roll"]): ConsequenceAttackRoll => {
+const transform_primary_roll = (roll: Required<Power>["roll"]): InstructionAttackRoll => {
     return {
         type: "attack_roll",
         attack: tokenize(standardize_attack(roll.attack)),
         defense: roll.defense,
         defender: PRIMARY_TARGET_LABEL,
-        before_consequences: roll.before_consequences?.map(transform_generic_consequence) || [],
-        hit: roll.hit.map(transform_generic_consequence),
-        miss: roll.miss?.map(transform_generic_consequence) || []
+        before_instructions: roll.before_instructions?.map(transform_generic_instruction) || [],
+        hit: roll.hit.map(transform_generic_instruction),
+        miss: roll.miss?.map(transform_generic_instruction) || []
     }
 }
 
 const standardize_attack = (text: string) =>
     ATTRIBUTE_CODES.reduce((text, attribute) => text.replaceAll(attribute, `owner.${attribute}_mod_lvl`), text)
 
-const transform_generic_consequence = (consequence: IRConsequence): Consequence => {
-    switch (consequence.type) {
+const transform_generic_instruction = (instruction: IRInstruction): Instruction => {
+    switch (instruction.type) {
         case "apply_damage":
             return {
                 type: "apply_damage",
-                value: tokenize(consequence.value),
-                target: consequence.target,
-                damage_types: consequence.damage_types ?? [],
-                half_damage: consequence.half_damage ?? false
+                value: tokenize(instruction.value),
+                target: instruction.target,
+                damage_types: instruction.damage_types ?? [],
+                half_damage: instruction.half_damage ?? false
             }
         case "select_target":
-            return transform_select_target_ir(consequence)
+            return transform_select_target_ir(instruction)
         case "move":
             return {
                 type: "move",
-                target: consequence.target,
-                destination: consequence.destination
+                target: instruction.target,
+                destination: instruction.destination
             }
         case "shift":
             return {
                 type: "shift",
-                target: consequence.target,
-                destination: consequence.destination
+                target: instruction.target,
+                destination: instruction.destination
             }
         case "condition":
             return {
                 type: "condition",
-                condition: tokenize(consequence.condition),
-                consequences_true: consequence.consequences_true.map(transform_generic_consequence),
-                consequences_false: consequence.consequences_false ? consequence.consequences_false.map(transform_generic_consequence) : []
+                condition: tokenize(instruction.condition),
+                instructions_true: instruction.instructions_true.map(transform_generic_instruction),
+                instructions_false: instruction.instructions_false ? instruction.instructions_false.map(transform_generic_instruction) : []
             }
         case "options":
             return {
                 type: "options",
-                options: consequence.options.map(option => ({
+                options: instruction.options.map(option => ({
                     text: option.text,
-                    consequences: option.consequences.map(transform_generic_consequence)
+                    instructions: option.instructions.map(transform_generic_instruction)
                 }))
             }
         case "save_position":
             return {
                 type: "save_position",
-                label: consequence.label,
-                target: consequence.target
+                label: instruction.label,
+                target: instruction.target
             }
         case "save_resolved_number":
             return {
                 type: "save_resolved_number",
-                label: consequence.label,
-                value: tokenize(consequence.value)
+                label: instruction.label,
+                value: tokenize(instruction.value)
             }
         case "push":
             return {
                 type: "push",
-                amount: tokenize(consequence.amount),
-                target: consequence.target
+                amount: tokenize(instruction.amount),
+                target: instruction.target
             }
         default:
-            throw Error(`consequence invalid ${JSON.stringify(consequence)}`)
+            throw Error(`instruction invalid ${JSON.stringify(instruction)}`)
     }
 }
 
 
-export type ConsequenceSelectTarget =
-    ConsequenceSelectTargetRanged |
-    ConsequenceSelectTargetMelee |
-    ConsequenceSelectTargetAreaBurst |
-    ConsequenceSelectTargetMovement
+export type InstructionSelectTarget =
+    InstructionSelectTargetRanged |
+    InstructionSelectTargetMelee |
+    InstructionSelectTargetAreaBurst |
+    InstructionSelectTargetMovement
 
-export type ConsequenceSelectTargetRanged = {
+export type InstructionSelectTargetRanged = {
     type: "select_target",
     targeting_type: "ranged"
     target_type: "terrain" | "enemy" | "creature"
@@ -216,7 +216,7 @@ export type ConsequenceSelectTargetRanged = {
     exclude: Array<string>
 }
 
-export type ConsequenceSelectTargetMelee = {
+export type InstructionSelectTargetMelee = {
     type: "select_target"
     targeting_type: "adjacent" | "melee_weapon"
     target_type: "enemy" | "creature"
@@ -225,7 +225,7 @@ export type ConsequenceSelectTargetMelee = {
     target_label: string
 }
 
-export type ConsequenceSelectTargetAreaBurst = {
+export type InstructionSelectTargetAreaBurst = {
     type: "select_target",
     targeting_type: "area_burst"
     target_type: "creature"
@@ -235,7 +235,7 @@ export type ConsequenceSelectTargetAreaBurst = {
     target_label: string
 }
 
-export type ConsequenceSelectTargetMovement = {
+export type InstructionSelectTargetMovement = {
     type: "select_target"
     targeting_type: "movement"
     distance: Token
@@ -243,7 +243,7 @@ export type ConsequenceSelectTargetMovement = {
     destination_requirement: Token | null
 }
 
-const transform_select_target_ir = (ir: IRConsequenceSelectTarget): ConsequenceSelectTarget => {
+const transform_select_target_ir = (ir: IRInstructionSelectTarget): InstructionSelectTarget => {
     if (ir.targeting_type === "area_burst")
         return {
             type: "select_target",

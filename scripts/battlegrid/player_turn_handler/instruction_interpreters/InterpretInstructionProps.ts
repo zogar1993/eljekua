@@ -1,12 +1,12 @@
-import {Consequence} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction} from "tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 import {BattleGrid} from "battlegrid/BattleGrid";
 import {ActionLog} from "action_log/ActionLog";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 
-export type InterpretConsequenceProps<T extends Consequence> = {
-    consequence: T
+export type InterpretInstructionProps<T extends Instruction> = {
+    instruction: T
     context: PowerContext
     player_turn_handler: PlayerTurnHandler
     battle_grid: BattleGrid
