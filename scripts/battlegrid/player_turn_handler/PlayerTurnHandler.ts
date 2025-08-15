@@ -269,17 +269,12 @@ export class PlayerTurnHandler {
     set_indicator_to_positions = ({positions, indicator}: {
         positions: Array<Position>,
         indicator: Parameters<SquareVisual["setIndicator"]>[0]
-    }) => {
-        const squares = positions.map(this.battle_grid.get_square)
-        squares.forEach(({visual}) => visual.setIndicator(indicator))
-    }
+    }) => positions.map(this.battle_grid.get_square).forEach(({visual}) => visual.setIndicator(indicator))
 
     clear_indicator_to_positions = ({positions}: {
         positions: Array<Position>
-    }) => {
-        const squares = positions.map(this.battle_grid.get_square)
-        squares.forEach(({visual}) => visual.clearIndicator())
-    }
+    }) => positions.map(this.battle_grid.get_square).forEach(({visual}) => visual.clearIndicator())
+
 }
 
 const get_target_creatures_from_selection = (selection: PlayerTurnHandlerContextSelectPosition) =>
