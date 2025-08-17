@@ -8,6 +8,7 @@ export class PowerContext {
     private variables: Map<string, VariableType> = new Map()
     private instructions: Array<Instruction> = []
     readonly power_name
+    status: "none" | "hit" | "miss" = "none"
 
     constructor({name, instructions, owner}: {
         name: string,

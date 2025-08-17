@@ -42,12 +42,15 @@ export const interpret_attack_roll = ({
         context.set_creature({name: defender_variable_name, value: defender})
         new_instructions.push(create_copy_variable_instruction(defender_variable_name, instruction.defender))
 
-        if (is_hit)
+        if (is_hit) {
+            context.status = "hit"
             new_instructions.push(...instruction.hit)
-        else {
+        } else {
             AnimationQueue.add_animation(defender.visual.display_miss)
+            context.status = "miss"
             new_instructions.push(...instruction.miss)
         }
+        new_instructions.push({type: "clean_context_status"})
 
         log_attack_roll({attacker, attack, is_hit, defender, defense, context, instruction, action_log})
     })

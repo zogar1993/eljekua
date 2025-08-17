@@ -107,6 +107,10 @@ export type InstructionExecutePower = {
     power: string
 }
 
+export type InstructionCleanContextStatus = {
+    type: "clean_context_status"
+}
+
 export type Instruction =
     InstructionApplyDamage |
     InstructionSelectTarget |
@@ -119,7 +123,8 @@ export type Instruction =
     InstructionPush |
     InstructionCopyVariable |
     InstructionAddPowers |
-    InstructionExecutePower
+    InstructionExecutePower |
+    InstructionCleanContextStatus
 
 const transform_primary_roll = (roll: Required<Power>["roll"]): InstructionAttackRoll => {
     return {
