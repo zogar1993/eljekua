@@ -11,6 +11,7 @@
     "concurrently": "9.1.2",
     "esbuild": "0.25.3",
     "live-server": "1.2.2",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "cypress": "^15.1.0"
   }
 }
