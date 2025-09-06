@@ -17,6 +17,9 @@ import {
 import {interpret_copy_variable} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_copy_variable";
 import {interpret_execute_power} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_execute_power";
 import {interpret_add_powers} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_add_powers";
+import {
+    interpret_clean_context_status
+} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_clean_context_status";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>) => {
     const {instruction} = props
@@ -59,6 +62,9 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             break
         case "execute_power":
             interpret_execute_power({...props, instruction})
+            break
+        case "clean_context_status":
+            interpret_clean_context_status({...props, instruction})
             break
         default:
             throw Error("action not implemented " + JSON.stringify(instruction))
