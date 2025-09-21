@@ -24,7 +24,7 @@ export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => 
 
 /*
     This is called "evaluate" instead on "interpret" to distinguish the expressions that evaluate to a value from the
-    instructions that affect the game context.
+    interpreting of instructions that affect the game context.
  */
 export const evaluate_token = ({token, ...props}: InterpretProps<Token>): AstNode => {
     switch (token.type) {
