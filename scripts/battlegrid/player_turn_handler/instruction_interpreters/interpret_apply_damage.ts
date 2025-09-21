@@ -26,5 +26,5 @@ export const interpret_apply_damage = ({
     } : resolved
 
     target.receive_damage(modified_result.value)
-    action_log.add_new_action_log(`${target.data.name} was dealt `, modified_result, `${instruction.half_damage ? " half" : ""} damage.`)
+    action_log.add_new_action_log(`${target.data.name} was dealt `, modified_result, ` damage.`)
 }
