@@ -1,9 +1,8 @@
 import {roll_d} from "randomness/dice";
 import {Token} from "tokenizer/tokens/AnyToken";
 import {TokenFunction} from "tokenizer/tokens/TokenFunction";
-import {NumberToken} from "tokenizer/tokens/NumberToken";
 import {DiceToken, WeaponToken} from "tokenizer/tokens/DiceToken";
-import {add_numbers, add_numbers_resolved, is_number, is_number_resolved} from "interpreter/add_numbers";
+import {is_number, is_number_resolved} from "interpreter/add_numbers";
 import {
     interpret_token_function_not_equals
 } from "interpreter/specific_interpreters/interpret_token_function_not_equals";
@@ -22,6 +21,7 @@ import {interpret_token_function_equipped} from "interpreter/specific_interprete
 import {interpret_token_string} from "interpreter/specific_interpreters/interpret_token_string";
 import {interpret_token_function_exists} from "interpreter/specific_interpreters/interpret_token_function_exists";
 import {interpret_token_function_add} from "interpreter/specific_interpreters/interpret_token_function_add";
+import {interpret_number} from "interpreter/specific_interpreters/interpret_number";
 
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number
@@ -41,13 +41,13 @@ export const interpret_token = ({token, ...props}: InterpretProps<Token>): AstNo
         case "function":
             return token_to_function_node({token, ...props})
         case "number":
-            return token_to_number_node({token, ...props})
+            return interpret_number({token, ...props})
         case "string":
             return interpret_token_string({token, ...props})
         case "weapon":
-            return token_to_weapon_node({token, ...props})
+            return interpret_weapon({token, ...props})
         case "dice":
-            return token_to_dice_node({token, ...props})
+            return interpret_dice({token, ...props})
         case "keyword":
             return interpret_token_keyword({token, ...props})
     }
@@ -70,12 +70,9 @@ const token_to_function_node = ({token, ...props}: InterpretProps<TokenFunction>
     }
 }
 
-const token_to_dice_node = ({token}: InterpretProps<DiceToken>): AstNodeNumberUnresolved =>
+const interpret_dice = ({token}: InterpretProps<DiceToken>): AstNodeNumberUnresolved =>
     ({type: "number_unresolved", min: 1, max: token.faces, description: `${token.faces}d${token.faces}`})
 
-const token_to_weapon_node = ({token}: InterpretProps<WeaponToken>): AstNodeNumberUnresolved =>
+const interpret_weapon = ({token}: InterpretProps<WeaponToken>): AstNodeNumberUnresolved =>
     ({type: "number_unresolved", min: 1, max: 4, description: `${token.amount}W`})
-
-const token_to_number_node = ({token}: InterpretProps<NumberToken>): AstNodeNumberResolved =>
-    ({type: "number_resolved", value: token.value, description: "hard number"})
 
