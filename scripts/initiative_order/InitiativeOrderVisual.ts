@@ -1,5 +1,6 @@
 import {Creature} from "battlegrid/creatures/Creature";
-import {AstNodeNumberResolved} from "interpreter/interpret_token";
+
+import {AstNodeNumberResolved} from "interpreter/types";
 
 export class InitiativeOrderVisual {
     create_creature = ({creature, initiative}: { creature: Creature, initiative: AstNodeNumberResolved }) => {

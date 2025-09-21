@@ -1,5 +1,4 @@
-import type {AstNodeNumber, AstNodeNumberResolved, AstNodeNumberUnresolved} from "interpreter/interpret_token";
-import {AstNode} from "interpreter/interpret_token";
+import {AstNode, AstNodeNumber, AstNodeNumberResolved, AstNodeNumberUnresolved} from "interpreter/types";
 
 export const add_numbers_resolved = (numbers: Array<AstNodeNumberResolved>): AstNodeNumberResolved => ({
     type: "number_resolved",

@@ -2,7 +2,8 @@ import {InstructionPush} from "tokenizer/transform_power_ir_into_vm_representati
 import {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {NODE, interpret_token} from "interpreter/interpret_token";
+import {interpret_token} from "interpreter/interpret_token";
+import {NODE} from "interpreter/NODE";
 
 export const interpret_push = ({
                                    instruction,

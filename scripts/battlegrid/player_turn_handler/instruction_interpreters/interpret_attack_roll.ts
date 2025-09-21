@@ -1,5 +1,5 @@
 import {roll_d} from "randomness/dice";
-import {AstNodeNumberResolved, NODE, preview_defense, interpret_token} from "interpreter/interpret_token";
+import {interpret_token} from "interpreter/interpret_token";
 import {AnimationQueue} from "AnimationQueue";
 import {
     Instruction,
@@ -13,6 +13,9 @@ import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {Creature} from "battlegrid/creatures/Creature";
 import {ActionLog} from "action_log/ActionLog";
 import {add_numbers_resolved} from "interpreter/add_numbers";
+import {NODE} from "interpreter/NODE";
+import {AstNodeNumberResolved} from "interpreter/types";
+import {preview_defense} from "interpreter/specific_interpreters/interpret_token_keyword";
 
 export const interpret_attack_roll = ({
                                           instruction,
@@ -30,11 +33,7 @@ export const interpret_attack_roll = ({
 
     defenders.forEach((defender, i) => {
         const attack_parts: Array<AstNodeNumberResolved> = []
-        attack_parts.push(NODE.as_number_resolved(interpret_token({
-            token: instruction.attack,
-            context,
-            player_turn_handler
-        })))//TODO Make this neater
+        attack_parts.push(NODE.as_number_resolved(interpret_token({token: instruction.attack, player_turn_handler})))
         attack_parts.push(roll_d(20))
         if (battle_grid.is_flanking({attacker, defender})) attack_parts.push(COMBAT_ADVANTAGE)
 

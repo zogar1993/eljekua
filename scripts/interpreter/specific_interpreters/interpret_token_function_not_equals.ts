@@ -1,6 +1,6 @@
-import {TokenFunction} from "tokenizer/tokens/TokenFunction";
-import {AstNodeBoolean, interpret_token} from "interpreter/interpret_token";
-import {InterpretProps} from "interpreter/types";
+import type {TokenFunction} from "tokenizer/tokens/TokenFunction";
+import {interpret_token} from "interpreter/interpret_token";
+import type {AstNodeBoolean, InterpretProps} from "interpreter/types";
 import {assert_parameters_amount_equals} from "interpreter/asserts";
 
 export const interpret_token_function_not_equals = ({

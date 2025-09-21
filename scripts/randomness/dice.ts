@@ -1,5 +1,6 @@
 import {assert} from "assert";
-import type {AstNodeNumberResolved} from "interpreter/interpret_token";
+
+import {AstNodeNumberResolved} from "interpreter/types";
 
 (window as any).rig_dice_roll = (faces: number, result: number) => {
     const rigs = rigged_rolls[faces]

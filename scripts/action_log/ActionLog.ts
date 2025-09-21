@@ -1,7 +1,4 @@
-import {
-    AstNode,
-    AstNodeNumberResolved,
-} from "interpreter/interpret_token";
+import {AstNode, AstNodeNumberResolved} from "interpreter/types";
 
 export class ActionLog {
     add_new_action_log = (...text: Array<string | AstNode>) => {

@@ -1,7 +1,7 @@
 import {BattleGrid} from "battlegrid/BattleGrid";
 import {OnPositionEvent, Position, positions_equal} from "battlegrid/Position";
 import {ActionLog} from "action_log/ActionLog";
-import {NODE, preview_defense, interpret_token} from "interpreter/interpret_token";
+import {interpret_token} from "interpreter/interpret_token";
 import {Creature} from "battlegrid/creatures/Creature";
 import {Instruction, InstructionSelectTarget} from "tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext, VariableType} from "battlegrid/player_turn_handler/PowerContext";
@@ -13,6 +13,8 @@ import {SquareVisual} from "battlegrid/squares/SquareVisual";
 import {ButtonOption} from "battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "initiative_order/InitiativeOrder";
 import {CreatureData} from "battlegrid/creatures/CreatureData";
+import {NODE} from "interpreter/NODE";
+import {preview_defense} from "interpreter/specific_interpreters/interpret_token_keyword";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition

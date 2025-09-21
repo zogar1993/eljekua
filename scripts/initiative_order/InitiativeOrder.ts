@@ -1,7 +1,7 @@
 import {Creature} from "battlegrid/creatures/Creature";
-import type {AstNodeNumberResolved} from "interpreter/interpret_token";
 import {roll_d} from "randomness/dice";
 import {InitiativeOrderVisual} from "initiative_order/InitiativeOrderVisual";
+import {AstNodeNumberResolved} from "interpreter/types";
 
 export class InitiativeOrder {
     initiative_order: Array<{ creature: Creature, initiative: AstNodeNumberResolved, visual: HTMLDivElement }> = []

@@ -2,7 +2,8 @@ import {InstructionSaveResolvedNumber} from "tokenizer/transform_power_ir_into_v
 import {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {NODE, resolve_number, interpret_token} from "interpreter/interpret_token";
+import {resolve_number, interpret_token} from "interpreter/interpret_token";
+import {NODE} from "interpreter/NODE";
 
 export const interpret_save_resolved_number = ({
                                                    instruction,
