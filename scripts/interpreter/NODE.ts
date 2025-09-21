@@ -1,11 +1,9 @@
-import {AstNodePosition} from "interpreter/ast_node_position";
-
 import {
     AstNode,
     AstNodeBoolean,
     AstNodeCreature,
     AstNodeNumber,
-    AstNodeNumberResolved,
+    AstNodeNumberResolved, AstNodePosition,
     AstNodePositions
 } from "interpreter/types";
 

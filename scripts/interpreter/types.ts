@@ -2,7 +2,6 @@ import type {Token} from "tokenizer/tokens/AnyToken";
 import type {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 import type {Creature} from "battlegrid/creatures/Creature";
 import type {Position} from "battlegrid/Position";
-import type {AstNodePosition} from "interpreter/ast_node_position";
 
 export type InterpretProps<T extends Token> = {
     token: T,
@@ -16,12 +15,6 @@ export type AstNode =
     | AstNodeCreature
     | AstNodePosition
     | AstNodePositions
-
-export type AstNodeString = {
-    type: "string",
-    value: string
-    description: string
-}
 
 export type AstNodeNumber = AstNodeNumberUnresolved | AstNodeNumberResolved
 
@@ -40,6 +33,12 @@ export type AstNodeNumberResolved = {
     params?: Array<AstNode>
 }
 
+export type AstNodeString = {
+    type: "string",
+    value: string
+    description: string
+}
+
 export type AstNodeCreature = {
     type: "creature"
     value: Creature
@@ -51,6 +50,12 @@ export type AstNodeBoolean = {
     value: boolean
     description: string
     params?: Array<AstNode>
+}
+
+export type AstNodePosition = {
+    type: "position",
+    value: Position
+    description: string
 }
 
 export type AstNodePositions = {
