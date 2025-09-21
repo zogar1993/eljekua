@@ -21,6 +21,7 @@ import {interpret_token_keyword} from "interpreter/specific_interpreters/interpr
 import {interpret_token_function_equipped} from "interpreter/specific_interpreters/interpret_token_function_equipped";
 import {interpret_token_string} from "interpreter/specific_interpreters/interpret_token_string";
 import {interpret_token_function_exists} from "interpreter/specific_interpreters/interpret_token_function_exists";
+import {interpret_token_function_add} from "interpreter/specific_interpreters/interpret_token_function_add";
 
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number
@@ -55,7 +56,7 @@ export const interpret_token = ({token, ...props}: InterpretProps<Token>): AstNo
 const token_to_function_node = ({token, ...props}: InterpretProps<TokenFunction>): AstNode => {
     switch (token.name) {
         case "add":
-            return token_to_add_function_node({token, ...props})
+            return interpret_token_function_add({token, ...props})
         case "exists":
             return interpret_token_function_exists({token, ...props})
         case "equipped":
@@ -67,18 +68,6 @@ const token_to_function_node = ({token, ...props}: InterpretProps<TokenFunction>
         default:
             throw Error(`function name ${token.name} not supported`)
     }
-}
-
-const token_to_add_function_node = ({token, ...props}: InterpretProps<TokenFunction>): AstNodeNumber => {
-    const params = token.parameters.map(parameter => interpret_token({token: parameter, ...props}))
-
-    if (params.every(is_number_resolved))
-        return add_numbers_resolved(params)
-
-    if (params.every(is_number))
-        return add_numbers(params)
-
-    throw Error(`not all params evaluate to numbers on add function`)
 }
 
 const token_to_dice_node = ({token}: InterpretProps<DiceToken>): AstNodeNumberUnresolved =>
