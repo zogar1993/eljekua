@@ -1,18 +1,11 @@
 import {roll_d} from "randomness/dice";
 import {Token} from "tokenizer/tokens/AnyToken";
 import {TokenFunction} from "tokenizer/tokens/TokenFunction";
-import {DiceToken} from "tokenizer/tokens/DiceToken";
 import {is_number, is_number_resolved} from "interpreter/add_numbers";
 import {
     interpret_token_function_not_equals
 } from "interpreter/specific_interpreters/interpret_token_function_not_equals";
-import {
-    AstNode,
-    AstNodeNumber,
-    AstNodeNumberResolved,
-    AstNodeNumberUnresolved,
-    InterpretProps
-} from "interpreter/types";
+import {AstNode, AstNodeNumber, AstNodeNumberResolved, InterpretProps} from "interpreter/types";
 import {
     token_to_has_valid_targets_function_node
 } from "interpreter/specific_interpreters/interpret_token_function_has_valid_targets";
@@ -23,6 +16,7 @@ import {interpret_token_function_exists} from "interpreter/specific_interpreters
 import {interpret_token_function_add} from "interpreter/specific_interpreters/interpret_token_function_add";
 import {interpret_number} from "interpreter/specific_interpreters/interpret_number";
 import {interpret_weapon} from "interpreter/specific_interpreters/interpret_weapon";
+import {interpret_dice} from "interpreter/specific_interpreters/interpret_dice";
 
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number
@@ -70,7 +64,4 @@ const token_to_function_node = ({token, ...props}: InterpretProps<TokenFunction>
             throw Error(`function name ${token.name} not supported`)
     }
 }
-
-const interpret_dice = ({token}: InterpretProps<DiceToken>): AstNodeNumberUnresolved =>
-    ({type: "number_unresolved", min: 1, max: token.faces, description: `${token.faces}d${token.faces}`})
 
