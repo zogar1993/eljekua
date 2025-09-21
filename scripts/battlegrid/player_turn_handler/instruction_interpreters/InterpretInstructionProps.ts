@@ -1,4 +1,4 @@
-import {Instruction} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 import {BattleGrid} from "battlegrid/BattleGrid";

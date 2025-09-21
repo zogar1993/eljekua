@@ -1,4 +1,4 @@
-import type {Token} from "tokenizer/tokens/AnyToken";
+import type {Token} from "expressions/tokenizer/tokens/AnyToken";
 import type {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 import type {Creature} from "battlegrid/creatures/Creature";
 import type {Position} from "battlegrid/Position";

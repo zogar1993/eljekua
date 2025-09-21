@@ -1,4 +1,4 @@
-import {InstructionMovement} from "tokenizer/transform_power_ir_into_vm_representation";
+import {InstructionMovement} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";

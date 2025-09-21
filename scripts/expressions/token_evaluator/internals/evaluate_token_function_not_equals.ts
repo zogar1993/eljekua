@@ -1,16 +1,16 @@
-import type {TokenFunction} from "tokenizer/tokens/TokenFunction";
-import {interpret_token} from "interpreter/interpret_token";
-import type {AstNodeBoolean, InterpretProps} from "interpreter/types";
-import {assert_parameters_amount_equals} from "interpreter/asserts";
+import type {TokenFunction} from "expressions/tokenizer/tokens/TokenFunction";
+import {evaluate_token} from "expressions/token_evaluator/evaluate_token";
+import type {AstNodeBoolean, InterpretProps} from "expressions/token_evaluator/types";
+import {assert_parameters_amount_equals} from "expressions/token_evaluator/asserts";
 
-export const interpret_token_function_not_equals = ({
+export const evaluate_token_function_not_equals = ({
                                                         token,
                                                         ...props
                                                     }: InterpretProps<TokenFunction>): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 2)
 
-    const parameter1 = interpret_token({token: token.parameters[0], ...props})
-    const parameter2 = interpret_token({token: token.parameters[1], ...props})
+    const parameter1 = evaluate_token({token: token.parameters[0], ...props})
+    const parameter2 = evaluate_token({token: token.parameters[1], ...props})
 
     if (parameter1.type === "position" && parameter2.type === "position") {
         const position1 = parameter1.value

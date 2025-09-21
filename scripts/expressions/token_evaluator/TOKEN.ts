@@ -1,6 +1,6 @@
-import {Token} from "tokenizer/tokens/AnyToken";
-import {KeywordToken} from "tokenizer/tokens/KeywordToken";
-import {StringToken} from "tokenizer/tokens/StringToken";
+import {Token} from "expressions/tokenizer/tokens/AnyToken";
+import {KeywordToken} from "expressions/tokenizer/tokens/KeywordToken";
+import {StringToken} from "expressions/tokenizer/tokens/StringToken";
 
 export const TOKEN = {
     as_keyword: (token: Token): KeywordToken => {

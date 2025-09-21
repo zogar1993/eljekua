@@ -5,7 +5,7 @@ import {
     AstNodeNumber,
     AstNodeNumberResolved, AstNodePosition,
     AstNodePositions
-} from "interpreter/types";
+} from "expressions/token_evaluator/types";
 
 export const NODE = {
     as_creature: (node: AstNode): AstNodeCreature => {

@@ -1,5 +1,5 @@
-import {Scanner} from "tokenizer/scanner";
-import {is_plain_text, is_text_character} from "tokenizer/regexes";
+import {Scanner} from "expressions/tokenizer/scanner";
+import {is_plain_text, is_text_character} from "expressions/tokenizer/regexes";
 import {assert} from "assert";
 
 export const tokenize_keyword = (scanner: Scanner): KeywordToken => {

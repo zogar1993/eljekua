@@ -1,14 +1,15 @@
-import {InstructionSaveResolvedNumber} from "tokenizer/transform_power_ir_into_vm_representation";
+import {InstructionSaveResolvedNumber} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {resolve_number, interpret_token} from "interpreter/interpret_token";
-import {NODE} from "interpreter/NODE";
+import {resolve_number, evaluate_token} from "expressions/token_evaluator/evaluate_token";
+import {NODE} from "expressions/token_evaluator/NODE";
 
 export const interpret_save_resolved_number = ({
                                                    instruction,
-                                                   context
+                                                   context,
+                                                   player_turn_handler
                                                }: InterpretInstructionProps<InstructionSaveResolvedNumber>) => {
-    const value = resolve_number(NODE.as_number(interpret_token({token: instruction.value, context})))
+    const value = resolve_number(NODE.as_number(evaluate_token({token: instruction.value, player_turn_handler})))
     context.set_resolved_number({name: instruction.label, value})
 }

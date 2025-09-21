@@ -1,9 +1,9 @@
-import {InstructionPush} from "tokenizer/transform_power_ir_into_vm_representation";
+import {InstructionPush} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {interpret_token} from "interpreter/interpret_token";
-import {NODE} from "interpreter/NODE";
+import {evaluate_token} from "expressions/token_evaluator/evaluate_token";
+import {NODE} from "expressions/token_evaluator/NODE";
 
 export const interpret_push = ({
                                    instruction,
@@ -17,7 +17,7 @@ export const interpret_push = ({
     const alternatives = battle_grid.get_push_positions({
         attacker_origin: attacker.data.position,
         defender_origin: defender.data.position,
-        amount: NODE.as_number_resolved(interpret_token({token: instruction.amount, player_turn_handler})).value
+        amount: NODE.as_number_resolved(evaluate_token({token: instruction.amount, player_turn_handler})).value
     })
 
     if (alternatives.length === 0) return

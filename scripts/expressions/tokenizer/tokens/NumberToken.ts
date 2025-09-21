@@ -1,5 +1,5 @@
-import {Scanner} from "tokenizer/scanner";
-import {is_numeric_character, is_numeric_text} from "tokenizer/regexes";
+import {Scanner} from "expressions/tokenizer/scanner";
+import {is_numeric_character, is_numeric_text} from "expressions/tokenizer/regexes";
 import {assert} from "assert";
 
 export const tokenize_number = (scanner: Scanner): NumberToken => {

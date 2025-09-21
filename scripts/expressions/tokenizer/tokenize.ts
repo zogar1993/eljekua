@@ -1,6 +1,6 @@
 import {assert} from "assert";
-import {Scanner} from "tokenizer/scanner";
-import {Token, tokenize_any} from "tokenizer/tokens/AnyToken";
+import {Scanner} from "expressions/tokenizer/scanner";
+import {Token, tokenize_any} from "expressions/tokenizer/tokens/AnyToken";
 
 export const tokenize = (value: string | number): Token => {
     const text = `${value}`

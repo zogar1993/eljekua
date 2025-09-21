@@ -1,6 +1,6 @@
 import {get_adjacent} from "battlegrid/ranges/get_adyacent";
 import {BASIC_ATTACK_ACTIONS} from "powers/basic";
-import {Instruction, InstructionMovement} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction, InstructionMovement} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";

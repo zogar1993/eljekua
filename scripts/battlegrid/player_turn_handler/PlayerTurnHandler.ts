@@ -1,9 +1,9 @@
 import {BattleGrid} from "battlegrid/BattleGrid";
 import {OnPositionEvent, Position, positions_equal} from "battlegrid/Position";
 import {ActionLog} from "action_log/ActionLog";
-import {interpret_token} from "interpreter/interpret_token";
+import {evaluate_token} from "expressions/token_evaluator/evaluate_token";
 import {Creature} from "battlegrid/creatures/Creature";
-import {Instruction, InstructionSelectTarget} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction, InstructionSelectTarget} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext, VariableType} from "battlegrid/player_turn_handler/PowerContext";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 import {get_move_area} from "battlegrid/ranges/get_move_area";
@@ -13,8 +13,8 @@ import {SquareVisual} from "battlegrid/squares/SquareVisual";
 import {ButtonOption} from "battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "initiative_order/InitiativeOrder";
 import {CreatureData} from "battlegrid/creatures/CreatureData";
-import {NODE} from "interpreter/NODE";
-import {preview_defense} from "interpreter/specific_interpreters/interpret_token_keyword";
+import {NODE} from "expressions/token_evaluator/NODE";
+import {preview_defense} from "expressions/token_evaluator/internals/evaluate_token_keyword";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -130,7 +130,7 @@ export class PlayerTurnHandler {
                 get_target_creatures_from_selection(this.selection_context).forEach(defender => {
 
                     const attacker = next_instruction.attack
-                    const attack = NODE.as_number_resolved(interpret_token({
+                    const attack = NODE.as_number_resolved(evaluate_token({
                         token: attacker,
                         player_turn_handler: this
                     })).value
@@ -179,7 +179,7 @@ export class PlayerTurnHandler {
         context: PowerContext
     }) {
         if (targeting.targeting_type === "movement") {
-            const distance = NODE.as_number_resolved(interpret_token({
+            const distance = NODE.as_number_resolved(evaluate_token({
                 token: targeting.distance,
                 player_turn_handler: this
             }))
@@ -189,7 +189,7 @@ export class PlayerTurnHandler {
         } else if (targeting.targeting_type === "adjacent") {
             return get_adjacent({position: origin, battle_grid: this.battle_grid})
         } else if (targeting.targeting_type === "ranged" || targeting.targeting_type === "area_burst") {
-            const distance = interpret_token({token: targeting.distance, player_turn_handler: this})
+            const distance = evaluate_token({token: targeting.distance, player_turn_handler: this})
 
             if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
             return this.battle_grid.get_in_range({origin, distance: distance.value})
@@ -210,7 +210,7 @@ export class PlayerTurnHandler {
         if (instruction.targeting_type === "movement") {
             const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
             if (instruction.destination_requirement) {
-                const node = interpret_token({
+                const node = evaluate_token({
                     token: instruction.destination_requirement,
                     player_turn_handler: this
                 })

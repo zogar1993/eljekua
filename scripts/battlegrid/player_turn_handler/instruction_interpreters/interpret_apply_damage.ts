@@ -1,10 +1,10 @@
-import {resolve_number, interpret_token} from "interpreter/interpret_token";
-import {InstructionApplyDamage} from "tokenizer/transform_power_ir_into_vm_representation";
+import {resolve_number, evaluate_token} from "expressions/token_evaluator/evaluate_token";
+import {InstructionApplyDamage} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {NODE} from "interpreter/NODE";
-import {AstNodeNumberResolved} from "interpreter/types";
+import {NODE} from "expressions/token_evaluator/NODE";
+import {AstNodeNumberResolved} from "expressions/token_evaluator/types";
 
 export const interpret_apply_damage = ({
                                            instruction,
@@ -14,7 +14,7 @@ export const interpret_apply_damage = ({
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
     const target = context.get_creature(instruction.target)
 
-    const damage = NODE.as_number(interpret_token({token: instruction.value, context, player_turn_handler}))
+    const damage = NODE.as_number(evaluate_token({token: instruction.value, context, player_turn_handler}))
 
     const resolved = resolve_number(damage)
 

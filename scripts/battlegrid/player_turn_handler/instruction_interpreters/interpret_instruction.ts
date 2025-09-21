@@ -7,7 +7,7 @@ import {interpret_push} from "battlegrid/player_turn_handler/instruction_interpr
 import {interpret_save_position} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_save_position";
 import {interpret_options} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_options";
 import {interpret_condition} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_condition";
-import {Instruction} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";

@@ -1,10 +1,10 @@
-import type {AstNode, InterpretProps} from "interpreter/types";
-import type {KeywordToken} from "tokenizer/tokens/KeywordToken";
+import type {AstNode, InterpretProps} from "expressions/token_evaluator/types";
+import type {KeywordToken} from "expressions/tokenizer/tokens/KeywordToken";
 import {ATTRIBUTE_CODES} from "character_sheet/attributes";
 import type {Creature} from "battlegrid/creatures/Creature";
-import type {AstNodeNumberResolved} from "interpreter/types";
+import type {AstNodeNumberResolved} from "expressions/token_evaluator/types";
 
-export const interpret_token_keyword = ({token, player_turn_handler}: InterpretProps<KeywordToken>): AstNode => {
+export const evaluate_token_keyword = ({token, player_turn_handler}: InterpretProps<KeywordToken>): AstNode => {
     const variable_name = token.value
     const variable = player_turn_handler.turn_context.get_current_context().get_variable(variable_name)
 
@@ -35,8 +35,6 @@ export const interpret_token_keyword = ({token, player_turn_handler}: InterpretP
 }
 
 
-
-
 const ATTRIBUTE_MOD_CODES = ATTRIBUTE_CODES.map(attribute => `${attribute}_mod`)
 const ATTRIBUTE_MOD_CODES_LVL = ATTRIBUTE_CODES.map(attribute => `${attribute}_mod_lvl`)
 
@@ -44,10 +42,8 @@ const preview_creature_property = ({creature, property}: {
     creature: Creature,
     property: string
 }): Omit<AstNodeNumberResolved, "type"> => {
-    if (property === "movement") return {
-        value: creature.data.movement,
-        description: "movement"
-    }
+    if (property === "movement")
+        return {value: creature.data.movement, description: "movement"}
 
     if (ATTRIBUTE_MOD_CODES.includes(property))
         return preview_creature_attribute_mod(creature, property.slice(0, 3) as any)

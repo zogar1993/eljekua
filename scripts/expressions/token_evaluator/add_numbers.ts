@@ -1,4 +1,4 @@
-import {AstNode, AstNodeNumber, AstNodeNumberResolved, AstNodeNumberUnresolved} from "interpreter/types";
+import {AstNode, AstNodeNumber, AstNodeNumberResolved, AstNodeNumberUnresolved} from "expressions/token_evaluator/types";
 
 export const add_numbers_resolved = (numbers: Array<AstNodeNumberResolved>): AstNodeNumberResolved => ({
     type: "number_resolved",

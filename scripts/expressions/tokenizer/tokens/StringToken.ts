@@ -1,8 +1,8 @@
-import {Scanner} from "tokenizer/scanner";
-import {is_text_character} from "tokenizer/regexes";
+import {Scanner} from "expressions/tokenizer/scanner";
+import {is_text_character} from "expressions/tokenizer/regexes";
 import {assert} from "assert";
 
-import {Token, tokenize_any} from "tokenizer/tokens/AnyToken";
+import {Token, tokenize_any} from "expressions/tokenizer/tokens/AnyToken";
 
 export const tokenize_string = (scanner: Scanner): StringToken => {
     scanner.consume(`"`)

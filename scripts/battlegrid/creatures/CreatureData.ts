@@ -1,5 +1,5 @@
 import {Position} from "battlegrid/Position";
-import {PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
+import {PowerVM} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {AttributeCode} from "character_sheet/attributes";
 
 export type CreatureData = {

@@ -1,4 +1,4 @@
-import {AstNode, AstNodeNumberResolved} from "interpreter/types";
+import {AstNode, AstNodeNumberResolved} from "expressions/token_evaluator/types";
 
 export class ActionLog {
     add_new_action_log = (...text: Array<string | AstNode>) => {

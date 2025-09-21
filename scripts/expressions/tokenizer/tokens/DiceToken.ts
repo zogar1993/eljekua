@@ -1,6 +1,6 @@
-import {Scanner} from "tokenizer/scanner";
+import {Scanner} from "expressions/tokenizer/scanner";
 import {assert} from "assert";
-import {is_numeric_character} from "tokenizer/regexes";
+import {is_numeric_character} from "expressions/tokenizer/regexes";
 
 export const tokenize_roll = (scanner: Scanner): DiceToken | WeaponToken => {
     scanner.consume("{")

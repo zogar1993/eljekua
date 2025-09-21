@@ -1,9 +1,9 @@
-import {tokenize} from "tokenizer/tokenize";
+import {tokenize} from "expressions/tokenizer/tokenize";
 import {
     IRInstruction, IRInstructionSelectTarget,
     Power
 } from "types";
-import {Token} from "tokenizer/tokens/AnyToken";
+import {Token} from "expressions/tokenizer/tokens/AnyToken";
 import {ATTRIBUTE_CODES} from "character_sheet/attributes";
 
 const PRIMARY_TARGET_LABEL = "primary_target"

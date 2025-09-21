@@ -1,5 +1,5 @@
 import {Power} from "types";
-import {transform_power_ir_into_vm_representation} from "tokenizer/transform_power_ir_into_vm_representation";
+import {transform_power_ir_into_vm_representation} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 
 const magic_missile: Power = {
     name: "Magic Missile",

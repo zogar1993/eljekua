@@ -1,9 +1,9 @@
-import {Instruction, PowerVM} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction, PowerVM} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {Creature} from "battlegrid/creatures/Creature";
 import {Path, Position} from "battlegrid/Position";
 import {assert} from "assert";
 
-import {AstNodeNumberResolved} from "interpreter/types";
+import {AstNodeNumberResolved} from "expressions/token_evaluator/types";
 
 export class PowerContext {
     private variables: Map<string, VariableType> = new Map()

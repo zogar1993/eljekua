@@ -1,4 +1,4 @@
-import {TokenFunction} from "tokenizer/tokens/TokenFunction";
+import {TokenFunction} from "expressions/tokenizer/tokens/TokenFunction";
 
 export const assert_parameters_amount_equals = (token: TokenFunction, amount: number) => {
     if (token.parameters.length === amount) return

@@ -1,6 +1,6 @@
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {Creature} from "battlegrid/creatures/Creature";
-import {Instruction} from "tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 
 export class TurnContext {
     power_contexts: Array<PowerContext> = []
