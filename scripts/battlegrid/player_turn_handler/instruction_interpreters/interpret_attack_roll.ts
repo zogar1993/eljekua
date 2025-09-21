@@ -12,6 +12,7 @@ import {
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {Creature} from "battlegrid/creatures/Creature";
 import {ActionLog} from "action_log/ActionLog";
+import {add_numbers_resolved} from "expression_parsers/add_numbers";
 
 export const interpret_attack_roll = ({
                                           instruction,
@@ -37,7 +38,7 @@ export const interpret_attack_roll = ({
         attack_parts.push(roll_d(20))
         if (battle_grid.is_flanking({attacker, defender})) attack_parts.push(COMBAT_ADVANTAGE)
 
-        const attack = add_resolved_numbers(...attack_parts)
+        const attack = add_numbers_resolved(attack_parts)
 
         const defense = NODE.as_number_resolved(preview_defense({defender, defense_code: instruction.defense}))
 
@@ -64,13 +65,6 @@ export const interpret_attack_roll = ({
 
     context.add_instructions(new_instructions)
 }
-
-const add_resolved_numbers = (...numbers: Array<AstNodeNumberResolved>): AstNodeNumberResolved => ({
-    type: "number_resolved",
-    value: numbers.reduce((accum, num) => accum + num.value, 0),
-    params: numbers,
-    description: "+"
-})
 
 const COMBAT_ADVANTAGE: AstNodeNumberResolved = {
     type: "number_resolved",

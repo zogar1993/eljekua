@@ -10,6 +10,12 @@ import {Position} from "battlegrid/Position";
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {ATTRIBUTE_CODES} from "character_sheet/attributes";
 import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
+import {
+    add_numbers,
+    add_numbers_resolved,
+    is_number,
+    is_number_resolved
+} from "expression_parsers/add_numbers";
 
 type PreviewExpressionProps<T extends Token> = {
     token: T,
@@ -68,21 +74,10 @@ const token_to_add_function_node = ({token, ...props}: PreviewExpressionProps<Fu
     const params = token.parameters.map(parameter => token_to_node({token: parameter, ...props}))
 
     if (are_all_numbers_unresolved(params))
-        return {
-            type: "number_resolved",
-            value: params.reduce((result, param) => param.value + result, 0),
-            params: params,
-            description: "+"
-        }
+        return add_numbers_resolved(params)
 
     if (are_all_numbers(params))
-        return {
-            type: "number_unresolved",
-            min: params.reduce((result, param) => (is_number_resolved(param) ? param.value : param.min) + result, 0),
-            max: params.reduce((result, param) => (is_number_resolved(param) ? param.value : param.max) + result, 0),
-            params: params,
-            description: "+"
-        }
+        return add_numbers(params)
     throw Error(`not all params evaluate to numbers on add function`)
 }
 
@@ -191,9 +186,8 @@ const token_to_keyword_node = ({token, context}: PreviewExpressionProps<KeywordT
             }
     }
 
-    if (variable.type === "resolved_number") {
+    if (variable.type === "resolved_number")
         return variable.value
-    }
 
     throw Error("variable type not supported")
 }
@@ -327,21 +321,6 @@ export type AstNodePositions = {
     params?: Array<AstNode>
 }
 
-const are_all_numbers = (values: Array<AstNode>): values is Array<AstNodeNumber> =>
-    values.every(is_number)
-
-const are_all_numbers_unresolved = (values: Array<AstNode>): values is Array<AstNodeNumberResolved> =>
-    values.every(is_number_resolved)
-
-const is_number_resolved = (value: AstNode): value is AstNodeNumberResolved =>
-    value.type === "number_resolved"
-
-const is_number_unresolved = (value: AstNode): value is AstNodeNumberUnresolved =>
-    value.type === "number_unresolved"
-
-export const is_number = (value: AstNode): value is AstNodeNumber =>
-    is_number_resolved(value) || is_number_unresolved(value)
-
 const assert_parameters_amount_equals = (token: FunctionToken, amount: number) => {
     if (token.parameters.length === amount) return
     throw Error("equipped function needs exactly two parameter")
@@ -385,3 +364,9 @@ const TOKEN = {
         throw Error(`Cannot cast token to "string"`)
     }
 }
+
+const are_all_numbers = (values: Array<AstNode>): values is Array<AstNodeNumber> =>
+    values.every(is_number)
+
+const are_all_numbers_unresolved = (values: Array<AstNode>): values is Array<AstNodeNumberResolved> =>
+    values.every(is_number_resolved)
