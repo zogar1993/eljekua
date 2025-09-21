@@ -9,20 +9,18 @@ import {
 } from "interpreter/specific_interpreters/interpret_token_function_not_equals";
 import {
     AstNode,
-    AstNodeBoolean,
     AstNodeNumber,
     AstNodeNumberResolved,
     AstNodeNumberUnresolved,
     InterpretProps
 } from "interpreter/types";
-import {assert_parameters_amount_equals} from "interpreter/asserts";
 import {
     token_to_has_valid_targets_function_node
 } from "interpreter/specific_interpreters/interpret_token_function_has_valid_targets";
-import {TOKEN} from "interpreter/TOKEN";
 import {interpret_token_keyword} from "interpreter/specific_interpreters/interpret_token_keyword";
 import {interpret_token_function_equipped} from "interpreter/specific_interpreters/interpret_token_function_equipped";
 import {interpret_token_string} from "interpreter/specific_interpreters/interpret_token_string";
+import {interpret_token_function_exists} from "interpreter/specific_interpreters/interpret_token_function_exists";
 
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number
@@ -59,7 +57,7 @@ const token_to_function_node = ({token, ...props}: InterpretProps<TokenFunction>
         case "add":
             return token_to_add_function_node({token, ...props})
         case "exists":
-            return token_to_exists_function_node({token, ...props})
+            return interpret_token_function_exists({token, ...props})
         case "equipped":
             return interpret_token_function_equipped({token, ...props})
         case "not_equals":
@@ -81,17 +79,6 @@ const token_to_add_function_node = ({token, ...props}: InterpretProps<TokenFunct
         return add_numbers(params)
 
     throw Error(`not all params evaluate to numbers on add function`)
-}
-
-const token_to_exists_function_node = ({token, player_turn_handler}: InterpretProps<TokenFunction>): AstNodeBoolean => {
-    assert_parameters_amount_equals(token, 1)
-    const parameter = TOKEN.as_keyword(token.parameters[0])
-
-    return {
-        type: "boolean",
-        value: player_turn_handler.turn_context.get_current_context().has_variable(parameter.value),
-        description: `exists ${parameter.value}`,
-    }
 }
 
 const token_to_dice_node = ({token}: InterpretProps<DiceToken>): AstNodeNumberUnresolved =>
