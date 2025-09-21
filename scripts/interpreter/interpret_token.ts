@@ -15,6 +15,10 @@ import {
 } from "interpreter/specific_interpreters/interpret_token_function_not_equals";
 import {InterpretProps} from "interpreter/types";
 import {assert_parameters_amount_equals} from "interpreter/asserts";
+import {
+    token_to_has_valid_targets_function_node
+} from "interpreter/specific_interpreters/interpret_token_function_has_valid_targets";
+import {TOKEN} from "interpreter/TOKEN";
 
 
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
@@ -97,32 +101,6 @@ const token_to_equipped_function_node = ({token, ...props}: InterpretProps<Token
         value: creature.value.has_equipped(text.value),
         description: "equipped",
         params: [creature, text]
-    }
-}
-
-const token_to_has_valid_targets_function_node = ({
-                                                      token,
-                                                      player_turn_handler
-                                                  }: InterpretProps<TokenFunction>): AstNodeBoolean => {
-    assert_parameters_amount_equals(token, 1)
-
-    const power_name = TOKEN.as_keyword(token.parameters[0]).value
-    const context = player_turn_handler.turn_context.get_current_context()
-    const power = context.get_power(power_name)
-
-    const first_instruction = power.instructions[0]
-
-    // If it does not need targets because it does not start with "select_target" we take as it's ok
-    let has_valid_targets = true
-    if (first_instruction.type === "select_target") {
-        const valid_targets = player_turn_handler.get_valid_targets({instruction: first_instruction, context})
-        has_valid_targets = valid_targets.length > 0
-    }
-
-    return {
-        type: "boolean",
-        value: has_valid_targets,
-        description: "has valid targets"
     }
 }
 
@@ -305,16 +283,5 @@ export const NODE = {
     as_positions: (node: AstNode): AstNodePositions => {
         if (node.type === "positions") return node
         throw Error(`Cannot cast node to "positions"`)
-    }
-}
-
-const TOKEN = {
-    as_keyword: (token: Token): KeywordToken => {
-        if (token.type === "keyword") return token
-        throw Error(`Cannot cast token to "keyword"`)
-    },
-    as_string: (token: Token): StringToken => {
-        if (token.type === "string") return token
-        throw Error(`Cannot cast token to "string"`)
     }
 }
