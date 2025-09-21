@@ -111,6 +111,13 @@ export type InstructionCleanContextStatus = {
     type: "clean_context_status"
 }
 
+export type InstructionGrantCombatAdvantage = {
+    type: "grant_combat_advantage",
+    target: Token,
+    to: Token,
+    duration: "start_of_your_next_turn"
+}
+
 export type Instruction =
     InstructionApplyDamage |
     InstructionSelectTarget |
@@ -124,7 +131,8 @@ export type Instruction =
     InstructionCopyVariable |
     InstructionAddPowers |
     InstructionExecutePower |
-    InstructionCleanContextStatus
+    InstructionCleanContextStatus |
+    InstructionGrantCombatAdvantage
 
 const transform_primary_roll = (roll: Required<Power>["roll"]): InstructionAttackRoll => {
     return {
@@ -197,6 +205,13 @@ const transform_generic_instruction = (instruction: IRInstruction): Instruction 
                 type: "push",
                 amount: tokenize(instruction.amount),
                 target: instruction.target
+            }
+        case "grant_combat_advantage":
+            return {
+                type: "grant_combat_advantage",
+                target: tokenize(instruction.target),
+                to: tokenize(instruction.target),
+                duration: instruction.duration
             }
         default:
             throw Error(`instruction invalid ${JSON.stringify(instruction)}`)

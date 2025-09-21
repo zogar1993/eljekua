@@ -1,5 +1,7 @@
 import {Power} from "types";
-import {transform_power_ir_into_vm_representation} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
+import {
+    transform_power_ir_into_vm_representation
+} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 
 const sure_strike: Power = {
     name: "Sure Strike",
@@ -202,6 +204,51 @@ const tide_of_iron: Power = {
             }
         ]
     },
+}
+
+const brash_strike: Power = {
+    name: "Brash Strike",
+    description: "With a battle cry, you throw your whole body behind your attack.",
+    type: {
+        action: "standard",
+        cooldown: "at-will",
+        attack: true,
+    },
+    targeting: {
+        targeting_type: "melee_weapon",
+        target_type: "creature",
+        amount: 1
+    },
+    roll: {
+        attack: "$add(str,2)",
+        defense: "ac",
+        hit: [
+            {
+                type: "apply_damage",
+                value: "$add({1W},owner.str_mod)",
+                target: "primary_target"
+            },
+            {
+                type: "condition",
+                condition: `$or($equipped(owner, "hammer"), $equipped(owner, "axe"), $equipped(owner, "mace"))`,
+                instructions_true: [
+                    {
+                        type: "apply_damage",
+                        value: "owner.con_mod",
+                        target: "primary_target"
+                    },//TODO revisit that these damages are all dealt as one chunk instead of parts
+                ]
+            }
+        ],
+    },
+    effect: [
+        {
+            type: "grant_combat_advantage",
+            target: "owner",
+            to: "primary_target",
+            duration: "start_of_your_next_turn"
+        }
+    ]
 }
 
 const tide_of_iron_true = {

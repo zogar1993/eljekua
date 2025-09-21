@@ -57,6 +57,11 @@ export type IRInstruction =
     type: "save_resolved_number"
     value: string
     label: string
+} | {
+    type: "grant_combat_advantage",
+    target: string,
+    to: string,
+    duration: "start_of_your_next_turn"
 }
 
 export type IRInstructionSelectTarget =
