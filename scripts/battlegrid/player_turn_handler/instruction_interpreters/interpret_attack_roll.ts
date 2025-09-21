@@ -17,7 +17,8 @@ export const interpret_attack_roll = ({
                                           instruction,
                                           context,
                                           action_log,
-                                          player_turn_handler
+                                          player_turn_handler,
+                                          battle_grid
                                       }: InterpretInstructionProps<InstructionAttackRoll>) => {
     const attacker = context.owner()
     const defenders = context.get_creatures(instruction.defender)
@@ -27,12 +28,16 @@ export const interpret_attack_roll = ({
     context.set_creatures({name: `${instruction.defender}(all)`, value: defenders})
 
     defenders.forEach((defender, i) => {
-        const attack_base = NODE.as_number_resolved(token_to_node({
+        const attack_parts: Array<AstNodeNumberResolved> = []
+        attack_parts.push(NODE.as_number_resolved(token_to_node({
             token: instruction.attack,
             context,
             player_turn_handler
-        }))
-        const attack = add_d20_roll_to_attack(attack_base)
+        })))//TODO Make this neater
+        attack_parts.push(roll_d(20))
+        if (battle_grid.is_flanking({attacker, defender})) attack_parts.push(COMBAT_ADVANTAGE)
+
+        const attack = add_resolved_numbers(...attack_parts)
 
         const defense = NODE.as_number_resolved(preview_defense({defender, defense_code: instruction.defense}))
 
@@ -60,17 +65,17 @@ export const interpret_attack_roll = ({
     context.add_instructions(new_instructions)
 }
 
-const add_d20_roll_to_attack = (attack_base: AstNodeNumberResolved): AstNodeNumberResolved => {
-    const d20_result = roll_d(20)
-    return {
-        type: "number_resolved",
-        value: attack_base.value + d20_result.value,
-        params: [
-            attack_base,
-            {type: "number_resolved", value: d20_result.value, description: "d20"}
-        ],
-        description: "attack"
-    }
+const add_resolved_numbers = (...numbers: Array<AstNodeNumberResolved>): AstNodeNumberResolved => ({
+    type: "number_resolved",
+    value: numbers.reduce((accum, num) => accum + num.value, 0),
+    params: numbers,
+    description: "+"
+})
+
+const COMBAT_ADVANTAGE: AstNodeNumberResolved = {
+    type: "number_resolved",
+    value: 2,
+    description: "Combat Advantage"
 }
 
 const create_copy_variable_instruction = (origin: string, destination: string): InstructionCopyVariable =>

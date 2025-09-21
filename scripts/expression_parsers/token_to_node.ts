@@ -29,7 +29,7 @@ export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => 
         params: resolved_parts
     }
 }
-
+//TODO change preview verbiage
 export const token_to_node = ({token, ...props}: PreviewExpressionProps<Token>): AstNode => {
     switch (token.type) {
         case "function":

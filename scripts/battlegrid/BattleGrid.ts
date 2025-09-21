@@ -156,7 +156,18 @@ export class BattleGrid {
         }
 
         return result
+    }
 
+    is_flanking({attacker, defender}: {attacker: Creature, defender: Creature}) {
+        if (attacker.data.team === null) return false
+
+        const offset = get_offset(attacker.data.position, defender.data.position)
+        const position = add_offset(defender.data.position, offset)
+
+        if (!this.is_terrain_occupied(position)) return false
+
+        const flanker = this.get_creature_by_position(position)
+        return flanker.data.team === attacker.data.team
     }
 
     move_creature_one_square({position, creature}: { position: Position, creature: Creature }) {
@@ -192,5 +203,12 @@ export type Square = {
     position: Position
 }
 
+type PositionOffset = {
+    x: number,
+    y: number
+}
+
 const distance_between_positions = (a: Position, b: Position) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
 const intuitive_distance_between_positions = (a: Position, b: Position) => Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
+const get_offset = (a: Position, b: Position): PositionOffset => ({x: b.x - a.x, y: b.y - a.y})
+const add_offset = (p: Position, o: PositionOffset): Position => ({x: p.x + o.x, y: p.y + o.y})

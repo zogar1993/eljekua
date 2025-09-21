@@ -11,5 +11,6 @@ export type CreatureData = {
     movement: number
     hp_current: number
     hp_max: number
+    team: number | null
     powers: Array<PowerVM>
 }

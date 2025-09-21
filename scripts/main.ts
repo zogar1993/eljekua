@@ -45,7 +45,8 @@ const ATTRIBUTES = {
         hp_max: 10,
         level: 2,
         attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
-        powers: FIGHTER_POWERS
+        powers: FIGHTER_POWERS,
+        team: 1
     }
     const maik = {
         name: "Maik",
@@ -56,7 +57,8 @@ const ATTRIBUTES = {
         hp_max: 10,
         level: 1,
         attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
-        powers: WIZARD_POWERS
+        powers: WIZARD_POWERS,
+        team: 1
     }
     const yeims = {
         name: "Yeims",
@@ -66,6 +68,7 @@ const ATTRIBUTES = {
         hp_current: 10,
         hp_max: 10,
         level: 1,
+        team: null,
         attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
         powers: []
     }
@@ -78,6 +81,7 @@ const ATTRIBUTES = {
         hp_current: 10,
         hp_max: 10,
         level: 1,
+        team: null,
         attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
         powers: ROGUE_POWERS
     }
