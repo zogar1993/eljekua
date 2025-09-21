@@ -1,7 +1,7 @@
 import {roll_d} from "randomness/dice";
 import {Token} from "tokenizer/tokens/AnyToken";
 import {TokenFunction} from "tokenizer/tokens/TokenFunction";
-import {DiceToken, WeaponToken} from "tokenizer/tokens/DiceToken";
+import {DiceToken} from "tokenizer/tokens/DiceToken";
 import {is_number, is_number_resolved} from "interpreter/add_numbers";
 import {
     interpret_token_function_not_equals
@@ -22,6 +22,7 @@ import {interpret_token_string} from "interpreter/specific_interpreters/interpre
 import {interpret_token_function_exists} from "interpreter/specific_interpreters/interpret_token_function_exists";
 import {interpret_token_function_add} from "interpreter/specific_interpreters/interpret_token_function_add";
 import {interpret_number} from "interpreter/specific_interpreters/interpret_number";
+import {interpret_weapon} from "interpreter/specific_interpreters/interpret_weapon";
 
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number
@@ -72,7 +73,4 @@ const token_to_function_node = ({token, ...props}: InterpretProps<TokenFunction>
 
 const interpret_dice = ({token}: InterpretProps<DiceToken>): AstNodeNumberUnresolved =>
     ({type: "number_unresolved", min: 1, max: token.faces, description: `${token.faces}d${token.faces}`})
-
-const interpret_weapon = ({token}: InterpretProps<WeaponToken>): AstNodeNumberUnresolved =>
-    ({type: "number_unresolved", min: 1, max: 4, description: `${token.amount}W`})
 
