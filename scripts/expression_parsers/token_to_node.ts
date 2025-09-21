@@ -33,38 +33,38 @@ export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => 
 export const token_to_node = ({token, ...props}: PreviewExpressionProps<Token>): AstNode => {
     switch (token.type) {
         case "function":
-            return preview_function({token, ...props})
+            return token_to_function_node({token, ...props})
         case "number":
-            return preview_number({token, ...props})
+            return token_to_number_node({token, ...props})
         case "string":
-            return preview_string({token, ...props})
+            return token_to_string_node({token, ...props})
         case "weapon":
-            return preview_weapon({token, ...props})
+            return token_to_weapon_node({token, ...props})
         case "dice":
-            return preview_dice({token, ...props})
+            return token_to_dice_node({token, ...props})
         case "keyword":
-            return preview_keyword({token, ...props})
+            return token_to_keyword_node({token, ...props})
     }
 }
 
-const preview_function = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNode => {
+const token_to_function_node = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNode => {
     switch (token.name) {
         case "add":
-            return preview_add_function({token, ...props})
+            return token_to_add_function_node({token, ...props})
         case "exists":
-            return preview_exists_function({token, ...props})
+            return token_to_exists_function_node({token, ...props})
         case "equipped":
-            return preview_equipped_function({token, ...props})
+            return token_to_equipped_function_node({token, ...props})
         case "not_equals":
-            return preview_not_equals_function({token, ...props})
+            return token_to_not_equals_function_node({token, ...props})
         case "has_valid_targets":
-            return preview_has_valid_targets_function({token, ...props})
+            return token_to_has_valid_targets_function_node({token, ...props})
         default:
             throw Error(`function name ${token.name} not supported`)
     }
 }
 
-const preview_add_function = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNodeNumber => {
+const token_to_add_function_node = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNodeNumber => {
     const params = token.parameters.map(parameter => token_to_node({token: parameter, ...props}))
 
     if (are_all_numbers_unresolved(params))
@@ -86,7 +86,7 @@ const preview_add_function = ({token, ...props}: PreviewExpressionProps<Function
     throw Error(`not all params evaluate to numbers on add function`)
 }
 
-const preview_exists_function = ({token, context}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
+const token_to_exists_function_node = ({token, context}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 1)
     const parameter = TOKEN.as_keyword(token.parameters[0])
 
@@ -97,10 +97,10 @@ const preview_exists_function = ({token, context}: PreviewExpressionProps<Functi
     }
 }
 
-const preview_equipped_function = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
+const token_to_equipped_function_node = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 2)
-    const creature = NODE.as_creature(preview_keyword({token: TOKEN.as_keyword(token.parameters[0]), ...props}))
-    const text = preview_string({token: TOKEN.as_string(token.parameters[1]), ...props})
+    const creature = NODE.as_creature(token_to_keyword_node({token: TOKEN.as_keyword(token.parameters[0]), ...props}))
+    const text = token_to_string_node({token: TOKEN.as_string(token.parameters[1]), ...props})
 
     return {
         type: "boolean",
@@ -110,7 +110,7 @@ const preview_equipped_function = ({token, ...props}: PreviewExpressionProps<Fun
     }
 }
 
-const preview_has_valid_targets_function = ({
+const token_to_has_valid_targets_function_node = ({
                                                 token,
                                                 context,
                                                 player_turn_handler
@@ -137,7 +137,7 @@ const preview_has_valid_targets_function = ({
     }
 }
 
-const preview_not_equals_function = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
+const token_to_not_equals_function_node = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 2)
 
     const parameter1 = token_to_node({token: token.parameters[0], ...props})
@@ -159,7 +159,7 @@ const preview_not_equals_function = ({token, ...props}: PreviewExpressionProps<F
 }
 
 
-const preview_keyword = ({token, context}: PreviewExpressionProps<KeywordToken>): AstNode => {
+const token_to_keyword_node = ({token, context}: PreviewExpressionProps<KeywordToken>): AstNode => {
     const variable = context.get_variable(token.value)
 
     if (variable.type === "position")
@@ -258,16 +258,16 @@ export const preview_defense = ({defender, defense_code}: {
 const RESOLVED_BASE_10: AstNodeNumberResolved =
     Object.freeze({type: "number_resolved", value: 10, description: "base"})
 
-const preview_dice = ({token}: PreviewExpressionProps<DiceToken>): AstNodeNumberUnresolved =>
+const token_to_dice_node = ({token}: PreviewExpressionProps<DiceToken>): AstNodeNumberUnresolved =>
     ({type: "number_unresolved", min: 1, max: token.faces, description: `${token.faces}d${token.faces}`})
 
-const preview_weapon = ({token}: PreviewExpressionProps<WeaponToken>): AstNodeNumberUnresolved =>
+const token_to_weapon_node = ({token}: PreviewExpressionProps<WeaponToken>): AstNodeNumberUnresolved =>
     ({type: "number_unresolved", min: 1, max: 4, description: `${token.amount}W`})
 
-const preview_string = ({token}: PreviewExpressionProps<StringToken>): AstNodeString =>
+const token_to_string_node = ({token}: PreviewExpressionProps<StringToken>): AstNodeString =>
     ({type: "string", value: token.value, description: token.value})
 
-const preview_number = ({token}: PreviewExpressionProps<NumberToken>): AstNodeNumberResolved =>
+const token_to_number_node = ({token}: PreviewExpressionProps<NumberToken>): AstNodeNumberResolved =>
     ({type: "number_resolved", value: token.value, description: "hard number"})
 
 export type AstNode =
