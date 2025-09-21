@@ -1,7 +1,7 @@
 import {BattleGrid} from "battlegrid/BattleGrid";
 import {OnPositionEvent, Position, positions_equal} from "battlegrid/Position";
 import {ActionLog} from "action_log/ActionLog";
-import {NODE, preview_defense, token_to_node} from "expression_parsers/token_to_node";
+import {NODE, preview_defense, interpret_token} from "interpreter/interpret_token";
 import {Creature} from "battlegrid/creatures/Creature";
 import {Instruction, InstructionSelectTarget} from "tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext, VariableType} from "battlegrid/player_turn_handler/PowerContext";
@@ -128,10 +128,8 @@ export class PlayerTurnHandler {
                 get_target_creatures_from_selection(this.selection_context).forEach(defender => {
 
                     const attacker = next_instruction.attack
-                    const attack = NODE.as_number_resolved(token_to_node({
+                    const attack = NODE.as_number_resolved(interpret_token({
                         token: attacker,
-                        //TODO doing this here seems redundant if we already have player turn handler
-                        context: this.turn_context.get_current_context(),
                         player_turn_handler: this
                     })).value
 
@@ -173,15 +171,14 @@ export class PlayerTurnHandler {
 
     has_selected_creature = () => this.selection_context !== null
 
-    get_in_range({targeting, origin, context}: {
+    get_in_range({targeting, origin}: {
         targeting: InstructionSelectTarget,
         origin: Position,
         context: PowerContext
     }) {
         if (targeting.targeting_type === "movement") {
-            const distance = NODE.as_number_resolved(token_to_node({
+            const distance = NODE.as_number_resolved(interpret_token({
                 token: targeting.distance,
-                context,
                 player_turn_handler: this
             }))
             return get_move_area({origin, distance: distance.value, battle_grid: this.battle_grid})
@@ -190,7 +187,7 @@ export class PlayerTurnHandler {
         } else if (targeting.targeting_type === "adjacent") {
             return get_adjacent({position: origin, battle_grid: this.battle_grid})
         } else if (targeting.targeting_type === "ranged" || targeting.targeting_type === "area_burst") {
-            const distance = token_to_node({token: targeting.distance, context, player_turn_handler: this})
+            const distance = interpret_token({token: targeting.distance, player_turn_handler: this})
 
             if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
             return this.battle_grid.get_in_range({origin, distance: distance.value})
@@ -211,9 +208,8 @@ export class PlayerTurnHandler {
         if (instruction.targeting_type === "movement") {
             const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
             if (instruction.destination_requirement) {
-                const node = token_to_node({
+                const node = interpret_token({
                     token: instruction.destination_requirement,
-                    context,
                     player_turn_handler: this
                 })
                 const possibility = NODE.as_position(node)

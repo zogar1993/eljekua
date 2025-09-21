@@ -1,7 +1,7 @@
 import {
     AstNode,
     AstNodeNumberResolved,
-} from "expression_parsers/token_to_node";
+} from "interpreter/interpret_token";
 
 export class ActionLog {
     add_new_action_log = (...text: Array<string | AstNode>) => {

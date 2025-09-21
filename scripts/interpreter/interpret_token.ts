@@ -2,26 +2,20 @@ import {roll_d} from "randomness/dice";
 import {Creature} from "battlegrid/creatures/Creature";
 import {KeywordToken} from "tokenizer/tokens/KeywordToken";
 import {Token} from "tokenizer/tokens/AnyToken";
-import {FunctionToken} from "tokenizer/tokens/FunctionToken";
+import {TokenFunction} from "tokenizer/tokens/TokenFunction";
 import {NumberToken} from "tokenizer/tokens/NumberToken";
 import {StringToken} from "tokenizer/tokens/StringToken";
 import {DiceToken, WeaponToken} from "tokenizer/tokens/DiceToken";
 import {Position} from "battlegrid/Position";
-import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {ATTRIBUTE_CODES} from "character_sheet/attributes";
-import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
+import {add_numbers, add_numbers_resolved, is_number, is_number_resolved} from "interpreter/add_numbers";
+import {AstNodePosition} from "interpreter/ast_node_position";
 import {
-    add_numbers,
-    add_numbers_resolved,
-    is_number,
-    is_number_resolved
-} from "expression_parsers/add_numbers";
+    interpret_token_function_not_equals
+} from "interpreter/specific_interpreters/interpret_token_function_not_equals";
+import {InterpretProps} from "interpreter/types";
+import {assert_parameters_amount_equals} from "interpreter/asserts";
 
-type PreviewExpressionProps<T extends Token> = {
-    token: T,
-    context: PowerContext,
-    player_turn_handler: PlayerTurnHandler
-}
 
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number
@@ -36,7 +30,7 @@ export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => 
     }
 }
 //TODO change preview verbiage
-export const token_to_node = ({token, ...props}: PreviewExpressionProps<Token>): AstNode => {
+export const interpret_token = ({token, ...props}: InterpretProps<Token>): AstNode => {
     switch (token.type) {
         case "function":
             return token_to_function_node({token, ...props})
@@ -53,7 +47,7 @@ export const token_to_node = ({token, ...props}: PreviewExpressionProps<Token>):
     }
 }
 
-const token_to_function_node = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNode => {
+const token_to_function_node = ({token, ...props}: InterpretProps<TokenFunction>): AstNode => {
     switch (token.name) {
         case "add":
             return token_to_add_function_node({token, ...props})
@@ -62,7 +56,7 @@ const token_to_function_node = ({token, ...props}: PreviewExpressionProps<Functi
         case "equipped":
             return token_to_equipped_function_node({token, ...props})
         case "not_equals":
-            return token_to_not_equals_function_node({token, ...props})
+            return interpret_token_function_not_equals({token, ...props})
         case "has_valid_targets":
             return token_to_has_valid_targets_function_node({token, ...props})
         default:
@@ -70,29 +64,30 @@ const token_to_function_node = ({token, ...props}: PreviewExpressionProps<Functi
     }
 }
 
-const token_to_add_function_node = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNodeNumber => {
-    const params = token.parameters.map(parameter => token_to_node({token: parameter, ...props}))
+const token_to_add_function_node = ({token, ...props}: InterpretProps<TokenFunction>): AstNodeNumber => {
+    const params = token.parameters.map(parameter => interpret_token({token: parameter, ...props}))
 
-    if (are_all_numbers_unresolved(params))
+    if (params.every(is_number_resolved))
         return add_numbers_resolved(params)
 
-    if (are_all_numbers(params))
+    if (params.every(is_number))
         return add_numbers(params)
+
     throw Error(`not all params evaluate to numbers on add function`)
 }
 
-const token_to_exists_function_node = ({token, context}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
+const token_to_exists_function_node = ({token, player_turn_handler}: InterpretProps<TokenFunction>): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 1)
     const parameter = TOKEN.as_keyword(token.parameters[0])
 
     return {
         type: "boolean",
-        value: context.has_variable(parameter.value),
+        value: player_turn_handler.turn_context.get_current_context().has_variable(parameter.value),
         description: `exists ${parameter.value}`,
     }
 }
 
-const token_to_equipped_function_node = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
+const token_to_equipped_function_node = ({token, ...props}: InterpretProps<TokenFunction>): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 2)
     const creature = NODE.as_creature(token_to_keyword_node({token: TOKEN.as_keyword(token.parameters[0]), ...props}))
     const text = token_to_string_node({token: TOKEN.as_string(token.parameters[1]), ...props})
@@ -106,13 +101,13 @@ const token_to_equipped_function_node = ({token, ...props}: PreviewExpressionPro
 }
 
 const token_to_has_valid_targets_function_node = ({
-                                                token,
-                                                context,
-                                                player_turn_handler
-                                            }: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
+                                                      token,
+                                                      player_turn_handler
+                                                  }: InterpretProps<TokenFunction>): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 1)
 
     const power_name = TOKEN.as_keyword(token.parameters[0]).value
+    const context = player_turn_handler.turn_context.get_current_context()
     const power = context.get_power(power_name)
 
     const first_instruction = power.instructions[0]
@@ -127,63 +122,33 @@ const token_to_has_valid_targets_function_node = ({
     return {
         type: "boolean",
         value: has_valid_targets,
-        description: "has valid targets",
-        params: []
+        description: "has valid targets"
     }
 }
 
-const token_to_not_equals_function_node = ({token, ...props}: PreviewExpressionProps<FunctionToken>): AstNodeBoolean => {
-    assert_parameters_amount_equals(token, 2)
 
-    const parameter1 = token_to_node({token: token.parameters[0], ...props})
-    const parameter2 = token_to_node({token: token.parameters[1], ...props})
-
-    if (parameter1.type === "position" && parameter2.type === "position") {
-        const position1 = parameter1.value
-        const position2 = parameter2.value
-        const are_equal = position1.x === position2.x && position1.y === position2.y
-
-        return {
-            type: "boolean",
-            value: !are_equal,
-            description: "not_equals",
-            params: [parameter1, parameter2]
-        }
-    }
-    throw Error(`not_equals parameters dont match, got ${parameter1.type} and ${parameter2.type}`)
-}
-
-
-const token_to_keyword_node = ({token, context}: PreviewExpressionProps<KeywordToken>): AstNode => {
-    const variable = context.get_variable(token.value)
+const token_to_keyword_node = ({token, player_turn_handler}: InterpretProps<KeywordToken>): AstNode => {
+    const variable_name = token.value
+    const variable = player_turn_handler.turn_context.get_current_context().get_variable(variable_name)
 
     if (variable.type === "position")
-        return {
-            type: "position",
-            value: variable.value,
-            description: token.value
-        }
+        return {type: "position", value: variable.value, description: variable_name}
 
     if (variable.type === "creature") {
         const creature = variable.value
 
         if (token.property) {
-            if (token.property === "position")
-                return {
-                    type: "position",
-                    value: creature.data.position,
-                    description: `${creature.data.name}'s position`
-                }
+            if (token.property === "position") {
+                const value = creature.data.position
+                const description = `${creature.data.name}'s position`
+                return {type: "position", value, description}
+            }
             return {
                 type: "number_resolved",
                 ...preview_creature_property({creature, property: token.property}),
             }
         } else
-            return {
-                type: "creature",
-                value: creature,
-                description: creature.data.name
-            }
+            return {type: "creature", value: creature, description: creature.data.name}
     }
 
     if (variable.type === "resolved_number")
@@ -252,16 +217,16 @@ export const preview_defense = ({defender, defense_code}: {
 const RESOLVED_BASE_10: AstNodeNumberResolved =
     Object.freeze({type: "number_resolved", value: 10, description: "base"})
 
-const token_to_dice_node = ({token}: PreviewExpressionProps<DiceToken>): AstNodeNumberUnresolved =>
+const token_to_dice_node = ({token}: InterpretProps<DiceToken>): AstNodeNumberUnresolved =>
     ({type: "number_unresolved", min: 1, max: token.faces, description: `${token.faces}d${token.faces}`})
 
-const token_to_weapon_node = ({token}: PreviewExpressionProps<WeaponToken>): AstNodeNumberUnresolved =>
+const token_to_weapon_node = ({token}: InterpretProps<WeaponToken>): AstNodeNumberUnresolved =>
     ({type: "number_unresolved", min: 1, max: 4, description: `${token.amount}W`})
 
-const token_to_string_node = ({token}: PreviewExpressionProps<StringToken>): AstNodeString =>
+const token_to_string_node = ({token}: InterpretProps<StringToken>): AstNodeString =>
     ({type: "string", value: token.value, description: token.value})
 
-const token_to_number_node = ({token}: PreviewExpressionProps<NumberToken>): AstNodeNumberResolved =>
+const token_to_number_node = ({token}: InterpretProps<NumberToken>): AstNodeNumberResolved =>
     ({type: "number_resolved", value: token.value, description: "hard number"})
 
 export type AstNode =
@@ -275,12 +240,6 @@ export type AstNode =
 export type AstNodeString = {
     type: "string",
     value: string
-    description: string
-}
-
-export type AstNodePosition = {
-    type: "position",
-    value: Position
     description: string
 }
 
@@ -321,11 +280,6 @@ export type AstNodePositions = {
     params?: Array<AstNode>
 }
 
-const assert_parameters_amount_equals = (token: FunctionToken, amount: number) => {
-    if (token.parameters.length === amount) return
-    throw Error("equipped function needs exactly two parameter")
-}
-
 export const NODE = {
     as_creature: (node: AstNode): AstNodeCreature => {
         if (node.type === "creature") return node
@@ -364,9 +318,3 @@ const TOKEN = {
         throw Error(`Cannot cast token to "string"`)
     }
 }
-
-const are_all_numbers = (values: Array<AstNode>): values is Array<AstNodeNumber> =>
-    values.every(is_number)
-
-const are_all_numbers_unresolved = (values: Array<AstNode>): values is Array<AstNodeNumberResolved> =>
-    values.every(is_number_resolved)

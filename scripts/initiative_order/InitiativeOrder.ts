@@ -1,5 +1,5 @@
 import {Creature} from "battlegrid/creatures/Creature";
-import type {AstNodeNumberResolved} from "expression_parsers/token_to_node";
+import type {AstNodeNumberResolved} from "interpreter/interpret_token";
 import {roll_d} from "randomness/dice";
 import {InitiativeOrderVisual} from "initiative_order/InitiativeOrderVisual";
 

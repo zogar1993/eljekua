@@ -1,5 +1,5 @@
 import {roll_d} from "randomness/dice";
-import {AstNodeNumberResolved, NODE, preview_defense, token_to_node} from "expression_parsers/token_to_node";
+import {AstNodeNumberResolved, NODE, preview_defense, interpret_token} from "interpreter/interpret_token";
 import {AnimationQueue} from "AnimationQueue";
 import {
     Instruction,
@@ -12,7 +12,7 @@ import {
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {Creature} from "battlegrid/creatures/Creature";
 import {ActionLog} from "action_log/ActionLog";
-import {add_numbers_resolved} from "expression_parsers/add_numbers";
+import {add_numbers_resolved} from "interpreter/add_numbers";
 
 export const interpret_attack_roll = ({
                                           instruction,
@@ -30,7 +30,7 @@ export const interpret_attack_roll = ({
 
     defenders.forEach((defender, i) => {
         const attack_parts: Array<AstNodeNumberResolved> = []
-        attack_parts.push(NODE.as_number_resolved(token_to_node({
+        attack_parts.push(NODE.as_number_resolved(interpret_token({
             token: instruction.attack,
             context,
             player_turn_handler

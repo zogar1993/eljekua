@@ -3,7 +3,7 @@ import {is_text_character} from "tokenizer/regexes";
 import {assert} from "assert";
 import {Token, tokenize_any} from "tokenizer/tokens/AnyToken";
 
-export const tokenize_function = (scanner: Scanner): FunctionToken => {
+export const tokenize_function = (scanner: Scanner): TokenFunction => {
     scanner.consume("$")
 
     const name = scanner.get_text_while(is_text_character)
@@ -34,7 +34,7 @@ export const tokenize_function = (scanner: Scanner): FunctionToken => {
 
 const FUNCTION_NAMES = ["add", "exists", "equipped", "greater_or_equals", "and", "not_equals", "has_valid_targets"]
 
-export type FunctionToken = {
+export type TokenFunction = {
     type: "function"
     name: string
     parameters: Array<Token>

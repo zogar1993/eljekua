@@ -2,7 +2,7 @@ import {InstructionOptions} from "tokenizer/transform_power_ir_into_vm_represent
 import {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {NODE, token_to_node} from "expression_parsers/token_to_node";
+import {NODE, interpret_token} from "interpreter/interpret_token";
 
 export const interpret_options = ({
                                       context,
@@ -15,7 +15,7 @@ export const interpret_options = ({
                 on_click: () => {
                     context.add_instructions(instructions)
                 },
-                disabled: condition ? !NODE.as_boolean(token_to_node({
+                disabled: condition ? !NODE.as_boolean(interpret_token({
                     token: condition,
                     context,
                     player_turn_handler

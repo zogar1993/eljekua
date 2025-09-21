@@ -1,4 +1,4 @@
-import {AstNodeNumberResolved, NODE, resolve_number, token_to_node} from "expression_parsers/token_to_node";
+import {AstNodeNumberResolved, NODE, resolve_number, interpret_token} from "interpreter/interpret_token";
 import {InstructionApplyDamage} from "tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
@@ -12,7 +12,7 @@ export const interpret_apply_damage = ({
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
     const target = context.get_creature(instruction.target)
 
-    const damage = NODE.as_number(token_to_node({token: instruction.value, context, player_turn_handler}))
+    const damage = NODE.as_number(interpret_token({token: instruction.value, context, player_turn_handler}))
 
     const resolved = resolve_number(damage)
 
