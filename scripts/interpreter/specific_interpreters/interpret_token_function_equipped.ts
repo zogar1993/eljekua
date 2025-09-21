@@ -3,7 +3,7 @@ import type {TokenFunction} from "tokenizer/tokens/TokenFunction";
 import {assert_parameters_amount_equals} from "interpreter/asserts";
 import {NODE} from "interpreter/NODE";
 import {TOKEN} from "interpreter/TOKEN";
-import {interpret_token_string} from "interpreter/interpret_token_string";
+import {interpret_token_string} from "interpreter/specific_interpreters/interpret_token_string";
 import {interpret_token_keyword} from "interpreter/specific_interpreters/interpret_token_keyword";
 
 export const interpret_token_function_equipped = ({token, ...props}: InterpretProps<TokenFunction>): AstNodeBoolean => {

@@ -22,7 +22,7 @@ import {
 import {TOKEN} from "interpreter/TOKEN";
 import {interpret_token_keyword} from "interpreter/specific_interpreters/interpret_token_keyword";
 import {interpret_token_function_equipped} from "interpreter/specific_interpreters/interpret_token_function_equipped";
-import {interpret_token_string} from "interpreter/interpret_token_string";
+import {interpret_token_string} from "interpreter/specific_interpreters/interpret_token_string";
 
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number
