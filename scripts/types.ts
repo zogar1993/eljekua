@@ -60,7 +60,7 @@ export type IRInstruction =
 } | {
     type: "grant_combat_advantage",
     target: string,
-    to: string,
+    beneficiaries: string,
     duration: "start_of_your_next_turn"
 }
 

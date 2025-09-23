@@ -114,7 +114,7 @@ export type InstructionCleanContextStatus = {
 export type InstructionGrantCombatAdvantage = {
     type: "grant_combat_advantage",
     target: Token,
-    to: Token,
+    beneficiaries: Token,
     duration: "start_of_your_next_turn"
 }
 
@@ -210,7 +210,7 @@ const transform_generic_instruction = (instruction: IRInstruction): Instruction 
             return {
                 type: "grant_combat_advantage",
                 target: tokenize(instruction.target),
-                to: tokenize(instruction.target),
+                beneficiaries: tokenize(instruction.beneficiaries),
                 duration: instruction.duration
             }
         default:

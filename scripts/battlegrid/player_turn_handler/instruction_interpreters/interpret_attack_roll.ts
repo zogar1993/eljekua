@@ -35,7 +35,11 @@ export const interpret_attack_roll = ({
         const attack_parts: Array<AstNodeNumberResolved> = []
         attack_parts.push(NODE.as_number_resolved(evaluate_token({token: instruction.attack, player_turn_handler})))
         attack_parts.push(roll_d(20))
-        if (battle_grid.is_flanking({attacker, defender})) attack_parts.push(COMBAT_ADVANTAGE)
+
+        if (
+            battle_grid.is_flanking({attacker, defender}) ||
+            defender.statuses.some(status => status.type === "grants_combat_advantage" && status.beneficiaries.includes(attacker))
+        ) attack_parts.push(COMBAT_ADVANTAGE)
 
         const attack = add_numbers_resolved(attack_parts)
 

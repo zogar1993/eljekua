@@ -28,10 +28,13 @@ export const evaluate_token_keyword = ({token, player_turn_handler}: InterpretPr
             return {type: "creature", value: creature, description: creature.data.name}
     }
 
+    if (variable.type === "creatures")
+        return {type: "creatures", value: variable.value, description: token.value}
+
     if (variable.type === "resolved_number")
         return variable.value
 
-    throw Error("variable type not supported")
+    throw Error(`variable type '${variable.type}' not supported. Found while evaluating token keyword.`)
 }
 
 

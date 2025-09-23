@@ -5,6 +5,7 @@ import {AnimationQueue} from "AnimationQueue";
 export class Creature {
     visual: CreatureVisual
     data: CreatureData
+    statuses: Array<Status> = []
 
     constructor({data, visual}: { data: CreatureData, visual: CreatureVisual }) {
         this.data = data
@@ -27,4 +28,14 @@ export class Creature {
 
     attribute_mod = (attribute_code: keyof Creature["data"]["attributes"]) =>
         Math.floor((this.data.attributes[attribute_code] - 10) / 2)
+
+    add_status(status: Status) {
+        this.statuses.push(status)
+    }
+}
+
+type Status = {
+    type: "grants_combat_advantage"
+    beneficiaries: Array<Creature>
+    duration: "start_of_your_next_turn"
 }

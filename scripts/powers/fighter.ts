@@ -245,7 +245,7 @@ const brash_strike: Power = {
         {
             type: "grant_combat_advantage",
             target: "owner",
-            to: "primary_target",
+            beneficiaries: "primary_target",
             duration: "start_of_your_next_turn"
         }
     ]
@@ -319,4 +319,4 @@ const tide_of_iron_true = {
     },
 }
 
-export const FIGHTER_POWERS = [sure_strike, cleave, reaping_strike, tide_of_iron].map(transform_power_ir_into_vm_representation)
+export const FIGHTER_POWERS = [sure_strike, cleave, reaping_strike, tide_of_iron, brash_strike].map(transform_power_ir_into_vm_representation)

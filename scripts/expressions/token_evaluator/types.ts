@@ -13,6 +13,7 @@ export type AstNode =
     | AstNodeString
     | AstNodeBoolean
     | AstNodeCreature
+    | AstNodeCreatures
     | AstNodePosition
     | AstNodePositions
 
@@ -42,6 +43,12 @@ export type AstNodeString = {
 export type AstNodeCreature = {
     type: "creature"
     value: Creature
+    description: string
+}
+
+export type AstNodeCreatures = {
+    type: "creatures"
+    value: Array<Creature>
     description: string
 }
 

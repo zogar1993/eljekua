@@ -1,7 +1,7 @@
 import {
     AstNode,
     AstNodeBoolean,
-    AstNodeCreature,
+    AstNodeCreature, AstNodeCreatures,
     AstNodeNumber,
     AstNodeNumberResolved, AstNodePosition,
     AstNodePositions
@@ -10,6 +10,10 @@ import {
 export const NODE = {
     as_creature: (node: AstNode): AstNodeCreature => {
         if (node.type === "creature") return node
+        throw Error(`Cannot cast node to "creature"`)
+    },
+    as_creatures: (node: AstNode): AstNodeCreatures => {
+        if (node.type === "creatures") return node
         throw Error(`Cannot cast node to "creature"`)
     },
     as_number: (node: AstNode): AstNodeNumber => {

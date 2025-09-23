@@ -20,6 +20,9 @@ import {interpret_add_powers} from "battlegrid/player_turn_handler/instruction_i
 import {
     interpret_clean_context_status
 } from "battlegrid/player_turn_handler/instruction_interpreters/interpret_clean_context_status";
+import {
+    interpret_grant_combat_advantage
+} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_grant_combat_advantage";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>) => {
     const {instruction} = props
@@ -66,7 +69,10 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
         case "clean_context_status":
             interpret_clean_context_status({...props, instruction})
             break
+        case "grant_combat_advantage":
+            interpret_grant_combat_advantage({...props, instruction})
+            break
         default:
-            throw Error("action not implemented " + JSON.stringify(instruction))
+            throw Error("instruction not implemented " + JSON.stringify(instruction))
     }
 }
