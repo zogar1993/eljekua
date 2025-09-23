@@ -3,10 +3,10 @@ import type {TokenFunction} from "expressions/tokenizer/tokens/TokenFunction";
 import {assert_parameters_amount_equals} from "expressions/token_evaluator/asserts";
 import {TOKEN} from "expressions/token_evaluator/TOKEN";
 
-export const token_to_has_valid_targets_function_node = ({
-                                                             token,
-                                                             player_turn_handler
-                                                         }: InterpretProps<TokenFunction>): AstNodeBoolean => {
+export const evaluate_token_function_has_valid_targets = ({
+                                                              token,
+                                                              player_turn_handler
+                                                          }: InterpretProps<TokenFunction>): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 1)
 
     const power_name = TOKEN.as_keyword(token.parameters[0]).value

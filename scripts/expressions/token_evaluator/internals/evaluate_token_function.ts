@@ -7,7 +7,7 @@ import {
     evaluate_token_function_not_equals
 } from "expressions/token_evaluator/internals/evaluate_token_function_not_equals";
 import {
-    token_to_has_valid_targets_function_node
+    evaluate_token_function_has_valid_targets
 } from "expressions/token_evaluator/internals/evaluate_token_function_has_valid_targets";
 
 export const evaluate_token_function = ({token, ...props}: InterpretProps<TokenFunction>): AstNode => {
@@ -21,8 +21,8 @@ export const evaluate_token_function = ({token, ...props}: InterpretProps<TokenF
         case "not_equals":
             return evaluate_token_function_not_equals({token, ...props})
         case "has_valid_targets":
-            return token_to_has_valid_targets_function_node({token, ...props})
+            return evaluate_token_function_has_valid_targets({token, ...props})
         default:
-            throw Error(`function name ${token.name} not supported`)
+            throw Error(`function name '${token.name}' not supported when evaluating token`)
     }
 }
