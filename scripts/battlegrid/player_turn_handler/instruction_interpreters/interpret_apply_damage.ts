@@ -14,7 +14,7 @@ export const interpret_apply_damage = ({
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
     const target = context.get_creature(instruction.target)
 
-    const damage = NODE.as_number(evaluate_token({token: instruction.value, context, player_turn_handler}))
+    const damage = NODE.as_number(evaluate_token({token: instruction.value, player_turn_handler}))
 
     const resolved = resolve_number(damage)
 

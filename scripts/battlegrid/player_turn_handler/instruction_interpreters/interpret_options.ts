@@ -18,7 +18,6 @@ export const interpret_options = ({
                 },
                 disabled: condition ? !NODE.as_boolean(evaluate_token({
                     token: condition,
-                    context,
                     player_turn_handler
                 })).value : false
             })

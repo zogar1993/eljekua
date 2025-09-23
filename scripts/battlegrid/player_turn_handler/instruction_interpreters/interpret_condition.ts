@@ -6,6 +6,6 @@ import {
 import {NODE} from "expressions/token_evaluator/NODE";
 
 export const interpret_condition = ({instruction, context, player_turn_handler}: InterpretInstructionProps<InstructionCondition>) => {
-    const condition = NODE.as_boolean(evaluate_token({token: instruction.condition, context, player_turn_handler}))
+    const condition = NODE.as_boolean(evaluate_token({token: instruction.condition, player_turn_handler}))
     context.add_instructions(condition.value ? instruction.instructions_true : instruction.instructions_false)
 }
