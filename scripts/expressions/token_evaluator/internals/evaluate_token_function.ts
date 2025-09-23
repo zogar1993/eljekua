@@ -9,6 +9,7 @@ import {
 import {
     evaluate_token_function_has_valid_targets
 } from "expressions/token_evaluator/internals/evaluate_token_function_has_valid_targets";
+import {evaluate_token_function_or} from "expressions/token_evaluator/internals/evaluate_token_function_or";
 
 export const evaluate_token_function = ({token, ...props}: InterpretProps<TokenFunction>): AstNode => {
     switch (token.name) {
@@ -22,6 +23,8 @@ export const evaluate_token_function = ({token, ...props}: InterpretProps<TokenF
             return evaluate_token_function_not_equals({token, ...props})
         case "has_valid_targets":
             return evaluate_token_function_has_valid_targets({token, ...props})
+        case "or":
+            return evaluate_token_function_or({token, ...props})
         default:
             throw Error(`function name '${token.name}' not supported when evaluating token`)
     }
