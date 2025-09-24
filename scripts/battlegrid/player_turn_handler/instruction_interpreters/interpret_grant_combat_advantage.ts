@@ -1,5 +1,4 @@
 import {
-    InstructionCleanContextStatus,
     InstructionGrantCombatAdvantage
 } from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
@@ -15,5 +14,7 @@ export const interpret_grant_combat_advantage = ({
     const target = NODE.as_creature(evaluate_token({token: instruction.target, player_turn_handler})).value
     const beneficiaries = NODE.as_creatures(evaluate_token({token: instruction.beneficiaries, player_turn_handler})).value
 
-    target.add_status({type: "grants_combat_advantage", beneficiaries, duration: instruction.duration})
+    const owner = player_turn_handler.turn_context.get_current_context().get_creature("owner")
+
+    target.add_status({type: "grants_combat_advantage", beneficiaries, duration: {until: "turn_start", creature: owner}})
 }

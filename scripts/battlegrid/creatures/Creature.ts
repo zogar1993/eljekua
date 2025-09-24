@@ -37,5 +37,8 @@ export class Creature {
 type Status = {
     type: "grants_combat_advantage"
     beneficiaries: Array<Creature>
-    duration: "start_of_your_next_turn"
+    duration: {
+        until: "turn_start",
+        creature: Creature
+    }
 }

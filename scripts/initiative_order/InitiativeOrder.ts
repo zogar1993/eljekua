@@ -6,8 +6,6 @@ import {AstNodeNumberResolved} from "expressions/token_evaluator/types";
 export class InitiativeOrder {
     initiative_order: Array<{ creature: Creature, initiative: AstNodeNumberResolved, visual: HTMLDivElement }> = []
     visual_initiative_order: InitiativeOrderVisual
-    onTurnEndHandlers: Array<() => void> = []
-    onRoundEndHandlers: Array<() => void> = []
 
     private current_index = 0
 
@@ -34,7 +32,6 @@ export class InitiativeOrder {
         else
             this.current_index++
         this.initiative_order[this.current_index].visual.setAttribute("current-turn", "")
-        this.onTurnEndHandlers.forEach(handler => handler())
     }
 
     start = () => {
@@ -44,13 +41,5 @@ export class InitiativeOrder {
         this.initiative_order.forEach(initiative => {
             this.visual_initiative_order.add_creature({visual: initiative.visual})
         })
-    }
-
-    addOnTurnEndEvent = (onTurnEnd: () => void) => {
-        this.onTurnEndHandlers.push(onTurnEnd)
-    }
-
-    addOnRoundEndEvent = (onRoundEnd: () => void) => {
-        this.onRoundEndHandlers.push(onRoundEnd)
     }
 }

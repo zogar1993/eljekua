@@ -53,7 +53,6 @@ export class PlayerTurnHandler {
         this.battle_grid = battle_grid
         this.action_log = action_log
         this.initiative_order = initiative_order
-        this.initiative_order.addOnTurnEndEvent(() => this.turn_context.refresh_opportunity_actions())
     }
 
     set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type" | "owner">) => {
@@ -245,9 +244,17 @@ export class PlayerTurnHandler {
 
             // Reached the end of all instructions
             if (instruction === null) {
+                this.turn_context.refresh_opportunity_actions()
                 this.initiative_order.next_turn()
-                const creature = this.initiative_order.get_current_creature()
-                this.set_creature_as_current_turn(creature)
+                const current_turn_creature = this.initiative_order.get_current_creature()
+
+                this.battle_grid.creatures.forEach(creature => {
+                    creature.statuses = creature.statuses.filter(({duration}) =>
+                        !(duration.until === "turn_start" && duration.creature === current_turn_creature)
+                    )
+                })
+
+                this.set_creature_as_current_turn(current_turn_creature)
                 return
             }
 
