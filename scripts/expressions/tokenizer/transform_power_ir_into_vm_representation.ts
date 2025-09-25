@@ -1,10 +1,13 @@
 import {tokenize} from "expressions/tokenizer/tokenize";
-import {
-    IRInstruction, IRInstructionSelectTarget,
-    Power
+import type {
+    IRInstruction,
+    IRInstructionSelectTarget,
+    Power,
+    StatusDuration
 } from "types";
-import {Token} from "expressions/tokenizer/tokens/AnyToken";
+import type {Token} from "expressions/tokenizer/tokens/AnyToken";
 import {ATTRIBUTE_CODES} from "character_sheet/attributes";
+import type {IRInstructionApplyStatus} from "types";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
@@ -71,7 +74,7 @@ export type InstructionOptions = {
     options: Array<InstructionOptionsItem>,
 }
 
-export type InstructionOptionsItem = { text: string, instructions: Array<Instruction>, condition?: Token}
+export type InstructionOptionsItem = { text: string, instructions: Array<Instruction>, condition?: Token }
 
 export type InstructionSavePosition = {
     type: "save_position",
@@ -111,11 +114,22 @@ export type InstructionCleanContextStatus = {
     type: "clean_context_status"
 }
 
-export type InstructionGrantCombatAdvantage = {
-    type: "grant_combat_advantage",
+export type InstructionApplyStatus = {
+    type: "apply_status",
     target: Token,
-    beneficiaries: Token,
-    duration: "start_of_your_next_turn"
+    duration: StatusDuration
+    status: {
+        type: "grant_combat_advantage",
+        against: Token,
+    } | {
+        type: "gain_resistance"
+        value: Token
+        against: Token,
+    } | {
+        type: "gain_attack_bonus"
+        value: Token
+        against: Token,
+    }
 }
 
 export type Instruction =
@@ -132,7 +146,7 @@ export type Instruction =
     InstructionAddPowers |
     InstructionExecutePower |
     InstructionCleanContextStatus |
-    InstructionGrantCombatAdvantage
+    InstructionApplyStatus
 
 const transform_primary_roll = (roll: Required<Power>["roll"]): InstructionAttackRoll => {
     return {
@@ -206,18 +220,17 @@ const transform_generic_instruction = (instruction: IRInstruction): Instruction 
                 amount: tokenize(instruction.amount),
                 target: instruction.target
             }
-        case "grant_combat_advantage":
+        case "apply_status":
             return {
-                type: "grant_combat_advantage",
+                type: "apply_status",
                 target: tokenize(instruction.target),
-                beneficiaries: tokenize(instruction.beneficiaries),
-                duration: instruction.duration
+                duration: typeof instruction.duration === "string" ? [instruction.duration] : instruction.duration,
+                status: transform_apply_status_ir(instruction)
             }
         default:
             throw Error(`instruction invalid ${JSON.stringify(instruction)}`)
     }
 }
-
 
 export type InstructionSelectTarget =
     InstructionSelectTargetRanged |
@@ -302,5 +315,31 @@ const transform_select_target_ir = (ir: IRInstructionSelectTarget): InstructionS
             exclude: ir.exclude || []
         }
     throw Error(`"${ir.targeting_type}" is not a valid "select_target" targeting_type`)
+}
+
+
+const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApplyStatus["status"] => {
+    const status = ir.status
+
+    switch (status.type) {
+        case "grant_combat_advantage":
+            return {
+                type: "grant_combat_advantage",
+                against: tokenize(status.against),
+            }
+        case "gain_resistance":
+            return {
+                type: "grant_combat_advantage",
+                against: tokenize(status.against),
+            }
+        case "gain_attack_bonus":
+            return {
+                type: "grant_combat_advantage",
+                against: tokenize(status.against),
+            }
+        default:
+            throw Error(`"${ir.status.type}" is not a valid "apply_status" type`)
+    }
+
 }
 

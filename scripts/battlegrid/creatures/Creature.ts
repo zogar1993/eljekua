@@ -1,6 +1,7 @@
 import {CreatureVisual} from "battlegrid/creatures/CreatureVisual";
 import {CreatureData} from "battlegrid/creatures/CreatureData";
 import {AnimationQueue} from "AnimationQueue";
+import type {Status} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_apply_status";
 
 export class Creature {
     visual: CreatureVisual
@@ -34,11 +35,3 @@ export class Creature {
     }
 }
 
-type Status = {
-    type: "grants_combat_advantage"
-    beneficiaries: Array<Creature>
-    duration: {
-        until: "turn_start",
-        creature: Creature
-    }
-}

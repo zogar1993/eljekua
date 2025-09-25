@@ -249,8 +249,9 @@ export class PlayerTurnHandler {
                 const current_turn_creature = this.initiative_order.get_current_creature()
 
                 this.battle_grid.creatures.forEach(creature => {
-                    creature.statuses = creature.statuses.filter(({duration}) =>
-                        !(duration.until === "turn_start" && duration.creature === current_turn_creature)
+                    creature.statuses = creature.statuses.filter(({until: duration}) =>
+                        //exclude the ones that expire on this turn start
+                        !(duration.some(({until, creature}) => until === "turn_start" && creature === current_turn_creature))
                     )
                 })
 

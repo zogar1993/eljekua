@@ -7,8 +7,8 @@ import {interpret_push} from "battlegrid/player_turn_handler/instruction_interpr
 import {interpret_save_position} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_save_position";
 import {interpret_options} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_options";
 import {interpret_condition} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_condition";
-import {Instruction} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
-import {
+import type {Instruction} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
+import type {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {
@@ -21,8 +21,8 @@ import {
     interpret_clean_context_status
 } from "battlegrid/player_turn_handler/instruction_interpreters/interpret_clean_context_status";
 import {
-    interpret_grant_combat_advantage
-} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_grant_combat_advantage";
+    interpret_apply_status
+} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_apply_status";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>) => {
     const {instruction} = props
@@ -69,8 +69,8 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
         case "clean_context_status":
             interpret_clean_context_status({...props, instruction})
             break
-        case "grant_combat_advantage":
-            interpret_grant_combat_advantage({...props, instruction})
+        case "apply_status":
+            interpret_apply_status({...props, instruction})
             break
         default:
             throw Error("instruction not implemented " + JSON.stringify(instruction))

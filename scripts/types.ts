@@ -1,6 +1,7 @@
 export type Power = {
     name: string
     description?: string
+    keywords?: Array<"Invigorating" | "Martial" | "Weapon">
     type: {
         action: "standard" | "movement" | "minor" | "free"
         cooldown: "at-will" | "encounter" | "daily"
@@ -57,12 +58,35 @@ export type IRInstruction =
     type: "save_resolved_number"
     value: string
     label: string
-} | {
-    type: "grant_combat_advantage",
+} | IRInstructionApplyStatus
+
+export type IRInstructionApplyStatus = {
+    type: "apply_status",
     target: string,
-    beneficiaries: string,
-    duration: "start_of_your_next_turn"
+    duration: IRStatusDuration
+    status: {
+        type: "grant_combat_advantage",
+        against: string,
+    } | {
+        type: "gain_resistance"
+        value: number | string
+        against: string,
+    } | {
+        type: "gain_attack_bonus"
+        value: number | string
+        against: string,
+    }
 }
+
+
+enum StatusDurationEnum {
+    "until_start_of_your_next_turn",
+    "until_end_of_your_next_turn",
+    "until_your_next_attack"
+}
+
+type IRStatusDuration = keyof typeof StatusDurationEnum | Array<keyof typeof StatusDurationEnum>
+export type StatusDuration = Array<keyof typeof StatusDurationEnum>
 
 export type IRInstructionSelectTarget =
     { type: "select_target", target_label: string } &

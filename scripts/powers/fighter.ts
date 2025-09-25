@@ -243,12 +243,42 @@ const brash_strike: Power = {
     },
     effect: [
         {
-            type: "grant_combat_advantage",
+            type: "apply_status",
             target: "owner",
-            beneficiaries: "primary_target",
-            duration: "start_of_your_next_turn"
+            duration: "until_start_of_your_next_turn",
+            status: {
+                type: "grant_combat_advantage",
+                against: "primary_target",
+            }
         }
     ]
+}
+
+const crushing_surge: Power = {
+    name: "Crushing Surge",
+    description: "The feel of your weapon crunching against the enemy puts your heart back in the fight.",
+    keywords: ["Invigorating", "Martial", "Weapon"],
+    type: {
+        action: "standard",
+        cooldown: "at-will",
+        attack: true,
+    },
+    targeting: {
+        targeting_type: "melee_weapon",
+        target_type: "creature",
+        amount: 1
+    },
+    roll: {
+        attack: "str",
+        defense: "ac",
+        hit: [
+            {
+                type: "apply_damage",
+                value: "$add({1W},owner.str_mod)",
+                target: "primary_target"
+            },
+        ],
+    },
 }
 
 const tide_of_iron_true = {
@@ -319,4 +349,4 @@ const tide_of_iron_true = {
     },
 }
 
-export const FIGHTER_POWERS = [sure_strike, cleave, reaping_strike, tide_of_iron, brash_strike].map(transform_power_ir_into_vm_representation)
+export const FIGHTER_POWERS = [sure_strike, cleave, reaping_strike, tide_of_iron, brash_strike, crushing_surge].map(transform_power_ir_into_vm_representation)

@@ -1,7 +1,7 @@
 import {roll_d} from "randomness/dice";
-import {Token} from "expressions/tokenizer/tokens/AnyToken";
+import type {Token} from "expressions/tokenizer/tokens/AnyToken";
 import {is_number, is_number_resolved} from "expressions/token_evaluator/add_numbers";
-import {AstNode, AstNodeNumber, AstNodeNumberResolved, InterpretProps} from "expressions/token_evaluator/types";
+import type {AstNode, AstNodeNumber, AstNodeNumberResolved, InterpretProps} from "expressions/token_evaluator/types";
 import {evaluate_token_keyword} from "expressions/token_evaluator/internals/evaluate_token_keyword";
 import {evaluate_token_string} from "expressions/token_evaluator/internals/evaluate_token_string";
 import {evaluate_token_number} from "expressions/token_evaluator/internals/evaluate_token_number";

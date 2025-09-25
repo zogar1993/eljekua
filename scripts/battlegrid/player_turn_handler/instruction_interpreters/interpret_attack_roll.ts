@@ -38,7 +38,7 @@ export const interpret_attack_roll = ({
 
         if (
             battle_grid.is_flanking({attacker, defender}) ||
-            defender.statuses.some(status => status.type === "grants_combat_advantage" && status.beneficiaries.includes(attacker))
+            defender.statuses.some(({effect}) => effect.type === "grant_combat_advantage" && effect.against.includes(attacker))
         ) attack_parts.push(COMBAT_ADVANTAGE)
 
         const attack = add_numbers_resolved(attack_parts)
