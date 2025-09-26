@@ -245,17 +245,34 @@ export class PlayerTurnHandler {
             // Reached the end of all instructions
             if (instruction === null) {
                 this.turn_context.refresh_opportunity_actions()
-                this.initiative_order.next_turn()
-                const current_turn_creature = this.initiative_order.get_current_creature()
+                const ending_turn_creature = this.initiative_order.get_current_creature()
 
                 this.battle_grid.creatures.forEach(creature => {
+                    //exclude the ones that expire on this turn end
                     creature.statuses = creature.statuses.filter(({until: duration}) =>
-                        //exclude the ones that expire on this turn start
-                        !(duration.some(({until, creature}) => until === "turn_start" && creature === current_turn_creature))
+                        !(duration.some(({until, creature, bypass_this_turn}) =>
+                            until === "turn_end" && !bypass_this_turn && creature === ending_turn_creature))
+                    )
+
+                    // this is so that "end of next turn" durations exclude current turn, but are removed next turn
+                    for (const status of creature.statuses)
+                        for (const duration of status.until)
+                            if (duration.until === "turn_end" && creature === ending_turn_creature)
+                                duration.bypass_this_turn = false
+                })
+
+                this.initiative_order.next_turn()
+                const initiating_turn_creature = this.initiative_order.get_current_creature()
+
+                this.battle_grid.creatures.forEach(creature => {
+                    //exclude the ones that expire on this turn start
+                    creature.statuses = creature.statuses.filter(({until: duration}) =>
+                        !(duration.some(({until, creature}) =>
+                            until === "turn_start" && creature === initiating_turn_creature))
                     )
                 })
 
-                this.set_creature_as_current_turn(current_turn_creature)
+                this.set_creature_as_current_turn(initiating_turn_creature)
                 return
             }
 
@@ -280,7 +297,6 @@ export class PlayerTurnHandler {
     clear_indicator_to_positions = ({positions}: {
         positions: Array<Position>
     }) => positions.map(this.battle_grid.get_square).forEach(({visual}) => visual.clearIndicator())
-
 }
 
 const get_target_creatures_from_selection = (selection: PlayerTurnHandlerContextSelectPosition) =>

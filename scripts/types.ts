@@ -84,9 +84,9 @@ enum StatusDurationEnum {
     "until_end_of_your_next_turn",
     "until_your_next_attack"
 }
+export type StatusDurationValue = keyof typeof StatusDurationEnum
 
-type IRStatusDuration = keyof typeof StatusDurationEnum | Array<keyof typeof StatusDurationEnum>
-export type StatusDuration = Array<keyof typeof StatusDurationEnum>
+type IRStatusDuration = StatusDurationValue | Array<StatusDurationValue>
 
 export type IRInstructionSelectTarget =
     { type: "select_target", target_label: string } &

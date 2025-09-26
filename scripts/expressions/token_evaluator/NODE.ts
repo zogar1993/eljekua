@@ -12,10 +12,6 @@ export const NODE = {
         if (node.type === "creature") return node
         throw Error(`Cannot cast node to "creature"`)
     },
-    as_creatures: (node: AstNode): AstNodeCreatures => {
-        if (node.type === "creatures") return node
-        throw Error(`Cannot cast node to "creature"`)
-    },
     as_number: (node: AstNode): AstNodeNumber => {
         if (node.type === "number_resolved") return node
         if (node.type === "number_unresolved") return node

@@ -1,4 +1,9 @@
-import {AstNode, AstNodeNumber, AstNodeNumberResolved, AstNodeNumberUnresolved} from "expressions/token_evaluator/types";
+import {
+    AstNode,
+    AstNodeNumber,
+    AstNodeNumberResolved,
+    AstNodeNumberUnresolved
+} from "expressions/token_evaluator/types";
 
 export const add_numbers_resolved = (numbers: Array<AstNodeNumberResolved>): AstNodeNumberResolved => ({
     type: "number_resolved",
@@ -6,6 +11,16 @@ export const add_numbers_resolved = (numbers: Array<AstNodeNumberResolved>): Ast
     params: numbers,
     description: "+"
 })
+
+export const subtract_numbers_resolved = (a: AstNodeNumberResolved, b: AstNodeNumberResolved): AstNodeNumberResolved => ({
+    type: "number_resolved",
+    value: a.value - b.value,
+    params: [a, b],
+    description: "-"
+})
+
+export const max_number_resolved = (numbers: Array<AstNodeNumberResolved>): AstNodeNumberResolved =>
+    numbers.reduce((previous, current) => previous.value > current.value ? previous : current)
 
 export const add_numbers = (numbers: Array<AstNodeNumber>): AstNodeNumberUnresolved => ({
     type: "number_unresolved",

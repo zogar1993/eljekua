@@ -1,7 +1,7 @@
 import {CreatureVisual} from "battlegrid/creatures/CreatureVisual";
 import {CreatureData} from "battlegrid/creatures/CreatureData";
 import {AnimationQueue} from "AnimationQueue";
-import type {Status} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_apply_status";
+import type {AstNodeNumberResolved} from "expressions/token_evaluator/types";
 
 export class Creature {
     visual: CreatureVisual
@@ -35,3 +35,32 @@ export class Creature {
     }
 }
 
+export type Status = { until: Array<StatusDuration> } & { effect: StatusEffect }
+
+export type StatusDuration = {
+    until: "turn_start" | "turn_end" | "next_attack",
+    creature: Creature
+    bypass_this_turn?: boolean
+}
+
+export type StatusEffect =
+    StatusEffectGrantCombatAdvantage |
+    StatusEffectGainResistance |
+    StatusEffectGainAttackBonus
+
+export type StatusEffectGrantCombatAdvantage = {
+    type: "grant_combat_advantage",
+    against: Array<Creature>,
+}
+
+export type StatusEffectGainResistance = {
+    type: "gain_resistance"
+    value: AstNodeNumberResolved
+    against: Array<Creature>,
+}
+
+export type StatusEffectGainAttackBonus = {
+    type: "gain_attack_bonus"
+    value: AstNodeNumberResolved
+    against: Array<Creature>,
+}

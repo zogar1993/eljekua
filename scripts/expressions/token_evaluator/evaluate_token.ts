@@ -8,6 +8,7 @@ import {evaluate_token_number} from "expressions/token_evaluator/internals/evalu
 import {evaluate_token_weapon} from "expressions/token_evaluator/internals/evaluate_token_weapon";
 import {evaluate_token_dice} from "expressions/token_evaluator/internals/evaluate_token_dice";
 import {evaluate_token_function} from "expressions/token_evaluator/internals/evaluate_token_function";
+import {Creature} from "battlegrid/creatures/Creature";
 
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number
@@ -41,4 +42,11 @@ export const evaluate_token = ({token, ...props}: InterpretProps<Token>): AstNod
         case "keyword":
             return evaluate_token_keyword({token, ...props})
     }
+}
+
+export const evaluate_token_to_creatures = (props: InterpretProps<Token>): Array<Creature> => {
+    const node = evaluate_token(props)
+    if (node.type === "creatures") return node.value
+    if (node.type === "creature") return [node.value]
+    throw `token '${JSON.stringify(props.token)}' did not evaluate to creatures, evaluated to '${JSON.stringify(node)}' instead`
 }

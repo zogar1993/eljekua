@@ -3,7 +3,7 @@ import type {
     IRInstruction,
     IRInstructionSelectTarget,
     Power,
-    StatusDuration
+    StatusDurationValue
 } from "types";
 import type {Token} from "expressions/tokenizer/tokens/AnyToken";
 import {ATTRIBUTE_CODES} from "character_sheet/attributes";
@@ -117,7 +117,7 @@ export type InstructionCleanContextStatus = {
 export type InstructionApplyStatus = {
     type: "apply_status",
     target: Token,
-    duration: StatusDuration
+    duration: Array<StatusDurationValue>
     status: {
         type: "grant_combat_advantage",
         against: Token,
@@ -329,13 +329,15 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
             }
         case "gain_resistance":
             return {
-                type: "grant_combat_advantage",
+                type: "gain_resistance",
                 against: tokenize(status.against),
+                value: tokenize(status.value)
             }
         case "gain_attack_bonus":
             return {
-                type: "grant_combat_advantage",
+                type: "gain_attack_bonus",
                 against: tokenize(status.against),
+                value: tokenize(status.value)
             }
         default:
             throw Error(`"${ir.status.type}" is not a valid "apply_status" type`)
