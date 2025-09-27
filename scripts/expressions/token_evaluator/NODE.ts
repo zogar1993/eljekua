@@ -1,16 +1,22 @@
 import {
     AstNode,
     AstNodeBoolean,
-    AstNodeCreature, AstNodeCreatures,
+    AstNodeCreature,
     AstNodeNumber,
     AstNodeNumberResolved, AstNodePosition,
-    AstNodePositions
+    AstNodePositions, AstNodeString
 } from "expressions/token_evaluator/types";
+import {Creature} from "battlegrid/creatures/Creature";
 
 export const NODE = {
     as_creature: (node: AstNode): AstNodeCreature => {
         if (node.type === "creature") return node
         throw Error(`Cannot cast node to "creature"`)
+    },
+    as_creatures: (node: AstNode): Array<Creature> => {
+        if (node.type === "creature") return [node.value]
+        if (node.type === "creatures") return node.value
+        throw Error(`Cannot cast node to "creatures"`)
     },
     as_number: (node: AstNode): AstNodeNumber => {
         if (node.type === "number_resolved") return node
@@ -32,5 +38,9 @@ export const NODE = {
     as_positions: (node: AstNode): AstNodePositions => {
         if (node.type === "positions") return node
         throw Error(`Cannot cast node to "positions"`)
+    },
+    as_string: (node: AstNode): AstNodeString => {
+        if (node.type === "string") return node
+        throw Error(`Cannot cast node to "string"`)
     }
 }

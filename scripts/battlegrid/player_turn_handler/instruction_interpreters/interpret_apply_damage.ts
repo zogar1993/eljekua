@@ -1,4 +1,4 @@
-import {resolve_number, evaluate_token} from "expressions/token_evaluator/evaluate_token";
+import {resolve_number} from "expressions/token_evaluator/evaluate_token";
 import {InstructionApplyDamage} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
@@ -12,12 +12,13 @@ export const interpret_apply_damage = ({
                                            instruction,
                                            context,
                                            action_log,
-                                           player_turn_handler
+                                           player_turn_handler,
+                                           evaluate_token
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
     const attacker = player_turn_handler.turn_context.get_current_context().owner()
     const target = context.get_creature(instruction.target)
 
-    const damage = NODE.as_number(evaluate_token({token: instruction.value, player_turn_handler}))
+    const damage = NODE.as_number(evaluate_token(instruction.value))
 
     let result = resolve_number(damage)
 

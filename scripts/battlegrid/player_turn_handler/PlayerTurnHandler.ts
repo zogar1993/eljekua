@@ -1,7 +1,7 @@
 import {BattleGrid} from "battlegrid/BattleGrid";
 import {OnPositionEvent, Position, positions_equal} from "battlegrid/Position";
 import {ActionLog} from "action_log/ActionLog";
-import {evaluate_token} from "expressions/token_evaluator/evaluate_token";
+import {build_evaluate_token} from "expressions/token_evaluator/evaluate_token";
 import {Creature} from "battlegrid/creatures/Creature";
 import {Instruction, InstructionSelectTarget} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext, VariableType} from "battlegrid/player_turn_handler/PowerContext";
@@ -14,7 +14,7 @@ import {ButtonOption} from "battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "initiative_order/InitiativeOrder";
 import {CreatureData} from "battlegrid/creatures/CreatureData";
 import {NODE} from "expressions/token_evaluator/NODE";
-import {preview_defense} from "expressions/token_evaluator/internals/evaluate_token_keyword";
+import {preview_defense} from "expressions/token_evaluator/internals/keyword/evaluate_keyword";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -41,6 +41,7 @@ export class PlayerTurnHandler {
     private readonly battle_grid: BattleGrid
     turn_context = new TurnContext()
     initiative_order: InitiativeOrder
+    evaluate_token = build_evaluate_token({player_turn_handler: this})
     started = false
 
     selection_context: PlayerTurnHandlerContextSelect | null = null
@@ -129,10 +130,7 @@ export class PlayerTurnHandler {
                 get_target_creatures_from_selection(this.selection_context).forEach(defender => {
 
                     const attacker = next_instruction.attack
-                    const attack = NODE.as_number_resolved(evaluate_token({
-                        token: attacker,
-                        player_turn_handler: this
-                    })).value
+                    const attack = NODE.as_number_resolved(this.evaluate_token(attacker)).value
 
                     const defense = preview_defense({defender, defense_code: next_instruction.defense}).value
 
@@ -178,17 +176,14 @@ export class PlayerTurnHandler {
         context: PowerContext
     }) {
         if (targeting.targeting_type === "movement") {
-            const distance = NODE.as_number_resolved(evaluate_token({
-                token: targeting.distance,
-                player_turn_handler: this
-            }))
+            const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance))
             return get_move_area({origin, distance: distance.value, battle_grid: this.battle_grid})
         } else if (targeting.targeting_type === "melee_weapon") {
             return this.battle_grid.get_melee({origin})
         } else if (targeting.targeting_type === "adjacent") {
             return get_adjacent({position: origin, battle_grid: this.battle_grid})
         } else if (targeting.targeting_type === "ranged" || targeting.targeting_type === "area_burst") {
-            const distance = evaluate_token({token: targeting.distance, player_turn_handler: this})
+            const distance = this.evaluate_token(targeting.distance)
 
             if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
             return this.battle_grid.get_in_range({origin, distance: distance.value})
@@ -209,10 +204,8 @@ export class PlayerTurnHandler {
         if (instruction.targeting_type === "movement") {
             const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
             if (instruction.destination_requirement) {
-                const node = evaluate_token({
-                    token: instruction.destination_requirement,
-                    player_turn_handler: this
-                })
+                //TODO move targeting and these evaluate token functions outside of the player turn handler
+                const node = this.evaluate_token(instruction.destination_requirement)
                 const possibility = NODE.as_position(node)
                 //TODO this needs to change how it works when we add big fellows
                 return valid_targets.filter(position => positions_equal(position, possibility.value))
@@ -280,7 +273,8 @@ export class PlayerTurnHandler {
                 player_turn_handler: this,
                 battle_grid: this.battle_grid,
                 action_log: this.action_log,
-                turn_context: this.turn_context
+                turn_context: this.turn_context,
+                evaluate_token: this.evaluate_token
             })
         }
     }

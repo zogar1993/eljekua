@@ -1,12 +1,5 @@
-import type {Token} from "expressions/tokenizer/tokens/AnyToken";
-import type {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 import type {Creature} from "battlegrid/creatures/Creature";
 import type {Position} from "battlegrid/Position";
-
-export type InterpretProps<T extends Token> = {
-    token: T,
-    player_turn_handler: PlayerTurnHandler
-}
 
 export type AstNode =
     AstNodeNumber

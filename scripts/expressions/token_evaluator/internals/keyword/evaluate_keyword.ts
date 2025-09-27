@@ -1,40 +1,43 @@
-import type {AstNode, InterpretProps} from "expressions/token_evaluator/types";
+import type {AstNode} from "expressions/token_evaluator/types";
 import type {KeywordToken} from "expressions/tokenizer/tokens/KeywordToken";
 import {ATTRIBUTE_CODES} from "character_sheet/attributes";
 import type {Creature} from "battlegrid/creatures/Creature";
 import type {AstNodeNumberResolved} from "expressions/token_evaluator/types";
+import type {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 
-export const evaluate_token_keyword = ({token, player_turn_handler}: InterpretProps<KeywordToken>): AstNode => {
-    const variable_name = token.value
-    const variable = player_turn_handler.turn_context.get_current_context().get_variable(variable_name)
+export const build_evaluate_token_keyword = ({turn_context}: { turn_context: TurnContext }) => {
+    return (token: KeywordToken): AstNode => {
+        const variable_name = token.value
+        const variable = turn_context.get_current_context().get_variable(variable_name)
 
-    if (variable.type === "position")
-        return {type: "position", value: variable.value, description: variable_name}
+        if (variable.type === "position")
+            return {type: "position", value: variable.value, description: variable_name}
 
-    if (variable.type === "creature") {
-        const creature = variable.value
+        if (variable.type === "creature") {
+            const creature = variable.value
 
-        if (token.property) {
-            if (token.property === "position") {
-                const value = creature.data.position
-                const description = `${creature.data.name}'s position`
-                return {type: "position", value, description}
-            }
-            return {
-                type: "number_resolved",
-                ...preview_creature_property({creature, property: token.property}),
-            }
-        } else
-            return {type: "creature", value: creature, description: creature.data.name}
+            if (token.property) {
+                if (token.property === "position") {
+                    const value = creature.data.position
+                    const description = `${creature.data.name}'s position`
+                    return {type: "position", value, description}
+                }
+                return {
+                    type: "number_resolved",
+                    ...preview_creature_property({creature, property: token.property}),
+                }
+            } else
+                return {type: "creature", value: creature, description: creature.data.name}
+        }
+
+        if (variable.type === "creatures")
+            return {type: "creatures", value: variable.value, description: token.value}
+
+        if (variable.type === "resolved_number")
+            return variable.value
+
+        throw Error(`variable type '${variable.type}' not supported. Found while evaluating token keyword.`)
     }
-
-    if (variable.type === "creatures")
-        return {type: "creatures", value: variable.value, description: token.value}
-
-    if (variable.type === "resolved_number")
-        return variable.value
-
-    throw Error(`variable type '${variable.type}' not supported. Found while evaluating token keyword.`)
 }
 
 

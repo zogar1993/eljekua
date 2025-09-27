@@ -1,5 +1,4 @@
 import {roll_d} from "randomness/dice";
-import {evaluate_token} from "expressions/token_evaluator/evaluate_token";
 import {AnimationQueue} from "AnimationQueue";
 import {
     Instruction,
@@ -15,14 +14,14 @@ import {ActionLog} from "action_log/ActionLog";
 import {add_numbers_resolved} from "expressions/token_evaluator/add_numbers";
 import {NODE} from "expressions/token_evaluator/NODE";
 import {AstNodeNumberResolved} from "expressions/token_evaluator/types";
-import {preview_defense} from "expressions/token_evaluator/internals/evaluate_token_keyword";
+import {preview_defense} from "expressions/token_evaluator/internals/keyword/evaluate_keyword";
 
 export const interpret_attack_roll = ({
                                           instruction,
                                           context,
                                           action_log,
-                                          player_turn_handler,
-                                          battle_grid
+                                          battle_grid,
+                                          evaluate_token
                                       }: InterpretInstructionProps<InstructionAttackRoll>) => {
     const attacker = context.owner()
     const defenders = context.get_creatures(instruction.defender)
@@ -33,7 +32,7 @@ export const interpret_attack_roll = ({
 
     defenders.forEach((defender, i) => {
         const attack_parts: Array<AstNodeNumberResolved> = []
-        attack_parts.push(NODE.as_number_resolved(evaluate_token({token: instruction.attack, player_turn_handler})))
+        attack_parts.push(NODE.as_number_resolved(evaluate_token(instruction.attack)))
         attack_parts.push(roll_d(20))
 
         for (const {effect} of attacker.statuses)

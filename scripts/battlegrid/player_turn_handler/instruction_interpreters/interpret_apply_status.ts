@@ -4,20 +4,22 @@ import type {
 import type {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {evaluate_token, evaluate_token_to_creatures} from "expressions/token_evaluator/evaluate_token";
 import {NODE} from "expressions/token_evaluator/NODE";
 import type {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 import type {StatusDuration, StatusEffect} from "battlegrid/creatures/Creature";
+import {Token} from "expressions/tokenizer/tokens/AnyToken";
+import {AstNode} from "expressions/token_evaluator/types";
 
 export const interpret_apply_status = ({
                                            instruction,
-                                           player_turn_handler
+                                           player_turn_handler,
+                                           evaluate_token,
                                        }: InterpretInstructionProps<InstructionApplyStatus>) => {
-    const target = NODE.as_creature(evaluate_token({token: instruction.target, player_turn_handler})).value
+    const target = NODE.as_creature(evaluate_token(instruction.target)).value
     const durations = interpret_duration({duration: instruction.duration, player_turn_handler})
 
     target.add_status({
-        effect: interpret_status({status: instruction.status, player_turn_handler}),
+        effect: interpret_status({status: instruction.status, evaluate_token}),
         durations
     })
 }
@@ -54,26 +56,29 @@ const interpret_duration = (
 }
 
 const interpret_status = (
-    {status, player_turn_handler}:
-        { status: InstructionApplyStatus["status"], player_turn_handler: PlayerTurnHandler }
+    {status, evaluate_token}:
+        {
+            status: InstructionApplyStatus["status"],
+            evaluate_token: (token: Token) => AstNode
+        }
 ): StatusEffect => {
     switch (status.type) {
         case "grant_combat_advantage":
             return {
                 type: "grant_combat_advantage",
-                against: evaluate_token_to_creatures({token: status.against, player_turn_handler})
+                against: NODE.as_creatures(evaluate_token(status.against))
             }
         case "gain_attack_bonus":
             return {
                 type: "gain_attack_bonus",
-                against: evaluate_token_to_creatures({token: status.against, player_turn_handler}),
-                value: NODE.as_number_resolved(evaluate_token({token: status.value, player_turn_handler}))
+                against: NODE.as_creatures(evaluate_token( status.against)),
+                value: NODE.as_number_resolved(evaluate_token(status.value))
             }
         case "gain_resistance":
             return {
                 type: "gain_resistance",
-                against: evaluate_token_to_creatures({token: status.against, player_turn_handler}),
-                value: NODE.as_number_resolved(evaluate_token({token: status.value, player_turn_handler}))
+                against: NODE.as_creatures(evaluate_token(status.against)),
+                value: NODE.as_number_resolved(evaluate_token(status.value))
             }
         default:
             throw Error(`could not interpret status '${JSON.stringify(status)}'`)

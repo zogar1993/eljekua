@@ -2,13 +2,13 @@ import {InstructionOptions} from "expressions/tokenizer/transform_power_ir_into_
 import {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {evaluate_token} from "expressions/token_evaluator/evaluate_token";
 import {NODE} from "expressions/token_evaluator/NODE";
 
 export const interpret_options = ({
                                       context,
                                       instruction,
-                                      player_turn_handler
+                                      player_turn_handler,
+                                      evaluate_token
                                   }: InterpretInstructionProps<InstructionOptions>) => {
     player_turn_handler.set_awaiting_option_selection({
         available_options: instruction.options.map(({text, condition, instructions}) => ({
@@ -16,10 +16,7 @@ export const interpret_options = ({
                 on_click: () => {
                     context.add_instructions(instructions)
                 },
-                disabled: condition ? !NODE.as_boolean(evaluate_token({
-                    token: condition,
-                    player_turn_handler
-                })).value : false
+                disabled: condition ? !NODE.as_boolean(evaluate_token(condition)).value : false
             })
         )
     })
