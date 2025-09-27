@@ -29,7 +29,7 @@ export const power_shield_faint: Power = {
             {
                 type: "apply_status",
                 target: "owner",
-                duration: ["until_end_of_your_next_turn", "until_your_next_attack"],
+                duration: ["until_end_of_your_next_turn", "until_your_next_attack_roll_against_target"],
                 status: {
                     type: "gain_attack_bonus",
                     value: 3,

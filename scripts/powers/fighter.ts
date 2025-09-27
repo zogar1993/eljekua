@@ -3,6 +3,7 @@ import {
     transform_power_ir_into_vm_representation
 } from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {power_resolute_shield} from "powers/fighter/resolute_shield";
+import {power_shield_faint} from "powers/fighter/shield_faint";
 
 const sure_strike: Power = {
     name: "Sure Strike",
@@ -357,5 +358,6 @@ export const FIGHTER_POWERS = [
     tide_of_iron,
     brash_strike,
     crushing_surge,
-    power_resolute_shield
+    power_resolute_shield,
+    power_shield_faint
 ].map(transform_power_ir_into_vm_representation)

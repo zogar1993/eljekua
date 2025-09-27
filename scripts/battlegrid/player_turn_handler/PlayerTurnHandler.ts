@@ -249,14 +249,12 @@ export class PlayerTurnHandler {
 
                 this.battle_grid.creatures.forEach(creature => {
                     //exclude the ones that expire on this turn end
-                    creature.statuses = creature.statuses.filter(({until: duration}) =>
-                        !(duration.some(({until, creature, bypass_this_turn}) =>
-                            until === "turn_end" && !bypass_this_turn && creature === ending_turn_creature))
-                    )
+                    creature.remove_statuses(({until, creature, bypass_this_turn}) =>
+                        until === "turn_end" && !bypass_this_turn && creature === ending_turn_creature)
 
                     // this is so that "end of next turn" durations exclude current turn, but are removed next turn
                     for (const status of creature.statuses)
-                        for (const duration of status.until)
+                        for (const duration of status.durations)
                             if (duration.until === "turn_end" && creature === ending_turn_creature)
                                 duration.bypass_this_turn = false
                 })
@@ -266,10 +264,8 @@ export class PlayerTurnHandler {
 
                 this.battle_grid.creatures.forEach(creature => {
                     //exclude the ones that expire on this turn start
-                    creature.statuses = creature.statuses.filter(({until: duration}) =>
-                        !(duration.some(({until, creature}) =>
-                            until === "turn_start" && creature === initiating_turn_creature))
-                    )
+                    creature.remove_statuses(({until, creature}) =>
+                        until === "turn_start" && creature === initiating_turn_creature)
                 })
 
                 this.set_creature_as_current_turn(initiating_turn_creature)

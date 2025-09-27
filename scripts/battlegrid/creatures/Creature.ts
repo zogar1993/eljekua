@@ -33,12 +33,16 @@ export class Creature {
     add_status(status: Status) {
         this.statuses.push(status)
     }
+
+    remove_statuses = (func: (duration: StatusDuration) => boolean) => {
+        this.statuses = this.statuses.filter(({durations}) => !(durations.some(func)))
+    }
 }
 
-export type Status = { until: Array<StatusDuration> } & { effect: StatusEffect }
+export type Status = { durations: Array<StatusDuration> } & { effect: StatusEffect }
 
 export type StatusDuration = {
-    until: "turn_start" | "turn_end" | "next_attack",
+    until: "turn_start" | "turn_end" | "next_attack_roll_against_target",
     creature: Creature
     bypass_this_turn?: boolean
 }

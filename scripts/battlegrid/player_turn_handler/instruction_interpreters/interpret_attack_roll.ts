@@ -36,6 +36,12 @@ export const interpret_attack_roll = ({
         attack_parts.push(NODE.as_number_resolved(evaluate_token({token: instruction.attack, player_turn_handler})))
         attack_parts.push(roll_d(20))
 
+        for (const {effect} of attacker.statuses)
+            if (effect.type === "gain_attack_bonus" && effect.against.includes(defender))
+                attack_parts.push(effect.value)
+
+        attacker.remove_statuses(({until, creature}) => until === "next_attack_roll_against_target" && creature === defender)
+
         if (
             battle_grid.is_flanking({attacker, defender}) ||
             defender.statuses.some(({effect}) => effect.type === "grant_combat_advantage" && effect.against.includes(attacker))
