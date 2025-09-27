@@ -1,15 +1,22 @@
 import {roll_d} from "randomness/dice";
 import type {Token} from "expressions/tokenizer/tokens/AnyToken";
 import {is_number, is_number_resolved} from "expressions/token_evaluator/add_numbers";
-import type {AstNode, AstNodeNumber, AstNodeNumberResolved, InterpretProps} from "expressions/token_evaluator/types";
-import {evaluate_token_keyword} from "expressions/token_evaluator/internals/evaluate_token_keyword";
-import {evaluate_token_string} from "expressions/token_evaluator/internals/evaluate_token_string";
-import {evaluate_token_number} from "expressions/token_evaluator/internals/evaluate_token_number";
-import {evaluate_token_weapon} from "expressions/token_evaluator/internals/evaluate_token_weapon";
-import {evaluate_token_dice} from "expressions/token_evaluator/internals/evaluate_token_dice";
-import {evaluate_token_function} from "expressions/token_evaluator/internals/evaluate_token_function";
-import {Creature} from "battlegrid/creatures/Creature";
+import type {AstNode, AstNodeNumber, AstNodeNumberResolved} from "expressions/token_evaluator/types";
+import {build_evaluate_token_keyword} from "expressions/token_evaluator/internals/keyword/evaluate_keyword";
+import {evaluate_string} from "expressions/token_evaluator/internals/evaluate_string";
+import {evaluate_number} from "expressions/token_evaluator/internals/evaluate_number";
+import {evaluate_weapon} from "expressions/token_evaluator/internals/evaluate_weapon";
+import {evaluate_dice} from "expressions/token_evaluator/internals/evaluate_dice";
+import {build_evaluate_token_function,} from "expressions/token_evaluator/internals/function/evaluate_function";
+import type {Creature} from "battlegrid/creatures/Creature";
+import type {NumberToken} from "expressions/tokenizer/tokens/NumberToken";
+import type {StringToken} from "expressions/tokenizer/tokens/StringToken";
+import type {DiceToken, WeaponToken} from "expressions/tokenizer/tokens/RollToken";
+import type {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
+import type {KeywordToken} from "expressions/tokenizer/tokens/KeywordToken";
+import type {TokenFunction} from "expressions/tokenizer/tokens/TokenFunction";
 
+//TODO move elsewhere
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number
     if (number.params === undefined)
@@ -27,26 +34,49 @@ export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => 
     This is called "evaluate" instead on "interpret" to distinguish the expressions that evaluate to a value from the
     interpreting of instructions that affect the game context.
  */
-export const evaluate_token = ({token, ...props}: InterpretProps<Token>): AstNode => {
-    switch (token.type) {
-        case "function":
-            return evaluate_token_function({token, ...props})
-        case "number":
-            return evaluate_token_number({token, ...props})
-        case "string":
-            return evaluate_token_string({token, ...props})
-        case "weapon":
-            return evaluate_token_weapon({token, ...props})
-        case "dice":
-            return evaluate_token_dice({token, ...props})
-        case "keyword":
-            return evaluate_token_keyword({token, ...props})
-    }
+export const evaluate_token = ({token, player_turn_handler}: {
+    token: Token,
+    player_turn_handler: PlayerTurnHandler
+}): AstNode => {
+    const evaluator = create_token_evaluator({player_turn_handler})
+    return evaluator(token)
 }
 
-export const evaluate_token_to_creatures = (props: InterpretProps<Token>): Array<Creature> => {
-    const node = evaluate_token(props)
+export const evaluate_token_to_creatures = ({token, player_turn_handler}: {
+    token: Token,
+    player_turn_handler: PlayerTurnHandler
+}): Array<Creature> => {
+    const node = evaluate_token({token, player_turn_handler})
     if (node.type === "creatures") return node.value
     if (node.type === "creature") return [node.value]
-    throw `token '${JSON.stringify(props.token)}' did not evaluate to creatures, evaluated to '${JSON.stringify(node)}' instead`
+    throw `token '${JSON.stringify(token)}' did not evaluate to creatures, evaluated to '${JSON.stringify(node)}' instead`
+}
+
+const create_token_evaluator = ({player_turn_handler}: { player_turn_handler: PlayerTurnHandler }) => {
+    const turn_context = player_turn_handler.turn_context
+    const token_evaluator_internals: Record<Token["type"], (token: Token) => AstNode> = {
+        "number": (token) => evaluate_number(token as NumberToken),
+        "string": (token) => evaluate_string(token as StringToken),
+        "weapon": (token) => evaluate_weapon(token as WeaponToken),
+        "dice": (token) => evaluate_dice(token as DiceToken),
+        "keyword": (token) => {
+            const evaluate_token_keyword = build_evaluate_token_keyword({turn_context})
+            return evaluate_token_keyword(token as KeywordToken)
+        },
+        "function": (token) => {
+            const evaluate_token_function = build_evaluate_token_function({
+                evaluate_token,
+                turn_context,
+                player_turn_handler
+            })
+            return evaluate_token_function(token as TokenFunction)
+        }
+
+    }
+    const evaluate_token = (token: Token) => {
+        const func = token_evaluator_internals[token.type]
+        if (!func) throw Error(`token evaluator for type '${token.type}' does not exist`)
+        return token_evaluator_internals[token.type](token)
+    }
+    return evaluate_token
 }

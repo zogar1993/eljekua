@@ -14,7 +14,7 @@ import {ButtonOption} from "battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "initiative_order/InitiativeOrder";
 import {CreatureData} from "battlegrid/creatures/CreatureData";
 import {NODE} from "expressions/token_evaluator/NODE";
-import {preview_defense} from "expressions/token_evaluator/internals/evaluate_token_keyword";
+import {preview_defense} from "expressions/token_evaluator/internals/keyword/evaluate_keyword";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition

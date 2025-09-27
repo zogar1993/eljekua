@@ -1,16 +1,20 @@
-import type {AstNodeBoolean, InterpretProps} from "expressions/token_evaluator/types";
+import type {AstNodeBoolean} from "expressions/token_evaluator/types";
 import type {TokenFunction} from "expressions/tokenizer/tokens/TokenFunction";
 import {assert_parameters_amount_equals} from "expressions/token_evaluator/asserts";
 import {TOKEN} from "expressions/token_evaluator/TOKEN";
+import type {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
+import type {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 
-export const evaluate_token_function_has_valid_targets = ({
-                                                              token,
-                                                              player_turn_handler
-                                                          }: InterpretProps<TokenFunction>): AstNodeBoolean => {
+export const evaluate_function_has_valid_targets = ({token, turn_context, player_turn_handler}:
+                                                        {
+                                                            token: TokenFunction,
+                                                            turn_context: TurnContext
+                                                            player_turn_handler: PlayerTurnHandler
+                                                        }): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 1)
 
     const power_name = TOKEN.as_keyword(token.parameters[0]).value
-    const context = player_turn_handler.turn_context.get_current_context()
+    const context = turn_context.get_current_context()
     const power = context.get_power(power_name)
 
     const first_instruction = power.instructions[0]

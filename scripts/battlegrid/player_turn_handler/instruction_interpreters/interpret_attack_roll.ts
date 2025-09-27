@@ -15,7 +15,7 @@ import {ActionLog} from "action_log/ActionLog";
 import {add_numbers_resolved} from "expressions/token_evaluator/add_numbers";
 import {NODE} from "expressions/token_evaluator/NODE";
 import {AstNodeNumberResolved} from "expressions/token_evaluator/types";
-import {preview_defense} from "expressions/token_evaluator/internals/evaluate_token_keyword";
+import {preview_defense} from "expressions/token_evaluator/internals/keyword/evaluate_keyword";
 
 export const interpret_attack_roll = ({
                                           instruction,

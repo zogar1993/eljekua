@@ -4,7 +4,7 @@ import {
     AstNodeCreature, AstNodeCreatures,
     AstNodeNumber,
     AstNodeNumberResolved, AstNodePosition,
-    AstNodePositions
+    AstNodePositions, AstNodeString
 } from "expressions/token_evaluator/types";
 
 export const NODE = {
@@ -32,5 +32,9 @@ export const NODE = {
     as_positions: (node: AstNode): AstNodePositions => {
         if (node.type === "positions") return node
         throw Error(`Cannot cast node to "positions"`)
+    },
+    as_string: (node: AstNode): AstNodeString => {
+        if (node.type === "string") return node
+        throw Error(`Cannot cast node to "string"`)
     }
 }

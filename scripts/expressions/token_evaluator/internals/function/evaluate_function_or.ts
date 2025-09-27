@@ -1,15 +1,17 @@
 import type {TokenFunction} from "expressions/tokenizer/tokens/TokenFunction";
-import {evaluate_token} from "expressions/token_evaluator/evaluate_token";
-import type {AstNodeBoolean, InterpretProps} from "expressions/token_evaluator/types";
+import type {AstNodeBoolean} from "expressions/token_evaluator/types";
 import {assert_parameters_amount_is_at_least} from "expressions/token_evaluator/asserts";
+import type {Token} from "expressions/tokenizer/tokens/AnyToken";
+import type {AstNode} from "expressions/token_evaluator/types";
 
-export const evaluate_token_function_or = ({
-                                               token,
-                                               ...props
-                                           }: InterpretProps<TokenFunction>): AstNodeBoolean => {
+export const evaluate_function_or = ({token, evaluate_token}:
+                                         {
+                                             token: TokenFunction
+                                             evaluate_token: (token: Token) => AstNode
+                                         }): AstNodeBoolean => {
     assert_parameters_amount_is_at_least(token, 2)
 
-    const parameters = token.parameters.map(parameter => evaluate_token({token: parameter, ...props}))
+    const parameters = token.parameters.map(evaluate_token)
 
     if (!parameters.every(parameter => parameter.type === "boolean"))
         throw Error(`Expected all '$or()' parameters to evaluate to booleans, but found '${JSON.stringify(parameters)}'`)
