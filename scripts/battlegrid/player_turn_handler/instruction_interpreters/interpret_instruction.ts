@@ -54,7 +54,6 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
         case "copy_variable":
             interpret_copy_variable({...props, instruction})
             break
-
         case "options":
             interpret_options({...props, instruction})
             break;
