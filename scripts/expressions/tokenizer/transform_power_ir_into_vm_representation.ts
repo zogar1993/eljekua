@@ -95,12 +95,6 @@ export type InstructionPush = {
     target: string
 }
 
-export type InstructionCopyVariable = {
-    type: "copy_variable",
-    origin: string,
-    destination: string
-}
-
 export type InstructionAddPowers = {
     type: "add_powers",
     creature: string
@@ -143,7 +137,6 @@ export type Instruction =
     InstructionSaveVariable |
     InstructionSaveResolvedNumber |
     InstructionPush |
-    InstructionCopyVariable |
     InstructionAddPowers |
     InstructionExecutePower |
     InstructionCleanContextStatus |

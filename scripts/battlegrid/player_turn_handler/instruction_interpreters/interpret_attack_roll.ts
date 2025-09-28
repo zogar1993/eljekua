@@ -3,7 +3,7 @@ import {AnimationQueue} from "AnimationQueue";
 import {
     Instruction,
     InstructionAttackRoll,
-    InstructionCopyVariable
+    InstructionSaveVariable
 } from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
@@ -58,7 +58,7 @@ export const interpret_attack_roll = ({
 
         const defender_label = `${instruction.defender}(${i + 1})`
         context.set_variable(defender_label, {type: "creature", value: defender, description: defender_label})
-        new_instructions.push(create_copy_variable_instruction(defender_label, instruction.defender))
+        new_instructions.push(copy_variable_instruction(defender_label, instruction.defender))
 
         if (is_hit) {
             context.status = "hit"
@@ -73,7 +73,7 @@ export const interpret_attack_roll = ({
         log_attack_roll({attacker, attack, is_hit, defender, defense, context, instruction, action_log})
     })
 
-    new_instructions.push(create_copy_variable_instruction(`${instruction.defender}(all)`, instruction.defender))
+    new_instructions.push(copy_variable_instruction(`${instruction.defender}(all)`, instruction.defender))
 
     context.add_instructions(new_instructions)
 }
@@ -84,8 +84,8 @@ const COMBAT_ADVANTAGE: AstNodeNumberResolved = {
     description: "Combat Advantage"
 }
 
-const create_copy_variable_instruction = (origin: string, destination: string): InstructionCopyVariable =>
-    ({type: "copy_variable", origin, destination})
+const copy_variable_instruction = (origin: string, destination: string): InstructionSaveVariable =>
+    ({type: "save_variable", value: {type: "keyword", value: origin}, label: destination})
 
 const log_attack_roll = (
     {context, attacker, attack, is_hit, defender, instruction, defense, action_log}: {

@@ -31,7 +31,6 @@ export const build_evaluate_token_keyword = ({turn_context}: { turn_context: Tur
     }
 }
 
-
 const ATTRIBUTE_MOD_CODES = ATTRIBUTE_CODES.map(attribute => `${attribute}_mod`)
 const ATTRIBUTE_MOD_CODES_LVL = ATTRIBUTE_CODES.map(attribute => `${attribute}_mod_lvl`)
 

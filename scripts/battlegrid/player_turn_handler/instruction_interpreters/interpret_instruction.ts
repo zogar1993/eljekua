@@ -14,7 +14,6 @@ import type {
 import {
     interpret_save_resolved_number
 } from "battlegrid/player_turn_handler/instruction_interpreters/interpret_save_resolved_number";
-import {interpret_copy_variable} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_copy_variable";
 import {interpret_execute_power} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_execute_power";
 import {interpret_add_powers} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_add_powers";
 import {
@@ -50,9 +49,6 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             break
         case "save_resolved_number":
             interpret_save_resolved_number({...props, instruction})
-            break
-        case "copy_variable":
-            interpret_copy_variable({...props, instruction})
             break
         case "options":
             interpret_options({...props, instruction})
