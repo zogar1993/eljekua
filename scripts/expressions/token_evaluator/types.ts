@@ -1,5 +1,6 @@
 import type {Creature} from "battlegrid/creatures/Creature";
 import type {Position} from "battlegrid/Position";
+import {PowerVM} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 
 export type AstNode =
     AstNodeNumber
@@ -9,6 +10,7 @@ export type AstNode =
     | AstNodeCreatures
     | AstNodePosition
     | AstNodePositions
+    | AstNodePower
 
 export type AstNodeNumber = AstNodeNumberUnresolved | AstNodeNumberResolved
 
@@ -48,7 +50,7 @@ export type AstNodeCreatures = {
 export type AstNodeBoolean = {
     type: "boolean"
     value: boolean
-    description: string
+    description?: string
     params?: Array<AstNode>
 }
 
@@ -63,4 +65,9 @@ export type AstNodePositions = {
     value: Array<Position>
     description: string
     params?: Array<AstNode>
+}
+
+export type AstNodePower = {
+    type: "power"
+    value: PowerVM
 }

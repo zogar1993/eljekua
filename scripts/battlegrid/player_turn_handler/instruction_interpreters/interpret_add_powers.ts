@@ -14,8 +14,8 @@ export const interpret_add_powers = ({
         type: "options",
         options: [
             ...creature.data.powers.map(power => {
-                const power_name = power.name.replaceAll(" ", "_").toLowerCase()
-                context.set_variable({name: power_name, type: "power", value: power})
+                const power_name = `power_${power.name.replaceAll(" ", "_").toLowerCase()}`
+                context.set_variable(power_name, {type: "power", value: power})
                 return {
                     text: power.name,
                     instructions: [

@@ -24,11 +24,12 @@ export const interpret_attack_roll = ({
                                           evaluate_token
                                       }: InterpretInstructionProps<InstructionAttackRoll>) => {
     const attacker = context.owner()
-    const defenders = context.get_creatures(instruction.defender)
+    const defenders = NODE.as_creatures(context.get_variable(instruction.defender))
 
     const new_instructions: Array<Instruction> = []
     new_instructions.push(...instruction.before_instructions)
-    context.set_creatures({name: `${instruction.defender}(all)`, value: defenders})
+    const defenders_label = `${instruction.defender}(all)`
+    context.set_variable(defenders_label, {type: "creatures", value: defenders, description: defenders_label})
 
     defenders.forEach((defender, i) => {
         const attack_parts: Array<AstNodeNumberResolved> = []
@@ -39,7 +40,10 @@ export const interpret_attack_roll = ({
             if (effect.type === "gain_attack_bonus" && effect.against.includes(defender))
                 attack_parts.push(effect.value)
 
-        attacker.remove_statuses(({until, creature}) => until === "next_attack_roll_against_target" && creature === defender)
+        attacker.remove_statuses(({
+                                      until,
+                                      creature
+                                  }) => until === "next_attack_roll_against_target" && creature === defender)
 
         if (
             battle_grid.is_flanking({attacker, defender}) ||
@@ -52,9 +56,9 @@ export const interpret_attack_roll = ({
 
         const is_hit = attack.value >= defense.value
 
-        const defender_variable_name = `${instruction.defender}(${i + 1})`
-        context.set_creature({name: defender_variable_name, value: defender})
-        new_instructions.push(create_copy_variable_instruction(defender_variable_name, instruction.defender))
+        const defender_label = `${instruction.defender}(${i + 1})`
+        context.set_variable(defender_label, {type: "creature", value: defender, description: defender_label})
+        new_instructions.push(create_copy_variable_instruction(defender_label, instruction.defender))
 
         if (is_hit) {
             context.status = "hit"

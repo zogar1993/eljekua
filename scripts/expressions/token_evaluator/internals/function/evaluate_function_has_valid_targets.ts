@@ -4,6 +4,7 @@ import {assert_parameters_amount_equals} from "expressions/token_evaluator/asser
 import {TOKEN} from "expressions/token_evaluator/TOKEN";
 import type {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 import type {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
+import {NODE} from "expressions/token_evaluator/NODE";
 
 export const evaluate_function_has_valid_targets = ({token, turn_context, player_turn_handler}:
                                                         {
@@ -15,7 +16,7 @@ export const evaluate_function_has_valid_targets = ({token, turn_context, player
 
     const power_name = TOKEN.as_keyword(token.parameters[0]).value
     const context = turn_context.get_current_context()
-    const power = context.get_power(power_name)
+    const power = NODE.as_power(context.get_variable(power_name)).value
 
     const first_instruction = power.instructions[0]
 

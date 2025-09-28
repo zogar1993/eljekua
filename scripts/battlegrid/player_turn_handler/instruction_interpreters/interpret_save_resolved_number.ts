@@ -11,5 +11,5 @@ export const interpret_save_resolved_number = ({
                                                    evaluate_token
                                                }: InterpretInstructionProps<InstructionSaveResolvedNumber>) => {
     const value = resolve_number(NODE.as_number(evaluate_token(instruction.value)))
-    context.set_resolved_number({name: instruction.label, value})
+    context.set_variable(instruction.label, value)
 }

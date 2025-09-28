@@ -15,6 +15,8 @@ export const interpret_select_target = ({
 
     if (clickable.length === 0) return
 
+    const target_label = instruction.target_label
+
     if (clickable.length === 1) {
         if (context.peek_instruction().type !== "attack_roll") {
             const position = clickable[0]
@@ -25,19 +27,19 @@ export const interpret_select_target = ({
                 const target_positions = highlighted_area.filter(battle_grid.is_terrain_occupied)
                 const targets = target_positions.map(battle_grid.get_creature_by_position)
 
-                context.set_variable({name: instruction.target_label, type: "creatures", value: targets})
+                context.set_variable(target_label, {type: "creatures", value: targets, description: target_label})
             } else if (instruction.targeting_type === "movement") {
                 // TODO automatic resolution for movement feels odd when its a movement action, but not when its a secondary action
                 const origin = context.owner().data.position
                 const path = battle_grid.get_shortest_path({origin, destination: position})
 
-                context.set_variable({name: instruction.target_label, type: "path", value: path})
+                context.set_variable(target_label, {type: "positions", value: path, description: target_label})
             } else {
                 if (instruction.target_type === "terrain") {
-                    context.set_variable({name: instruction.target_label, type: "position", value: position})
+                    context.set_variable(target_label, {type: "position", value: position, description: target_label})
                 } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
                     const creature = battle_grid.get_creature_by_position(position)
-                    context.set_variable({name: instruction.target_label, type: "creature", value: creature})
+                    context.set_variable(target_label, {type: "creature", value: creature, description: target_label})
                 } else {
                     throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
                 }
@@ -45,7 +47,6 @@ export const interpret_select_target = ({
 
             return
         }
-
     }
 
     const on_click = (position: Position) => {
@@ -60,13 +61,13 @@ export const interpret_select_target = ({
 
         if (selection.target === null) throw Error("target needed for clicking")
 
-        if (selection.target.type === "path") {
+        if (selection.target.type === "positions") {
             const path = selection.target.value
             if (!positions_equal(position, path[path.length - 1]))
                 throw Error("position should be the end of the path")
         }
 
-        context.set_variable({name: instruction.target_label, ...selection.target})
+        context.set_variable(target_label, selection.target)
     }
 
 
@@ -89,7 +90,7 @@ export const interpret_select_target = ({
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
                 highlighted_area,
-                target: {type: "creatures", value: targets}
+                target: {type: "creatures", value: targets, description: "target"}
             })
         } else if (instruction.targeting_type === "movement") {
             const origin = context.owner().data.position
@@ -98,19 +99,20 @@ export const interpret_select_target = ({
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
                 highlighted_area: path,
-                target: {type: "path", value: path}
+                target: {type: "positions", value: path, description: "target"}
             })
         } else {
             if (instruction.target_type === "terrain") {
                 player_turn_handler.set_awaiting_position_selection({
                     ...selection_base,
-                    target: {type: "position", value: position}
+                    //TODO these descriptions of target seem off
+                    target: {type: "position", value: position, description: "target"}
                 })
             } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
                 const creature = battle_grid.get_creature_by_position(position)
                 player_turn_handler.set_awaiting_position_selection({
                     ...selection_base,
-                    target: {type: "creature", value: creature}
+                    target: {type: "creature", value: creature, description: "target"}
                 })
             } else {
                 throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)

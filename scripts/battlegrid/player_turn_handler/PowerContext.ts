@@ -1,12 +1,12 @@
-import {Instruction, PowerVM} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {Creature} from "battlegrid/creatures/Creature";
-import {Path, Position} from "battlegrid/Position";
 import {assert} from "assert";
 
-import {AstNodeNumberResolved, AstNodeNumberUnresolved} from "expressions/token_evaluator/types";
+import {AstNode} from "expressions/token_evaluator/types";
+import {NODE} from "expressions/token_evaluator/NODE";
 
 export class PowerContext {
-    private variables: Map<string, VariableType> = new Map()
+    private variables: Map<string, AstNode> = new Map()
     private instructions: Array<Instruction> = []
     readonly power_name
     status: "none" | "hit" | "miss" = "none"
@@ -18,64 +18,19 @@ export class PowerContext {
     }) {
         this.instructions = instructions
         this.power_name = name
-        this.set_creature({name: "owner", value: owner})
+        this.set_variable("owner", {type: "creature", value: owner, description: "owner"})
     }
 
-    owner = () => this.get_creature("owner")
+    owner = () => NODE.as_creature(this.get_variable("owner")).value
 
-    set_variable = ({name, ...variable}: { name: string } & VariableType) => {
+    set_variable = (name: string, variable: AstNode) => {
         this.variables.set(name, variable)
-    }
-
-    set_creature = ({name, value}: { name: string, value: Creature }) => {
-        this.variables.set(name, {type: "creature", value})
-    }
-
-    set_creatures = ({name, value}: { name: string, value: Array<Creature> }) => {
-        this.variables.set(name, {type: "creatures", value})
-    }
-
-    set_path = ({name, value}: { name: string, value: Path }) => {
-        this.variables.set(name, {type: "path", value})
-    }
-
-    set_resolved_number = ({name, value}: { name: string, value: AstNodeNumberResolved }) => {
-        this.variables.set(name, {type: "resolved_number", value})
-    }
-
-    get_power = (name: string): PowerVM => {
-        const variable = this.variables.get(name)
-        if (!variable) throw Error(`variable ${name} not found in context`)
-        if (variable.type !== "power") throw Error(`variable ${name} expected to be a 'power', but its a '${variable.type}'`)
-        return variable.value
     }
 
     get_creature = (name: string): Creature => {
         const variable = this.variables.get(name)
         if (!variable) throw Error(`variable ${name} not found in context`)
         if (variable.type !== "creature") throw Error(`variable ${name} expected to be a 'creature', but its a '${variable.type}'`)
-        return variable.value
-    }
-
-    get_creatures = (name: string): Array<Creature> => {
-        const variable = this.variables.get(name)
-        if (!variable) throw Error(`variable ${name} not found in context`)
-        if (variable.type === "creature") return [variable.value]
-        if (variable.type === "creatures") return variable.value
-        throw Error(`variable ${name} expected to be a 'creature' or 'creatures', but its a '${variable.type}'`)
-    }
-
-    get_position = (name: string): Position => {
-        const variable = this.variables.get(name)
-        if (!variable) throw Error(`variable ${name} not found in context`)
-        if (variable.type !== "position") throw Error(`variable ${name} expected to be a 'position', but its a '${variable.type}'`)
-        return variable.value
-    }
-
-    get_path = (name: string): Path => {
-        const variable = this.variables.get(name)
-        if (!variable) throw Error(`variable ${name} not found in context`)
-        if (variable.type !== "path") throw Error(`variable ${name} expected to be a 'path', but its a '${variable.type}'`)
         return variable.value
     }
 
@@ -109,21 +64,3 @@ export class PowerContext {
         return variable
     }
 }
-
-export type VariableType =
-    VariableTypeCreature
-    | VariableTypePosition
-    | VariableTypePath
-    | VariableTypeCreatures
-    | VariableTypeResolvedNumber
-    | VariableTypeUnresolvedNumber
-    | VariableTypePower
-
-//TODO check viability of using nodes here to simplify some things
-type VariableTypeCreature = { type: "creature", value: Creature }
-type VariableTypeCreatures = { type: "creatures", value: Array<Creature> }
-type VariableTypePosition = { type: "position", value: Position }
-type VariableTypePath = { type: "path", value: Path }
-type VariableTypeResolvedNumber = { type: "resolved_number", value: AstNodeNumberResolved }
-type VariableTypeUnresolvedNumber = { type: "unresolved_number", value: AstNodeNumberUnresolved }
-type VariableTypePower = { type: "power", value: PowerVM }

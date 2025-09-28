@@ -4,7 +4,7 @@ import {ActionLog} from "action_log/ActionLog";
 import {build_evaluate_token} from "expressions/token_evaluator/evaluate_token";
 import {Creature} from "battlegrid/creatures/Creature";
 import {Instruction, InstructionSelectTarget} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
-import {PowerContext, VariableType} from "battlegrid/player_turn_handler/PowerContext";
+import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 import {get_move_area} from "battlegrid/ranges/get_move_area";
 import {get_adjacent} from "battlegrid/ranges/get_adyacent";
@@ -15,6 +15,7 @@ import {InitiativeOrder} from "initiative_order/InitiativeOrder";
 import {CreatureData} from "battlegrid/creatures/CreatureData";
 import {NODE} from "expressions/token_evaluator/NODE";
 import {preview_defense} from "expressions/token_evaluator/internals/keyword/evaluate_keyword";
+import {AstNode} from "expressions/token_evaluator/types";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -25,7 +26,7 @@ export type PlayerTurnHandlerContextSelectPosition = {
     owner: Creature
     clickable: Array<Position>
     highlighted_area: Array<Position>
-    target: VariableType | null
+    target: AstNode | null
     on_click: (position: Position) => void
     on_hover: (position: Position) => void
 }
@@ -126,8 +127,8 @@ export class PlayerTurnHandler {
 
             const next_instruction = this.turn_context.get_current_context().peek_instruction()
             const needs_roll = next_instruction.type === "attack_roll"
-            if (needs_roll) {
-                get_target_creatures_from_selection(this.selection_context).forEach(defender => {
+            if (needs_roll && this.selection_context.target) {
+                NODE.as_creatures(this.selection_context.target).forEach(defender => {
 
                     const attacker = next_instruction.attack
                     const attack = NODE.as_number_resolved(this.evaluate_token(attacker)).value
@@ -158,9 +159,13 @@ export class PlayerTurnHandler {
             this.clear_indicator_to_positions({positions: this.selection_context.clickable})
             this.clear_indicator_to_positions({positions: this.selection_context.highlighted_area})
 
-            const creatures = get_target_creatures_from_selection(this.selection_context)
-
-            creatures.forEach(creature => creature.visual.remove_hit_chance())
+            if (this.selection_context.target) {
+                if (this.selection_context.target.type === "creature"
+                    || this.selection_context.target.type === "creatures") {
+                    const creatures = NODE.as_creatures(this.selection_context.target)
+                    creatures.forEach(creature => creature.visual.remove_hit_chance())
+                }
+            }
         } else if (this.selection_context.type === "option_select") {
             this.selection_context.owner.visual.remove_options()
         }
@@ -288,10 +293,3 @@ export class PlayerTurnHandler {
         positions: Array<Position>
     }) => positions.map(this.battle_grid.get_square).forEach(({visual}) => visual.clearIndicator())
 }
-
-const get_target_creatures_from_selection = (selection: PlayerTurnHandlerContextSelectPosition) =>
-    selection.target?.type === "creature" ?
-        [selection.target.value] :
-        selection.target?.type === "creatures" ?
-            selection.target.value :
-            []
