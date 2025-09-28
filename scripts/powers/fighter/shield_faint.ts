@@ -23,7 +23,7 @@ export const power_shield_faint: Power = {
         hit: [
             {
                 type: "apply_damage",
-                value: "$add({1W},owner.str_mod)",
+                value: `$add($lvl_damage(21,{1W},{2W}),owner.str_mod)`,
                 target: "primary_target"
             },
             {
