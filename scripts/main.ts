@@ -43,7 +43,7 @@ const ATTRIBUTES = {
         movement: 5,
         hp_current: 7,
         hp_max: 10,
-        level: 2,
+        level: 20,
         attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
         powers: FIGHTER_POWERS,
         team: 1
