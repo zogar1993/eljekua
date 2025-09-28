@@ -155,8 +155,8 @@ const tide_of_iron: Power = {
                         text: "Push",
                         instructions: [
                             {
-                                type: "save_position",
-                                target: "primary_target",
+                                type: "save_variable",
+                                value: "primary_target.position",
                                 label: "primary_target_original_position"
                             },
                             {
@@ -310,15 +310,15 @@ const tide_of_iron_true = {
             },
             {
                 type: "condition",
-                condition: "$greater_or_equals($add(owner.size,1),target.size)",
+                condition: "is_greater_or_equal($add(owner.size,1),target.size)",
                 instructions_true: [
                     {
                         type: "question_yes_no",
                         question: "Push?",
                         instructions_true: [
                             {
-                                type: "save_position",
-                                target: "primary_target",
+                                type: "save_variable",
+                                target: "primary_target.position",
                                 label: "primary_target_original_position"
                             },
                             {

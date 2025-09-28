@@ -3,7 +3,7 @@ import {Creature} from "battlegrid/creatures/Creature";
 import {Path, Position} from "battlegrid/Position";
 import {assert} from "assert";
 
-import {AstNodeNumberResolved} from "expressions/token_evaluator/types";
+import {AstNodeNumberResolved, AstNodeNumberUnresolved} from "expressions/token_evaluator/types";
 
 export class PowerContext {
     private variables: Map<string, VariableType> = new Map()
@@ -116,11 +116,14 @@ export type VariableType =
     | VariableTypePath
     | VariableTypeCreatures
     | VariableTypeResolvedNumber
+    | VariableTypeUnresolvedNumber
     | VariableTypePower
 
+//TODO check viability of using nodes here to simplify some things
 type VariableTypeCreature = { type: "creature", value: Creature }
 type VariableTypeCreatures = { type: "creatures", value: Array<Creature> }
 type VariableTypePosition = { type: "position", value: Position }
 type VariableTypePath = { type: "path", value: Path }
 type VariableTypeResolvedNumber = { type: "resolved_number", value: AstNodeNumberResolved }
+type VariableTypeUnresolvedNumber = { type: "unresolved_number", value: AstNodeNumberUnresolved }
 type VariableTypePower = { type: "power", value: PowerVM }

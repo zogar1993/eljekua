@@ -37,11 +37,10 @@ const FUNCTION_NAMES = [
     "or",
     "and",
     "add",
-    "greater_or_equals",
+    "is_greater_or_equal",
     "not_equals",
     "equipped",
-    "has_valid_targets",
-    "lvl_damage"
+    "has_valid_targets"
 ]
 
 export type TokenFunction = {

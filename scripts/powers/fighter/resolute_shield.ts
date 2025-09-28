@@ -17,13 +17,17 @@ export const power_resolute_shield: Power = {
         target_type: "creature",
         amount: 1
     },
+    damage: {
+        lvl_1: "{1W}",
+        lvl_21: "{2W}"
+    },
     roll: {
         attack: "str",
         defense: "ac",
         hit: [
             {
                 type: "apply_damage",
-                value: "$add($lvl_damage(21,{1W},{2W}),owner.str_mod)",
+                value: "$add(primary_damage,owner.str_mod)",
                 target: "primary_target"
             },
             {

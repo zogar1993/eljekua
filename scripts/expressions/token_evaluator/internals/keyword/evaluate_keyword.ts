@@ -5,6 +5,7 @@ import type {Creature} from "battlegrid/creatures/Creature";
 import type {AstNodeNumberResolved} from "expressions/token_evaluator/types";
 import type {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 
+//TODO this most likely needs to be reworked to make variable be ast nodes
 export const build_evaluate_token_keyword = ({turn_context}: { turn_context: TurnContext }) => {
     return (token: KeywordToken): AstNode => {
         const variable_name = token.value
@@ -36,6 +37,9 @@ export const build_evaluate_token_keyword = ({turn_context}: { turn_context: Tur
         if (variable.type === "resolved_number")
             return variable.value
 
+        if (variable.type === "unresolved_number")
+            return variable.value
+
         throw Error(`variable type '${variable.type}' not supported. Found while evaluating token keyword.`)
     }
 }
@@ -50,6 +54,9 @@ const preview_creature_property = ({creature, property}: {
 }): Omit<AstNodeNumberResolved, "type"> => {
     if (property === "movement")
         return {value: creature.data.movement, description: "movement"}
+
+    if (property === "level")
+        return {value: creature.data.level, description: "level"}
 
     if (ATTRIBUTE_MOD_CODES.includes(property))
         return preview_creature_attribute_mod(creature, property.slice(0, 3) as any)

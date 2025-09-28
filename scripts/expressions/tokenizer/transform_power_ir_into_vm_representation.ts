@@ -14,6 +14,7 @@ const PRIMARY_TARGET_LABEL = "primary_target"
 export const transform_power_ir_into_vm_representation = (power: Power): PowerVM => {
     const formatted_targeting = {type: "select_target", target_label: PRIMARY_TARGET_LABEL, ...power.targeting}
     const instructions: Array<Instruction> = [
+        ...(power.damage ? transform_primary_damage(power.damage) : []),
         transform_select_target_ir(formatted_targeting as IRInstructionSelectTarget),
         ...(power.roll ? [transform_primary_roll(power.roll)] : []),
         ...(power.effect ? power.effect.map(transform_generic_instruction) : [])
@@ -76,9 +77,9 @@ export type InstructionOptions = {
 
 export type InstructionOptionsItem = { text: string, instructions: Array<Instruction>, condition?: Token }
 
-export type InstructionSavePosition = {
-    type: "save_position",
-    target: string,
+export type InstructionSaveVariable = {
+    type: "save_variable",
+    value: Token,
     label: string
 }
 
@@ -139,7 +140,7 @@ export type Instruction =
     InstructionCondition |
     InstructionMovement |
     InstructionOptions |
-    InstructionSavePosition |
+    InstructionSaveVariable |
     InstructionSaveResolvedNumber |
     InstructionPush |
     InstructionCopyVariable |
@@ -202,11 +203,11 @@ const transform_generic_instruction = (instruction: IRInstruction): Instruction 
                     instructions: option.instructions.map(transform_generic_instruction)
                 }))
             }
-        case "save_position":
+        case "save_variable":
             return {
-                type: "save_position",
-                label: instruction.label,
-                target: instruction.target
+                type: "save_variable",
+                value: tokenize(instruction.value),
+                label: instruction.label
             }
         case "save_resolved_number":
             return {
@@ -276,6 +277,36 @@ export type InstructionSelectTargetMovement = {
     destination_requirement: Token | null
 }
 
+const transform_primary_damage = (damage: NonNullable<Power["damage"]>): Array<Instruction> => {
+    return [
+        {
+            type: "save_variable",
+            value: tokenize(damage.lvl_1),
+            label: "primary_damage"
+        },
+        ...(damage.lvl_11 ? [{
+            type: "condition",
+            condition: tokenize("$is_greater_or_equal(owner.level,11)"),
+            instructions_true: [{
+                type: "save_variable",
+                value: tokenize(damage.lvl_11),
+                label: "primary_damage"
+            }],
+            instructions_false: []
+        } as InstructionCondition] : []),
+        ...(damage.lvl_21 ? [{
+            type: "condition",
+            condition: tokenize("$is_greater_or_equal(owner.level,21)"),
+            instructions_true: [{
+                type: "save_variable",
+                value: tokenize(damage.lvl_21),
+                label: "primary_damage"
+            }],
+            instructions_false: []
+        } as InstructionCondition] : [])
+    ]
+}
+
 const transform_select_target_ir = (ir: IRInstructionSelectTarget): InstructionSelectTarget => {
     if (ir.targeting_type === "area_burst")
         return {
@@ -342,6 +373,5 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
         default:
             throw Error(`"${ir.status.type}" is not a valid "apply_status" type`)
     }
-
 }
 

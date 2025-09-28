@@ -4,7 +4,7 @@ import {interpret_apply_damage} from "battlegrid/player_turn_handler/instruction
 import {interpret_move} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_move";
 import {interpret_shift} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_shift";
 import {interpret_push} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_push";
-import {interpret_save_position} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_save_position";
+import {interpret_save_variable} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_save_variable";
 import {interpret_options} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_options";
 import {interpret_condition} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_condition";
 import type {Instruction} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
@@ -45,8 +45,8 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
         case "push":
             interpret_push({...props, instruction})
             break
-        case "save_position":
-            interpret_save_position({...props, instruction})
+        case "save_variable":
+            interpret_save_variable({...props, instruction})
             break
         case "save_resolved_number":
             interpret_save_resolved_number({...props, instruction})
@@ -54,6 +54,7 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
         case "copy_variable":
             interpret_copy_variable({...props, instruction})
             break
+
         case "options":
             interpret_options({...props, instruction})
             break;

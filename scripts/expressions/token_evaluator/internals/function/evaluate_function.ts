@@ -14,8 +14,8 @@ import type {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 import {evaluate_function_exists} from "expressions/token_evaluator/internals/function/evaluate_function_exists";
 import type {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
 import {
-    evaluate_function_lvl_damage
-} from "expressions/token_evaluator/internals/function/evaluate_function_lvl_damage";
+    evaluate_function_is_greater_or_equal
+} from "expressions/token_evaluator/internals/function/evaluate_function_is_greater_or_equal";
 
 export const build_evaluate_token_function = ({evaluate_token, turn_context, player_turn_handler}:
                                                   {
@@ -38,8 +38,8 @@ export const build_evaluate_token_function = ({evaluate_token, turn_context, pla
                 return evaluate_function_has_valid_targets({token, turn_context, player_turn_handler})
             case "or":
                 return evaluate_function_or({token, evaluate_token})
-            case "lvl_damage":
-                return evaluate_function_lvl_damage({token, turn_context, evaluate_token})
+            case "is_greater_or_equal":
+                return evaluate_function_is_greater_or_equal({token, evaluate_token})
             default:
                 throw Error(`function name '${token.name}' not supported when evaluating token`)
         }

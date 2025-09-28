@@ -8,6 +8,11 @@ export type Power = {
         attack: boolean
     }
     prerequisites?: Array<string>,
+    damage?: {
+        lvl_1: string,
+        lvl_11?: string,
+        lvl_21?: string
+    }
     targeting: Targeting,
     roll?: {
         attack: string
@@ -47,8 +52,8 @@ export type IRInstruction =
     type: "options",
     options: Array<{ text: string, instructions: Array<IRInstruction> }>
 } | {
-    type: "save_position",
-    target: string,
+    type: "save_variable",
+    value: string,
     label: string
 } | {
     type: "push",
