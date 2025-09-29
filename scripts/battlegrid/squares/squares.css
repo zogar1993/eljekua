@@ -29,6 +29,8 @@
 
 .board__square[data-indicator=selected]::after {
     background-color: greenyellow;
+    outline: 4px red solid;
+    z-index: 1;
 }
 
 .board__square[data-indicator=selected]:hover::after {

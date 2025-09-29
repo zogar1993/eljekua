@@ -1,14 +1,15 @@
 #actions_menu {
     display: flex;
-    flex-direction: column;
+    gap: 8px;
+    flex-wrap: wrap;
+    /* TODO this can be useful for the action log
     align-items: stretch;
     position: absolute;
     position-anchor: --cell--selected;
     top: anchor(top);
     left: anchor(right);
 
-    border: 4px gray solid;
-    border-radius: 8px;
+     */
 }
 
 #actions_menu:empty {
@@ -20,7 +21,8 @@
     font-size: 1rem;
     text-align: left;
     background-color: lightpink;
-    border: none;
+    border: 4px gray solid;
+    border-radius: 8px;
 }
 
 #actions_menu button:hover {

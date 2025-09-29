@@ -11,12 +11,16 @@
     <link rel="stylesheet" href="./scripts/action_log/action_log.css">
 </head>
 <body>
-<div style="position: relative; display: inline-flex">
-    <div class="board"></div>
-    <div id="creatures"></div>
-    <div id="initiative_order"></div>
-    <div id="actions_menu"></div>
-    <div id="action_log"></div>
+<div style="position: relative; display: flex; flex-direction: column; gap: 8px;">
+    <div style="display: flex; gap: 8px;">
+        <div class="board"></div>
+        <div id="creatures"></div>
+        <div id="initiative_order"></div>
+        <div id="action_log"></div>
+    </div>
+    <div >
+        <div id="actions_menu"></div>
+    </div>
 </div>
 </body>
 </html>
