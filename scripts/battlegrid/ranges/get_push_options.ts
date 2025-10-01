@@ -3,7 +3,6 @@ import {get_adjacent} from "battlegrid/ranges/get_adyacent";
 import type {BattleGrid} from "battlegrid/BattleGrid";
 import {distance_between_positions} from "battlegrid/BattleGrid";
 
-
 export const get_push_positions = ({anchor, origin, distance, battle_grid}: {
         anchor: Position,
         origin: Position,
