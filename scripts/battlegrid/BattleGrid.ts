@@ -120,21 +120,6 @@ export class BattleGrid {
         throw Error(`Path not found from ${JSON.stringify(origin)} to ${JSON.stringify(destination)}`)
     }
 
-    get_melee({origin}: { origin: Position }): Array<Position> {
-        const distance = 1
-        const lower_x = Math.max(0, origin.x - distance)
-        const upper_x = Math.min(this.BOARD_WIDTH - 1, origin.x + distance)
-        const lower_y = Math.max(0, origin.y - distance)
-        const upper_y = Math.min(this.BOARD_HEIGHT - 1, origin.y + distance)
-
-        const result = [];
-        for (let x = lower_x; x <= upper_x; x++)
-            for (let y = lower_y; y <= upper_y; y++)
-                if (origin.x !== x || origin.y !== y)
-                    result.push({x, y});
-        return result
-    }
-
     get_push_positions({attacker_origin, defender_origin, amount}: {
         attacker_origin: Position,
         defender_origin: Position,

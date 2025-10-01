@@ -16,6 +16,7 @@ import {CreatureData} from "battlegrid/creatures/CreatureData";
 import {NODE} from "expressions/token_evaluator/NODE";
 import {preview_defense} from "expressions/token_evaluator/internals/keyword/evaluate_keyword";
 import {AstNode} from "expressions/token_evaluator/types";
+import {get_melee} from "battlegrid/ranges/get_melee";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -184,7 +185,7 @@ export class PlayerTurnHandler {
             const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance))
             return get_movement_range({origin, distance: distance.value, battle_grid: this.battle_grid})
         } else if (targeting.targeting_type === "melee_weapon") {
-            return this.battle_grid.get_melee({origin})
+            return get_melee({origin, battle_grid: this.battle_grid})
         } else if (targeting.targeting_type === "adjacent") {
             return get_adjacent({position: origin, battle_grid: this.battle_grid})
         } else if (targeting.targeting_type === "ranged" || targeting.targeting_type === "area_burst") {
