@@ -6,7 +6,7 @@ import {Creature} from "battlegrid/creatures/Creature";
 import {Instruction, InstructionSelectTarget} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
-import {get_move_area} from "battlegrid/ranges/get_move_area";
+import {get_movement_range} from "battlegrid/ranges/get_movement_range";
 import {get_adjacent} from "battlegrid/ranges/get_adyacent";
 import {interpret_instruction} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
 import {SquareVisual} from "battlegrid/squares/SquareVisual";
@@ -182,7 +182,7 @@ export class PlayerTurnHandler {
     }) {
         if (targeting.targeting_type === "movement") {
             const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance))
-            return get_move_area({origin, distance: distance.value, battle_grid: this.battle_grid})
+            return get_movement_range({origin, distance: distance.value, battle_grid: this.battle_grid})
         } else if (targeting.targeting_type === "melee_weapon") {
             return this.battle_grid.get_melee({origin})
         } else if (targeting.targeting_type === "adjacent") {

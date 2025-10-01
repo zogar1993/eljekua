@@ -3,7 +3,7 @@ import {BattleGrid} from "battlegrid/BattleGrid";
 import {get_adjacent} from "battlegrid/ranges/get_adyacent";
 
 
-export const get_move_area = ({origin, distance, battle_grid}: {
+export const get_movement_range = ({origin, distance, battle_grid}: {
     origin: Position,
     distance: number,
     battle_grid: BattleGrid
