@@ -120,29 +120,6 @@ export class BattleGrid {
         throw Error(`Path not found from ${JSON.stringify(origin)} to ${JSON.stringify(destination)}`)
     }
 
-    get_push_positions({attacker_origin, defender_origin, amount}: {
-        attacker_origin: Position,
-        defender_origin: Position,
-        amount: number
-    }) {
-        const visited: Array<Position> = [defender_origin]
-        let next_ring: Array<Position> = [defender_origin]
-        const result: Array<Position> = []
-
-        for (let i = 0; i < amount; i++) {
-            const evaluating = next_ring
-            for (const position of evaluating) {
-                const distance = distance_between_positions(position, attacker_origin)
-                const adjacent = get_adjacent({position, battle_grid: this}).filter(x => !this.is_terrain_occupied(x))
-                const exclude_visited = adjacent.filter(a => visited.every(v => !positions_equal(a, v)))
-                next_ring = exclude_visited.filter(x => distance_between_positions(x, attacker_origin) > distance)
-                result.push(...next_ring)
-            }
-        }
-
-        return result
-    }
-
     is_flanking({attacker, defender}: {attacker: Creature, defender: Creature}) {
         if (attacker.data.team === null) return false
 
@@ -193,7 +170,7 @@ type PositionOffset = {
     y: number
 }
 
-const distance_between_positions = (a: Position, b: Position) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
+export const distance_between_positions = (a: Position, b: Position) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
 const intuitive_distance_between_positions = (a: Position, b: Position) => Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
 const get_offset = (a: Position, b: Position): PositionOffset => ({x: b.x - a.x, y: b.y - a.y})
 const add_offset = (p: Position, o: PositionOffset): Position => ({x: p.x + o.x, y: p.y + o.y})

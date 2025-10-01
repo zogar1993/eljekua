@@ -17,6 +17,7 @@ import {NODE} from "expressions/token_evaluator/NODE";
 import {preview_defense} from "expressions/token_evaluator/internals/keyword/evaluate_keyword";
 import {AstNode} from "expressions/token_evaluator/types";
 import {get_melee} from "battlegrid/ranges/get_melee";
+import {get_push_positions} from "battlegrid/ranges/get_push_options";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -176,23 +177,34 @@ export class PlayerTurnHandler {
 
     has_selected_creature = () => this.selection_context !== null
 
+//TODO is this somewhat redundant with get valid targets?
     get_in_range({targeting, origin}: {
         targeting: InstructionSelectTarget,
         origin: Position,
         context: PowerContext
     }) {
-        if (targeting.targeting_type === "movement") {
-            const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance))
-            return get_movement_range({origin, distance: distance.value, battle_grid: this.battle_grid})
-        } else if (targeting.targeting_type === "melee_weapon") {
-            return get_melee({origin, battle_grid: this.battle_grid})
-        } else if (targeting.targeting_type === "adjacent") {
-            return get_adjacent({position: origin, battle_grid: this.battle_grid})
-        } else if (targeting.targeting_type === "ranged" || targeting.targeting_type === "area_burst") {
-            const distance = this.evaluate_token(targeting.distance)
+        switch (targeting.targeting_type) {
+            case "movement": {
+                const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance))
+                return get_movement_range({origin, distance: distance.value, battle_grid: this.battle_grid})
+            }
+            case "melee_weapon":
+                return get_melee({origin, battle_grid: this.battle_grid})
+            case "adjacent":
+                return get_adjacent({position: origin, battle_grid: this.battle_grid})
+            case "push": {
+                const anchor = NODE.as_position(this.evaluate_token(targeting.anchor)).value
+                const origin = NODE.as_position(this.evaluate_token(targeting.origin)).value
+                const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance)).value
+                return get_push_positions({anchor, origin, distance, battle_grid: this.battle_grid})
+            }
+            case "ranged":
+            case "area_burst": {
+                const distance = this.evaluate_token(targeting.distance)
 
-            if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
-            return this.battle_grid.get_in_range({origin, distance: distance.value})
+                if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
+                return this.battle_grid.get_in_range({origin, distance: distance.value})
+            }
         }
 
         throw `Range "${JSON.stringify(targeting)}" not supported`
@@ -217,6 +229,13 @@ export class PlayerTurnHandler {
                 return valid_targets.filter(position => positions_equal(position, possibility.value))
             } else
                 return valid_targets
+        }
+
+        if (instruction.targeting_type === "push") {
+            const anchor = NODE.as_position(this.evaluate_token(instruction.anchor)).value
+            const origin = NODE.as_position(this.evaluate_token(instruction.origin)).value
+            const distance = NODE.as_number_resolved(this.evaluate_token(instruction.distance)).value
+            return get_push_positions({anchor, origin, distance, battle_grid: this.battle_grid})
         }
 
         const valid_targets = in_range.filter(position => {

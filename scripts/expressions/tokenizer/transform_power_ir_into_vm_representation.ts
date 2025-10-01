@@ -17,7 +17,7 @@ export const transform_power_ir_into_vm_representation = (power: Power): PowerVM
         ...(power.damage ? transform_primary_damage(power.damage) : []),
         transform_select_target_ir(formatted_targeting as IRInstructionSelectTarget),
         ...(power.roll ? [transform_primary_roll(power.roll)] : []),
-        ...(power.effect ? power.effect.map(transform_generic_instruction) : [])
+        ...transform_instructions(power.effect)
     ]
     return {
         name: power.name,
@@ -89,12 +89,6 @@ export type InstructionSaveResolvedNumber = {
     label: string
 }
 
-export type InstructionPush = {
-    type: "push",
-    amount: Token,
-    target: string
-}
-
 export type InstructionAddPowers = {
     type: "add_powers",
     creature: string
@@ -103,6 +97,13 @@ export type InstructionAddPowers = {
 export type InstructionExecutePower = {
     type: "execute_power",
     power: string
+}
+
+export type InstructionForceMovement = {
+    type: "force_movement",
+    movement_type: "push" | "pull" | "slide",
+    target: Token,
+    destination: Token
 }
 
 export type InstructionCleanContextStatus = {
@@ -136,11 +137,11 @@ export type Instruction =
     InstructionOptions |
     InstructionSaveVariable |
     InstructionSaveResolvedNumber |
-    InstructionPush |
     InstructionAddPowers |
     InstructionExecutePower |
     InstructionCleanContextStatus |
-    InstructionApplyStatus
+    InstructionApplyStatus |
+    InstructionForceMovement
 
 const transform_primary_roll = (roll: Required<Power>["roll"]): InstructionAttackRoll => {
     return {
@@ -148,79 +149,96 @@ const transform_primary_roll = (roll: Required<Power>["roll"]): InstructionAttac
         attack: tokenize(standardize_attack(roll.attack)),
         defense: roll.defense,
         defender: PRIMARY_TARGET_LABEL,
-        before_instructions: roll.before_instructions?.map(transform_generic_instruction) || [],
-        hit: roll.hit.map(transform_generic_instruction),
-        miss: roll.miss?.map(transform_generic_instruction) || []
+        before_instructions: transform_instructions(roll.before_instructions),
+        hit: transform_instructions(roll.hit),
+        miss: transform_instructions(roll.miss)
     }
 }
 
 const standardize_attack = (text: string) =>
     ATTRIBUTE_CODES.reduce((text, attribute) => text.replaceAll(attribute, `owner.${attribute}_mod_lvl`), text)
 
-const transform_generic_instruction = (instruction: IRInstruction): Instruction => {
+const transform_instructions = (instructions: Array<IRInstruction> | undefined): Array<Instruction> => {
+    if (instructions === undefined) return []
+    return instructions.flatMap(transform_generic_instruction)
+
+}
+
+const transform_generic_instruction = (instruction: IRInstruction): Array<Instruction> => {
     switch (instruction.type) {
         case "apply_damage":
-            return {
+            return [{
                 type: "apply_damage",
                 value: tokenize(instruction.value),
                 target: instruction.target,
                 damage_types: instruction.damage_types ?? [],
                 half_damage: instruction.half_damage ?? false
-            }
+            }]
         case "select_target":
-            return transform_select_target_ir(instruction)
+            return [transform_select_target_ir(instruction)]
         case "move":
-            return {
+            return [{
                 type: "move",
                 target: instruction.target,
                 destination: instruction.destination
-            }
+            }]
         case "shift":
-            return {
+            return [{
                 type: "shift",
                 target: instruction.target,
                 destination: instruction.destination
-            }
+            }]
         case "condition":
-            return {
+            return [{
                 type: "condition",
                 condition: tokenize(instruction.condition),
-                instructions_true: instruction.instructions_true.map(transform_generic_instruction),
-                instructions_false: instruction.instructions_false ? instruction.instructions_false.map(transform_generic_instruction) : []
-            }
+                instructions_true: transform_instructions(instruction.instructions_true),
+                instructions_false: transform_instructions(instruction.instructions_false)
+            }]
         case "options":
-            return {
+            return [{
                 type: "options",
                 options: instruction.options.map(option => ({
                     text: option.text,
-                    instructions: option.instructions.map(transform_generic_instruction)
+                    instructions: transform_instructions(option.instructions)
                 }))
-            }
+            }]
         case "save_variable":
-            return {
+            return [{
                 type: "save_variable",
                 value: tokenize(instruction.value),
                 label: instruction.label
-            }
+            }]
         case "save_resolved_number":
-            return {
+            return [{
                 type: "save_resolved_number",
                 label: instruction.label,
                 value: tokenize(instruction.value)
-            }
+            }]
         case "push":
-            return {
-                type: "push",
-                amount: tokenize(instruction.amount),
-                target: instruction.target
-            }
+            return [
+                {
+                    type: "select_target",
+                    targeting_type: "push",
+                    distance: tokenize(instruction.amount),
+                    anchor: tokenize("owner.position"),
+                    origin: tokenize(`${instruction.target}.position`),
+                    target_label: "push_position"
+                },
+                {
+                    type: "force_movement",
+                    movement_type: "push",
+                    target: tokenize(instruction.target),
+                    destination: tokenize("push_position")
+                }
+            ]
         case "apply_status":
-            return {
+            return [{
                 type: "apply_status",
                 target: tokenize(instruction.target),
                 duration: typeof instruction.duration === "string" ? [instruction.duration] : instruction.duration,
                 status: transform_apply_status_ir(instruction)
-            }
+            }]
         default:
             throw Error(`instruction invalid ${JSON.stringify(instruction)}`)
     }
@@ -230,7 +248,8 @@ export type InstructionSelectTarget =
     InstructionSelectTargetRanged |
     InstructionSelectTargetMelee |
     InstructionSelectTargetAreaBurst |
-    InstructionSelectTargetMovement
+    InstructionSelectTargetMovement |
+    InstructionSelectTargetPush
 
 export type InstructionSelectTargetRanged = {
     type: "select_target",
@@ -268,6 +287,15 @@ export type InstructionSelectTargetMovement = {
     distance: Token
     target_label: string
     destination_requirement: Token | null
+}
+
+export type InstructionSelectTargetPush = {
+    type: "select_target"
+    targeting_type: "push"
+    distance: Token
+    anchor: Token
+    origin: Token
+    target_label: string
 }
 
 const transform_primary_damage = (damage: NonNullable<Power["damage"]>): Array<Instruction> => {

@@ -34,6 +34,8 @@ export const interpret_select_target = ({
                 const path = battle_grid.get_shortest_path({origin, destination: position})
 
                 context.set_variable(target_label, {type: "positions", value: path, description: target_label})
+            } else if (instruction.targeting_type === "push") {
+                context.set_variable(target_label, {type: "position", value: position, description: target_label})
             } else {
                 if (instruction.target_type === "terrain") {
                     context.set_variable(target_label, {type: "position", value: position, description: target_label})
@@ -100,6 +102,11 @@ export const interpret_select_target = ({
                 ...selection_base,
                 highlighted_area: path,
                 target: {type: "positions", value: path, description: "target"}
+            })
+        } else if (instruction.targeting_type === "push") {
+            player_turn_handler.set_awaiting_position_selection({
+                ...selection_base,
+                target: {type: "position", value: position, description: "target"}
             })
         } else {
             if (instruction.target_type === "terrain") {

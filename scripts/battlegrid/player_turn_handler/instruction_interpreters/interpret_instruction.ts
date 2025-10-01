@@ -3,7 +3,7 @@ import {interpret_attack_roll} from "battlegrid/player_turn_handler/instruction_
 import {interpret_apply_damage} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_apply_damage";
 import {interpret_move} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_move";
 import {interpret_shift} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_shift";
-import {interpret_push} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_push";
+import {interpret_force_movement} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_force_movement";
 import {interpret_save_variable} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_save_variable";
 import {interpret_options} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_options";
 import {interpret_condition} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_condition";
@@ -41,8 +41,8 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
         case "shift":
             interpret_shift({...props, instruction})
             break
-        case "push":
-            interpret_push({...props, instruction})
+        case "force_movement":
+            interpret_force_movement({...props, instruction})
             break
         case "save_variable":
             interpret_save_variable({...props, instruction})
