@@ -19,6 +19,7 @@ import {AstNode} from "expressions/token_evaluator/types";
 import {get_reach_melee} from "battlegrid/ranges/get_reach_melee";
 import {get_reach_push} from "battlegrid/ranges/get_reach_push";
 import {get_reach_ranged} from "battlegrid/ranges/get_reach_ranged";
+import {get_reach_area_burst} from "battlegrid/ranges/get_reach_area_burst";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -198,10 +199,13 @@ export class PlayerTurnHandler {
                 const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance)).value
                 return get_reach_push({anchor, origin, distance, battle_grid: this.battle_grid})
             }
-            case "ranged":
-            case "area_burst": {
+            case "ranged": {
                 const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance))
                 return get_reach_ranged({origin, distance: distance.value, battle_grid: this.battle_grid})
+            }
+            case "area_burst": {
+                const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance))
+                return get_reach_area_burst({origin, distance: distance.value, battle_grid: this.battle_grid})
             }
         }
 
@@ -216,7 +220,12 @@ export class PlayerTurnHandler {
             context
         })
 
-        if (instruction.targeting_type === "area_burst") return [context.owner().data.position, ...in_range]
+        if (instruction.targeting_type === "area_burst")
+            return in_range
+
+        if (instruction.targeting_type === "push")
+            return in_range
+
         if (instruction.targeting_type === "movement") {
             const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
             if (instruction.destination_requirement) {
@@ -228,9 +237,6 @@ export class PlayerTurnHandler {
             } else
                 return valid_targets
         }
-
-        if (instruction.targeting_type === "push")
-            return in_range
 
         const valid_targets = in_range.filter(position => {
             if (instruction.target_type === "terrain")

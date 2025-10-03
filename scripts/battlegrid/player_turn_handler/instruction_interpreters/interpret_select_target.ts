@@ -4,7 +4,7 @@ import {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {PlayerTurnHandlerContextSelectPosition} from "battlegrid/player_turn_handler/PlayerTurnHandler";
-import {get_reach_ranged} from "battlegrid/ranges/get_reach_ranged";
+import {get_reach_area_burst} from "battlegrid/ranges/get_reach_area_burst";
 
 export const interpret_select_target = ({
                                             instruction,
@@ -24,7 +24,7 @@ export const interpret_select_target = ({
 
             if (instruction.targeting_type === "area_burst") {
                 const distance = instruction.radius
-                const highlighted_area = [...get_reach_ranged({origin: position, distance, battle_grid}), position]
+                const highlighted_area = get_reach_area_burst({origin: position, distance, battle_grid})
                 const target_positions = highlighted_area.filter(battle_grid.is_terrain_occupied)
                 const targets = target_positions.map(battle_grid.get_creature_by_position)
 
@@ -86,7 +86,7 @@ export const interpret_select_target = ({
 
         if (instruction.targeting_type === "area_burst") {
             const distance = instruction.radius
-            const highlighted_area = [...get_reach_ranged({origin: position, distance, battle_grid}), position]
+            const highlighted_area = get_reach_area_burst({origin: position, distance, battle_grid})
             const target_positions = highlighted_area.filter(battle_grid.is_terrain_occupied)
             const targets = target_positions.map(battle_grid.get_creature_by_position)
 
