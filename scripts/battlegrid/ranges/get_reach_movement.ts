@@ -1,6 +1,6 @@
 import {Position, positions_equal} from "battlegrid/Position";
 import {BattleGrid} from "battlegrid/BattleGrid";
-import {get_reach_adyacents} from "battlegrid/ranges/get_reach_adyacent";
+import {get_reach_adjacent} from "battlegrid/ranges/get_reach_adjacent";
 
 
 export const get_reach_movement = ({origin, distance, battle_grid}: {
@@ -17,7 +17,7 @@ export const get_reach_movement = ({origin, distance, battle_grid}: {
         const new_ring: Array<Position> = []
 
         for (const anchor of last_ring) {
-            const new_ring_candidates = get_reach_adyacents({position: anchor, battle_grid})
+            const new_ring_candidates = get_reach_adjacent({position: anchor, battle_grid})
 
             for (const new_ring_candidate of new_ring_candidates) {
                 if (battle_grid.is_terrain_occupied(new_ring_candidate)) continue

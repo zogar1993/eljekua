@@ -1,4 +1,4 @@
-import {get_reach_adyacents} from "battlegrid/ranges/get_reach_adyacent";
+import {get_reach_adjacent} from "battlegrid/ranges/get_reach_adjacent";
 import {BASIC_ATTACK_ACTIONS} from "powers/basic";
 import {Instruction, InstructionMovement} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
@@ -19,7 +19,7 @@ export const interpret_move = ({
 
     for (let i = 0; i < path.length - 1; i++) {
         const current_position = path[i]
-        const potential_attackers = get_reach_adyacents({
+        const potential_attackers = get_reach_adjacent({
             position: current_position,
             battle_grid
         })

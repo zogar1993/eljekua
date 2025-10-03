@@ -7,7 +7,7 @@ import {Instruction, InstructionSelectTarget} from "expressions/tokenizer/transf
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
 import {get_reach_movement} from "battlegrid/ranges/get_reach_movement";
-import {get_reach_adyacents} from "battlegrid/ranges/get_reach_adyacent";
+import {get_reach_adjacent} from "battlegrid/ranges/get_reach_adjacent";
 import {interpret_instruction} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
 import {SquareVisual} from "battlegrid/squares/SquareVisual";
 import {ButtonOption} from "battlegrid/creatures/CreatureVisual";
@@ -191,7 +191,7 @@ export class PlayerTurnHandler {
             case "melee_weapon":
                 return get_reach_melee({origin, battle_grid: this.battle_grid})
             case "adjacent":
-                return get_reach_adyacents({position: origin, battle_grid: this.battle_grid})
+                return get_reach_adjacent({position: origin, battle_grid: this.battle_grid})
             case "push": {
                 const anchor = NODE.as_position(this.evaluate_token(targeting.anchor)).value
                 const origin = NODE.as_position(this.evaluate_token(targeting.origin)).value
