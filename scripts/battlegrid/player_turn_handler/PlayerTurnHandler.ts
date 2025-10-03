@@ -200,9 +200,7 @@ export class PlayerTurnHandler {
             }
             case "ranged":
             case "area_burst": {
-                const distance = this.evaluate_token(targeting.distance)
-
-                if (distance.type !== "number_resolved") throw "distance needs to be number resolved"
+                const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance))
                 return this.battle_grid.get_in_range({origin, distance: distance.value})
             }
         }
