@@ -6,8 +6,8 @@ import {Creature} from "battlegrid/creatures/Creature";
 import {Instruction, InstructionSelectTarget} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext} from "battlegrid/player_turn_handler/PowerContext";
 import {TurnContext} from "battlegrid/player_turn_handler/TurnContext";
-import {get_movement_range} from "battlegrid/ranges/get_movement_range";
-import {get_adjacent} from "battlegrid/ranges/get_adyacent";
+import {get_reach_movement} from "battlegrid/ranges/get_reach_movement";
+import {get_reach_adyacents} from "battlegrid/ranges/get_reach_adyacent";
 import {interpret_instruction} from "battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
 import {SquareVisual} from "battlegrid/squares/SquareVisual";
 import {ButtonOption} from "battlegrid/creatures/CreatureVisual";
@@ -16,8 +16,8 @@ import {CreatureData} from "battlegrid/creatures/CreatureData";
 import {NODE} from "expressions/token_evaluator/NODE";
 import {preview_defense} from "expressions/token_evaluator/internals/keyword/evaluate_keyword";
 import {AstNode} from "expressions/token_evaluator/types";
-import {get_melee} from "battlegrid/ranges/get_melee";
-import {get_push_positions} from "battlegrid/ranges/get_push_options";
+import {get_reach_melee} from "battlegrid/ranges/get_reach_melee";
+import {get_reach_push} from "battlegrid/ranges/get_reach_push";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -186,17 +186,17 @@ export class PlayerTurnHandler {
         switch (targeting.targeting_type) {
             case "movement": {
                 const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance))
-                return get_movement_range({origin, distance: distance.value, battle_grid: this.battle_grid})
+                return get_reach_movement({origin, distance: distance.value, battle_grid: this.battle_grid})
             }
             case "melee_weapon":
-                return get_melee({origin, battle_grid: this.battle_grid})
+                return get_reach_melee({origin, battle_grid: this.battle_grid})
             case "adjacent":
-                return get_adjacent({position: origin, battle_grid: this.battle_grid})
+                return get_reach_adyacents({position: origin, battle_grid: this.battle_grid})
             case "push": {
                 const anchor = NODE.as_position(this.evaluate_token(targeting.anchor)).value
                 const origin = NODE.as_position(this.evaluate_token(targeting.origin)).value
                 const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance)).value
-                return get_push_positions({anchor, origin, distance, battle_grid: this.battle_grid})
+                return get_reach_push({anchor, origin, distance, battle_grid: this.battle_grid})
             }
             case "ranged":
             case "area_burst": {
@@ -229,12 +229,8 @@ export class PlayerTurnHandler {
                 return valid_targets
         }
 
-        if (instruction.targeting_type === "push") {
-            const anchor = NODE.as_position(this.evaluate_token(instruction.anchor)).value
-            const origin = NODE.as_position(this.evaluate_token(instruction.origin)).value
-            const distance = NODE.as_number_resolved(this.evaluate_token(instruction.distance)).value
-            return get_push_positions({anchor, origin, distance, battle_grid: this.battle_grid})
-        }
+        if (instruction.targeting_type === "push")
+            return in_range
 
         const valid_targets = in_range.filter(position => {
             if (instruction.target_type === "terrain")

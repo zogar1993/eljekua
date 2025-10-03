@@ -1,7 +1,7 @@
 import type {Position} from "battlegrid/Position";
 import type {BattleGrid} from "battlegrid/BattleGrid";
 
-export const get_melee = ({origin, battle_grid}: { origin: Position, battle_grid: BattleGrid }): Array<Position> => {
+export const get_reach_melee = ({origin, battle_grid}: { origin: Position, battle_grid: BattleGrid }): Array<Position> => {
     const distance = 1
     const lower_x = Math.max(0, origin.x - distance)
     const upper_x = Math.min(battle_grid.BOARD_WIDTH - 1, origin.x + distance)

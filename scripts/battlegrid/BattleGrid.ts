@@ -4,7 +4,7 @@ import {Creature} from "battlegrid/creatures/Creature";
 import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
 import {Position, positions_equal} from "battlegrid/Position";
 import {AnimationQueue} from "AnimationQueue";
-import {get_adjacent} from "battlegrid/ranges/get_adyacent";
+import {get_reach_adyacents} from "battlegrid/ranges/get_reach_adyacent";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "powers/basic";
 
 export class BattleGrid {
@@ -102,7 +102,7 @@ export class BattleGrid {
             paths = paths.filter(x => x !== current_path)
 
             const head = current_path.path[current_path.path.length - 1]
-            const alternatives = get_adjacent({position: head, battle_grid: this})
+            const alternatives = get_reach_adyacents({position: head, battle_grid: this})
                 .filter(x => visited.every(y => !positions_equal(x, y)))
                 .filter(x => !this.is_terrain_occupied(x))
 
