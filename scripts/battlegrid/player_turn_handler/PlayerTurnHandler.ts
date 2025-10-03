@@ -18,6 +18,7 @@ import {preview_defense} from "expressions/token_evaluator/internals/keyword/eva
 import {AstNode} from "expressions/token_evaluator/types";
 import {get_reach_melee} from "battlegrid/ranges/get_reach_melee";
 import {get_reach_push} from "battlegrid/ranges/get_reach_push";
+import {get_reach_ranged} from "battlegrid/ranges/get_reach_ranged";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -177,7 +178,6 @@ export class PlayerTurnHandler {
 
     has_selected_creature = () => this.selection_context !== null
 
-//TODO is this somewhat redundant with get valid targets?
     get_in_range({targeting, origin}: {
         targeting: InstructionSelectTarget,
         origin: Position,
@@ -201,7 +201,7 @@ export class PlayerTurnHandler {
             case "ranged":
             case "area_burst": {
                 const distance = NODE.as_number_resolved(this.evaluate_token(targeting.distance))
-                return this.battle_grid.get_in_range({origin, distance: distance.value})
+                return get_reach_ranged({origin, distance: distance.value, battle_grid: this.battle_grid})
             }
         }
 

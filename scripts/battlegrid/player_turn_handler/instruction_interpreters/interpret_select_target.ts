@@ -4,6 +4,7 @@ import {
     InterpretInstructionProps
 } from "battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {PlayerTurnHandlerContextSelectPosition} from "battlegrid/player_turn_handler/PlayerTurnHandler";
+import {get_reach_ranged} from "battlegrid/ranges/get_reach_ranged";
 
 export const interpret_select_target = ({
                                             instruction,
@@ -23,7 +24,7 @@ export const interpret_select_target = ({
 
             if (instruction.targeting_type === "area_burst") {
                 const distance = instruction.radius
-                const highlighted_area = [...battle_grid.get_in_range({origin: position, distance}), position]
+                const highlighted_area = [...get_reach_ranged({origin: position, distance, battle_grid}), position]
                 const target_positions = highlighted_area.filter(battle_grid.is_terrain_occupied)
                 const targets = target_positions.map(battle_grid.get_creature_by_position)
 
@@ -85,7 +86,7 @@ export const interpret_select_target = ({
 
         if (instruction.targeting_type === "area_burst") {
             const distance = instruction.radius
-            const highlighted_area = [...battle_grid.get_in_range({origin: position, distance}), position]
+            const highlighted_area = [...get_reach_ranged({origin: position, distance, battle_grid}), position]
             const target_positions = highlighted_area.filter(battle_grid.is_terrain_occupied)
             const targets = target_positions.map(battle_grid.get_creature_by_position)
 
@@ -104,6 +105,7 @@ export const interpret_select_target = ({
                 target: {type: "positions", value: path, description: "target"}
             })
         } else if (instruction.targeting_type === "push") {
+        //TODO push should be a path also instead of a position
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
                 target: {type: "position", value: position, description: "target"}

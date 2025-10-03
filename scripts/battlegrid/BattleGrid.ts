@@ -49,19 +49,6 @@ export class BattleGrid {
         return result
     }
 
-    get_in_range({origin, distance}: { origin: Position, distance: number }): Array<Position> {
-        const lower_x = Math.max(0, origin.x - distance)
-        const upper_x = Math.min(this.BOARD_WIDTH - 1, origin.x + distance)
-        const lower_y = Math.max(0, origin.y - distance)
-        const upper_y = Math.min(this.BOARD_HEIGHT - 1, origin.y + distance)
-        const result = [];
-        for (let x = lower_x; x <= upper_x; x++)
-            for (let y = lower_y; y <= upper_y; y++)
-                if (origin.x !== x || origin.y !== y)
-                    result.push({x, y});
-        return result
-    }
-
     get_shortest_path = ({origin, destination}: { origin: Position, destination: Position }) => {
         const visited: Array<Position> = [origin]
         type WeightedPath = {
