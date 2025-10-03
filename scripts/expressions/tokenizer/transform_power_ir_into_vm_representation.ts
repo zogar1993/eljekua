@@ -161,7 +161,6 @@ const standardize_attack = (text: string) =>
 const transform_instructions = (instructions: Array<IRInstruction> | undefined): Array<Instruction> => {
     if (instructions === undefined) return []
     return instructions.flatMap(transform_generic_instruction)
-
 }
 
 const transform_generic_instruction = (instruction: IRInstruction): Array<Instruction> => {
