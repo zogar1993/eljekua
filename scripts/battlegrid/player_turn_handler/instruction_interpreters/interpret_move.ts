@@ -25,7 +25,7 @@ export const interpret_move = ({
         })
             .filter(battle_grid.is_terrain_occupied)
             .map(battle_grid.get_creature_by_position)
-            .filter(turn_context.has_opportunity_action)
+            .filter(creature => creature.has_opportunity_action())
 
         if (potential_attackers.length === 0) {
             const new_position = path[i + 1]
@@ -36,8 +36,8 @@ export const interpret_move = ({
                 const name = BASIC_ATTACK_ACTIONS[0].name
                 turn_context.add_power_context({name, instructions, owner: attacker})
                 turn_context.get_current_context().set_variable("primary_target", creature_node)
-
-                turn_context.expend_opportunity_action(attacker)
+//TODO opportunity action should not be spent if the action is not taken
+                attacker.use_opportunity_action()
             }
 
             context.add_instructions([{type: "move", target: instruction.target, destination: instruction.destination}])

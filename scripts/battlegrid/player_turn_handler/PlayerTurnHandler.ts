@@ -260,7 +260,6 @@ export class PlayerTurnHandler {
 
             // Reached the end of all instructions
             if (instruction === null) {
-                this.turn_context.refresh_opportunity_actions()
                 const ending_turn_creature = this.initiative_order.get_current_creature()
 
                 this.battle_grid.creatures.forEach(creature => {
@@ -281,7 +280,9 @@ export class PlayerTurnHandler {
                 this.battle_grid.creatures.forEach(creature => {
                     //exclude the ones that expire on this turn start
                     creature.remove_statuses(({until, creature}) =>
-                        until === "turn_start" && creature === initiating_turn_creature)
+                        until === "turn_start" &&
+                        (creature === initiating_turn_creature || creature === undefined)
+                    )
                 })
 
                 this.set_creature_as_current_turn(initiating_turn_creature)

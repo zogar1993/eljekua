@@ -4,7 +4,6 @@ import {Instruction} from "expressions/tokenizer/transform_power_ir_into_vm_repr
 
 export class TurnContext {
     power_contexts: Array<PowerContext> = []
-    expended_opportunity_actions: Array<Creature> = []
 
     add_power_context = ({name, instructions, owner}: {
         name: string,
@@ -29,9 +28,4 @@ export class TurnContext {
     }
 
     get_current_context = () => this.power_contexts[this.power_contexts.length - 1]
-
-    expend_opportunity_action = (creature: Creature) => this.expended_opportunity_actions.push(creature)
-    has_opportunity_action = (creature: Creature) => !this.expended_opportunity_actions.includes(creature)
-    //TODO we could make this a status
-    refresh_opportunity_actions = () => this.expended_opportunity_actions = []
 }

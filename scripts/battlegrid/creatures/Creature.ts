@@ -37,20 +37,32 @@ export class Creature {
     remove_statuses = (func: (duration: StatusDuration) => boolean) => {
         this.statuses = this.statuses.filter(({durations}) => !(durations.some(func)))
     }
+
+    use_opportunity_action = () => {
+        if (!this.has_opportunity_action())
+            throw Error(`attempted to use opportunity action when it was used already`)
+            //TODO assert it cant be used in its own turn
+        this.statuses.push({effect: {type: "opportunity_action_used"}, durations: [{until: "turn_start"}]})
+    }
+
+    has_opportunity_action = () => {
+        return !this.statuses.some(({effect}) => effect.type === "opportunity_action_used")
+    }
 }
 
 export type Status = { durations: Array<StatusDuration> } & { effect: StatusEffect }
 
 export type StatusDuration = {
     until: "turn_start" | "turn_end" | "next_attack_roll_against_target",
-    creature: Creature
+    creature?: Creature
     bypass_this_turn?: boolean
 }
 
 export type StatusEffect =
     StatusEffectGrantCombatAdvantage |
     StatusEffectGainResistance |
-    StatusEffectGainAttackBonus
+    StatusEffectGainAttackBonus |
+    StatusEffectOpportunityAttackUsed
 
 export type StatusEffectGrantCombatAdvantage = {
     type: "grant_combat_advantage",
@@ -67,4 +79,8 @@ export type StatusEffectGainAttackBonus = {
     type: "gain_attack_bonus"
     value: AstNodeNumberResolved
     against: Array<Creature>,
+}
+
+export type StatusEffectOpportunityAttackUsed = {
+    type: "opportunity_action_used"
 }
