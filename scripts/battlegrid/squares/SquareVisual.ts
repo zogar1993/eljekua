@@ -20,11 +20,11 @@ export class VisualSquareCreator {
         html_board.appendChild(html_square)
 
         html_square.addEventListener("click", () => this.onClickHandlers.forEach(
-            handler => handler({position: {x, y}})
+            handler => handler({position: {x, y, footprint: 1}})
         ))
 
         html_square.addEventListener("mouseenter", () => this.onHoverHandlers.forEach(
-            handler => handler({position: {x, y}})
+            handler => handler({position: {x, y, footprint: 1}})
         ))
 
         return {

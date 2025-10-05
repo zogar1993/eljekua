@@ -2,7 +2,7 @@ import {SquareVisual, VisualSquareCreator} from "battlegrid/squares/SquareVisual
 import {CreatureData} from "battlegrid/creatures/CreatureData";
 import {Creature} from "battlegrid/creatures/Creature";
 import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
-import {Position, positions_equal} from "battlegrid/Position";
+import {assert_positions_have_same_footprint, Position, positions_equal} from "battlegrid/Position";
 import {AnimationQueue} from "AnimationQueue";
 import {get_reach_adjacent} from "battlegrid/ranges/get_reach_adjacent";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "powers/basic";
@@ -31,23 +31,23 @@ export class BattleGrid {
         this.board = Array.from({length: this.BOARD_HEIGHT}, (_, y) => {
                 return Array.from({length: this.BOARD_WIDTH}, (_, x) => {
                     const visual = visual_square_creator.create({x, y})
-                    return {visual, position: {x, y}}
+                    return {visual, position: {x, y, footprint: 1}}
                 })
             }
         )
     }
 
-    get_area_burst({origin, radius}: { origin: Position, radius: number }): Array<Position> {
-        const lower_x = Math.max(0, origin.x - radius)
-        const upper_x = Math.min(this.BOARD_WIDTH - 1, origin.x + radius)
-        const lower_y = Math.max(0, origin.y - radius)
-        const upper_y = Math.min(this.BOARD_HEIGHT - 1, origin.y + radius)
-        const result = [];
-        for (let x = lower_x; x <= upper_x; x++)
-            for (let y = lower_y; y <= upper_y; y++)
-                result.push({x, y});
-        return result
-    }
+    // get_area_burst({origin, radius}: { origin: Position, radius: number }): Array<Position> {
+    //     const lower_x = Math.max(0, origin.x - radius)
+    //     const upper_x = Math.min(this.BOARD_WIDTH - 1, origin.x + radius)
+    //     const lower_y = Math.max(0, origin.y - radius)
+    //     const upper_y = Math.min(this.BOARD_HEIGHT - 1, origin.y + radius)
+    //     const result = [];
+    //     for (let x = lower_x; x <= upper_x; x++)
+    //         for (let y = lower_y; y <= upper_y; y++)
+    //             result.push({x, y});
+    //     return result
+    // }
 
     get_shortest_path = ({origin, destination}: { origin: Position, destination: Position }) => {
         const visited: Array<Position> = [origin]
@@ -90,8 +90,8 @@ export class BattleGrid {
 
             const head = current_path.path[current_path.path.length - 1]
             const alternatives = get_reach_adjacent({position: head, battle_grid: this})
-                .filter(x => visited.every(y => !positions_equal(x, y)))
-                .filter(x => !this.is_terrain_occupied(x))
+                .filter(a => visited.every(b => !positions_equal(a, b)))
+                .filter(a => !this.is_terrain_occupied(a))
 
             const ending_position = alternatives.find(alternative => positions_equal(alternative, destination))
             if (ending_position) return [...current_path.path, ending_position]
@@ -107,7 +107,7 @@ export class BattleGrid {
         throw Error(`Path not found from ${JSON.stringify(origin)} to ${JSON.stringify(destination)}`)
     }
 
-    is_flanking({attacker, defender}: {attacker: Creature, defender: Creature}) {
+    is_flanking({attacker, defender}: { attacker: Creature, defender: Creature }) {
         if (attacker.data.team === null) return false
 
         const offset = get_offset(attacker.data.position, defender.data.position)
@@ -145,6 +145,10 @@ export class BattleGrid {
         this.creatures.push(creature)
         return creature
     }
+
+    transform_virtual_positions_to_concrete_positions = (position: Position) => {
+        position
+    }
 }
 
 export type Square = {
@@ -157,7 +161,16 @@ type PositionOffset = {
     y: number
 }
 
-export const distance_between_positions = (a: Position, b: Position) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
-const intuitive_distance_between_positions = (a: Position, b: Position) => Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
-const get_offset = (a: Position, b: Position): PositionOffset => ({x: b.x - a.x, y: b.y - a.y})
-const add_offset = (p: Position, o: PositionOffset): Position => ({x: p.x + o.x, y: p.y + o.y})
+export const distance_between_positions = (a: Position, b: Position) => {
+    assert_positions_have_same_footprint(a, b)
+    return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
+}
+const intuitive_distance_between_positions = (a: Position, b: Position) => {
+    assert_positions_have_same_footprint(a, b)
+    return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
+}
+const get_offset = (a: Position, b: Position): PositionOffset => {
+    assert_positions_have_same_footprint(a, b)
+    return {x: b.x - a.x, y: b.y - a.y}
+}
+const add_offset = (p: Position, o: PositionOffset): Position => ({x: p.x + o.x, y: p.y + o.y, footprint: p.footprint})

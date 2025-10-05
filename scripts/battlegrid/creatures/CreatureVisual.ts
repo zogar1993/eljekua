@@ -1,5 +1,6 @@
 import {OnPositionEvent, Position} from "battlegrid/Position";
 import {CreatureData} from "battlegrid/creatures/CreatureData";
+import {SIZE} from "creatures/SIZES";
 
 export type CreatureVisual = {
     place_at: (position: Position) => void
@@ -27,6 +28,8 @@ export class VisualCreatureCreator {
         html_creature.setAttribute("id", data.name.toLowerCase())
         html_creature.classList.add("creature")
         html_creature.style.setProperty("--creature__image", data.image)
+
+        html_creature.style.setProperty("--creature_size", `${SIZE[data.size]}`)
 
         html_creature.style.setProperty("--creature_position-x", `${data.position.x}`)
         html_creature.style.setProperty("--creature_position-y", `${data.position.y}`)

@@ -18,6 +18,9 @@
     transition:
         var(--creature__position-animation-duration, 0ms) top,
         var(--creature__position-animation-duration, 0ms) left;
+
+    transform: scale(var(--creature_size));
+    transform-origin: top left;
 }
 
 .creature * {
@@ -34,7 +37,7 @@
 
 .creature__lifebar {
     position: absolute;
-    width: 50px;
+    width: 50px ;
     height: 8px;
     border: 1px solid black;
     top: 6px;

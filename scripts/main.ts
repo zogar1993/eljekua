@@ -36,9 +36,9 @@ const ATTRIBUTES = {
     } as const
 
 ;(window as any).init_demo = () => {
-    const bob = {
+    const bob = build_character({
         name: "Bob",
-        position: {x: 1, y: 2},
+        position: {x: 1, y: 2, footprint: 1},
         image: `url("/public/war-axe.svg")`,
         movement: 5,
         hp_current: 7,
@@ -47,10 +47,10 @@ const ATTRIBUTES = {
         attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
         powers: FIGHTER_POWERS,
         team: 1
-    }
-    const maik = {
+    })
+    const maik = build_character({
         name: "Maik",
-        position: {x: 0, y: 1},
+        position: {x: 0, y: 1, footprint: 1},
         image: `url("/public/wizard-staff.svg")`,
         movement: 2,
         hp_current: 10,
@@ -59,10 +59,10 @@ const ATTRIBUTES = {
         attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
         powers: WIZARD_POWERS,
         team: 1
-    }
-    const yeims = {
+    })
+    const yeims = build_character({
         name: "Yeims",
-        position: {x: 1, y: 0},
+        position: {x: 1, y: 0, footprint: 1},
         image: `url("/public/crossbow.svg")`,
         movement: 10,
         hp_current: 10,
@@ -70,21 +70,14 @@ const ATTRIBUTES = {
         level: 1,
         team: null,
         attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
-        powers: []
-    }
-
-    const jenri = {
-        name: "Jenri",
-        position: {x: 9, y: 2},
-        image: `url("/public/saber-and-pistol.svg")`,
-        movement: 10,
-        hp_current: 10,
-        hp_max: 10,
-        level: 1,
-        team: null,
-        attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
         powers: ROGUE_POWERS
-    }
+    })
+
+    const jenri = build_character({
+        name: "Jenri",
+        position: {x: 8, y: 8, footprint: 2},
+        size: "large"
+    })
 
     player_turn_handler.add_creature(bob)
     player_turn_handler.add_creature(maik)
@@ -100,4 +93,22 @@ const ATTRIBUTES = {
 
 ;(window as any).start = () => {
     player_turn_handler.start()
+}
+
+const build_character = (data:
+    Omit<Partial<CreatureData>, "position"> &
+    Pick<CreatureData, "name" | "position">): CreatureData => {
+    return {
+        name: data.name,
+        position: data.position,
+        size: data.size ?? "medium",
+        image: data.image ?? `url("/public/saber-and-pistol.svg")`,
+        movement: data.movement ?? 5,
+        hp_current: data.hp_current ?? 10,
+        hp_max: data.hp_max ?? 10,
+        level: data.level ?? 1,
+        team: data.team ?? null,
+        attributes: data.attributes ?? Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
+        powers: data.powers ?? []
+    }
 }
