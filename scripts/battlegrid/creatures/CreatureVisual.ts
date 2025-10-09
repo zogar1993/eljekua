@@ -19,9 +19,6 @@ export type CreatureVisual = {
 }
 
 export class VisualCreatureCreator {
-    onClickHandlers: Array<OnPositionEvent> = []
-    onHoverHandlers: Array<OnPositionEvent> = []
-
     create(data: CreatureData): CreatureVisual {
         const html_creature = document.createElement("div")
 
@@ -49,14 +46,6 @@ export class VisualCreatureCreator {
 
         const html_creatures = document.getElementById("creatures")!
         html_creatures.appendChild(html_creature)
-
-        html_creature.addEventListener("click", () => this.onClickHandlers.forEach(
-            handler => handler({position: data.position})
-        ))
-
-        html_creature.addEventListener("mouseenter", () => this.onHoverHandlers.forEach(
-            handler => handler({position: data.position})
-        ))
 
         const set_position_at = ({x, y}: Position) => {
             html_creature.style.setProperty("--creature_position-x", `${x}`)
@@ -133,14 +122,6 @@ export class VisualCreatureCreator {
                 buttons.forEach(button => button.remove())
             }
         }
-    }
-
-    addOnCreatureClickEvent = (onClick: OnPositionEvent) => {
-        this.onClickHandlers.push(onClick)
-    }
-
-    addOnCreatureHoverEvent = (onHover: OnPositionEvent) => {
-        this.onHoverHandlers.push(onHover)
     }
 }
 

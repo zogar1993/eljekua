@@ -1,4 +1,4 @@
-import {BattleGrid} from "battlegrid/BattleGrid";
+import {BattleGrid, ClickableCoordinate} from "battlegrid/BattleGrid";
 import {VisualSquareCreator} from "battlegrid/squares/SquareVisual";
 import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
 import {PlayerTurnHandler} from "battlegrid/player_turn_handler/PlayerTurnHandler";
@@ -19,12 +19,6 @@ const initiative_order = new InitiativeOrder(visual_initiative_order)
 const action_log = new ActionLog()
 const battle_grid = new BattleGrid({visual_square_creator, visual_creature_creator})
 const player_turn_handler = new PlayerTurnHandler({battle_grid, action_log, initiative_order})
-
-visual_creature_creator.addOnCreatureClickEvent(player_turn_handler.on_click)
-visual_square_creator.addOnSquareClickEvent(player_turn_handler.on_click)
-
-visual_creature_creator.addOnCreatureHoverEvent(player_turn_handler.on_hover)
-visual_square_creator.addOnSquareHoverEvent(player_turn_handler.on_hover)
 
 const ATTRIBUTES = {
         STRENGTH: "str",
@@ -96,8 +90,8 @@ const ATTRIBUTES = {
 }
 
 const build_character = (data:
-    Omit<Partial<CreatureData>, "position"> &
-    Pick<CreatureData, "name" | "position">): CreatureData => {
+                             Omit<Partial<CreatureData>, "position"> &
+                             Pick<CreatureData, "name" | "position">): CreatureData => {
     return {
         name: data.name,
         position: data.position,
@@ -112,3 +106,28 @@ const build_character = (data:
         powers: data.powers ?? []
     }
 }
+
+const transform_clickable_coordinate_into_position = ({coordinate, footprint}: {
+    coordinate: ClickableCoordinate,
+    footprint: number
+}) => {
+    const raw_x = Math.floor((coordinate.x - footprint + 1) / 2)
+    const x = Math.min(Math.max(0, raw_x), battle_grid.BOARD_WIDTH - footprint)
+    const raw_y = Math.floor((coordinate.y - footprint + 1) / 2)
+    const y = Math.min(Math.max(0, raw_y), battle_grid.BOARD_HEIGHT - footprint)
+    return {x, y, footprint}
+}
+
+battle_grid.addOnMouseMoveHandler(coordinate => {
+    if (player_turn_handler.selection_context?.type !== "position_select") return
+    const footprint = player_turn_handler.selection_context.footprint
+    const position = transform_clickable_coordinate_into_position({coordinate, footprint})
+    player_turn_handler.on_hover({position})
+})
+
+battle_grid.addOnClickHandler(coordinate => {
+    if (player_turn_handler.selection_context?.type !== "position_select") return
+    const footprint = player_turn_handler.selection_context.footprint
+    const position = transform_clickable_coordinate_into_position({coordinate, footprint})
+    player_turn_handler.on_click({position})
+})

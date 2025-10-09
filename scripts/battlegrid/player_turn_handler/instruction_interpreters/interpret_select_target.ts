@@ -1,4 +1,4 @@
-import {Position, positions_equal} from "battlegrid/Position";
+import {Position, positions_equal, positions_share_surface} from "battlegrid/Position";
 import {InstructionSelectTarget} from "expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
@@ -25,14 +25,13 @@ export const interpret_select_target = ({
             if (instruction.targeting_type === "area_burst") {
                 const distance = instruction.radius
                 const highlighted_area = get_reach_area_burst({origin: position, distance, battle_grid})
-                const target_positions = highlighted_area.filter(battle_grid.is_terrain_occupied)
+                const target_positions = highlighted_area.filter(p => battle_grid.is_terrain_occupied(p))
                 const targets = target_positions.map(battle_grid.get_creature_by_position)
 
                 context.set_variable(target_label, {type: "creatures", value: targets, description: target_label})
             } else if (instruction.targeting_type === "movement") {
                 // TODO automatic resolution for movement feels odd when its a movement action, but not when its a secondary action
-                const origin = context.owner().data.position
-                const path = battle_grid.get_shortest_path({origin, destination: position})
+                const path = battle_grid.get_shortest_path({creature: context.owner(), destination: position})
 
                 context.set_variable(target_label, {type: "positions", value: path, description: target_label})
             } else if (instruction.targeting_type === "push") {
@@ -59,7 +58,7 @@ export const interpret_select_target = ({
         const selection = player_turn_handler.selection_context
 
         // check if position is selectable
-        if (selection.clickable.every(target => !positions_equal(target, position)))
+        if (!selection.clickable.some(target => positions_share_surface(target, position)))
             return
 
         if (selection.target === null) throw Error("target needed for clicking")
@@ -80,14 +79,13 @@ export const interpret_select_target = ({
 
         const selection = player_turn_handler.selection_context
 
-        // check if position is clickable
-        if (selection.clickable.every(target => !positions_equal(target, position)))
+        if (!selection.clickable.some(target => positions_share_surface(target, position)))
             return
 
         if (instruction.targeting_type === "area_burst") {
             const distance = instruction.radius
             const highlighted_area = get_reach_area_burst({origin: position, distance, battle_grid})
-            const target_positions = highlighted_area.filter(battle_grid.is_terrain_occupied)
+            const target_positions = highlighted_area.filter(p => battle_grid.is_terrain_occupied(p))
             const targets = target_positions.map(battle_grid.get_creature_by_position)
 
             player_turn_handler.set_awaiting_position_selection({
@@ -96,16 +94,15 @@ export const interpret_select_target = ({
                 target: {type: "creatures", value: targets, description: "target"}
             })
         } else if (instruction.targeting_type === "movement") {
-            const origin = context.owner().data.position
-            const path = battle_grid.get_shortest_path({origin, destination: position})
+            const path = battle_grid.get_shortest_path({creature: context.owner(), destination: position})
 
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
                 highlighted_area: path,
-                target: {type: "positions", value: path, description: "target"}
+                target: {type: "positions", value: path, description: "target"},
             })
         } else if (instruction.targeting_type === "push") {
-        //TODO push should be a path also instead of a position
+            //TODO push should be a path also instead of a position
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
                 target: {type: "position", value: position, description: "target"}
@@ -129,8 +126,15 @@ export const interpret_select_target = ({
         }
     }
 
-    const selection_base: Omit<PlayerTurnHandlerContextSelectPosition, "owner" | "type"> =
-        {clickable, highlighted_area: [], target: null, on_click, on_hover}
+    const selection_base: Omit<PlayerTurnHandlerContextSelectPosition, "owner" | "type"> = {
+        clickable,
+        highlighted_area: [],
+        target: null,
+        on_click,
+        on_hover,
+        //TODO clean up
+        footprint: instruction.targeting_type === "movement" ? context.owner().data.position.footprint : 1
+    }
 
     player_turn_handler.set_awaiting_position_selection(selection_base)
 }

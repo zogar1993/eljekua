@@ -21,8 +21,7 @@ export const get_reach = ({instruction, origin, battle_grid, evaluate_token}: {
         //TODO remove origin position
         switch (instruction.targeting_type) {
             case "movement": {
-                const distance = NODE.as_number_resolved(evaluate_token(instruction.distance))
-                return get_reach_movement({origin, distance: distance.value, battle_grid})
+                return get_reach_movement({instruction, evaluate_token, battle_grid})
             }
             case "melee_weapon":
                 return get_reach_melee({origin, battle_grid})

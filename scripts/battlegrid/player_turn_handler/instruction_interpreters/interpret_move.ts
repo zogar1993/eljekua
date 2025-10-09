@@ -12,7 +12,8 @@ export const interpret_move = ({
                                    battle_grid,
                                    turn_context
                                }: InterpretInstructionProps<InstructionMovement>) => {
-    const creature_node = NODE.as_creature(context.get_variable(instruction.target))
+    const target_creature_node = NODE.as_creature(context.get_variable(instruction.target))
+    const target_creature = target_creature_node.value
     const destination_label = instruction.destination
     const path_node = NODE.as_positions(context.get_variable(destination_label))
     const path = path_node.value
@@ -23,19 +24,20 @@ export const interpret_move = ({
             position: current_position,
             battle_grid
         })
-            .filter(battle_grid.is_terrain_occupied)
+            .filter(p => battle_grid.is_terrain_occupied(p))
             .map(battle_grid.get_creature_by_position)
+            .filter(creature => creature !== target_creature)
             .filter(creature => creature.has_opportunity_action())
 
         if (potential_attackers.length === 0) {
             const new_position = path[i + 1]
-            battle_grid.move_creature_one_square({creature: creature_node.value, position: new_position})
+            battle_grid.move_creature_one_square({creature: target_creature, position: new_position})
         } else {
             for (const attacker of potential_attackers) {
                 const instructions = turn_power_into_opportunity_attack(BASIC_ATTACK_ACTIONS[0].instructions)
                 const name = BASIC_ATTACK_ACTIONS[0].name
                 turn_context.add_power_context({name, instructions, owner: attacker})
-                turn_context.get_current_context().set_variable("primary_target", creature_node)
+                turn_context.get_current_context().set_variable("primary_target", target_creature_node)
 //TODO opportunity action should not be spent if the action is not taken
                 attacker.use_opportunity_action()
             }

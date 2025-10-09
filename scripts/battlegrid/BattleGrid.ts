@@ -2,7 +2,14 @@ import {SquareVisual, VisualSquareCreator} from "battlegrid/squares/SquareVisual
 import {CreatureData} from "battlegrid/creatures/CreatureData";
 import {Creature} from "battlegrid/creatures/Creature";
 import {VisualCreatureCreator} from "battlegrid/creatures/CreatureVisual";
-import {assert_positions_have_same_footprint, Position, positions_equal} from "battlegrid/Position";
+import {
+    assert_positions_have_same_footprint,
+    Position,
+    PositionFootprintOne,
+    positions_equal,
+    positions_equal_footprint_one,
+    positions_share_surface
+} from "battlegrid/Position";
 import {AnimationQueue} from "AnimationQueue";
 import {get_reach_adjacent} from "battlegrid/ranges/get_reach_adjacent";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "powers/basic";
@@ -14,7 +21,7 @@ export class BattleGrid {
 
     board: Array<Array<Square>>
     visual_creature_creator: VisualCreatureCreator
-    get_square = ({x, y}: Position) => {
+    get_square = ({x, y}: PositionFootprintOne) => {
         if (x < 0 || x >= this.BOARD_WIDTH || y < 0 || y >= this.BOARD_HEIGHT)
             throw (`position {x:${x}, y:${y}} is out of the battle grid dimensions (width:${this.BOARD_WIDTH}, height:${this.BOARD_HEIGHT})`)
         return this.board[y][x]
@@ -27,6 +34,36 @@ export class BattleGrid {
         visual_square_creator: VisualSquareCreator,
         visual_creature_creator: VisualCreatureCreator,
     }) {
+        const html_board = document.querySelector(".board")! as HTMLDivElement
+
+        const get_click_coordinate_from_mouse_event = (e: MouseEvent): ClickableCoordinate => {
+            const rect = html_board.getBoundingClientRect();
+            const BORDER_WIDTH = 1
+
+            const BATTLE_GRID_PIXEL_WIDTH = rect.width - BORDER_WIDTH * 2
+            const COORDINATE_PIXEL_WIDTH = BATTLE_GRID_PIXEL_WIDTH / (this.BOARD_WIDTH * 2)
+            const coordinate_x = Math.floor((e.clientX - rect.left) / COORDINATE_PIXEL_WIDTH);
+
+            const BATTLE_GRID_PIXEL_HEIGHT = rect.width - BORDER_WIDTH * 2
+            const COORDINATE_PIXEL_HEIGHT = BATTLE_GRID_PIXEL_HEIGHT / (this.BOARD_HEIGHT * 2)
+            const coordinate_y = Math.floor((e.clientY - rect.top) / COORDINATE_PIXEL_HEIGHT);
+
+            return {
+                x: Math.min(Math.max(0, coordinate_x), (this.BOARD_WIDTH * 2) - 1),
+                y: Math.min(Math.max(0, coordinate_y), (this.BOARD_HEIGHT * 2) - 1)
+            }
+        }
+
+        html_board.addEventListener('mousemove', (e: MouseEvent) => {
+            const coordinate = get_click_coordinate_from_mouse_event(e)
+            this.onMouseMoveHandlers.forEach(handler => handler(coordinate))
+        });
+
+        html_board.addEventListener('click', (e: MouseEvent) => {
+            const coordinate = get_click_coordinate_from_mouse_event(e)
+            this.onClickHandlers.forEach(handler => handler(coordinate))
+        });
+
         this.visual_creature_creator = visual_creature_creator
         this.board = Array.from({length: this.BOARD_HEIGHT}, (_, y) => {
                 return Array.from({length: this.BOARD_WIDTH}, (_, x) => {
@@ -49,8 +86,10 @@ export class BattleGrid {
     //     return result
     // }
 
-    get_shortest_path = ({origin, destination}: { origin: Position, destination: Position }) => {
+    get_shortest_path = ({creature, destination}: { creature: Creature, destination: Position }) => {
+        const origin = creature.data.position
         const visited: Array<Position> = [origin]
+
         type WeightedPath = {
             path: Array<Position>,
             distance: { squares: number, intuitive: number },
@@ -91,7 +130,7 @@ export class BattleGrid {
             const head = current_path.path[current_path.path.length - 1]
             const alternatives = get_reach_adjacent({position: head, battle_grid: this})
                 .filter(a => visited.every(b => !positions_equal(a, b)))
-                .filter(a => !this.is_terrain_occupied(a))
+                .filter(a => !this.is_terrain_occupied(a, {exclude: [creature]}))
 
             const ending_position = alternatives.find(alternative => positions_equal(alternative, destination))
             if (ending_position) return [...current_path.path, ending_position]
@@ -107,6 +146,7 @@ export class BattleGrid {
         throw Error(`Path not found from ${JSON.stringify(origin)} to ${JSON.stringify(destination)}`)
     }
 
+    //TODO make get_flanking_positions to contemplate big fellows
     is_flanking({attacker, defender}: { attacker: Creature, defender: Creature }) {
         if (attacker.data.team === null) return false
 
@@ -130,13 +170,18 @@ export class BattleGrid {
     }
 
     get_creature_by_position = (position: Position): Creature => {
-        const creature = this.creatures.find(creature => positions_equal(creature.data.position, position))
+        const creature = this.creatures.find(creature => positions_share_surface(creature.data.position, position))
         if (!creature) throw Error(`creature not found for cell ${position}`)
         return creature
     }
 
-    is_terrain_occupied = (position: Position) =>
-        this.creatures.some(creature => positions_equal(creature.data.position, position))
+    is_terrain_occupied = (position: Position, {exclude}: { exclude?: Array<Creature> } = {}): boolean => {
+        for (const p1 of transform_position_to_footprint_one(position))
+            for (const creature of this.creatures.filter(c => exclude ? !exclude.includes(c) : true))
+                for (const p2 of transform_position_to_footprint_one(creature.data.position))
+                    if (positions_equal_footprint_one(p1, p2)) return true
+        return false
+    }
 
     create_creature = (data: CreatureData) => {
         const d = {...data, powers: [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS, ...data.powers]}
@@ -146,10 +191,29 @@ export class BattleGrid {
         return creature
     }
 
-    transform_virtual_positions_to_concrete_positions = (position: Position) => {
-        position
+    onMouseMoveHandlers: Array<(coordinate: ClickableCoordinate) => void> = []
+    addOnMouseMoveHandler = (handler: (coordinate: ClickableCoordinate) => void) => {
+        this.onMouseMoveHandlers.push((coordinate: ClickableCoordinate) => {
+            //TODO maybe this needs a cleanup on mouse leave, and maybe the caller needs to do the same with position
+            if (latest_coordinate === null || !coordinates_equal(coordinate, latest_coordinate)) {
+                latest_coordinate = coordinate
+                handler(coordinate)
+            }
+        })
+    }
+
+    onClickHandlers: Array<(coordinate: ClickableCoordinate) => void> = []
+    addOnClickHandler = (handler: (coordinate: ClickableCoordinate) => void) => {
+        this.onClickHandlers.push((coordinate: ClickableCoordinate) => {
+            if (latest_coordinate === null) return
+            if (!coordinates_equal(coordinate, latest_coordinate))
+                throw Error(`clicked coordinate '${JSON.stringify(coordinate)}' does not match latest coordinate '${JSON.stringify(latest_coordinate)}'`)
+            handler(latest_coordinate)
+        })
     }
 }
+
+let latest_coordinate: ClickableCoordinate | null = null
 
 export type Square = {
     visual: SquareVisual,
@@ -174,3 +238,18 @@ const get_offset = (a: Position, b: Position): PositionOffset => {
     return {x: b.x - a.x, y: b.y - a.y}
 }
 const add_offset = (p: Position, o: PositionOffset): Position => ({x: p.x + o.x, y: p.y + o.y, footprint: p.footprint})
+
+export const transform_position_to_footprint_one = (position: Position): Array<PositionFootprintOne> => {
+    if (position.footprint === 1) return [position as PositionFootprintOne]
+    const positions: Array<PositionFootprintOne> = []
+    for (let offset_x = 0; offset_x < position.footprint; offset_x++)
+        for (let offset_y = 0; offset_y < position.footprint; offset_y++)
+            positions.push({x: position.x + offset_x, y: position.y + offset_y, footprint: 1})
+    return positions
+}
+
+export type ClickableCoordinate = { x: number, y: number }
+
+export const coordinates_equal = (a: ClickableCoordinate, b: ClickableCoordinate) => {
+    return a.x === b.x && a.y === b.y
+}

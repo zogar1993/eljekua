@@ -3,6 +3,7 @@
     width: 60px;
     aspect-ratio: 1;
     z-index: 2;
+    pointer-events: none;
 
     --creature__offset-x: calc(var(--creature_position-x) * 60px + 1px);
     --creature__offset-y: calc(var(--creature_position-y) * 60px + 1px);
@@ -21,10 +22,6 @@
 
     transform: scale(var(--creature_size));
     transform-origin: top left;
-}
-
-.creature * {
-    pointer-events: none;
 }
 
 .creature__image {

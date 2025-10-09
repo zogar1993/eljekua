@@ -1,5 +1,10 @@
-import {BattleGrid} from "battlegrid/BattleGrid";
-import {OnPositionEvent, Position, positions_equal} from "battlegrid/Position";
+import {BattleGrid, transform_position_to_footprint_one} from "battlegrid/BattleGrid";
+import {
+    OnPositionEvent,
+    Position,
+    positions_equal,
+    positions_share_surface
+} from "battlegrid/Position";
 import {ActionLog} from "action_log/ActionLog";
 import {build_evaluate_token} from "expressions/token_evaluator/evaluate_token";
 import {Creature} from "battlegrid/creatures/Creature";
@@ -28,6 +33,7 @@ export type PlayerTurnHandlerContextSelectPosition = {
     target: AstNode | null
     on_click: (position: Position) => void
     on_hover: (position: Position) => void
+    footprint: number
 }
 
 type PlayerTurnHandlerContextSelectOption = {
@@ -103,7 +109,7 @@ export class PlayerTurnHandler {
 
     on_click: OnPositionEvent = ({position}) => {
         if (this.selection_context?.type === "position_select") {
-            if (this.selection_context.clickable.some(p => positions_equal(p, position))) {
+            if (this.selection_context.clickable.some(p => positions_share_surface(p, position))) {
                 this.selection_context.on_click(position)
                 this.deselect()
                 this.evaluate_instructions()
@@ -144,15 +150,20 @@ export class PlayerTurnHandler {
 
     set_selected_indicator() {
         const creature = this.turn_context.get_current_context().owner()
-        const cell = this.battle_grid.get_square(creature.data.position)
-        cell.visual.setIndicator("selected")
+        const positions = transform_position_to_footprint_one(creature.data.position)
+
+        for (const position of positions) {
+            const cell = this.battle_grid.get_square(position)
+            cell.visual.setIndicator("selected")
+        }
     }
 
     deselect() {
         if (this.selection_context === null) return
 
-        const square = this.battle_grid.get_square(this.selection_context.owner.data.position)
-        square.visual.clearIndicator()
+        transform_position_to_footprint_one(this.selection_context.owner.data.position)
+            .map(this.battle_grid.get_square)
+            .forEach(({visual}) => visual.clearIndicator())
 
         if (this.selection_context.type === "position_select") {
             this.clear_indicator_to_positions({positions: this.selection_context.clickable})
@@ -192,10 +203,14 @@ export class PlayerTurnHandler {
             const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
             if (instruction.destination_requirement) {
                 //TODO move targeting and these evaluate token functions outside of the player turn handler
-                const node = this.evaluate_token(instruction.destination_requirement)
-                const possibility = NODE.as_position(node)
-                //TODO this needs to change how it works when we add big fellows
-                return valid_targets.filter(position => positions_equal(position, possibility.value))
+                const possibilities = NODE.as_positions(this.evaluate_token(instruction.destination_requirement)).value
+
+                const restricted: Array<Position> = []
+                for (const position of valid_targets)
+                    for (const possibility of possibilities)
+                        if (positions_share_surface(position, possibility))
+                            restricted.push(position)
+                return restricted
             } else
                 return valid_targets
         }
@@ -270,9 +285,21 @@ export class PlayerTurnHandler {
     set_indicator_to_positions = ({positions, indicator}: {
         positions: Array<Position>,
         indicator: Parameters<SquareVisual["setIndicator"]>[0]
-    }) => positions.map(this.battle_grid.get_square).forEach(({visual}) => visual.setIndicator(indicator))
+    }) => {
+        //TODO can be redundant
+        positions
+            .flatMap(transform_position_to_footprint_one)
+            .map(this.battle_grid.get_square)
+            .forEach(({visual}) => visual.setIndicator(indicator))
+    }
 
     clear_indicator_to_positions = ({positions}: {
         positions: Array<Position>
-    }) => positions.map(this.battle_grid.get_square).forEach(({visual}) => visual.clearIndicator())
+    }) => {
+        //TODO can be redundant
+        positions
+            .flatMap(transform_position_to_footprint_one)
+            .map(this.battle_grid.get_square)
+            .forEach(({visual}) => visual.clearIndicator())
+    }
 }
