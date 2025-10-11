@@ -1,7 +1,7 @@
-import {SquareVisual, VisualSquareCreator} from "scripts/battlegrid/squares/SquareVisual";
+import {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
-import {VisualCreatureCreator} from "scripts/battlegrid/creatures/CreatureVisual";
+import {CreatureVisual} from "scripts/battlegrid/creatures/CreatureVisual";
 import {
     assert_positions_have_same_footprint,
     Position,
@@ -20,7 +20,7 @@ export class BattleGrid {
     readonly creatures: Array<Creature> = []
 
     board: Array<Array<Square>>
-    visual_creature_creator: VisualCreatureCreator
+    create_visual_creature: (creature: CreatureData) => CreatureVisual
     get_square = ({x, y}: PositionFootprintOne) => {
         if (x < 0 || x >= this.BOARD_WIDTH || y < 0 || y >= this.BOARD_HEIGHT)
             throw (`position {x:${x}, y:${y}} is out of the battle grid dimensions (width:${this.BOARD_WIDTH}, height:${this.BOARD_HEIGHT})`)
@@ -28,11 +28,11 @@ export class BattleGrid {
     }
 
     constructor({
-                    visual_square_creator,
-                    visual_creature_creator
+                    create_visual_square,
+                    create_visual_creature
                 }: {
-        visual_square_creator: VisualSquareCreator,
-        visual_creature_creator: VisualCreatureCreator,
+        create_visual_square: (square: { x: number, y: number }) => SquareVisual,
+        create_visual_creature: (creature: CreatureData) => CreatureVisual,
     }) {
         const html_board = document.querySelector(".board")! as HTMLDivElement
 
@@ -64,10 +64,10 @@ export class BattleGrid {
             this.onClickHandlers.forEach(handler => handler(coordinate))
         });
 
-        this.visual_creature_creator = visual_creature_creator
+        this.create_visual_creature = create_visual_creature
         this.board = Array.from({length: this.BOARD_HEIGHT}, (_, y) => {
                 return Array.from({length: this.BOARD_WIDTH}, (_, x) => {
-                    const visual = visual_square_creator.create({x, y})
+                    const visual = create_visual_square({x, y})
                     return {visual, position: {x, y, footprint: 1}}
                 })
             }
@@ -185,7 +185,7 @@ export class BattleGrid {
 
     create_creature = (data: CreatureData) => {
         const d = {...data, powers: [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS, ...data.powers]}
-        const visual = this.visual_creature_creator.create(d)
+        const visual = this.create_visual_creature(d)
         const creature = new Creature({data: d, visual})
         this.creatures.push(creature)
         return creature

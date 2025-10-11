@@ -1,6 +1,6 @@
 import {BattleGrid, ClickableCoordinate} from "scripts/battlegrid/BattleGrid";
-import {VisualSquareCreator} from "scripts/battlegrid/squares/SquareVisual";
-import {VisualCreatureCreator} from "scripts/battlegrid/creatures/CreatureVisual";
+import {create_visual_square} from "scripts/battlegrid/squares/SquareVisual";
+import {create_visual_creature} from "scripts/battlegrid/creatures/CreatureVisual";
 import {PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {ActionLog} from "scripts/action_log/ActionLog";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
@@ -11,13 +11,11 @@ import type {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {InitiativeOrderVisual} from "scripts/initiative_order/InitiativeOrderVisual";
 
-const visual_square_creator = new VisualSquareCreator()
-const visual_creature_creator = new VisualCreatureCreator()
 const visual_initiative_order = new InitiativeOrderVisual()
 
 const initiative_order = new InitiativeOrder(visual_initiative_order)
 const action_log = new ActionLog()
-const battle_grid = new BattleGrid({visual_square_creator, visual_creature_creator})
+const battle_grid = new BattleGrid({create_visual_square, create_visual_creature})
 const player_turn_handler = new PlayerTurnHandler({battle_grid, action_log, initiative_order})
 
 const ATTRIBUTES = {

@@ -9,6 +9,7 @@ module.exports = {
     ...tsJestTransformCfg,
   },
   moduleNameMapper: {
-    "^src/(.+)$": "<rootDir>/src/scripts/$1",
+    "^scripts/(.+)$": "<rootDir>/src/scripts/$1",
   },
+  setupFilesAfterEnv: ['jest-extended/all'],
 };

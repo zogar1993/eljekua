@@ -3,8 +3,7 @@ export type SquareVisual = {
     setIndicator: (value: "selected" | "available-target" | "current-path" | "area") => void
 }
 
-export class VisualSquareCreator {
-    create({x, y}: { x: number, y: number }) {
+   export const create_visual_square = ({x, y}: { x: number, y: number }) =>  {
         const html_board = document.querySelector(".board")!
 
         const html_square = document.createElement("div")
@@ -19,4 +18,3 @@ export class VisualSquareCreator {
             setIndicator: (value: "selected" | "available-target" | "current-path" | "area") => html_square.dataset["indicator"] = value
         }
     }
-}
