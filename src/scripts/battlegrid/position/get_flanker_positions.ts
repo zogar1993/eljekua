@@ -6,64 +6,75 @@ export const get_flanker_positions = (
         { attacker_position: Position, defender_position: Position, battle_grid: BattleGrid }
 ): Array<PositionFootprintOne> => {
     const viewbox_rectangle = {
-        x_lower: Math.max(defender_position.x - 1, 0),
-        x_upper: Math.min(defender_position.x + defender_position.footprint, battle_grid.BOARD_WIDTH - 1),
-        y_lower: Math.max(defender_position.y - 1, 0),
-        y_upper: Math.min(defender_position.y + defender_position.footprint, battle_grid.BOARD_HEIGHT - 1)
+        x: get_viewbox_axis_from_position({position: defender_position, axis: "x", battle_grid}),
+        y: get_viewbox_axis_from_position({position: defender_position, axis: "y", battle_grid}),
     }
 
     const attacker_rectangle = {
-        x_lower: attacker_position.x,
-        x_upper: attacker_position.x + attacker_position.footprint - 1,
-        y_lower: attacker_position.y,
-        y_upper: attacker_position.y + attacker_position.footprint - 1
+        x: get_axis_from_position({position: attacker_position, axis: "x"}),
+        y: get_axis_from_position({position: attacker_position, axis: "y"}),
     }
 
     const intersection_rectangle = {
-        x_lower: Math.max(viewbox_rectangle.x_lower, attacker_rectangle.x_lower),
-        x_upper: Math.min(viewbox_rectangle.x_upper, attacker_rectangle.x_upper),
-        y_lower: Math.max(viewbox_rectangle.y_lower, attacker_rectangle.y_lower),
-        y_upper: Math.min(viewbox_rectangle.y_upper, attacker_rectangle.y_upper),
+        x: get_axis_intersection(viewbox_rectangle.x, attacker_rectangle.x),
+        y: get_axis_intersection(viewbox_rectangle.y, attacker_rectangle.y),
     }
 
     const has_intersection =
-        intersection_rectangle.x_lower <= intersection_rectangle.x_upper &&
-        intersection_rectangle.y_lower <= intersection_rectangle.y_upper
+        intersection_rectangle.x.lower <= intersection_rectangle.x.upper &&
+        intersection_rectangle.y.lower <= intersection_rectangle.y.upper
 
     if (!has_intersection) return []
 
-    const x_offset = viewbox_rectangle.x_lower
-    const y_offset = viewbox_rectangle.y_lower
-
     const mirror_rectangle = {
-        x_lower: viewbox_rectangle.x_upper - intersection_rectangle.x_upper + x_offset,
-        x_upper: viewbox_rectangle.x_upper - intersection_rectangle.x_lower + x_offset,
-        y_lower: viewbox_rectangle.y_upper - intersection_rectangle.y_upper + y_offset,
-        y_upper: viewbox_rectangle.y_upper - intersection_rectangle.y_lower + y_offset,
+        x: get_mirror_axis({axis: intersection_rectangle.x, viewbox: viewbox_rectangle.x}),
+        y: get_mirror_axis({axis: intersection_rectangle.y, viewbox: viewbox_rectangle.y}),
     }
 
     const flanker_rectangle = {
-        x_lower:
-            mirror_rectangle.x_lower === viewbox_rectangle.x_lower ||
-            mirror_rectangle.x_lower === viewbox_rectangle.x_upper ?
-                mirror_rectangle.x_lower : viewbox_rectangle.x_lower + 1,
-        x_upper:
-            mirror_rectangle.x_upper === viewbox_rectangle.x_lower ||
-            mirror_rectangle.x_upper === viewbox_rectangle.x_upper ?
-                mirror_rectangle.x_upper : viewbox_rectangle.x_upper - 1,
-        y_lower:
-            mirror_rectangle.y_lower === viewbox_rectangle.y_lower ||
-            mirror_rectangle.y_lower === viewbox_rectangle.y_upper ?
-                mirror_rectangle.y_lower : viewbox_rectangle.y_lower + 1,
-        y_upper:
-            mirror_rectangle.y_upper === viewbox_rectangle.y_lower ||
-            mirror_rectangle.y_upper === viewbox_rectangle.y_upper ?
-                mirror_rectangle.y_upper : viewbox_rectangle.y_upper - 1,
+        x: extend_axis_if_flanker_is_on_a_side({axis: mirror_rectangle.x, viewbox: viewbox_rectangle.x}),
+        y: extend_axis_if_flanker_is_on_a_side({axis: mirror_rectangle.y, viewbox: viewbox_rectangle.y})
     }
 
     const results: Array<PositionFootprintOne> = []
-    for (let x = flanker_rectangle.x_lower; x <= flanker_rectangle.x_upper; x++)
-        for (let y = flanker_rectangle.y_lower; y <= flanker_rectangle.y_upper; y++)
+    for (let x = flanker_rectangle.x.lower; x <= flanker_rectangle.x.upper; x++)
+        for (let y = flanker_rectangle.y.lower; y <= flanker_rectangle.y.upper; y++)
             results.push({x, y, footprint: 1})
     return results
 }
+
+const get_axis_intersection = ((a: Axis, b: Axis): Axis => ({
+    lower: Math.max(a.lower, b.lower),
+    upper: Math.min(a.upper, b.upper)
+}))
+
+const get_viewbox_axis_from_position = ({position, axis, battle_grid}: {
+    position: Position,
+    axis: AxisKey,
+    battle_grid: BattleGrid
+}): Axis => ({
+    lower: Math.max(position[axis] - 1, 0),
+    upper: Math.min(position[axis] + position.footprint, battle_grid.size[axis] - 1)
+})
+
+const get_axis_from_position = ({position, axis,}: { position: Position, axis: AxisKey }): Axis => ({
+    lower: position[axis],
+    upper: position[axis] + position.footprint - 1,
+})
+
+const get_mirror_axis = ({axis, viewbox,}: { axis: Axis, viewbox: Axis }): Axis => {
+    const offset = viewbox.lower
+    return {
+        lower: viewbox.upper - axis.upper + offset,
+        upper: viewbox.upper - axis.lower + offset,
+    }
+}
+
+const extend_axis_if_flanker_is_on_a_side = ({axis, viewbox}: { axis: Axis, viewbox: Axis }) => ({
+    lower: axis.lower === viewbox.lower || axis.lower === viewbox.upper ? axis.lower : viewbox.lower + 1,
+    upper: axis.upper === viewbox.lower || axis.upper === viewbox.upper ? axis.upper : viewbox.upper - 1,
+})
+
+
+type Axis = { lower: number, upper: number }
+type AxisKey = "x" | "y"

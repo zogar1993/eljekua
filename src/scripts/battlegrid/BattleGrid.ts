@@ -20,6 +20,7 @@ export class BattleGrid {
     readonly BOARD_HEIGHT = 10
     readonly BOARD_WIDTH = 10
     readonly creatures: Array<Creature> = []
+    readonly size: {x: number, y: number} = {x: this.BOARD_WIDTH, y: this.BOARD_HEIGHT}
 
     board: Array<Array<Square>>
     create_visual_creature: (creature: CreatureData) => CreatureVisual
