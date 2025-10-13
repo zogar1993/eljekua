@@ -1,11 +1,14 @@
-import {resolve_number} from "scripts/expressions/token_evaluator/evaluate_token";
 import {InstructionApplyDamage} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {NODE} from "scripts/expressions/token_evaluator/NODE";
 import {AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
-import {max_number_resolved, subtract_numbers_resolved} from "scripts/expressions/token_evaluator/add_numbers";
+import {
+    max_number_resolved,
+    resolve_number,
+    subtract_numbers_resolved
+} from "scripts/expressions/token_evaluator/number_utils";
 import {StatusEffectGainResistance} from "scripts/battlegrid/creatures/Creature";
 
 export const interpret_apply_damage = ({

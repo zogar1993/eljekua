@@ -1,7 +1,5 @@
-import {roll_d} from "scripts/randomness/dice";
 import type {Token} from "scripts/expressions/tokenizer/tokens/AnyToken";
-import {is_number, is_number_resolved} from "scripts/expressions/token_evaluator/add_numbers";
-import type {AstNode, AstNodeNumber, AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
+import type {AstNode} from "scripts/expressions/token_evaluator/types";
 import {build_evaluate_token_keyword} from "scripts/expressions/token_evaluator/internals/keyword/evaluate_keyword";
 import {evaluate_string} from "scripts/expressions/token_evaluator/internals/evaluate_string";
 import {evaluate_number} from "scripts/expressions/token_evaluator/internals/evaluate_number";
@@ -14,20 +12,6 @@ import type {DiceToken, WeaponToken} from "scripts/expressions/tokenizer/tokens/
 import type {PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import type {KeywordToken} from "scripts/expressions/tokenizer/tokens/KeywordToken";
 import type {TokenFunction} from "scripts/expressions/tokenizer/tokens/TokenFunction";
-
-//TODO move elsewhere
-export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
-    if (is_number_resolved(number)) return number
-    if (number.params === undefined)
-        return roll_d(number.max) //TODO this is to be enhanced when randomness apart from dice is added
-    const resolved_parts = number.params.map(part => is_number(part) ? resolve_number(part) : part)
-    return {
-        type: "number_resolved",
-        value: resolved_parts.reduce((result, part) => is_number(part) ? part.value + result : result, 0),
-        description: number.description,
-        params: resolved_parts
-    }
-}
 
 /*
     This is called "evaluate" instead on "interpret" to distinguish the expressions that evaluate to a value from the

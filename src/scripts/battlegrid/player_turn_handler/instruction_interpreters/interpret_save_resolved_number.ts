@@ -2,8 +2,8 @@ import {InstructionSaveResolvedNumber} from "scripts/expressions/tokenizer/trans
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {resolve_number} from "scripts/expressions/token_evaluator/evaluate_token";
 import {NODE} from "scripts/expressions/token_evaluator/NODE";
+import {resolve_number} from "scripts/expressions/token_evaluator/number_utils";
 
 export const interpret_save_resolved_number = ({
                                                    instruction,

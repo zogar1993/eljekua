@@ -11,7 +11,7 @@ import {
 import {PowerContext} from "scripts/battlegrid/player_turn_handler/PowerContext";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {ActionLog} from "scripts/action_log/ActionLog";
-import {add_numbers_resolved} from "scripts/expressions/token_evaluator/add_numbers";
+import {add_numbers_resolved} from "scripts/expressions/token_evaluator/number_utils";
 import {NODE} from "scripts/expressions/token_evaluator/NODE";
 import {AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
 import {preview_defense} from "scripts/expressions/token_evaluator/internals/keyword/evaluate_keyword";
