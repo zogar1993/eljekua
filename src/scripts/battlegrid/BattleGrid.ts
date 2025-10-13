@@ -13,6 +13,8 @@ import {
 import {AnimationQueue} from "scripts/AnimationQueue";
 import {get_reach_adjacent} from "scripts/battlegrid/ranges/get_reach_adjacent";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "scripts/powers/basic";
+import {get_flanker_positions} from "scripts/battlegrid/position/get_flanker_positions";
+import {are_creatures_allied} from "scripts/creatures/are_creatures_allied";
 
 export class BattleGrid {
     readonly BOARD_HEIGHT = 10
@@ -146,17 +148,21 @@ export class BattleGrid {
         throw Error(`Path not found from ${JSON.stringify(origin)} to ${JSON.stringify(destination)}`)
     }
 
-    //TODO make get_flanking_positions to contemplate big fellows
     is_flanking({attacker, defender}: { attacker: Creature, defender: Creature }) {
         if (attacker.data.team === null) return false
 
-        const offset = get_offset(attacker.data.position, defender.data.position)
-        const position = add_offset(defender.data.position, offset)
+        //TODO refactor battle_grid so that functions are attached to it
+        //TODO test actual flanking
+        const positions = get_flanker_positions({
+            attacker_position: attacker.data.position,
+            defender_position: defender.data.position,
+            battle_grid: this
+        })
 
-        if (!this.is_terrain_occupied(position)) return false
+        if (positions.every(position => !this.is_terrain_occupied(position))) return false
 
-        const flanker = this.get_creature_by_position(position)
-        return flanker.data.team === attacker.data.team
+        const flankers = positions.map(this.get_creature_by_position)
+        return flankers.some(flanker => are_creatures_allied(flanker, attacker))
     }
 
     move_creature_one_square({position, creature}: { position: Position, creature: Creature }) {
@@ -220,11 +226,6 @@ export type Square = {
     position: Position
 }
 
-type PositionOffset = {
-    x: number,
-    y: number
-}
-
 export const distance_between_positions = (a: Position, b: Position) => {
     assert_positions_have_same_footprint(a, b)
     return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
@@ -233,11 +234,6 @@ const intuitive_distance_between_positions = (a: Position, b: Position) => {
     assert_positions_have_same_footprint(a, b)
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
 }
-const get_offset = (a: Position, b: Position): PositionOffset => {
-    assert_positions_have_same_footprint(a, b)
-    return {x: b.x - a.x, y: b.y - a.y}
-}
-const add_offset = (p: Position, o: PositionOffset): Position => ({x: p.x + o.x, y: p.y + o.y, footprint: p.footprint})
 
 export const transform_position_to_footprint_one = (position: Position): Array<PositionFootprintOne> => {
     if (position.footprint === 1) return [position as PositionFootprintOne]

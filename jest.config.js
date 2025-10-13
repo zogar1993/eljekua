@@ -10,6 +10,7 @@ module.exports = {
   },
   moduleNameMapper: {
     "^scripts/(.+)$": "<rootDir>/src/scripts/$1",
+    "^tests/(.+)$": "<rootDir>/src/tests/$1",
   },
   setupFilesAfterEnv: ['jest-extended/all'],
 };
