@@ -42,6 +42,7 @@ export class Creature {
         if (!this.has_opportunity_action())
             throw Error(`attempted to use opportunity action when it was used already`)
             //TODO assert it cant be used in its own turn
+            //TODO seems to not be working correctly with big fellows
         this.statuses.push({effect: {type: "opportunity_action_used"}, durations: [{until: "turn_start"}]})
     }
 
