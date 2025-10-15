@@ -77,18 +77,6 @@ export class BattleGrid {
         )
     }
 
-    // get_area_burst({origin, radius}: { origin: Position, radius: number }): Array<Position> {
-    //     const lower_x = Math.max(0, origin.x - radius)
-    //     const upper_x = Math.min(this.BOARD_WIDTH - 1, origin.x + radius)
-    //     const lower_y = Math.max(0, origin.y - radius)
-    //     const upper_y = Math.min(this.BOARD_HEIGHT - 1, origin.y + radius)
-    //     const result = [];
-    //     for (let x = lower_x; x <= upper_x; x++)
-    //         for (let y = lower_y; y <= upper_y; y++)
-    //             result.push({x, y});
-    //     return result
-    // }
-
     get_shortest_path = ({creature, destination}: { creature: Creature, destination: Position }) => {
         const origin = creature.data.position
         const visited: Array<Position> = [origin]
