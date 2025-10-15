@@ -8,10 +8,15 @@ import {
 import {ActionLog} from "scripts/action_log/ActionLog";
 import {build_evaluate_token} from "scripts/expressions/token_evaluator/evaluate_token";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
-import {Instruction, InstructionSelectTarget} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+import {
+    Instruction,
+    InstructionSelectTarget
+} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {PowerContext} from "scripts/battlegrid/player_turn_handler/PowerContext";
 import {TurnContext} from "scripts/battlegrid/player_turn_handler/TurnContext";
-import {interpret_instruction} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
+import {
+    interpret_instruction
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
 import {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {ButtonOption} from "scripts/battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
@@ -73,9 +78,8 @@ export class PlayerTurnHandler {
 
         this.set_selected_indicator()
 
-        this.set_indicator_to_positions({positions: context.clickable, indicator: "available-target"})
-        this.set_indicator_to_positions({positions: context.highlighted_area, indicator: "current-path"})
-        //this.set_indicator_to_positions({positions: context.affected_area, indicator: "area"})
+        context.clickable.forEach(position => this.set_indicator_to_position(position, "available-target"))
+        context.highlighted_area.forEach(position => this.set_indicator_to_position(position, "current-path"))
     }
 
     set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type" | "owner">) => {
@@ -150,24 +154,17 @@ export class PlayerTurnHandler {
 
     set_selected_indicator() {
         const creature = this.turn_context.get_current_context().owner()
-        const positions = transform_position_to_footprint_one(creature.data.position)
-
-        for (const position of positions) {
-            const cell = this.battle_grid.get_square(position)
-            cell.visual.setIndicator("selected")
-        }
+        this.set_indicator_to_position(creature.data.position, "selected")
     }
 
     deselect() {
         if (this.selection_context === null) return
 
-        transform_position_to_footprint_one(this.selection_context.owner.data.position)
-            .map(this.battle_grid.get_square)
-            .forEach(({visual}) => visual.clearIndicator())
+        this.set_indicator_to_position(this.selection_context.owner.data.position, null)
 
         if (this.selection_context.type === "position_select") {
-            this.clear_indicator_to_positions({positions: this.selection_context.clickable})
-            this.clear_indicator_to_positions({positions: this.selection_context.highlighted_area})
+            this.selection_context.clickable.forEach(position => this.set_indicator_to_position(position, null))
+            this.selection_context.highlighted_area.forEach(position => this.set_indicator_to_position(position, null))
 
             if (this.selection_context.target) {
                 if (this.selection_context.target.type === "creature"
@@ -282,24 +279,9 @@ export class PlayerTurnHandler {
         }
     }
 
-    set_indicator_to_positions = ({positions, indicator}: {
-        positions: Array<Position>,
-        indicator: Parameters<SquareVisual["setIndicator"]>[0]
-    }) => {
-        //TODO can be redundant
-        positions
-            .flatMap(transform_position_to_footprint_one)
+    set_indicator_to_position = (position: Position, indicator: Parameters<SquareVisual["setIndicator"]>[0] | null) => {
+        transform_position_to_footprint_one(position)
             .map(this.battle_grid.get_square)
             .forEach(({visual}) => visual.setIndicator(indicator))
-    }
-
-    clear_indicator_to_positions = ({positions}: {
-        positions: Array<Position>
-    }) => {
-        //TODO can be redundant
-        positions
-            .flatMap(transform_position_to_footprint_one)
-            .map(this.battle_grid.get_square)
-            .forEach(({visual}) => visual.clearIndicator())
     }
 }
