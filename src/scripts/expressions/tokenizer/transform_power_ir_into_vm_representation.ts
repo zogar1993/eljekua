@@ -125,6 +125,8 @@ export type InstructionApplyStatus = {
         type: "gain_attack_bonus"
         value: Token
         against: Token,
+    } | {
+        type: "opportunity_action_used"
     }
 }
 

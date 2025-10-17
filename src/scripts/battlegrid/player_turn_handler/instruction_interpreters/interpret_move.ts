@@ -1,10 +1,14 @@
 import {get_reach_adjacent} from "scripts/battlegrid/ranges/get_reach_adjacent";
 import {BASIC_ATTACK_ACTIONS} from "scripts/powers/basic";
-import {Instruction, InstructionMovement} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+import {
+    Instruction,
+    InstructionMovement
+} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {NODE} from "scripts/expressions/token_evaluator/NODE";
+import {tokenize} from "scripts/expressions/tokenizer/tokenize";
 
 export const interpret_move = ({
                                    instruction,
@@ -34,12 +38,12 @@ export const interpret_move = ({
             battle_grid.move_creature_one_square({creature: target_creature, position: new_position})
         } else {
             for (const attacker of potential_attackers) {
+                //TODO assert it cant be used in its own turn
+                //TODO seems to not be working correctly with big fellows
                 const instructions = turn_power_into_opportunity_attack(BASIC_ATTACK_ACTIONS[0].instructions)
                 const name = BASIC_ATTACK_ACTIONS[0].name
                 turn_context.add_power_context({name, instructions, owner: attacker})
                 turn_context.get_current_context().set_variable("primary_target", target_creature_node)
-//TODO opportunity action should not be spent if the action is not taken
-                attacker.use_opportunity_action()
             }
 
             context.add_instructions([{type: "move", target: instruction.target, destination: instruction.destination}])
@@ -62,8 +66,31 @@ const add_option_for_opportunity_attack = (instructions: Array<Instruction>): Ar
     {
         type: "options",
         options: [
-            {text: "Opportunity Attack", instructions},
-            {text: "Ignore", instructions: []},
+            {
+                text: "Opportunity Attack",
+                //TODO homogenize durations so that there is littler parsing
+                instructions: [
+                    {
+                        type: "apply_status",
+                        target: tokenize("owner"),
+                        duration: ["until_start_of_next_turn"],
+                        status: {type: "opportunity_action_used"}
+                    },
+                    ...instructions
+                ]
+            },
+            {
+                text: "Ignore",
+                instructions: [
+                    {
+                //TODO make it so that we can forgo opportunity attack for a whole movement
+                        type: "apply_status",
+                        target: tokenize("owner"),
+                        duration: ["until_start_of_next_turn"],
+                        status: {type: "opportunity_action_used"}
+                    }
+                ]
+            },
         ],
     }
 ]

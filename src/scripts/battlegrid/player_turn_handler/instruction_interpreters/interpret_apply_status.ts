@@ -38,6 +38,10 @@ const interpret_duration = (
                     until: "turn_start",
                     creature: owner
                 }
+            case "until_start_of_next_turn":
+                return {
+                    until: "turn_start"
+                }
             case "until_end_of_your_next_turn":
                 return {
                     until: "turn_end",
@@ -79,6 +83,10 @@ const interpret_status = (
                 type: "gain_resistance",
                 against: NODE.as_creatures(evaluate_token(status.against)),
                 value: NODE.as_number_resolved(evaluate_token(status.value))
+            }
+        case "opportunity_action_used":
+            return {
+                type: "opportunity_action_used",
             }
         default:
             throw Error(`could not interpret status '${JSON.stringify(status)}'`)
