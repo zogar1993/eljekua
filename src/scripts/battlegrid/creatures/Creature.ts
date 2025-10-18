@@ -34,8 +34,10 @@ export class Creature {
         this.statuses.push(status)
     }
 
-    remove_statuses = (func: (duration: StatusDuration) => boolean) => {
-        this.statuses = this.statuses.filter(({durations}) => !(durations.some(func)))
+    remove_statuses = ({type, creature}: { type: StatusDuration["until"], creature: Creature | undefined }) => {
+        this.statuses = this.statuses.filter(
+            ({durations}) => durations.every(duration => !(duration.until === type && duration.creature === creature))
+        )
     }
 
     has_opportunity_action = () => {
@@ -46,9 +48,8 @@ export class Creature {
 export type Status = { durations: Array<StatusDuration> } & { effect: StatusEffect }
 
 export type StatusDuration = {
-    until: "turn_start" | "turn_end" | "next_attack_roll_against_target",
+    until: "next_turn_end" | "turn_start" | "turn_end" | "next_attack_roll_against_target",
     creature?: Creature
-    bypass_this_turn?: boolean
 }
 
 export type StatusEffect =

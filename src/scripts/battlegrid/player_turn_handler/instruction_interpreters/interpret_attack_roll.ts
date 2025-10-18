@@ -40,10 +40,7 @@ export const interpret_attack_roll = ({
             if (effect.type === "gain_attack_bonus" && effect.against.includes(defender))
                 attack_parts.push(effect.value)
 
-        attacker.remove_statuses(({
-                                      until,
-                                      creature
-                                  }) => until === "next_attack_roll_against_target" && creature === defender)
+        attacker.remove_statuses({type: "next_attack_roll_against_target", creature: defender})
 
         if (
             battle_grid.is_flanking({attacker, defender}) ||

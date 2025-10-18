@@ -16,11 +16,10 @@ export const interpret_apply_status = ({
                                            evaluate_token,
                                        }: InterpretInstructionProps<InstructionApplyStatus>) => {
     const target = NODE.as_creature(evaluate_token(instruction.target)).value
-    const durations = interpret_duration({duration: instruction.duration, player_turn_handler})
 
     target.add_status({
         effect: interpret_status({status: instruction.status, evaluate_token}),
-        durations
+        durations: interpret_duration({ duration: instruction.duration, player_turn_handler})
     })
 }
 
@@ -44,9 +43,8 @@ const interpret_duration = (
                 }
             case "until_end_of_your_next_turn":
                 return {
-                    until: "turn_end",
-                    creature: owner,
-                    bypass_this_turn: owner === player_turn_handler.initiative_order.get_current_creature()
+                    until: "next_turn_end",
+                    creature: owner
                 }
             case "until_your_next_attack_roll_against_target":
                 return {

@@ -239,27 +239,21 @@ export class PlayerTurnHandler {
                 const ending_turn_creature = this.initiative_order.get_current_creature()
 
                 this.battle_grid.creatures.forEach(creature => {
-                    //exclude the ones that expire on this turn end
-                    creature.remove_statuses(({until, creature, bypass_this_turn}) =>
-                        until === "turn_end" && !bypass_this_turn && creature === ending_turn_creature)
-
-                    // this is so that "end of next turn" durations exclude current turn, but are removed next turn
-                    for (const status of creature.statuses)
-                        for (const duration of status.durations)
-                            if (duration.until === "turn_end" && creature === ending_turn_creature)
-                                duration.bypass_this_turn = false
+                    creature.remove_statuses({type: "turn_end", creature: ending_turn_creature})
                 })
 
                 this.initiative_order.next_turn()
                 const initiating_turn_creature = this.initiative_order.get_current_creature()
 
-                this.battle_grid.creatures.forEach(creature => {
-                    //exclude the ones that expire on this turn start
-                    creature.remove_statuses(({until, creature}) =>
-                        until === "turn_start" &&
-                        (creature === initiating_turn_creature || creature === undefined)
-                    )
-                })
+                for (const creature of this.battle_grid.creatures) {
+                    creature.remove_statuses({type: "turn_start", creature: initiating_turn_creature})
+
+                    //TODO a little mutation but whatever, we can clean up later
+                    for (const status of creature.statuses)
+                        for (const duration of status.durations)
+                            if (duration.until === "next_turn_end" && creature === duration.creature)
+                                duration.until = "turn_end"
+                }
 
                 this.set_creature_as_current_turn(initiating_turn_creature)
                 return
