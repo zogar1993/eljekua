@@ -22,9 +22,9 @@ import {ButtonOption} from "scripts/battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {NODE} from "scripts/expressions/token_evaluator/NODE";
-import {preview_defense} from "scripts/expressions/token_evaluator/internals/keyword/evaluate_keyword";
 import {AstNode} from "scripts/expressions/token_evaluator/types";
 import {get_reach} from "scripts/battlegrid/ranges/get_reach";
+import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -142,7 +142,7 @@ export class PlayerTurnHandler {
                     const attacker = next_instruction.attack
                     const attack = NODE.as_number_resolved(this.evaluate_token(attacker)).value
 
-                    const defense = preview_defense({defender, defense_code: next_instruction.defense}).value
+                    const defense = get_creature_defense({creature: defender, defense_code: next_instruction.defense}).value
 
                     const chance = (attack + 20 - defense + 1) * 5
 

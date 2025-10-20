@@ -1,6 +1,6 @@
 import type {Token} from "scripts/expressions/tokenizer/tokens/AnyToken";
 import type {AstNode} from "scripts/expressions/token_evaluator/types";
-import {build_evaluate_token_keyword} from "scripts/expressions/token_evaluator/internals/keyword/evaluate_keyword";
+import {build_evaluate_token_keyword} from "scripts/expressions/token_evaluator/internals/evaluate_keyword";
 import {evaluate_string} from "scripts/expressions/token_evaluator/internals/evaluate_string";
 import {evaluate_number} from "scripts/expressions/token_evaluator/internals/evaluate_number";
 import {evaluate_weapon} from "scripts/expressions/token_evaluator/internals/evaluate_weapon";

@@ -14,7 +14,8 @@ import {ActionLog} from "scripts/action_log/ActionLog";
 import {add_numbers_resolved} from "scripts/expressions/token_evaluator/number_utils";
 import {NODE} from "scripts/expressions/token_evaluator/NODE";
 import {AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
-import {preview_defense} from "scripts/expressions/token_evaluator/internals/keyword/evaluate_keyword";
+
+import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 
 export const interpret_attack_roll = ({
                                           instruction,
@@ -49,7 +50,7 @@ export const interpret_attack_roll = ({
 
         const attack = add_numbers_resolved(attack_parts)
 
-        const defense = NODE.as_number_resolved(preview_defense({defender, defense_code: instruction.defense}))
+        const defense = get_creature_defense({creature: defender, defense_code: instruction.defense})
 
         const is_hit = attack.value >= defense.value
 

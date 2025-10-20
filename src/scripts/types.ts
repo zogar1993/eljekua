@@ -1,3 +1,5 @@
+import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
+
 export type Power = {
     name: string
     description?: string
@@ -16,7 +18,7 @@ export type Power = {
     targeting: Targeting,
     roll?: {
         attack: string
-        defense: string
+        defense: DefenseCode
         before_instructions?: Array<IRInstruction>
         hit: Array<IRInstruction>
         miss?: Array<IRInstruction>

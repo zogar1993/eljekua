@@ -9,6 +9,8 @@ import type {Token} from "scripts/expressions/tokenizer/tokens/AnyToken";
 import {ATTRIBUTE_CODES} from "scripts/character_sheet/attributes";
 import type {IRInstructionApplyStatus} from "scripts/types";
 
+import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
+
 const PRIMARY_TARGET_LABEL = "primary_target"
 
 export const transform_power_ir_into_vm_representation = (power: Power): PowerVM => {
@@ -42,7 +44,7 @@ export type PowerVM = {
 export type InstructionAttackRoll = {
     type: "attack_roll"
     attack: Token
-    defense: string
+    defense: DefenseCode
     defender: string
     before_instructions: Array<Instruction>
     hit: Array<Instruction>
@@ -398,4 +400,3 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
             throw Error(`"${ir.status.type}" is not a valid "apply_status" type`)
     }
 }
-
