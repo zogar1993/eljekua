@@ -1,6 +1,7 @@
-import {BattleGrid, ClickableCoordinate} from "scripts/battlegrid/BattleGrid";
+import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import {create_visual_square} from "scripts/battlegrid/squares/SquareVisual";
 import {create_visual_creature} from "scripts/battlegrid/creatures/CreatureVisual";
+import {ClickableCoordinate, create_battle_grid_visual} from "scripts/battlegrid/BattleGridVisual";
 import {PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {ActionLog} from "scripts/action_log/ActionLog";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
@@ -15,7 +16,8 @@ const visual_initiative_order = new InitiativeOrderVisual()
 
 const initiative_order = new InitiativeOrder(visual_initiative_order)
 const action_log = new ActionLog()
-const battle_grid = new BattleGrid({create_visual_square, create_visual_creature})
+
+const battle_grid = new BattleGrid({create_visual_square, create_visual_creature, create_battle_grid_visual})
 const player_turn_handler = new PlayerTurnHandler({battle_grid, action_log, initiative_order})
 
 const ATTRIBUTES = {
@@ -116,14 +118,14 @@ const transform_clickable_coordinate_into_position = ({coordinate, footprint}: {
     return {x, y, footprint}
 }
 
-battle_grid.addOnMouseMoveHandler(coordinate => {
+battle_grid.visual.addOnMouseMoveHandler(coordinate => {
     if (player_turn_handler.selection_context?.type !== "position_select") return
     const footprint = player_turn_handler.selection_context.footprint
     const position = transform_clickable_coordinate_into_position({coordinate, footprint})
     player_turn_handler.on_hover({position})
 })
 
-battle_grid.addOnClickHandler(coordinate => {
+battle_grid.visual.addOnClickHandler(coordinate => {
     if (player_turn_handler.selection_context?.type !== "position_select") return
     const footprint = player_turn_handler.selection_context.footprint
     const position = transform_clickable_coordinate_into_position({coordinate, footprint})

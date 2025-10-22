@@ -15,12 +15,14 @@ import {get_reach_adjacent} from "scripts/battlegrid/ranges/get_reach_adjacent";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "scripts/powers/basic";
 import {get_flanker_positions} from "scripts/battlegrid/position/get_flanker_positions";
 import {are_creatures_allied} from "scripts/creatures/are_creatures_allied";
+import type {BattleGridVisual} from "scripts/battlegrid/BattleGridVisual";
 
 export class BattleGrid {
+    readonly visual: BattleGridVisual
     readonly BOARD_HEIGHT = 10
     readonly BOARD_WIDTH = 10
     readonly creatures: Array<Creature> = []
-    readonly size: {x: number, y: number} = {x: this.BOARD_WIDTH, y: this.BOARD_HEIGHT}
+    readonly size: { x: number, y: number } = {x: this.BOARD_WIDTH, y: this.BOARD_HEIGHT}
 
     board: Array<Array<Square>>
     create_visual_creature: (creature: CreatureData) => CreatureVisual
@@ -32,41 +34,14 @@ export class BattleGrid {
 
     constructor({
                     create_visual_square,
-                    create_visual_creature
+                    create_visual_creature,
+                    create_battle_grid_visual
                 }: {
+        create_battle_grid_visual: ({width, height}: { width: number, height: number }) => BattleGridVisual
         create_visual_square: (square: { x: number, y: number }) => SquareVisual,
         create_visual_creature: (creature: CreatureData) => CreatureVisual,
     }) {
-        const html_board = document.querySelector(".board")! as HTMLDivElement
-
-        const get_click_coordinate_from_mouse_event = (e: MouseEvent): ClickableCoordinate => {
-            const rect = html_board.getBoundingClientRect();
-            const BORDER_WIDTH = 1
-
-            const BATTLE_GRID_PIXEL_WIDTH = rect.width - BORDER_WIDTH * 2
-            const COORDINATE_PIXEL_WIDTH = BATTLE_GRID_PIXEL_WIDTH / (this.BOARD_WIDTH * 2)
-            const coordinate_x = Math.floor((e.clientX - rect.left) / COORDINATE_PIXEL_WIDTH);
-
-            const BATTLE_GRID_PIXEL_HEIGHT = rect.width - BORDER_WIDTH * 2
-            const COORDINATE_PIXEL_HEIGHT = BATTLE_GRID_PIXEL_HEIGHT / (this.BOARD_HEIGHT * 2)
-            const coordinate_y = Math.floor((e.clientY - rect.top) / COORDINATE_PIXEL_HEIGHT);
-
-            return {
-                x: Math.min(Math.max(0, coordinate_x), (this.BOARD_WIDTH * 2) - 1),
-                y: Math.min(Math.max(0, coordinate_y), (this.BOARD_HEIGHT * 2) - 1)
-            }
-        }
-
-        html_board.addEventListener('mousemove', (e: MouseEvent) => {
-            const coordinate = get_click_coordinate_from_mouse_event(e)
-            this.onMouseMoveHandlers.forEach(handler => handler(coordinate))
-        });
-
-        html_board.addEventListener('click', (e: MouseEvent) => {
-            const coordinate = get_click_coordinate_from_mouse_event(e)
-            this.onClickHandlers.forEach(handler => handler(coordinate))
-        });
-
+        this.visual = create_battle_grid_visual({width: this.BOARD_WIDTH, height: this.BOARD_HEIGHT})
         this.create_visual_creature = create_visual_creature
         this.board = Array.from({length: this.BOARD_HEIGHT}, (_, y) => {
                 return Array.from({length: this.BOARD_WIDTH}, (_, x) => {
@@ -185,30 +160,8 @@ export class BattleGrid {
         this.creatures.push(creature)
         return creature
     }
-
-    onMouseMoveHandlers: Array<(coordinate: ClickableCoordinate) => void> = []
-    addOnMouseMoveHandler = (handler: (coordinate: ClickableCoordinate) => void) => {
-        this.onMouseMoveHandlers.push((coordinate: ClickableCoordinate) => {
-            //TODO P3 maybe this needs a cleanup on mouse leave, and maybe the caller needs to do the same with position
-            if (latest_coordinate === null || !coordinates_equal(coordinate, latest_coordinate)) {
-                latest_coordinate = coordinate
-                handler(coordinate)
-            }
-        })
-    }
-
-    onClickHandlers: Array<(coordinate: ClickableCoordinate) => void> = []
-    addOnClickHandler = (handler: (coordinate: ClickableCoordinate) => void) => {
-        this.onClickHandlers.push((coordinate: ClickableCoordinate) => {
-            if (latest_coordinate === null) return
-            if (!coordinates_equal(coordinate, latest_coordinate))
-                throw Error(`clicked coordinate '${JSON.stringify(coordinate)}' does not match latest coordinate '${JSON.stringify(latest_coordinate)}'`)
-            handler(latest_coordinate)
-        })
-    }
 }
 
-let latest_coordinate: ClickableCoordinate | null = null
 
 export type Square = {
     visual: SquareVisual,
@@ -231,10 +184,4 @@ export const transform_position_to_footprint_one = (position: Position): Array<P
         for (let offset_y = 0; offset_y < position.footprint; offset_y++)
             positions.push({x: position.x + offset_x, y: position.y + offset_y, footprint: 1})
     return positions
-}
-
-export type ClickableCoordinate = { x: number, y: number }
-
-export const coordinates_equal = (a: ClickableCoordinate, b: ClickableCoordinate) => {
-    return a.x === b.x && a.y === b.y
 }
