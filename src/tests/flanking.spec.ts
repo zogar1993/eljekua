@@ -3,7 +3,7 @@ import type {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import {get_flanker_positions} from "scripts/battlegrid/position/get_flanker_positions";
 
-//TODO abstract this
+//TODO P3 abstract this
 const board = document.createElement("div")
 board.classList.add("board")
 document.body.appendChild(board)
@@ -21,7 +21,6 @@ const create_visual_creature = (): CreatureVisual => ({
 })
 
 const create_visual_square = (): SquareVisual => ({
-    clearIndicator: jest.fn(),
     setIndicator: jest.fn(),
 })
 

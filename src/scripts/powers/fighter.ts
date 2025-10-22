@@ -238,7 +238,7 @@ const brash_strike: Power = {
                         type: "apply_damage",
                         value: "owner.con_mod",
                         target: "primary_target"
-                    },//TODO revisit that these damages are all dealt as one chunk instead of parts
+                    },//TODO P1 revisit that these damages are all dealt as one chunk instead of parts
                 ]
             }
         ],

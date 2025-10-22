@@ -1,7 +1,7 @@
 import type {Position} from "scripts/battlegrid/Position";
 import type {BattleGrid} from "scripts/battlegrid/BattleGrid";
 
-//TODO move away from ranges and into utilss
+//TODO P3 move away from ranges and into utils
 export const get_positions_within_distance = ({battle_grid, position, distance}: {
     position: Position,
     battle_grid: BattleGrid,

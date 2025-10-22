@@ -43,7 +43,7 @@ export const is_number = (value: AstNode): value is AstNodeNumber =>
 export const resolve_number = (number: AstNodeNumber): AstNodeNumberResolved => {
     if (is_number_resolved(number)) return number
     if (number.params === undefined)
-        return roll_d(number.max) //TODO this is to be enhanced when randomness apart from dice is added
+        return roll_d(number.max) //TODO P4 this is to be enhanced when randomness apart from dice is added
     const resolved_parts = number.params.map(part => is_number(part) ? resolve_number(part) : part)
     return {
         type: "number_resolved",

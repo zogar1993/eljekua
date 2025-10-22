@@ -38,8 +38,8 @@ export const interpret_move = ({
             battle_grid.move_creature_one_square({creature: target_creature, position: new_position})
         } else {
             for (const attacker of potential_attackers) {
-                //TODO assert it cant be used in its own turn
-                //TODO seems to not be working correctly with big fellows
+                //TODO P0 assert it cant be used in its own turn
+                //TODO P0 seems to not be working correctly with big fellows
                 const instructions = turn_power_into_opportunity_attack(BASIC_ATTACK_ACTIONS[0].instructions)
                 const name = BASIC_ATTACK_ACTIONS[0].name
                 turn_context.add_power_context({name, instructions, owner: attacker})
@@ -68,7 +68,7 @@ const add_option_for_opportunity_attack = (instructions: Array<Instruction>): Ar
         options: [
             {
                 text: "Opportunity Attack",
-                //TODO homogenize durations so that there is littler parsing
+                //TODO P3 homogenize durations so that there is littler parsing
                 instructions: [
                     {
                         type: "apply_status",
@@ -83,7 +83,7 @@ const add_option_for_opportunity_attack = (instructions: Array<Instruction>): Ar
                 text: "Ignore",
                 instructions: [
                     {
-                //TODO make it so that we can forgo opportunity attack for a whole movement
+                //TODO P2 make it so that we can forgo opportunity attack for a whole movement
                         type: "apply_status",
                         target: tokenize("owner"),
                         duration: ["until_start_of_next_turn"],

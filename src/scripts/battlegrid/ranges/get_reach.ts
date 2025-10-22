@@ -18,7 +18,7 @@ export const get_reach = ({instruction, origin, battle_grid, evaluate_token}: {
         battle_grid: BattleGrid,
         evaluate_token: (token: Token) => AstNode
     }) => {
-        //TODO remove origin position
+        //TODO P3 remove origin position
         switch (instruction.targeting_type) {
             case "movement": {
                 return get_reach_movement({instruction, evaluate_token, battle_grid})

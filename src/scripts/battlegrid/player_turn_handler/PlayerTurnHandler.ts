@@ -69,7 +69,7 @@ export class PlayerTurnHandler {
 
     set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type" | "owner">) => {
         const owner = this.turn_context.get_current_context().owner()
-        //TODO this should be better on_hover
+        //TODO P3 this should be better on_hover
         this.selection_context = {
             type: "position_select",
             owner,
@@ -131,7 +131,7 @@ export class PlayerTurnHandler {
         if (this.selection_context?.type === "position_select") {
             this.selection_context.on_hover(position)
 
-            //TODO this is all very untidy
+            //TODO P3 this is all very untidy
             this.battle_grid.creatures.map(creature => creature.visual.remove_hit_chance())
 
             const next_instruction = this.turn_context.get_current_context().peek_instruction()
@@ -199,7 +199,7 @@ export class PlayerTurnHandler {
         if (instruction.targeting_type === "movement") {
             const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
             if (instruction.destination_requirement) {
-                //TODO move targeting and these evaluate token functions outside of the player turn handler
+                //TODO P3 move targeting and these evaluate token functions outside of the player turn handler
                 const possibilities = NODE.as_positions(this.evaluate_token(instruction.destination_requirement)).value
 
                 const restricted: Array<Position> = []
@@ -248,7 +248,7 @@ export class PlayerTurnHandler {
                 for (const creature of this.battle_grid.creatures) {
                     creature.remove_statuses({type: "turn_start", creature: initiating_turn_creature})
 
-                    //TODO a little mutation but whatever, we can clean up later
+                    //TODO P3 a little mutation but whatever, we can clean up later
                     for (const status of creature.statuses)
                         for (const duration of status.durations)
                             if (duration.until === "next_turn_end" && creature === duration.creature)

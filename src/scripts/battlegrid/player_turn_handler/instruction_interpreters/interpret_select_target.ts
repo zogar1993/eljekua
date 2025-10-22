@@ -30,7 +30,7 @@ export const interpret_select_target = ({
 
                 context.set_variable(target_label, {type: "creatures", value: targets, description: target_label})
             } else if (instruction.targeting_type === "movement") {
-                // TODO automatic resolution for movement feels odd when its a movement action, but not when its a secondary action
+                // TODO P2 automatic resolution for movement feels odd when its a movement action, but not when its a secondary action
                 const path = battle_grid.get_shortest_path({creature: context.owner(), destination: position})
 
                 context.set_variable(target_label, {type: "positions", value: path, description: target_label})
@@ -102,7 +102,7 @@ export const interpret_select_target = ({
                 target: {type: "positions", value: path, description: "target"},
             })
         } else if (instruction.targeting_type === "push") {
-            //TODO push should be a path also instead of a position
+            //TODO P3 push should be a path also instead of a position
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
                 target: {type: "position", value: position, description: "target"}
@@ -111,7 +111,7 @@ export const interpret_select_target = ({
             if (instruction.target_type === "terrain") {
                 player_turn_handler.set_awaiting_position_selection({
                     ...selection_base,
-                    //TODO these descriptions of target seem off
+                    //TODO P3 these descriptions of target seem off
                     target: {type: "position", value: position, description: "target"}
                 })
             } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
@@ -132,7 +132,7 @@ export const interpret_select_target = ({
         target: null,
         on_click,
         on_hover,
-        //TODO clean up
+        //TODO P3 clean up
         footprint: instruction.targeting_type === "movement" ? context.owner().data.position.footprint : 1
     }
 

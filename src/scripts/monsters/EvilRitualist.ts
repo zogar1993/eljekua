@@ -12,7 +12,7 @@ const evil_ritualist = {
     },
     alignment: "unaligned",
     languages: [],
-    hp: 1, //TODO a missed attack never damages a minion.
+    hp: 1, //TODO P1 a missed attack never damages a minion.
     defenses: {
         ac: 15,
         fortitude: 13,
@@ -63,7 +63,7 @@ const evil_ritualist = {
                 `$lower_or_equal($distance($triggerer(),owner),5)`,
                 `$or($is_ally($triggerer()),$is_monster_template(owner.template))`,
             ]
-            //TODO melee basic attack against an adyacent enemy
+            //TODO P1 melee basic attack against an adjacent enemy
         }
     ]
 }

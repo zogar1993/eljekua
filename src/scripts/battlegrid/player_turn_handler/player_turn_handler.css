@@ -2,14 +2,6 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-    /* TODO this can be useful for the action log
-    align-items: stretch;
-    position: absolute;
-    position-anchor: --cell--selected;
-    top: anchor(top);
-    left: anchor(right);
-
-     */
 }
 
 #actions_menu:empty {

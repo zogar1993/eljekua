@@ -19,7 +19,7 @@ const magic_missile: Power = {
             type: "apply_damage",
             value: "$add(2,owner.int_mod)",
             target: "primary_target",
-            damage_types: ["force"] //TODO add vulnerabilities and resistances
+            damage_types: ["force"] //TODO P1 add vulnerabilities and resistances
         }
     ]
 }

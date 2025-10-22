@@ -140,8 +140,8 @@ export class BattleGrid {
     is_flanking({attacker, defender}: { attacker: Creature, defender: Creature }) {
         if (attacker.data.team === null) return false
 
-        //TODO refactor battle_grid so that functions are attached to it
-        //TODO test actual flanking
+        //TODO P3 refactor battle_grid so that functions are attached to it
+        //TODO P4 test actual flanking
         const positions = get_flanker_positions({
             attacker_position: attacker.data.position,
             defender_position: defender.data.position,
@@ -189,7 +189,7 @@ export class BattleGrid {
     onMouseMoveHandlers: Array<(coordinate: ClickableCoordinate) => void> = []
     addOnMouseMoveHandler = (handler: (coordinate: ClickableCoordinate) => void) => {
         this.onMouseMoveHandlers.push((coordinate: ClickableCoordinate) => {
-            //TODO maybe this needs a cleanup on mouse leave, and maybe the caller needs to do the same with position
+            //TODO P3 maybe this needs a cleanup on mouse leave, and maybe the caller needs to do the same with position
             if (latest_coordinate === null || !coordinates_equal(coordinate, latest_coordinate)) {
                 latest_coordinate = coordinate
                 handler(coordinate)
