@@ -14,7 +14,7 @@ export const interpret_move = ({
                                    instruction,
                                    context,
                                    battle_grid,
-                                   turn_context
+                                   turn_context,
                                }: InterpretInstructionProps<InstructionMovement>) => {
     const target_creature_node = NODE.as_creature(context.get_variable(instruction.target))
     const target_creature = target_creature_node.value
@@ -31,6 +31,7 @@ export const interpret_move = ({
             .filter(p => battle_grid.is_terrain_occupied(p))
             .map(battle_grid.get_creature_by_position)
             .filter(creature => creature !== target_creature)
+            .filter(creature => creature !== turn_context.get_turn_owner())
             .filter(creature => creature.has_opportunity_action())
 
         if (potential_attackers.length === 0) {
@@ -38,8 +39,8 @@ export const interpret_move = ({
             battle_grid.move_creature_one_square({creature: target_creature, position: new_position})
         } else {
             for (const attacker of potential_attackers) {
-                //TODO P0 assert it cant be used in its own turn
                 //TODO P0 seems to not be working correctly with big fellows
+                //TODO P1 allow for any attack that can be a melee basic attack
                 const instructions = turn_power_into_opportunity_attack(BASIC_ATTACK_ACTIONS[0].instructions)
                 const name = BASIC_ATTACK_ACTIONS[0].name
                 turn_context.add_power_context({name, instructions, owner: attacker})

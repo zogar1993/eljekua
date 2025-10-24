@@ -28,4 +28,11 @@ export class TurnContext {
     }
 
     get_current_context = () => this.power_contexts[this.power_contexts.length - 1]
+
+
+    //TODO P3 there are two ways of getting the current turn owner
+    get_turn_owner = () => {
+        if (this.power_contexts.length === 0) throw Error(`can't get owner without setting a power context`)
+        return this.power_contexts[0].owner()
+    }
 }
