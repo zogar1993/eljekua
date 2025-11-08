@@ -17,7 +17,8 @@ const create_visual_creature = (): CreatureVisual => ({
 })
 
 const create_visual_square = (): SquareVisual => ({
-    setIndicator: jest.fn(),
+    set_indicator: jest.fn(),
+    set_interaction_status: jest.fn()
 })
 
 const create_battle_grid_visual = (): BattleGridVisual => ({

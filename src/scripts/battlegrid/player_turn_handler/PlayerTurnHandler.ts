@@ -1,9 +1,9 @@
-import {BattleGrid, transform_position_to_footprint_one} from "scripts/battlegrid/BattleGrid";
+import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import {
-    OnPositionEvent,
-    Position,
-    positions_equal,
-    positions_share_surface
+    Position, PositionFootprintOne,
+    positions_of_same_footprint_equal,
+    positions_share_surface,
+    transform_position_to_footprint_one
 } from "scripts/battlegrid/Position";
 import {ActionLog} from "scripts/action_log/ActionLog";
 import {build_evaluate_token} from "scripts/expressions/token_evaluator/evaluate_token";
@@ -111,7 +111,13 @@ export class PlayerTurnHandler {
         this.set_creature_as_current_turn(creature)
     }
 
-    on_click: OnPositionEvent = ({position}) => {
+    set_creature_as_current_turn(creature: Creature) {
+        const instructions: Array<Instruction> = [{type: "add_powers", creature: "owner"}]
+        this.turn_context.add_power_context({name: "Action Selection", instructions, owner: creature})
+        this.evaluate_instructions()
+    }
+
+    on_click = ({position}: { position: Position }) => {
         if (this.selection_context?.type === "position_select") {
             if (this.selection_context.clickable.some(p => positions_share_surface(p, position))) {
                 this.selection_context.on_click(position)
@@ -121,33 +127,43 @@ export class PlayerTurnHandler {
         }
     }
 
-    set_creature_as_current_turn(creature: Creature) {
-        const instructions: Array<Instruction> = [{type: "add_powers", creature: "owner"}]
-        this.turn_context.add_power_context({name: "Action Selection", instructions, owner: creature})
-        this.evaluate_instructions()
-    }
-
-    on_hover: OnPositionEvent = ({position}) => {
+    on_hover = ({position}: { position: Position | null }) => {
         if (this.selection_context?.type === "position_select") {
-            this.selection_context.on_hover(position)
+            if (position) {
+                if (!this.selection_context.clickable.some(c => positions_of_same_footprint_equal(position, c))) return
 
-            //TODO P3 this is all very untidy
-            this.battle_grid.creatures.map(creature => creature.visual.remove_hit_chance())
+                this.selection_context.on_hover(position)
 
-            const next_instruction = this.turn_context.get_current_context().peek_instruction()
-            const needs_roll = next_instruction.type === "attack_roll"
-            if (needs_roll && this.selection_context.target) {
-                NODE.as_creatures(this.selection_context.target).forEach(defender => {
+                //TODO P3 this is all very untidy
+                this.battle_grid.creatures.map(creature => creature.visual.remove_hit_chance())
 
-                    const attacker = next_instruction.attack
-                    const attack = NODE.as_number_resolved(this.evaluate_token(attacker)).value
+                const next_instruction = this.turn_context.get_current_context().peek_instruction()
+                const needs_roll = next_instruction.type === "attack_roll"
+                if (needs_roll && this.selection_context.target) {
+                    NODE.as_creatures(this.selection_context.target).forEach(defender => {
 
-                    const defense = get_creature_defense({creature: defender, defense_code: next_instruction.defense}).value
+                        const attacker = next_instruction.attack
+                        const attack = NODE.as_number_resolved(this.evaluate_token(attacker)).value
 
-                    const chance = (attack + 20 - defense + 1) * 5
+                        const defense = get_creature_defense({
+                            creature: defender,
+                            defense_code: next_instruction.defense
+                        }).value
 
-                    defender.display_hit_chance_on_hover({attack, defense, chance})
-                })
+                        const chance = (attack + 20 - defense + 1) * 5
+
+                        defender.display_hit_chance_on_hover({attack, defense, chance})
+                    })
+                }
+
+                //TODO P1 this line is wrong on many levels, but it gets us out of the way to test hovering
+                this.set_interaction_status_to_positions(this.battle_grid.board.flatMap(x => x).map(x => x.position), "none")
+                this.set_interaction_status_to_positions(transform_position_to_footprint_one(position), "hover")
+            } else {
+                //TODO P2 WIP remove indicators from creatures and tiles when you go out of the selectable space
+                this.battle_grid.creatures.map(creature => creature.visual.remove_hit_chance())
+                this.selection_context.highlighted_area.forEach(position => this.set_indicator_to_position(position, null))
+
             }
         }
     }
@@ -225,7 +241,7 @@ export class PlayerTurnHandler {
 
         return valid_targets.filter(
             target => !instruction.exclude.some(
-                excluded => positions_equal(context.get_creature(excluded).data.position, target)
+                excluded => positions_of_same_footprint_equal(context.get_creature(excluded).data.position, target)
             )
         )
     }
@@ -273,9 +289,15 @@ export class PlayerTurnHandler {
         }
     }
 
-    set_indicator_to_position = (position: Position, indicator: Parameters<SquareVisual["setIndicator"]>[0] | null) => {
+    set_indicator_to_position = (position: Position, value: Parameters<SquareVisual["set_indicator"]>[0]) => {
         transform_position_to_footprint_one(position)
             .map(this.battle_grid.get_square)
-            .forEach(({visual}) => visual.setIndicator(indicator))
+            .forEach(({visual}) => visual.set_indicator(value))
+    }
+
+    set_interaction_status_to_positions = (positions: Array<PositionFootprintOne>, value: Parameters<SquareVisual["set_interaction_status"]>[0]) => {
+        positions
+            .map(this.battle_grid.get_square)
+            .forEach(({visual}) => visual.set_interaction_status(value))
     }
 }

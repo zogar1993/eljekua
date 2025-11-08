@@ -1,4 +1,4 @@
-import {Position, positions_equal, positions_share_surface} from "scripts/battlegrid/Position";
+import {Position, positions_of_same_footprint_equal, positions_share_surface} from "scripts/battlegrid/Position";
 import {InstructionSelectTarget} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
@@ -65,7 +65,7 @@ export const interpret_select_target = ({
 
         if (selection.target.type === "positions") {
             const path = selection.target.value
-            if (!positions_equal(position, path[path.length - 1]))
+            if (!positions_of_same_footprint_equal(position, path[path.length - 1]))
                 throw Error("position should be the end of the path")
         }
 

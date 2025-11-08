@@ -6,9 +6,10 @@ import {
     assert_positions_have_same_footprint,
     Position,
     PositionFootprintOne,
-    positions_equal,
+    positions_of_same_footprint_equal,
     positions_equal_footprint_one,
-    positions_share_surface
+    positions_share_surface,
+    transform_position_to_footprint_one
 } from "scripts/battlegrid/Position";
 import {AnimationQueue} from "scripts/AnimationQueue";
 import {get_reach_adjacent} from "scripts/battlegrid/ranges/get_reach_adjacent";
@@ -95,10 +96,10 @@ export class BattleGrid {
 
             const head = current_path.path[current_path.path.length - 1]
             const alternatives = get_reach_adjacent({position: head, battle_grid: this})
-                .filter(a => visited.every(b => !positions_equal(a, b)))
+                .filter(a => visited.every(b => !positions_of_same_footprint_equal(a, b)))
                 .filter(a => !this.is_terrain_occupied(a, {exclude: [creature]}))
 
-            const ending_position = alternatives.find(alternative => positions_equal(alternative, destination))
+            const ending_position = alternatives.find(alternative => positions_of_same_footprint_equal(alternative, destination))
             if (ending_position) return [...current_path.path, ending_position]
 
             visited.push(...alternatives)
@@ -165,7 +166,7 @@ export class BattleGrid {
 
 export type Square = {
     visual: SquareVisual,
-    position: Position
+    position: PositionFootprintOne
 }
 
 export const distance_between_positions = (a: Position, b: Position) => {
@@ -177,11 +178,3 @@ const intuitive_distance_between_positions = (a: Position, b: Position) => {
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
 }
 
-export const transform_position_to_footprint_one = (position: Position): Array<PositionFootprintOne> => {
-    if (position.footprint === 1) return [position as PositionFootprintOne]
-    const positions: Array<PositionFootprintOne> = []
-    for (let offset_x = 0; offset_x < position.footprint; offset_x++)
-        for (let offset_y = 0; offset_y < position.footprint; offset_y++)
-            positions.push({x: position.x + offset_x, y: position.y + offset_y, footprint: 1})
-    return positions
-}

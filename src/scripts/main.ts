@@ -11,6 +11,7 @@ import {WIZARD_POWERS} from "scripts/powers/wizard";
 import type {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {InitiativeOrderVisual} from "scripts/initiative_order/InitiativeOrderVisual";
+import {Position, positions_equal} from "scripts/battlegrid/Position";
 
 const visual_initiative_order = new InitiativeOrderVisual()
 
@@ -118,11 +119,21 @@ const transform_clickable_coordinate_into_position = ({coordinate, footprint}: {
     return {x, y, footprint}
 }
 
+
+let latest_position: Position | null = null
 battle_grid.visual.addOnMouseMoveHandler(coordinate => {
     if (player_turn_handler.selection_context?.type !== "position_select") return
     const footprint = player_turn_handler.selection_context.footprint
-    const position = transform_clickable_coordinate_into_position({coordinate, footprint})
-    player_turn_handler.on_hover({position})
+
+    if (coordinate === null) {
+        latest_position = null
+    } else {
+        const position = transform_clickable_coordinate_into_position({coordinate, footprint})
+        if (latest_position === null || !positions_equal(latest_position, position)) {
+            latest_position = position
+            player_turn_handler.on_hover({position})
+        }
+    }
 })
 
 battle_grid.visual.addOnClickHandler(coordinate => {

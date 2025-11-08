@@ -20,13 +20,7 @@ export const create_battle_grid_visual = ({width, height}: { width: number, heig
     }
 
 
-    const onMouseMoveHandlers: Array<(coordinate: ClickableCoordinate) => void> = []
-
-    html_board.addEventListener('mousemove', (e: MouseEvent) => {
-        const coordinate = get_click_coordinate_from_mouse_event(e)
-        onMouseMoveHandlers.forEach(handler => handler(coordinate))
-    });
-
+    const onMouseMoveHandlers: Array<(coordinate: ClickableCoordinate | null) => void> = []
     const onClickHandlers: Array<(coordinate: ClickableCoordinate) => void> = []
 
     html_board.addEventListener('click', (e: MouseEvent) => {
@@ -34,11 +28,24 @@ export const create_battle_grid_visual = ({width, height}: { width: number, heig
         onClickHandlers.forEach(handler => handler(coordinate))
     });
 
+    html_board.addEventListener('mousemove', (e: MouseEvent) => {
+        const coordinate = get_click_coordinate_from_mouse_event(e)
+        onMouseMoveHandlers.forEach(handler => handler(coordinate))
+    });
+
+    html_board.addEventListener('mouseleave', () => {
+        onMouseMoveHandlers.forEach(handler => handler(null))
+    })
+
+    let latest_coordinate: ClickableCoordinate | null = null
+
     return {
-        addOnMouseMoveHandler: (handler: (coordinate: ClickableCoordinate) => void) => {
-            onMouseMoveHandlers.push((coordinate: ClickableCoordinate) => {
-                //TODO P3 maybe this needs a cleanup on mouse leave, and maybe the caller needs to do the same with position
-                if (latest_coordinate === null || !coordinates_equal(coordinate, latest_coordinate)) {
+        addOnMouseMoveHandler: (handler: (coordinate: ClickableCoordinate | null) => void) => {
+            onMouseMoveHandlers.push((coordinate: ClickableCoordinate | null) => {
+                if (coordinate === null) {
+                    latest_coordinate = null
+                    handler(null)
+                } else if (latest_coordinate === null || !coordinates_equal(coordinate, latest_coordinate)) {
                     latest_coordinate = coordinate
                     handler(coordinate)
                 }
@@ -55,15 +62,14 @@ export const create_battle_grid_visual = ({width, height}: { width: number, heig
     }
 }
 
-let latest_coordinate: ClickableCoordinate | null = null
-
 export type ClickableCoordinate = { x: number, y: number }
 
 const coordinates_equal = (a: ClickableCoordinate, b: ClickableCoordinate) => a.x === b.x && a.y === b.y
 
 type ClickableCoordinateFunction = (coordinate: ClickableCoordinate) => void
+type ClickableCoordinateOrNullFunction = (coordinate: ClickableCoordinate | null) => void
 
 export type BattleGridVisual = {
-    addOnMouseMoveHandler: (handler: ClickableCoordinateFunction) => void
+    addOnMouseMoveHandler: (handler: ClickableCoordinateOrNullFunction) => void
     addOnClickHandler: (handler: ClickableCoordinateFunction) => void
 }
