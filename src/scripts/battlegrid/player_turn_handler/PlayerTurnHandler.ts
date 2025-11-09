@@ -25,6 +25,7 @@ import {NODE} from "scripts/expressions/token_evaluator/NODE";
 import {AstNode} from "scripts/expressions/token_evaluator/types";
 import {get_reach} from "scripts/battlegrid/ranges/get_reach";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
+import {bound_minmax} from "scripts/math/minmax";
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -118,6 +119,7 @@ export class PlayerTurnHandler {
     }
 
     on_click = ({position}: { position: Position }) => {
+        //TODO P0 big fellows break when moving to the edge of their movement
         if (this.selection_context?.type === "position_select") {
             if (this.selection_context.clickable.some(p => positions_share_surface(p, position))) {
                 this.selection_context.on_click(position)
@@ -141,18 +143,15 @@ export class PlayerTurnHandler {
                 const needs_roll = next_instruction.type === "attack_roll"
                 if (needs_roll && this.selection_context.target) {
                     NODE.as_creatures(this.selection_context.target).forEach(defender => {
-
                         const attacker = next_instruction.attack
                         const attack = NODE.as_number_resolved(this.evaluate_token(attacker)).value
 
-                        const defense = get_creature_defense({
-                            creature: defender,
-                            defense_code: next_instruction.defense
-                        }).value
+                        const defense_code = next_instruction.defense
+                        const defense = get_creature_defense({creature: defender, defense_code}).value
 
-                        const chance = (attack + 20 - defense + 1) * 5
+                        const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
 
-                        defender.display_hit_chance_on_hover({attack, defense, chance})
+                        defender.visual.display_hit_chance({attack, defense, chance})
                     })
                 }
 

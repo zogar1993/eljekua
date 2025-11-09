@@ -1,0 +1,1 @@
+export const bound_minmax = (min: number, value: number, max: number) => Math.max(Math.min(max, value), min)

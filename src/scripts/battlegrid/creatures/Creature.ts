@@ -18,10 +18,6 @@ export class Creature {
         AnimationQueue.add_animation(() => this.visual.receive_damage({hp: this.data.hp_current, damage: value}))
     }
 
-    display_hit_chance_on_hover = ({attack, defense, chance}: { attack: number, defense: number, chance: number }) => {
-        this.visual.display_hit_chance({attack, defense, chance})
-    }
-
     has_equipped = (weapon_type: string) => false
 
     half_level = () =>
