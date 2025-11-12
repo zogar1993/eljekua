@@ -26,6 +26,9 @@ import {AstNode} from "scripts/expressions/token_evaluator/types";
 import {get_reach} from "scripts/battlegrid/ranges/get_reach";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 import {bound_minmax} from "scripts/math/minmax";
+import {SquareHighlight} from "scripts/battlegrid/squares/SquareHighlight";
+
+type HighlightedPosition = {position: PositionFootprintOne, highlight: SquareHighlight}
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -35,7 +38,7 @@ export type PlayerTurnHandlerContextSelectPosition = {
     type: "position_select"
     owner: Creature
     clickable: Array<Position>
-    highlighted_area: Array<Position>
+    highlighted: Array<HighlightedPosition>
     target: AstNode | null
     on_click: (position: Position) => void
     on_hover: (position: Position) => void
@@ -79,8 +82,8 @@ export class PlayerTurnHandler {
 
         this.set_selected_indicator()
 
-        context.clickable.forEach(position => this.set_indicator_to_position(position, "available-target"))
-        context.highlighted_area.forEach(position => this.set_indicator_to_position(position, "current-path"))
+        context.clickable.forEach(position => this.set_highlight_to_position(position, "available-target"))
+        context.highlighted.forEach(({position, highlight}) => this.set_highlight_to_position(position, highlight))
     }
 
     set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type" | "owner">) => {
@@ -161,7 +164,7 @@ export class PlayerTurnHandler {
             } else {
                 //TODO P2 WIP remove indicators from creatures and tiles when you go out of the selectable space
                 this.battle_grid.creatures.map(creature => creature.visual.remove_hit_chance())
-                this.selection_context.highlighted_area.forEach(position => this.set_indicator_to_position(position, null))
+                this.selection_context.highlighted.forEach(({position}) => this.set_highlight_to_position(position, "none"))
 
             }
         }
@@ -169,17 +172,17 @@ export class PlayerTurnHandler {
 
     set_selected_indicator() {
         const creature = this.turn_context.get_current_context().owner()
-        this.set_indicator_to_position(creature.data.position, "selected")
+        this.set_highlight_to_position(creature.data.position, "selected")
     }
 
     deselect() {
         if (this.selection_context === null) return
 
-        this.set_indicator_to_position(this.selection_context.owner.data.position, null)
+        this.set_highlight_to_position(this.selection_context.owner.data.position, "none")
 
         if (this.selection_context.type === "position_select") {
-            this.selection_context.clickable.forEach(position => this.set_indicator_to_position(position, null))
-            this.selection_context.highlighted_area.forEach(position => this.set_indicator_to_position(position, null))
+            this.selection_context.clickable.forEach(position => this.set_highlight_to_position(position, "none"))
+            this.selection_context.highlighted.forEach(({position}) => this.set_highlight_to_position(position, "none"))
 
             if (this.selection_context.target) {
                 if (this.selection_context.target.type === "creature"
@@ -288,10 +291,10 @@ export class PlayerTurnHandler {
         }
     }
 
-    set_indicator_to_position = (position: Position, value: Parameters<SquareVisual["set_indicator"]>[0]) => {
+    set_highlight_to_position = (position: Position, highlight: SquareHighlight) => {
         transform_position_to_footprint_one(position)
             .map(this.battle_grid.get_square)
-            .forEach(({visual}) => visual.set_indicator(value))
+            .forEach(({visual}) => visual.set_highlight(highlight))
     }
 
     set_interaction_status_to_positions = (positions: Array<PositionFootprintOne>, value: Parameters<SquareVisual["set_interaction_status"]>[0]) => {

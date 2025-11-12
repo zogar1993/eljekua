@@ -1,5 +1,7 @@
+import {SquareHighlight} from "scripts/battlegrid/squares/SquareHighlight";
+
 export type SquareVisual = {
-    set_indicator: (value: "selected" | "available-target" | "current-path" | null) => void
+    set_highlight: (value: SquareHighlight) => void
     set_interaction_status: (value: "hover" | "none") => void
 }
 
@@ -14,8 +16,8 @@ export const create_visual_square = ({x, y}: { x: number, y: number }): SquareVi
     html_board.appendChild(html_square)
 
     return {
-        set_indicator: (value: "selected" | "available-target" | "current-path" | null) => {
-            if (value === null)
+        set_highlight: (value: SquareHighlight) => {
+            if (value === "none")
                 delete html_square.dataset["indicator"]
             else
                 html_square.dataset["indicator"] = value

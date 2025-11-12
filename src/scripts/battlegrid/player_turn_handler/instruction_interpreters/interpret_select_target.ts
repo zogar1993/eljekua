@@ -1,4 +1,9 @@
-import {Position, positions_of_same_footprint_equal, positions_share_surface} from "scripts/battlegrid/Position";
+import {
+    Position,
+    positions_of_same_footprint_equal,
+    positions_share_surface,
+    positions_to_footprint_one
+} from "scripts/battlegrid/Position";
 import {InstructionSelectTarget} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
@@ -84,13 +89,13 @@ export const interpret_select_target = ({
 
         if (instruction.targeting_type === "area_burst") {
             const distance = instruction.radius
-            const highlighted_area = get_reach_area_burst({origin: position, distance, battle_grid})
-            const target_positions = highlighted_area.filter(p => battle_grid.is_terrain_occupied(p))
+            const area = get_reach_area_burst({origin: position, distance, battle_grid})
+            const target_positions = area.filter(p => battle_grid.is_terrain_occupied(p))
             const targets = target_positions.map(battle_grid.get_creature_by_position)
 
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
-                highlighted_area,
+                highlighted: positions_to_footprint_one(area).map(position => ({position, highlight: "area"})),
                 target: {type: "creatures", value: targets, description: "target"}
             })
         } else if (instruction.targeting_type === "movement") {
@@ -98,7 +103,7 @@ export const interpret_select_target = ({
 
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
-                highlighted_area: path,
+                highlighted: positions_to_footprint_one(path).map(position => ({position, highlight: "path"})),
                 target: {type: "positions", value: path, description: "target"},
             })
         } else if (instruction.targeting_type === "push") {
@@ -128,7 +133,7 @@ export const interpret_select_target = ({
 
     const selection_base: Omit<PlayerTurnHandlerContextSelectPosition, "owner" | "type"> = {
         clickable,
-        highlighted_area: [],
+        highlighted: [],
         target: null,
         on_click,
         on_hover,

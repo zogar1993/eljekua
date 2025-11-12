@@ -17,7 +17,7 @@ const create_visual_creature = (): CreatureVisual => ({
 })
 
 const create_visual_square = (): SquareVisual => ({
-    set_indicator: jest.fn(),
+    set_highlight: jest.fn(),
     set_interaction_status: jest.fn()
 })
 

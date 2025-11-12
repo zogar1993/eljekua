@@ -45,18 +45,15 @@
     background-color: cadetblue;
 }
 
-.board__square[data-indicator=current-path]::after {
+.board__square[data-indicator=path]::after {
     background-color: lightpink;
 }
 
-.board__square[data-indicator=current-path][data-interaction_status=hover]::after {
+.board__square[data-indicator=path][data-interaction_status=hover]::after {
     background-color: pink;
 }
 
 .board__square[data-indicator=area]::after {
-    background-color: yellow;
+    background-color: mediumpurple;
 }
 
-.board__square[data-indicator=area][data-interaction_status=hover]::after {
-    background-color: lightyellow;
-}
