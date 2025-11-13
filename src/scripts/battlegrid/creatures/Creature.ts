@@ -18,6 +18,7 @@ export class Creature {
         AnimationQueue.add_animation(() => this.visual.receive_damage({hp: this.data.hp_current, damage: value}))
     }
 
+    //P1 add weapon types
     has_equipped = (weapon_type: string) => false
 
     half_level = () =>
