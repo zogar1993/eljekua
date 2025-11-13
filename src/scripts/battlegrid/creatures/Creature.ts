@@ -31,9 +31,12 @@ export class Creature {
     }
 
     remove_statuses = ({type, creature}: { type: StatusDuration["until"], creature: Creature | undefined }) => {
-        this.statuses = this.statuses.filter(
-            ({durations}) => durations.every(duration => !(duration.until === type && duration.creature === creature))
-        )
+        const new_statuses: Array<Status> = []
+        for(const status of this.statuses)
+            if (!status.durations.some((d) => d.until == type && d.creature === undefined || d.creature === creature))
+                new_statuses.push(status)
+
+        this.statuses = new_statuses
     }
 
     has_opportunity_action = () => {
