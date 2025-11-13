@@ -16,35 +16,33 @@ export const interpret_move = ({
                                    battle_grid,
                                    turn_context,
                                }: InterpretInstructionProps<InstructionMovement>) => {
-    const target_creature_node = NODE.as_creature(context.get_variable(instruction.target))
-    const target_creature = target_creature_node.value
+    const mover_creature_node = NODE.as_creature(context.get_variable(instruction.target))
+    const mover_creature = mover_creature_node.value
     const destination_label = instruction.destination
     const path_node = NODE.as_positions(context.get_variable(destination_label))
     const path = path_node.value
 
     for (let i = 0; i < path.length - 1; i++) {
         const current_position = path[i]
-        const potential_attackers = get_reach_adjacent({
-            position: current_position,
-            battle_grid
-        })
-            .filter(p => battle_grid.is_terrain_occupied(p))
-            .map(battle_grid.get_creature_by_position)
-            .filter(creature => creature !== target_creature)
-            .filter(creature => creature !== turn_context.get_turn_owner())
-            .filter(creature => creature.has_opportunity_action())
+        const potential_attackers = [...new Set(
+            get_reach_adjacent({position: current_position, battle_grid})
+                .filter(p => battle_grid.is_terrain_occupied(p))
+                .map(battle_grid.get_creature_by_position)
+                .filter(creature => creature !== mover_creature)
+                .filter(creature => creature !== turn_context.get_turn_owner())
+                .filter(creature => creature.has_opportunity_action())
+        )]
 
         if (potential_attackers.length === 0) {
             const new_position = path[i + 1]
-            battle_grid.move_creature_one_square({creature: target_creature, position: new_position})
+            battle_grid.move_creature_one_square({creature: mover_creature, position: new_position})
         } else {
             for (const attacker of potential_attackers) {
-                //TODO P0 seems to not be working correctly with big fellows
                 //TODO P1 allow for any attack that can be a melee basic attack
                 const instructions = turn_power_into_opportunity_attack(BASIC_ATTACK_ACTIONS[0].instructions)
                 const name = BASIC_ATTACK_ACTIONS[0].name
                 turn_context.add_power_context({name, instructions, owner: attacker})
-                turn_context.get_current_context().set_variable("primary_target", target_creature_node)
+                turn_context.get_current_context().set_variable("primary_target", mover_creature_node)
             }
 
             context.add_instructions([{type: "move", target: instruction.target, destination: instruction.destination}])
@@ -84,7 +82,7 @@ const add_option_for_opportunity_attack = (instructions: Array<Instruction>): Ar
                 text: "Ignore",
                 instructions: [
                     {
-                //TODO P2 make it so that we can forgo opportunity attack for a whole movement
+                        //TODO P2 make it so that we can forgo opportunity attack for a whole movement
                         type: "apply_status",
                         target: tokenize("owner"),
                         duration: ["until_start_of_next_turn"],
