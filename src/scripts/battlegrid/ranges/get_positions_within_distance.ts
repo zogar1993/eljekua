@@ -9,9 +9,9 @@ export const get_positions_within_distance = ({battle_grid, position, distance}:
 }): Array<Position> => {
     const footprint = position.footprint
     const lower_x = Math.max(0, position.x - distance)
-    const upper_x = Math.min(battle_grid.BOARD_WIDTH - footprint, position.x + distance)
+    const upper_x = Math.min(battle_grid.size.x - footprint, position.x + distance)
     const lower_y = Math.max(0, position.y - distance)
-    const upper_y = Math.min(battle_grid.BOARD_HEIGHT - footprint, position.y + distance)
+    const upper_y = Math.min(battle_grid.size.y - footprint, position.y + distance)
 
     const result: Array<Position> = [];
     for (let x = lower_x; x <= upper_x; x++)

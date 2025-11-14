@@ -1,4 +1,4 @@
-import {BattleGrid} from "scripts/battlegrid/BattleGrid";
+import {create_battle_grid} from "scripts/battlegrid/BattleGrid";
 import {create_visual_square} from "scripts/battlegrid/squares/SquareVisual";
 import {create_visual_creature} from "scripts/battlegrid/creatures/CreatureVisual";
 import {ClickableCoordinate, create_battle_grid_visual} from "scripts/battlegrid/BattleGridVisual";
@@ -18,7 +18,12 @@ const visual_initiative_order = new InitiativeOrderVisual()
 const initiative_order = new InitiativeOrder(visual_initiative_order)
 const action_log = new ActionLog()
 
-const battle_grid = new BattleGrid({create_visual_square, create_visual_creature, create_battle_grid_visual})
+const battle_grid = create_battle_grid({
+    create_visual_square,
+    create_visual_creature,
+    create_battle_grid_visual,
+    size: {x: 10, y: 10}
+})
 const player_turn_handler = new PlayerTurnHandler({battle_grid, action_log, initiative_order})
 
 const ATTRIBUTES = {
@@ -113,9 +118,9 @@ const transform_clickable_coordinate_into_position = ({coordinate, footprint}: {
     footprint: number
 }) => {
     const raw_x = Math.floor((coordinate.x - footprint + 1) / 2)
-    const x = Math.min(Math.max(0, raw_x), battle_grid.BOARD_WIDTH - footprint)
+    const x = Math.min(Math.max(0, raw_x), battle_grid.size.x - footprint)
     const raw_y = Math.floor((coordinate.y - footprint + 1) / 2)
-    const y = Math.min(Math.max(0, raw_y), battle_grid.BOARD_HEIGHT - footprint)
+    const y = Math.min(Math.max(0, raw_y), battle_grid.size.y - footprint)
     return {x, y, footprint}
 }
 

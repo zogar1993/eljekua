@@ -1,7 +1,7 @@
 import type {CreatureVisual} from "scripts/battlegrid/creatures/CreatureVisual";
 import type {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import type {BattleGridVisual} from "scripts/battlegrid/BattleGridVisual";
-import {BattleGrid} from "scripts/battlegrid/BattleGrid";
+import {create_battle_grid} from "scripts/battlegrid/BattleGrid";
 import {get_flanker_positions} from "scripts/battlegrid/position/get_flanker_positions";
 
 const create_visual_creature = (): CreatureVisual => ({
@@ -26,7 +26,12 @@ const create_battle_grid_visual = (): BattleGridVisual => ({
     addOnClickHandler: jest.fn(),
 })
 
-const battle_grid = new BattleGrid({create_visual_square, create_visual_creature, create_battle_grid_visual});
+const battle_grid = create_battle_grid({
+    create_visual_square,
+    create_visual_creature,
+    create_battle_grid_visual,
+    size: {x: 10, y: 10}
+});
 
 describe("when a 1x1 attacker attacks a 1x1 defender, there is one flanking position", () => {
     [

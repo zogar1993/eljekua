@@ -6,161 +6,110 @@ import {
     assert_positions_have_same_footprint,
     Position,
     PositionFootprintOne,
-    positions_of_same_footprint_equal,
     positions_equal_footprint_one,
     positions_share_surface,
     transform_position_to_footprint_one
 } from "scripts/battlegrid/Position";
 import {AnimationQueue} from "scripts/AnimationQueue";
-import {get_reach_adjacent} from "scripts/battlegrid/ranges/get_reach_adjacent";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "scripts/powers/basic";
-import {get_flanker_positions} from "scripts/battlegrid/position/get_flanker_positions";
-import {are_creatures_allied} from "scripts/creatures/are_creatures_allied";
 import type {BattleGridVisual} from "scripts/battlegrid/BattleGridVisual";
+import {create_is_flanking} from "scripts/battlegrid/queries/is_flanking";
+import {create_get_shortest_path} from "scripts/battlegrid/queries/get_shortest_path";
 
-export class BattleGrid {
-    readonly visual: BattleGridVisual
-    readonly BOARD_HEIGHT = 10
-    readonly BOARD_WIDTH = 10
-    readonly creatures: Array<Creature> = []
-    readonly size: { x: number, y: number } = {x: this.BOARD_WIDTH, y: this.BOARD_HEIGHT}
-
-    board: Array<Array<Square>>
-    create_visual_creature: (creature: CreatureData) => CreatureVisual
-    get_square = ({x, y}: PositionFootprintOne) => {
-        if (x < 0 || x >= this.BOARD_WIDTH || y < 0 || y >= this.BOARD_HEIGHT)
-            throw (`position {x:${x}, y:${y}} is out of the battle grid dimensions (width:${this.BOARD_WIDTH}, height:${this.BOARD_HEIGHT})`)
-        return this.board[y][x]
-    }
-
-    constructor({
-                    create_visual_square,
-                    create_visual_creature,
-                    create_battle_grid_visual
-                }: {
-        create_battle_grid_visual: ({width, height}: { width: number, height: number }) => BattleGridVisual
-        create_visual_square: (square: { x: number, y: number }) => SquareVisual,
-        create_visual_creature: (creature: CreatureData) => CreatureVisual,
-    }) {
-        this.visual = create_battle_grid_visual({width: this.BOARD_WIDTH, height: this.BOARD_HEIGHT})
-        this.create_visual_creature = create_visual_creature
-        this.board = Array.from({length: this.BOARD_HEIGHT}, (_, y) => {
-                return Array.from({length: this.BOARD_WIDTH}, (_, x) => {
-                    const visual = create_visual_square({x, y})
-                    return {visual, position: {x, y, footprint: 1}}
-                })
-            }
-        )
-    }
-
-    get_shortest_path = ({creature, destination}: { creature: Creature, destination: Position }) => {
-        const origin = creature.data.position
-        const visited: Array<Position> = [origin]
-
-        type WeightedPath = {
-            path: Array<Position>,
-            distance: { squares: number, intuitive: number },
-            moved: number,
-            weight: number
+export const create_battle_grid = ({
+                                       create_visual_square,
+                                       create_visual_creature,
+                                       create_battle_grid_visual,
+                                       size,
+                                   }: {
+    create_battle_grid_visual: ({width, height}: { width: number, height: number }) => BattleGridVisual
+    create_visual_square: (square: { x: number, y: number }) => SquareVisual,
+    create_visual_creature: (creature: CreatureData) => CreatureVisual,
+    size: { x: number, y: number }
+}): BattleGrid => {
+    const visual: BattleGridVisual = create_battle_grid_visual({width: size.x, height: size.y})
+    const creatures: Array<Creature> = []
+    const board: Array<Array<Square>> = Array.from({length: size.y}, (_, y) => {
+            return Array.from({length: size.x}, (_, x) => {
+                const visual = create_visual_square({x, y})
+                return {visual, position: {x, y, footprint: 1}}
+            })
         }
-        const initial_distance = distance_between_positions(origin, destination)
-        let paths: Array<WeightedPath> =
-            [{
-                path: [origin],
-                moved: 0,
-                distance: {
-                    squares: initial_distance,
-                    intuitive: intuitive_distance_between_positions(origin, destination)
-                },
-                weight: initial_distance
-            }]
-        const extend_path = ({old_path, position}: { old_path: WeightedPath, position: Position }): WeightedPath => {
-            const distance = distance_between_positions(position, destination)
-            const moved = old_path.moved + 1
-            return {
-                path: [...old_path.path, position],
-                distance: {squares: distance, intuitive: intuitive_distance_between_positions(position, destination)},
-                moved,
-                weight: distance + moved
-            }
-        }
+    )
 
-        while (paths.length > 0) {
-            const min_weight = Math.min(...paths.map(x => x.weight))
-            const min_weight_paths = paths.filter(x => x.weight === min_weight)
-            const min_intuitive_distance = Math.min(...min_weight_paths.map(x => x.distance.intuitive))
-            const current_path = paths.find(x => x.distance.intuitive === min_intuitive_distance)!
-
-            // remove the current path from the list, we only need its products, and we also avoid dead ends
-            paths = paths.filter(x => x !== current_path)
-
-            const head = current_path.path[current_path.path.length - 1]
-            const alternatives = get_reach_adjacent({position: head, battle_grid: this})
-                .filter(a => visited.every(b => !positions_of_same_footprint_equal(a, b)))
-                .filter(a => !this.is_terrain_occupied(a, {exclude: [creature]}))
-
-            const ending_position = alternatives.find(alternative => positions_of_same_footprint_equal(alternative, destination))
-            if (ending_position) return [...current_path.path, ending_position]
-
-            visited.push(...alternatives)
-
-            paths = [
-                ...alternatives.map(position => extend_path({old_path: current_path, position})),
-                ...paths
-            ]
-        }
-
-        throw Error(`Path not found from ${JSON.stringify(origin)} to ${JSON.stringify(destination)}`)
+    const get_square = ({x, y}: PositionFootprintOne) => {
+        if (x < 0 || x >= size.x || y < 0 || y >= size.y)
+            throw (`position {x:${x}, y:${y}} is out of the battle grid dimensions (width:${size.x}, height:${size.y})`)
+        return board[y][x]
     }
 
-    is_flanking({attacker, defender}: { attacker: Creature, defender: Creature }) {
-        if (attacker.data.team === null) return false
-
-        //TODO P3 refactor battle_grid so that functions are attached to it
-        //TODO P4 test actual flanking
-        const positions = get_flanker_positions({
-            attacker_position: attacker.data.position,
-            defender_position: defender.data.position,
-            battle_grid: this
-        })
-
-        if (positions.every(position => !this.is_terrain_occupied(position))) return false
-
-        const flankers = positions.map(this.get_creature_by_position)
-        return flankers.some(flanker => are_creatures_allied(flanker, attacker))
-    }
-
-    move_creature_one_square({position, creature}: { position: Position, creature: Creature }) {
-        creature.data.position = position
-        AnimationQueue.add_animation(() => creature.visual.move_one_square(position))
-    }
-
-    push_creature({position, creature}: { position: Position, creature: Creature }) {
-        creature.data.position = position
-        AnimationQueue.add_animation(() => creature.visual.push_to(position))
-    }
-
-    get_creature_by_position = (position: Position): Creature => {
-        const creature = this.creatures.find(creature => positions_share_surface(creature.data.position, position))
+    const get_creature_by_position = (position: Position): Creature => {
+        const creature = creatures.find(creature => positions_share_surface(creature.data.position, position))
         if (!creature) throw Error(`creature not found for cell ${position}`)
         return creature
     }
 
-    is_terrain_occupied = (position: Position, {exclude}: { exclude?: Array<Creature> } = {}): boolean => {
+    const is_terrain_occupied = (position: Position, {exclude}: { exclude?: Array<Creature> } = {}): boolean => {
         for (const p1 of transform_position_to_footprint_one(position))
-            for (const creature of this.creatures.filter(c => exclude ? !exclude.includes(c) : true))
+            for (const creature of creatures.filter(c => exclude ? !exclude.includes(c) : true))
                 for (const p2 of transform_position_to_footprint_one(creature.data.position))
                     if (positions_equal_footprint_one(p1, p2)) return true
         return false
     }
 
-    create_creature = (data: CreatureData) => {
+    const create_creature = (data: CreatureData) => {
         const d = {...data, powers: [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS, ...data.powers]}
-        const visual = this.create_visual_creature(d)
+        const visual = create_visual_creature(d)
         const creature = new Creature({data: d, visual})
-        this.creatures.push(creature)
+        creatures.push(creature)
         return creature
     }
+
+    const move_creature_one_square = ({position, creature}: { position: Position, creature: Creature }) => {
+        creature.data.position = position
+        AnimationQueue.add_animation(() => creature.visual.move_one_square(position))
+    }
+
+    const push_creature = ({position, creature}: { position: Position, creature: Creature }) => {
+        creature.data.position = position
+        AnimationQueue.add_animation(() => creature.visual.push_to(position))
+    }
+
+    const battle_grid = {} as BattleGrid
+
+    battle_grid.visual = visual
+    battle_grid.size = size
+    battle_grid.creatures = creatures
+    battle_grid.board = board
+
+    battle_grid.create_creature = create_creature
+    battle_grid.get_square = get_square
+    battle_grid.is_terrain_occupied = is_terrain_occupied
+    battle_grid.get_creature_by_position = get_creature_by_position
+    battle_grid.push_creature = push_creature
+    battle_grid.move_creature_one_square = move_creature_one_square
+    battle_grid.is_flanking = create_is_flanking(battle_grid)
+    battle_grid.get_shortest_path = create_get_shortest_path(battle_grid)
+
+    return battle_grid
+}
+
+export type BattleGrid = {
+    visual: BattleGridVisual
+    size: { x: number, y: number }
+    creatures: ReadonlyArray<Creature>
+    board: Array<Array<Square>>
+
+    get_square: (position: PositionFootprintOne) => Square
+    is_terrain_occupied: (position: Position, options?: { exclude?: Array<Creature> }) => boolean
+    get_creature_by_position: (position: Position) => Creature
+
+    create_creature: (data: CreatureData) => Creature
+    push_creature: (props: { position: Position, creature: Creature }) => void
+    move_creature_one_square: (props: { position: Position, creature: Creature }) => void
+
+    is_flanking: ({attacker, defender}: { attacker: Creature, defender: Creature }) => boolean
+    get_shortest_path: ({creature, destination}: { creature: Creature, destination: Position }) => Array<Position>
 }
 
 
@@ -172,9 +121,5 @@ export type Square = {
 export const distance_between_positions = (a: Position, b: Position) => {
     assert_positions_have_same_footprint(a, b)
     return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
-}
-const intuitive_distance_between_positions = (a: Position, b: Position) => {
-    assert_positions_have_same_footprint(a, b)
-    return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
 }
 
