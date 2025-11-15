@@ -43,11 +43,6 @@ export const create_battle_grid = ({
         return board[y][x]
     }
 
-    const get_creature_by_position = (position: Position): Creature => {
-        const creature = creatures.find(creature => positions_share_surface(creature.data.position, position))
-        if (!creature) throw Error(`creature not found for cell ${position}`)
-        return creature
-    }
 
     const is_terrain_occupied = (position: Position, {exclude}: { exclude?: Array<Creature> } = {}): boolean => {
         for (const p1 of transform_position_to_footprint_one(position))
@@ -55,6 +50,17 @@ export const create_battle_grid = ({
                 for (const p2 of transform_position_to_footprint_one(creature.data.position))
                     if (positions_equal_footprint_one(p1, p2)) return true
         return false
+    }
+
+    const get_creature_by_position = (position: Position): Creature => {
+        const creature = creatures.find(creature => positions_share_surface(creature.data.position, position))
+        if (!creature) throw Error(`creature not found for cell ${position}`)
+        return creature
+    }
+
+    const get_creatures_in_positions = (positions: Array<PositionFootprintOne>): Array<Creature> => {
+        const creatures = positions.filter(position => is_terrain_occupied(position)).map(get_creature_by_position)
+        return [...new Set(creatures)]
     }
 
     const create_creature = (data: CreatureData) => {
@@ -86,6 +92,7 @@ export const create_battle_grid = ({
     battle_grid.get_square = get_square
     battle_grid.is_terrain_occupied = is_terrain_occupied
     battle_grid.get_creature_by_position = get_creature_by_position
+    battle_grid.get_creatures_in_positions = get_creatures_in_positions
     battle_grid.push_creature = push_creature
     battle_grid.move_creature_one_square = move_creature_one_square
     battle_grid.is_flanking = create_is_flanking(battle_grid)
@@ -103,6 +110,7 @@ export type BattleGrid = {
     get_square: (position: PositionFootprintOne) => Square
     is_terrain_occupied: (position: Position, options?: { exclude?: Array<Creature> }) => boolean
     get_creature_by_position: (position: Position) => Creature
+    get_creatures_in_positions: (positions: Array<PositionFootprintOne>) => Array<Creature>
 
     create_creature: (data: CreatureData) => Creature
     push_creature: (props: { position: Position, creature: Creature }) => void

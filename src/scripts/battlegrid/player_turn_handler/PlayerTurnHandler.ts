@@ -28,7 +28,7 @@ import {get_creature_defense} from "scripts/character_sheet/get_creature_defense
 import {bound_minmax} from "scripts/math/minmax";
 import {SquareHighlight} from "scripts/battlegrid/squares/SquareHighlight";
 
-type HighlightedPosition = {position: PositionFootprintOne, highlight: SquareHighlight}
+type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
 type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
@@ -53,7 +53,7 @@ type PlayerTurnHandlerContextSelectOption = {
 
 export class PlayerTurnHandler {
     private readonly action_log: ActionLog
-    private readonly battle_grid: BattleGrid
+    battle_grid: BattleGrid
     turn_context = new TurnContext()
     initiative_order: InitiativeOrder
     evaluate_token = build_evaluate_token({player_turn_handler: this})
@@ -137,11 +137,12 @@ export class PlayerTurnHandler {
             if (position) {
                 if (!this.selection_context.clickable.some(c => positions_of_same_footprint_equal(position, c))) return
 
+                //TODO P3 this breaks the chance of hitting, where the chance stays on screen
+                clean_highlighted_status(this)
+
                 this.selection_context.on_hover(position)
 
                 //TODO P3 this is all very untidy
-                this.battle_grid.creatures.map(creature => creature.visual.remove_hit_chance())
-
                 const next_instruction = this.turn_context.get_current_context().peek_instruction()
                 const needs_roll = next_instruction.type === "attack_roll"
                 if (needs_roll && this.selection_context.target) {
@@ -302,4 +303,12 @@ export class PlayerTurnHandler {
             .map(this.battle_grid.get_square)
             .forEach(({visual}) => visual.set_interaction_status(value))
     }
+}
+
+const clean_highlighted_status = (player_turn_handler: PlayerTurnHandler) => {
+    //TODO P3 we should receive the selection context from a param
+    if (player_turn_handler.selection_context?.type !== "position_select") throw Error("position should be position_select")
+    const highlighted_positions = player_turn_handler.selection_context?.highlighted.map(({position}) => position)
+    player_turn_handler.set_interaction_status_to_positions(highlighted_positions, "none")
+    player_turn_handler.battle_grid.get_creatures_in_positions(highlighted_positions).forEach(creature => creature.visual.remove_hit_chance())
 }
