@@ -138,7 +138,7 @@ export class PlayerTurnHandler {
                 if (!this.selection_context.clickable.some(c => positions_of_same_footprint_equal(position, c))) return
 
                 //TODO P3 this breaks the chance of hitting, where the chance stays on screen
-                clean_highlighted_status(this)
+                clean_highlighted_status({selection_context: this.selection_context, battle_grid: this.battle_grid})
 
                 this.selection_context.on_hover(position)
 
@@ -160,8 +160,16 @@ export class PlayerTurnHandler {
                 }
 
                 //TODO P1 this line is wrong on many levels, but it gets us out of the way to test hovering
-                this.set_interaction_status_to_positions(this.battle_grid.board.flatMap(x => x).map(x => x.position), "none")
-                this.set_interaction_status_to_positions(transform_position_to_footprint_one(position), "hover")
+                set_interaction_status_to_positions({
+                    positions: this.battle_grid.board.flatMap(x => x).map(x => x.position),
+                    value: "none",
+                    battle_grid: this.battle_grid
+                })
+                set_interaction_status_to_positions({
+                    positions: transform_position_to_footprint_one(position),
+                    value: "hover",
+                    battle_grid: this.battle_grid
+                })
             } else {
                 //TODO P2 WIP remove indicators from creatures and tiles when you go out of the selectable space
                 this.battle_grid.creatures.map(creature => creature.visual.remove_hit_chance())
@@ -297,18 +305,23 @@ export class PlayerTurnHandler {
             .map(this.battle_grid.get_square)
             .forEach(({visual}) => visual.set_highlight(highlight))
     }
-
-    set_interaction_status_to_positions = (positions: Array<PositionFootprintOne>, value: Parameters<SquareVisual["set_interaction_status"]>[0]) => {
-        positions
-            .map(this.battle_grid.get_square)
-            .forEach(({visual}) => visual.set_interaction_status(value))
-    }
 }
 
-const clean_highlighted_status = (player_turn_handler: PlayerTurnHandler) => {
-    //TODO P3 we should receive the selection context from a param
-    if (player_turn_handler.selection_context?.type !== "position_select") throw Error("position should be position_select")
-    const highlighted_positions = player_turn_handler.selection_context?.highlighted.map(({position}) => position)
-    player_turn_handler.set_interaction_status_to_positions(highlighted_positions, "none")
-    player_turn_handler.battle_grid.get_creatures_in_positions(highlighted_positions).forEach(creature => creature.visual.remove_hit_chance())
+const clean_highlighted_status = ({selection_context, battle_grid}: {
+    selection_context: PlayerTurnHandlerContextSelectPosition,
+    battle_grid: BattleGrid
+}) => {
+    const highlighted_positions = selection_context.highlighted.map(({position}) => position)
+    set_interaction_status_to_positions({positions: highlighted_positions, value: "none", battle_grid})
+    battle_grid.get_creatures_in_positions(highlighted_positions).forEach(creature => creature.visual.remove_hit_chance())
+}
+
+const set_interaction_status_to_positions = ({positions, value, battle_grid}: {
+    positions: Array<PositionFootprintOne>,
+    value: Parameters<SquareVisual["set_interaction_status"]>[0],
+    battle_grid: BattleGrid
+}) => {
+    positions
+        .map(battle_grid.get_square)
+        .forEach(({visual}) => visual.set_interaction_status(value))
 }
