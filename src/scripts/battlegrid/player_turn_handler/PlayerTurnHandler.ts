@@ -82,8 +82,16 @@ export class PlayerTurnHandler {
 
         this.set_selected_indicator()
 
-        context.clickable.forEach(position => this.set_highlight_to_position(position, "available-target"))
-        context.highlighted.forEach(({position, highlight}) => this.set_highlight_to_position(position, highlight))
+        context.clickable.forEach(position => set_highlight_to_position({
+            position,
+            highlight: "available-target",
+            battle_grid: this.battle_grid
+        }))
+        context.highlighted.forEach(({position, highlight}) => set_highlight_to_position({
+            position,
+            highlight,
+            battle_grid: this.battle_grid
+        }))
     }
 
     set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type" | "owner">) => {
@@ -173,7 +181,11 @@ export class PlayerTurnHandler {
             } else {
                 //TODO P2 WIP remove indicators from creatures and tiles when you go out of the selectable space
                 this.battle_grid.creatures.map(creature => creature.visual.remove_hit_chance())
-                this.selection_context.highlighted.forEach(({position}) => this.set_highlight_to_position(position, "none"))
+                this.selection_context.highlighted.forEach(({position}) => set_highlight_to_position({
+                    position,
+                    highlight: "none",
+                    battle_grid: this.battle_grid
+                }))
 
             }
         }
@@ -181,17 +193,33 @@ export class PlayerTurnHandler {
 
     set_selected_indicator() {
         const creature = this.turn_context.get_current_context().owner()
-        this.set_highlight_to_position(creature.data.position, "selected")
+        set_highlight_to_position({
+            position: creature.data.position,
+            highlight: "selected",
+            battle_grid: this.battle_grid
+        })
     }
 
     deselect() {
         if (this.selection_context === null) return
 
-        this.set_highlight_to_position(this.selection_context.owner.data.position, "none")
+        set_highlight_to_position({
+            position: this.selection_context.owner.data.position,
+            highlight: "none",
+            battle_grid: this.battle_grid
+        })
 
         if (this.selection_context.type === "position_select") {
-            this.selection_context.clickable.forEach(position => this.set_highlight_to_position(position, "none"))
-            this.selection_context.highlighted.forEach(({position}) => this.set_highlight_to_position(position, "none"))
+            this.selection_context.clickable.forEach(position => set_highlight_to_position({
+                position,
+                highlight: "none",
+                battle_grid: this.battle_grid
+            }))
+            this.selection_context.highlighted.forEach(({position}) => set_highlight_to_position({
+                position,
+                highlight: "none",
+                battle_grid: this.battle_grid
+            }))
 
             if (this.selection_context.target) {
                 if (this.selection_context.target.type === "creature"
@@ -299,12 +327,6 @@ export class PlayerTurnHandler {
             })
         }
     }
-
-    set_highlight_to_position = (position: Position, highlight: SquareHighlight) => {
-        transform_position_to_footprint_one(position)
-            .map(this.battle_grid.get_square)
-            .forEach(({visual}) => visual.set_highlight(highlight))
-    }
 }
 
 const clean_highlighted_status = ({selection_context, battle_grid}: {
@@ -324,4 +346,14 @@ const set_interaction_status_to_positions = ({positions, value, battle_grid}: {
     positions
         .map(battle_grid.get_square)
         .forEach(({visual}) => visual.set_interaction_status(value))
+}
+
+const set_highlight_to_position = ({position, highlight, battle_grid}: {
+    position: Position,
+    highlight: SquareHighlight,
+    battle_grid: BattleGrid
+}) => {
+    transform_position_to_footprint_one(position)
+        .map(battle_grid.get_square)
+        .forEach(({visual}) => visual.set_highlight(highlight))
 }
