@@ -111,6 +111,14 @@ export class PlayerTurnHandler {
         owner.visual.display_options(options)
     }
 
+    get_position_selection_context = (): PlayerTurnHandlerContextSelectPosition => {
+        const selection = this.selection_context
+        if (selection?.type !== "position_select")
+            throw Error("position_select selection_context not set")
+        return selection
+    }
+
+
     add_creature = (data: CreatureData) => {
         const creature = this.battle_grid.create_creature(data)
         this.initiative_order.add_creature(creature)

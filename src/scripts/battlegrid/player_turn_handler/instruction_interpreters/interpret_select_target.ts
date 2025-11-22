@@ -57,10 +57,7 @@ export const interpret_select_target = ({
     }
 
     const on_click = (position: Position) => {
-        if (player_turn_handler.selection_context?.type !== "position_select")
-            throw Error("on_click needs selection_context to be set")
-
-        const selection = player_turn_handler.selection_context
+        const selection = player_turn_handler.get_position_selection_context()
 
         // check if position is selectable
         if (!selection.clickable.some(target => positions_share_surface(target, position)))
@@ -79,10 +76,7 @@ export const interpret_select_target = ({
 
 
     const on_hover = (position: Position) => {
-        if (player_turn_handler.selection_context?.type !== "position_select")
-            throw Error("on_hover needs selection_context to be set")
-
-        const selection = player_turn_handler.selection_context
+        const selection = player_turn_handler.get_position_selection_context()
 
         if (!selection.clickable.some(target => positions_share_surface(target, position)))
             return
