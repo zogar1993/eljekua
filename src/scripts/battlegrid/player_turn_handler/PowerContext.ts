@@ -18,20 +18,13 @@ export class PowerContext {
     }) {
         this.instructions = instructions
         this.power_name = name
-        this.set_variable("owner", {type: "creature", value: owner, description: "owner"})
+        this.set_variable("owner", {type: "creatures", value: [owner], description: "owner"})
     }
 
-    owner = () => NODE.as_creature(this.get_variable("owner")).value
+    owner = () => NODE.as_creature(this.get_variable("owner"))
 
     set_variable = (name: string, variable: AstNode) => {
         this.variables.set(name, variable)
-    }
-
-    //TODO P3 move this out of power context, we dont need it anymore
-    get_creature = (name: string): Creature => {
-        const variable = this.variables.get(name)
-        if (!variable) throw Error(`variable ${name} not found in context`)
-        return NODE.as_creature(variable).value
     }
 
     peek_instruction = (): Instruction => {

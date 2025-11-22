@@ -16,10 +16,9 @@ export const interpret_move = ({
                                    battle_grid,
                                    turn_context,
                                }: InterpretInstructionProps<InstructionMovement>) => {
-    const mover_creature_node = NODE.as_creature(context.get_variable(instruction.target))
-    const mover_creature = mover_creature_node.value
+    const mover_creature = NODE.as_creature(context.get_variable(instruction.target))
     const destination_label = instruction.destination
-    const path_node = NODE.as_positions(context.get_variable(destination_label))
+    const path_node = NODE.as_positions_node(context.get_variable(destination_label))
     const path = path_node.value
 
     for (let i = 0; i < path.length - 1; i++) {
@@ -41,8 +40,9 @@ export const interpret_move = ({
                 //TODO P1 allow for any attack that can be a melee basic attack
                 const instructions = turn_power_into_opportunity_attack(BASIC_ATTACK_ACTIONS[0].instructions)
                 const name = BASIC_ATTACK_ACTIONS[0].name
+                //TODO P3 this may be easier to follow if the new context was returned, so that we can name each context
                 turn_context.add_power_context({name, instructions, owner: attacker})
-                turn_context.get_current_context().set_variable("primary_target", mover_creature_node)
+                turn_context.get_current_context().set_variable("primary_target", context.get_variable(instruction.target))
             }
 
             context.add_instructions([{type: "move", target: instruction.target, destination: instruction.destination}])

@@ -55,7 +55,7 @@ export const interpret_attack_roll = ({
         const is_hit = attack.value >= defense.value
 
         const defender_label = `${instruction.defender}(${i + 1})`
-        context.set_variable(defender_label, {type: "creature", value: defender, description: defender_label})
+        context.set_variable(defender_label, {type: "creatures", value: [defender], description: defender_label})
         new_instructions.push(copy_variable_instruction(defender_label, instruction.defender))
 
         if (is_hit) {

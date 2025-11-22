@@ -9,10 +9,10 @@ export const interpret_force_movement = ({
                                              battle_grid,
                                              evaluate_token
                                          }: InterpretInstructionProps<InstructionForceMovement>) => {
-    const creature = NODE.as_creature(evaluate_token(instruction.target)).value
+    const creature = NODE.as_creature(evaluate_token(instruction.target))
     switch (instruction.movement_type) {
         case "push": {
-            const destination = NODE.as_position(evaluate_token(instruction.destination)).value
+            const destination = NODE.as_position(evaluate_token(instruction.destination))
             battle_grid.push_creature({creature, position: destination})
             break
         }

@@ -19,7 +19,8 @@ export const interpret_apply_damage = ({
                                            evaluate_token
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
     const attacker = player_turn_handler.turn_context.get_current_context().owner()
-    const target = context.get_creature(instruction.target)
+    //TODO P3 we probably want to apply damage to a bunch of enemies at the same time
+    const target = NODE.as_creature(context.get_variable(instruction.target))
 
     const damage = NODE.as_number(evaluate_token(instruction.value))
 

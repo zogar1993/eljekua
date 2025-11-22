@@ -22,7 +22,6 @@ import {ButtonOption} from "scripts/battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {NODE} from "scripts/expressions/token_evaluator/NODE";
-import {AstNode} from "scripts/expressions/token_evaluator/types";
 import {get_reach} from "scripts/battlegrid/ranges/get_reach";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 import {bound_minmax} from "scripts/math/minmax";
@@ -39,8 +38,8 @@ export type PlayerTurnHandlerContextSelectPosition = {
     owner: Creature
     clickable: Array<Position>
     highlighted: Array<HighlightedPosition>
-    target: AstNode | null
-    on_click: (position: Position) => void
+    target: { type: "creatures", value: Array<Creature> } | { type: "positions", value: Array<Position> } | null
+    target_label: string
     on_hover: (position: Position) => void
     footprint: number
 }
@@ -139,14 +138,33 @@ export class PlayerTurnHandler {
 
     on_click = ({position}: { position: Position }) => {
         //TODO P0 big fellows break when moving to the edge of their movement
-        if (this.selection_context?.type === "position_select") {
-            if (this.selection_context.clickable.some(p => positions_share_surface(p, position))) {
-                this.selection_context.on_click(position)
-                this.deselect()
-                this.evaluate_instructions()
-            }
+        const selection = this.selection_context
+        if (selection?.type !== "position_select") return
+        if (selection.target === null) return
+
+        if (selection.target.type === "positions") {
+            const path = selection.target.value
+            if (!positions_of_same_footprint_equal(position, path[path.length - 1]))
+                throw Error("position should be the end of the path")
         }
+
+        const power_context = this.turn_context.get_current_context()
+        power_context.set_variable(selection.target_label,
+            selection.target.type === "creatures" ? {
+                type: selection.target.type,
+                value: selection.target.value,
+                description: "target"
+            } : {
+                type: selection.target.type,
+                value: selection.target.value,
+                description: "target"
+            })
+
+        this.deselect()
+        this.evaluate_instructions()
+
     }
+
 
     on_hover = ({position}: { position: Position | null }) => {
         if (this.selection_context?.type === "position_select") {
@@ -162,7 +180,11 @@ export class PlayerTurnHandler {
                 const next_instruction = this.turn_context.get_current_context().peek_instruction()
                 const needs_roll = next_instruction.type === "attack_roll"
                 if (needs_roll && this.selection_context.target) {
-                    NODE.as_creatures(this.selection_context.target).forEach(defender => {
+                    if (this.selection_context.target.type !== "creatures")
+                        throw Error("an attack roll needs to target creatures")
+
+                    const creatures = this.selection_context.target.value
+                    creatures.forEach(defender => {
                         const attacker = next_instruction.attack
                         const attack = NODE.as_number_resolved(this.evaluate_token(attacker)).value
 
@@ -230,9 +252,8 @@ export class PlayerTurnHandler {
             }))
 
             if (this.selection_context.target) {
-                if (this.selection_context.target.type === "creature"
-                    || this.selection_context.target.type === "creatures") {
-                    const creatures = NODE.as_creatures(this.selection_context.target)
+                if (this.selection_context.target.type === "creatures") {
+                    const creatures = this.selection_context.target.value
                     creatures.forEach(creature => creature.visual.remove_hit_chance())
                 }
             }
@@ -263,7 +284,7 @@ export class PlayerTurnHandler {
             const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
             if (instruction.destination_requirement) {
                 //TODO P3 move targeting and these evaluate token functions outside of the player turn handler
-                const possibilities = NODE.as_positions(this.evaluate_token(instruction.destination_requirement)).value
+                const possibilities = NODE.as_positions(this.evaluate_token(instruction.destination_requirement))
 
                 const restricted: Array<Position> = []
                 for (const position of valid_targets)
@@ -288,7 +309,8 @@ export class PlayerTurnHandler {
 
         return valid_targets.filter(
             target => !instruction.exclude.some(
-                excluded => positions_of_same_footprint_equal(context.get_creature(excluded).data.position, target)
+                //TODO P3 this one feels fishy
+                excluded => positions_of_same_footprint_equal(NODE.as_creature(context.get_variable(excluded)).data.position, target)
             )
         )
     }

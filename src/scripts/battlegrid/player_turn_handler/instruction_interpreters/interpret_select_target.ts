@@ -40,13 +40,21 @@ export const interpret_select_target = ({
 
                 context.set_variable(target_label, {type: "positions", value: path, description: target_label})
             } else if (instruction.targeting_type === "push") {
-                context.set_variable(target_label, {type: "position", value: position, description: target_label})
+                context.set_variable(target_label, {type: "positions", value: [position], description: target_label})
             } else {
                 if (instruction.target_type === "terrain") {
-                    context.set_variable(target_label, {type: "position", value: position, description: target_label})
+                    context.set_variable(target_label, {
+                        type: "positions",
+                        value: [position],
+                        description: target_label
+                    })
                 } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
                     const creature = battle_grid.get_creature_by_position(position)
-                    context.set_variable(target_label, {type: "creature", value: creature, description: target_label})
+                    context.set_variable(target_label, {
+                        type: "creatures",
+                        value: [creature],
+                        description: target_label
+                    })
                 } else {
                     throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
                 }
@@ -54,24 +62,6 @@ export const interpret_select_target = ({
 
             return
         }
-    }
-
-    const on_click = (position: Position) => {
-        const selection = player_turn_handler.get_position_selection_context()
-
-        // check if position is selectable
-        if (!selection.clickable.some(target => positions_share_surface(target, position)))
-            return
-
-        if (selection.target === null) throw Error("target needed for clicking")
-
-        if (selection.target.type === "positions") {
-            const path = selection.target.value
-            if (!positions_of_same_footprint_equal(position, path[path.length - 1]))
-                throw Error("position should be the end of the path")
-        }
-
-        context.set_variable(target_label, selection.target)
     }
 
 
@@ -90,7 +80,7 @@ export const interpret_select_target = ({
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
                 highlighted: positions_to_footprint_one(area).map(position => ({position, highlight: "area"})),
-                target: {type: "creatures", value: targets, description: "target"}
+                target: {type: "creatures", value: targets}
             })
         } else if (instruction.targeting_type === "movement") {
             const path = battle_grid.get_shortest_path({creature: context.owner(), destination: position})
@@ -98,26 +88,25 @@ export const interpret_select_target = ({
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
                 highlighted: positions_to_footprint_one(path).map(position => ({position, highlight: "path"})),
-                target: {type: "positions", value: path, description: "target"},
+                target: {type: "positions", value: path},
             })
         } else if (instruction.targeting_type === "push") {
-            //TODO P3 push should be a path also instead of a position
+            //TODO P0 fix push that was changed from position to positions
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
-                target: {type: "position", value: position, description: "target"}
+                target: {type: "positions", value: [position]}
             })
         } else {
             if (instruction.target_type === "terrain") {
                 player_turn_handler.set_awaiting_position_selection({
                     ...selection_base,
-                    //TODO P3 these descriptions of target seem off
-                    target: {type: "position", value: position, description: "target"}
+                    target: {type: "positions", value: [position]}
                 })
             } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
                 const creature = battle_grid.get_creature_by_position(position)
                 player_turn_handler.set_awaiting_position_selection({
                     ...selection_base,
-                    target: {type: "creature", value: creature, description: "target"}
+                    target: {type: "creatures", value: [creature]}
                 })
             } else {
                 throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
@@ -126,10 +115,10 @@ export const interpret_select_target = ({
     }
 
     const selection_base: Omit<PlayerTurnHandlerContextSelectPosition, "owner" | "type"> = {
+        target_label,
         clickable,
         highlighted: [],
         target: null,
-        on_click,
         on_hover,
         //TODO P3 clean up
         footprint: instruction.targeting_type === "movement" ? context.owner().data.position.footprint : 1

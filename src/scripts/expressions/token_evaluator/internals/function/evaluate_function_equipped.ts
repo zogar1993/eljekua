@@ -12,12 +12,13 @@ export const evaluate_function_equipped = ({token, evaluate_token}:
                                                    evaluate_token: (token: Token) => AstNode,
                                                }): AstNodeBoolean => {
     assert_parameters_amount_equals(token, 2)
-    const creature = NODE.as_creature(evaluate_token(TOKEN.as_keyword(token.parameters[0])))
+    const creature = NODE.as_creatures_node(evaluate_token(TOKEN.as_keyword(token.parameters[0])))
     const text = NODE.as_string(evaluate_token(TOKEN.as_string(token.parameters[1])))
 
     return {
         type: "boolean",
-        value: creature.value.has_equipped(text.value),
+        //TODO P3 this is a bit ugly
+        value: creature.value[0].has_equipped(text.value),
         description: "equipped",
         params: [creature, text]
     }

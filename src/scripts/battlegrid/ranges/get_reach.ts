@@ -36,8 +36,8 @@ export const get_reach = ({instruction, origin, battle_grid, evaluate_token}: {
                 return get_reach_area_burst({origin, distance: distance.value, battle_grid})
             }
             case "push": {
-                const anchor = NODE.as_position(evaluate_token(instruction.anchor)).value
-                const origin = NODE.as_position(evaluate_token(instruction.origin)).value
+                const anchor = NODE.as_position(evaluate_token(instruction.anchor))
+                const origin = NODE.as_position(evaluate_token(instruction.origin))
                 const distance = NODE.as_number_resolved(evaluate_token(instruction.distance)).value
                 return get_reach_push({anchor, origin, distance, battle_grid})
             }

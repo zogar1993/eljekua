@@ -6,9 +6,7 @@ export type AstNode =
     AstNodeNumber
     | AstNodeString
     | AstNodeBoolean
-    | AstNodeCreature
     | AstNodeCreatures
-    | AstNodePosition
     | AstNodePositions
     | AstNodePower
 
@@ -35,12 +33,6 @@ export type AstNodeString = {
     description: string
 }
 
-export type AstNodeCreature = {
-    type: "creature"
-    value: Creature
-    description: string
-}
-
 export type AstNodeCreatures = {
     type: "creatures"
     value: Array<Creature>
@@ -52,12 +44,6 @@ export type AstNodeBoolean = {
     value: boolean
     description?: string
     params?: Array<AstNode>
-}
-
-export type AstNodePosition = {
-    type: "position",
-    value: Position
-    description: string
 }
 
 export type AstNodePositions = {

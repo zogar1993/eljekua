@@ -15,12 +15,13 @@ export const interpret_apply_status = ({
                                            player_turn_handler,
                                            evaluate_token,
                                        }: InterpretInstructionProps<InstructionApplyStatus>) => {
-    const target = NODE.as_creature(evaluate_token(instruction.target)).value
+    const creatures = NODE.as_creatures(evaluate_token(instruction.target))
 
-    target.add_status({
-        effect: interpret_status({status: instruction.status, evaluate_token}),
-        durations: interpret_duration({ duration: instruction.duration, player_turn_handler})
-    })
+    for (const creature of creatures)
+        creature.add_status({
+            effect: interpret_status({status: instruction.status, evaluate_token}),
+            durations: interpret_duration({duration: instruction.duration, player_turn_handler})
+        })
 }
 
 const interpret_duration = (
@@ -73,7 +74,7 @@ const interpret_status = (
         case "gain_attack_bonus":
             return {
                 type: "gain_attack_bonus",
-                against: NODE.as_creatures(evaluate_token( status.against)),
+                against: NODE.as_creatures(evaluate_token(status.against)),
                 value: NODE.as_number_resolved(evaluate_token(status.value))
             }
         case "gain_resistance":

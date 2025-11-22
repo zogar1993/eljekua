@@ -14,7 +14,7 @@ export const get_reach_movement = ({instruction, evaluate_token, battle_grid}: {
 }): Array<Position> => {
     if (instruction.targeting_type !== "movement") throw Error()
     const distance = NODE.as_number_resolved(evaluate_token(instruction.distance)).value
-    const creature = NODE.as_creature(evaluate_token(instruction.creature)).value
+    const creature = NODE.as_creature(evaluate_token(instruction.creature))
     const visited: Array<Position> = [creature.data.position]
     let last_ring: Array<Position> = [creature.data.position]
 

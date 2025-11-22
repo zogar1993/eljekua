@@ -3,12 +3,13 @@ import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {tokenize} from "scripts/expressions/tokenizer/tokenize";
+import {NODE} from "scripts/expressions/token_evaluator/NODE";
 
 export const interpret_add_powers = ({
                                          instruction,
                                          context,
                                      }: InterpretInstructionProps<InstructionAddPowers>) => {
-    const creature = context.get_creature(instruction.creature)
+    const creature = NODE.as_creature(context.get_variable(instruction.creature))
 
     context.add_instructions([{
         type: "options",
