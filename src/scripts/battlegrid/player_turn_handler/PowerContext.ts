@@ -27,11 +27,11 @@ export class PowerContext {
         this.variables.set(name, variable)
     }
 
+    //TODO P3 move this out of power context, we dont need it anymore
     get_creature = (name: string): Creature => {
         const variable = this.variables.get(name)
         if (!variable) throw Error(`variable ${name} not found in context`)
-        if (variable.type !== "creature") throw Error(`variable ${name} expected to be a 'creature', but its a '${variable.type}'`)
-        return variable.value
+        return NODE.as_creature(variable).value
     }
 
     peek_instruction = (): Instruction => {
