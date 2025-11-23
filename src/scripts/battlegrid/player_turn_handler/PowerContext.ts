@@ -2,11 +2,11 @@ import {Instruction} from "scripts/expressions/tokenizer/transform_power_ir_into
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {assert} from "scripts/assert";
 
-import {AstNode} from "scripts/expressions/token_evaluator/types";
-import {NODE} from "scripts/expressions/token_evaluator/NODE";
+import {Expr} from "scripts/expressions/token_evaluator/types";
+import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
 
 export class PowerContext {
-    private variables: Map<string, AstNode> = new Map()
+    private variables: Map<string, Expr> = new Map()
     private instructions: Array<Instruction> = []
     readonly power_name
     status: "none" | "hit" | "miss" = "none"
@@ -21,9 +21,9 @@ export class PowerContext {
         this.set_variable("owner", {type: "creatures", value: [owner], description: "owner"})
     }
 
-    owner = () => NODE.as_creature(this.get_variable("owner"))
+    owner = () => EXPR.as_creature(this.get_variable("owner"))
 
-    set_variable = (name: string, variable: AstNode) => {
+    set_variable = (name: string, variable: Expr) => {
         this.variables.set(name, variable)
     }
 

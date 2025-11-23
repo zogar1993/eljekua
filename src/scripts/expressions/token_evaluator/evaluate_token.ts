@@ -1,5 +1,5 @@
 import type {Token} from "scripts/expressions/tokenizer/tokens/AnyToken";
-import type {AstNode} from "scripts/expressions/token_evaluator/types";
+import type {Expr} from "scripts/expressions/token_evaluator/types";
 import {build_evaluate_token_keyword} from "scripts/expressions/token_evaluator/internals/evaluate_keyword";
 import {evaluate_string} from "scripts/expressions/token_evaluator/internals/evaluate_string";
 import {evaluate_number} from "scripts/expressions/token_evaluator/internals/evaluate_number";
@@ -19,7 +19,7 @@ import type {TokenFunction} from "scripts/expressions/tokenizer/tokens/TokenFunc
  */
 export const build_evaluate_token = ({player_turn_handler}: { player_turn_handler: PlayerTurnHandler }) => {
     const turn_context = player_turn_handler.turn_context
-    const token_evaluator_internals: Record<Token["type"], (token: Token) => AstNode> = {
+    const token_evaluator_internals: Record<Token["type"], (token: Token) => Expr> = {
         "number": (token) => evaluate_number(token as NumberToken),
         "string": (token) => evaluate_string(token as StringToken),
         "weapon": (token) => evaluate_weapon(token as WeaponToken),

@@ -2,58 +2,58 @@ import type {Creature} from "scripts/battlegrid/creatures/Creature";
 import type {Position} from "scripts/battlegrid/Position";
 import {PowerVM} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
 
-export type AstNode =
-    AstNodeNumber
-    | AstNodeString
-    | AstNodeBoolean
-    | AstNodeCreatures
-    | AstNodePositions
-    | AstNodePower
+export type Expr =
+    ExprNumber
+    | ExprString
+    | ExprBoolean
+    | ExprCreatures
+    | ExprPositions
+    | ExprPower
 
-export type AstNodeNumber = AstNodeNumberUnresolved | AstNodeNumberResolved
+export type ExprNumber = ExprNumberUnresolved | ExprNumberResolved
 
-export type AstNodeNumberUnresolved = {
+export type ExprNumberUnresolved = {
     type: "number_unresolved"
     min: number
     max: number
     description: string
-    params?: Array<AstNode>
+    params?: Array<Expr>
 }
 
-export type AstNodeNumberResolved = {
+export type ExprNumberResolved = {
     type: "number_resolved"
     value: number
     description: string
-    params?: Array<AstNode>
+    params?: Array<Expr>
 }
 
-export type AstNodeString = {
+export type ExprString = {
     type: "string",
     value: string
     description: string
 }
 
-export type AstNodeCreatures = {
+export type ExprCreatures = {
     type: "creatures"
     value: Array<Creature>
     description: string
 }
 
-export type AstNodeBoolean = {
+export type ExprBoolean = {
     type: "boolean"
     value: boolean
     description?: string
-    params?: Array<AstNode>
+    params?: Array<Expr>
 }
 
-export type AstNodePositions = {
+export type ExprPositions = {
     type: "positions"
     value: Array<Position>
     description: string
-    params?: Array<AstNode>
+    params?: Array<Expr>
 }
 
-export type AstNodePower = {
+export type ExprPower = {
     type: "power"
     value: PowerVM
 }

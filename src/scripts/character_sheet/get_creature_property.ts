@@ -1,6 +1,6 @@
 import {ATTRIBUTE_CODES} from "scripts/character_sheet/attributes";
 import type {Creature} from "scripts/battlegrid/creatures/Creature";
-import type {AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
+import type {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
 import {get_creature_attribute_mod} from "scripts/character_sheet/get_creature_attribute_mod";
 import {get_creature_half_level} from "scripts/character_sheet/get_creature_half_level";
 
@@ -10,7 +10,7 @@ const ATTRIBUTE_MOD_CODES_LVL = ATTRIBUTE_CODES.map(attribute => `${attribute}_m
 export const get_creature_property = ({creature, property}: {
     creature: Creature,
     property: string
-}): Omit<AstNodeNumberResolved, "type"> => {
+}): Omit<ExprNumberResolved, "type"> => {
     if (property === "movement")
         return {value: creature.data.movement, description: "movement"}
 

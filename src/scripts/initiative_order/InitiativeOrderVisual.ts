@@ -1,9 +1,9 @@
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 
-import {AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
+import {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
 
 export class InitiativeOrderVisual {
-    create_creature = ({creature, initiative}: { creature: Creature, initiative: AstNodeNumberResolved }) => {
+    create_creature = ({creature, initiative}: { creature: Creature, initiative: ExprNumberResolved }) => {
         const html_initiative = document.createElement("div")
 
         const html_initiative_name = document.createElement("span")

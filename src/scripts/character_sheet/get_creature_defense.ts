@@ -1,14 +1,14 @@
 import type {Creature} from "scripts/battlegrid/creatures/Creature";
-import type {AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
+import type {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
 import {get_creature_half_level} from "scripts/character_sheet/get_creature_half_level";
 import {get_creature_attribute_mod} from "scripts/character_sheet/get_creature_attribute_mod";
 
 export const get_creature_defense = ({creature, defense_code}: {
     creature: Creature,
     defense_code: DefenseCode
-}): AstNodeNumberResolved => {
+}): ExprNumberResolved => {
     if (DEFENSES.includes(defense_code)) {
-        const parts: Array<AstNodeNumberResolved> = [
+        const parts: Array<ExprNumberResolved> = [
             RESOLVED_BASE_10,
             get_creature_half_level(creature),
             get_creature_attribute_mod(creature, get_attribute_bonus_from_defense({creature, defense_code}))
@@ -41,7 +41,7 @@ const get_attribute_bonus_from_defense = ({creature, defense_code}: {
     }
 }
 
-const RESOLVED_BASE_10: AstNodeNumberResolved =
+const RESOLVED_BASE_10: ExprNumberResolved =
     Object.freeze({type: "number_resolved", value: 10, description: "base"})
 
 export type DefenseCode = "ac" | "fortitude" | "reflex" | "will"

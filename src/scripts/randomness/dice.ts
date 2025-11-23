@@ -1,6 +1,6 @@
 import {assert} from "scripts/assert";
 
-import {AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
+import {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
 
 (window as any).rig_dice_roll = (faces: number, result: number) => {
     const rigs = rigged_rolls[faces]
@@ -26,7 +26,7 @@ const get_rigged_roll = (faces: number) => {
     return result
 }
 
-export const roll_d = (faces: number): AstNodeNumberResolved => {
+export const roll_d = (faces: number): ExprNumberResolved => {
     const rigged_roll = get_rigged_roll(faces)
 
     return {

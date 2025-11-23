@@ -1,4 +1,4 @@
-import type {AstNodeNumber} from "scripts/expressions/token_evaluator/types";
+import type {ExprNumber} from "scripts/expressions/token_evaluator/types";
 import type {TokenFunction} from "scripts/expressions/tokenizer/tokens/TokenFunction";
 import {
     number_utils,
@@ -7,13 +7,13 @@ import {
     is_number_resolved
 } from "scripts/expressions/token_evaluator/number_utils";
 import type {Token} from "scripts/expressions/tokenizer/tokens/AnyToken";
-import type {AstNode} from "scripts/expressions/token_evaluator/types";
+import type {Expr} from "scripts/expressions/token_evaluator/types";
 
 export const evaluate_function_add = ({token, evaluate_token}:
                                                 {
                                                     token: TokenFunction,
-                                                    evaluate_token: (token: Token) => AstNode,
-                                                }): AstNodeNumber => {
+                                                    evaluate_token: (token: Token) => Expr,
+                                                }): ExprNumber => {
     const params = token.parameters.map(evaluate_token)
 
     if (params.every(is_number_resolved))

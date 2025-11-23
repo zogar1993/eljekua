@@ -1,4 +1,4 @@
-import type {AstNodeBoolean} from "scripts/expressions/token_evaluator/types";
+import type {ExprBoolean} from "scripts/expressions/token_evaluator/types";
 import type {TokenFunction} from "scripts/expressions/tokenizer/tokens/TokenFunction";
 import {assert_parameters_amount_equals} from "scripts/expressions/token_evaluator/asserts";
 import {TOKEN} from "scripts/expressions/token_evaluator/TOKEN";
@@ -8,7 +8,7 @@ export const evaluate_function_exists = ({token, turn_context}:
                                              {
                                                  token: TokenFunction,
                                                  turn_context: TurnContext
-                                             }): AstNodeBoolean => {
+                                             }): ExprBoolean => {
     assert_parameters_amount_equals(token, 1)
     const parameter = TOKEN.as_keyword(token.parameters[0])
 

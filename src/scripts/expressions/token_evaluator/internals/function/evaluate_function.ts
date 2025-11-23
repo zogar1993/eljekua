@@ -1,4 +1,4 @@
-import {AstNode} from "scripts/expressions/token_evaluator/types";
+import {Expr} from "scripts/expressions/token_evaluator/types";
 import {TokenFunction} from "scripts/expressions/tokenizer/tokens/TokenFunction";
 import {evaluate_function_add} from "scripts/expressions/token_evaluator/internals/function/evaluate_function_add";
 import {evaluate_function_equipped} from "scripts/expressions/token_evaluator/internals/function/evaluate_function_equipped";
@@ -19,12 +19,12 @@ import {
 
 export const build_evaluate_token_function = ({evaluate_token, turn_context, player_turn_handler}:
                                                   {
-                                                      evaluate_token: (token: Token) => AstNode,
+                                                      evaluate_token: (token: Token) => Expr,
                                                       turn_context: TurnContext,
                                                       player_turn_handler: PlayerTurnHandler
                                                   }
 ) => {
-    return (token: TokenFunction): AstNode => {
+    return (token: TokenFunction): Expr => {
         switch (token.name) {
             case "add":
                 return evaluate_function_add({token, evaluate_token})

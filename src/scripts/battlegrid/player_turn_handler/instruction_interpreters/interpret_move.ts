@@ -7,7 +7,7 @@ import {
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {NODE} from "scripts/expressions/token_evaluator/NODE";
+import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
 import {tokenize} from "scripts/expressions/tokenizer/tokenize";
 
 export const interpret_move = ({
@@ -16,10 +16,11 @@ export const interpret_move = ({
                                    battle_grid,
                                    turn_context,
                                }: InterpretInstructionProps<InstructionMovement>) => {
-    const mover_creature = NODE.as_creature(context.get_variable(instruction.target))
+    const mover_creature = EXPR.as_creature(context.get_variable(instruction.target))
     const destination_label = instruction.destination
-    const path_node = NODE.as_positions_node(context.get_variable(destination_label))
-    const path = path_node.value
+    //TODO P4 this is a bit weird, we overwrite the values so
+    const path_expr = EXPR.as_positions_expr(context.get_variable(destination_label))
+    const path = path_expr.value
 
     for (let i = 0; i < path.length - 1; i++) {
         const current_position = path[i]
@@ -46,7 +47,7 @@ export const interpret_move = ({
             }
 
             context.add_instructions([{type: "move", target: instruction.target, destination: instruction.destination}])
-            context.set_variable(destination_label, {...path_node, value: path.slice(i)})
+            context.set_variable(destination_label, {...path_expr, value: path.slice(i)})
             break
         }
     }

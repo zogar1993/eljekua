@@ -1,10 +1,10 @@
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {roll_d} from "scripts/randomness/dice";
 import {InitiativeOrderVisual} from "scripts/initiative_order/InitiativeOrderVisual";
-import {AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
+import {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
 
 export class InitiativeOrder {
-    initiative_order: Array<{ creature: Creature, initiative: AstNodeNumberResolved, visual: HTMLDivElement }> = []
+    initiative_order: Array<{ creature: Creature, initiative: ExprNumberResolved, visual: HTMLDivElement }> = []
     visual_initiative_order: InitiativeOrderVisual
 
     private current_index = 0

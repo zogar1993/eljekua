@@ -2,9 +2,9 @@ import {InstructionCondition} from "scripts/expressions/tokenizer/transform_powe
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {NODE} from "scripts/expressions/token_evaluator/NODE";
+import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
 
 export const interpret_condition = ({instruction, context, evaluate_token}: InterpretInstructionProps<InstructionCondition>) => {
-    const condition = NODE.as_boolean(evaluate_token(instruction.condition))
+    const condition = EXPR.as_boolean(evaluate_token(instruction.condition))
     context.add_instructions(condition.value ? instruction.instructions_true : instruction.instructions_false)
 }

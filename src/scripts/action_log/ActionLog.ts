@@ -1,7 +1,7 @@
-import {AstNode, AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
+import {Expr, ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
 
 export class ActionLog {
-    add_new_action_log = (...text: Array<string | AstNode>) => {
+    add_new_action_log = (...text: Array<string | Expr>) => {
         const action_log = document.querySelector("#action_log")!
 
         const action_log_entry = document.createElement("div");
@@ -14,14 +14,14 @@ export class ActionLog {
                     const span = document.createElement("span")
                     span.className = "action-log__value"
 
-                    const show_line = (result: AstNodeNumberResolved, container: HTMLDivElement) => {
+                    const show_line = (result: ExprNumberResolved, container: HTMLDivElement) => {
 
                         const line = document.createElement("div")
                         line.className = "action-log-details__line"
                         line.append(`${result.description}: ${result.value}`)
                         container.appendChild(line)
                     }
-                    const add_sub_parts = (result: AstNodeNumberResolved, container: HTMLDivElement) => {
+                    const add_sub_parts = (result: ExprNumberResolved, container: HTMLDivElement) => {
                         if (result.params) {
                             const sub_details = document.createElement("div")
                             sub_details.className = "action-log-details__sub-details"
@@ -53,6 +53,6 @@ export class ActionLog {
     }
 }
 
-const is_typed = (entry: string | AstNode): entry is AstNode => {
+const is_typed = (entry: string | Expr): entry is Expr => {
     return entry.hasOwnProperty("type")
 }

@@ -21,7 +21,7 @@ import {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {ButtonOption} from "scripts/battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
-import {NODE} from "scripts/expressions/token_evaluator/NODE";
+import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
 import {get_reach} from "scripts/battlegrid/ranges/get_reach";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 import {bound_minmax} from "scripts/math/minmax";
@@ -186,7 +186,7 @@ export class PlayerTurnHandler {
                     const creatures = this.selection_context.target.value
                     creatures.forEach(defender => {
                         const attacker = next_instruction.attack
-                        const attack = NODE.as_number_resolved(this.evaluate_token(attacker)).value
+                        const attack = EXPR.as_number_resolved(this.evaluate_token(attacker)).value
 
                         const defense_code = next_instruction.defense
                         const defense = get_creature_defense({creature: defender, defense_code}).value
@@ -284,7 +284,7 @@ export class PlayerTurnHandler {
             const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
             if (instruction.destination_requirement) {
                 //TODO P3 move targeting and these evaluate token functions outside of the player turn handler
-                const possibilities = NODE.as_positions(this.evaluate_token(instruction.destination_requirement))
+                const possibilities = EXPR.as_positions(this.evaluate_token(instruction.destination_requirement))
 
                 const restricted: Array<Position> = []
                 for (const position of valid_targets)
@@ -310,7 +310,7 @@ export class PlayerTurnHandler {
         return valid_targets.filter(
             target => !instruction.exclude.some(
                 //TODO P3 this one feels fishy
-                excluded => positions_of_same_footprint_equal(NODE.as_creature(context.get_variable(excluded)).data.position, target)
+                excluded => positions_of_same_footprint_equal(EXPR.as_creature(context.get_variable(excluded)).data.position, target)
             )
         )
     }

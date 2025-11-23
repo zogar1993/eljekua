@@ -1,14 +1,14 @@
 import type {TokenFunction} from "scripts/expressions/tokenizer/tokens/TokenFunction";
-import type {AstNodeBoolean} from "scripts/expressions/token_evaluator/types";
+import type {ExprBoolean} from "scripts/expressions/token_evaluator/types";
 import {assert_parameters_amount_is_at_least} from "scripts/expressions/token_evaluator/asserts";
 import type {Token} from "scripts/expressions/tokenizer/tokens/AnyToken";
-import type {AstNode} from "scripts/expressions/token_evaluator/types";
+import type {Expr} from "scripts/expressions/token_evaluator/types";
 
 export const evaluate_function_or = ({token, evaluate_token}:
                                          {
                                              token: TokenFunction
-                                             evaluate_token: (token: Token) => AstNode
-                                         }): AstNodeBoolean => {
+                                             evaluate_token: (token: Token) => Expr
+                                         }): ExprBoolean => {
     assert_parameters_amount_is_at_least(token, 2)
 
     const parameters = token.parameters.map(evaluate_token)

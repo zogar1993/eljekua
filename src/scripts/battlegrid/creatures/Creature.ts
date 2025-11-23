@@ -1,7 +1,7 @@
 import {CreatureVisual} from "scripts/battlegrid/creatures/CreatureVisual";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {AnimationQueue} from "scripts/AnimationQueue";
-import type {AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
+import type {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
 
 export class Creature {
     visual: CreatureVisual
@@ -65,13 +65,13 @@ export type StatusEffectGrantCombatAdvantage = {
 
 export type StatusEffectGainResistance = {
     type: "gain_resistance"
-    value: AstNodeNumberResolved
+    value: ExprNumberResolved
     against: Array<Creature>,
 }
 
 export type StatusEffectGainAttackBonus = {
     type: "gain_attack_bonus"
-    value: AstNodeNumberResolved
+    value: ExprNumberResolved
     against: Array<Creature>,
 }
 

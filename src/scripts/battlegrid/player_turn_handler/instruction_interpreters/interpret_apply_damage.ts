@@ -2,8 +2,8 @@ import {InstructionApplyDamage} from "scripts/expressions/tokenizer/transform_po
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {NODE} from "scripts/expressions/token_evaluator/NODE";
-import {AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
+import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
+import {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
 import {
     max_number_resolved,
     resolve_number,
@@ -20,9 +20,9 @@ export const interpret_apply_damage = ({
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
     const attacker = player_turn_handler.turn_context.get_current_context().owner()
     //TODO P3 we probably want to apply damage to a bunch of enemies at the same time
-    const target = NODE.as_creature(context.get_variable(instruction.target))
+    const target = EXPR.as_creature(context.get_variable(instruction.target))
 
-    const damage = NODE.as_number(evaluate_token(instruction.value))
+    const damage = EXPR.as_number(evaluate_token(instruction.value))
 
     let result = resolve_number(damage)
 
@@ -39,7 +39,7 @@ export const interpret_apply_damage = ({
     action_log.add_new_action_log(`${target.data.name} was dealt `, result, ` damage.`)
 }
 
-const apply_half_damage = (number: AstNodeNumberResolved): AstNodeNumberResolved => ({
+const apply_half_damage = (number: ExprNumberResolved): ExprNumberResolved => ({
     type: "number_resolved",
     value: Math.floor(number.value / 2),
     params: [number],

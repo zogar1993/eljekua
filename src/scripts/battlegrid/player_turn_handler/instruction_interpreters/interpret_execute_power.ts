@@ -2,13 +2,13 @@ import {InstructionExecutePower} from "scripts/expressions/tokenizer/transform_p
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {NODE} from "scripts/expressions/token_evaluator/NODE";
+import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
 
 export const interpret_execute_power = ({
                                             instruction,
                                             context,
                                             turn_context
                                         }: InterpretInstructionProps<InstructionExecutePower>) => {
-    const {name, instructions} = NODE.as_power(context.get_variable(instruction.power)).value
+    const {name, instructions} = EXPR.as_power(context.get_variable(instruction.power)).value
     turn_context.add_power_context({name, instructions, owner: context.owner()})
 }

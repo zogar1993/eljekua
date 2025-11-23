@@ -1,15 +1,15 @@
 import type {TokenFunction} from "scripts/expressions/tokenizer/tokens/TokenFunction";
-import type {AstNodeBoolean} from "scripts/expressions/token_evaluator/types";
+import type {ExprBoolean} from "scripts/expressions/token_evaluator/types";
 import {assert_parameters_amount_equals} from "scripts/expressions/token_evaluator/asserts";
 import type {Token} from "scripts/expressions/tokenizer/tokens/AnyToken";
-import type {AstNode} from "scripts/expressions/token_evaluator/types";
+import type {Expr} from "scripts/expressions/token_evaluator/types";
 import {positions_equal} from "scripts/battlegrid/Position";
 
 export const evaluate_function_not_equals = ({token, evaluate_token}:
                                                  {
                                                      token: TokenFunction
-                                                     evaluate_token: (token: Token) => AstNode
-                                                 }): AstNodeBoolean => {
+                                                     evaluate_token: (token: Token) => Expr
+                                                 }): ExprBoolean => {
     assert_parameters_amount_equals(token, 2)
 
     const parameter1 = evaluate_token(token.parameters[0])

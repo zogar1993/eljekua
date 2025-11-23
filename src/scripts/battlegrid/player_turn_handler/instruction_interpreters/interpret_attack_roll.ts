@@ -12,8 +12,8 @@ import {PowerContext} from "scripts/battlegrid/player_turn_handler/PowerContext"
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {ActionLog} from "scripts/action_log/ActionLog";
 import {add_numbers_resolved} from "scripts/expressions/token_evaluator/number_utils";
-import {NODE} from "scripts/expressions/token_evaluator/NODE";
-import {AstNodeNumberResolved} from "scripts/expressions/token_evaluator/types";
+import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
+import {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
 
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 
@@ -25,7 +25,7 @@ export const interpret_attack_roll = ({
                                           evaluate_token
                                       }: InterpretInstructionProps<InstructionAttackRoll>) => {
     const attacker = context.owner()
-    const defenders = NODE.as_creatures(context.get_variable(instruction.defender))
+    const defenders = EXPR.as_creatures(context.get_variable(instruction.defender))
 
     const new_instructions: Array<Instruction> = []
     new_instructions.push(...instruction.before_instructions)
@@ -33,8 +33,8 @@ export const interpret_attack_roll = ({
     context.set_variable(defenders_label, {type: "creatures", value: defenders, description: defenders_label})
 
     defenders.forEach((defender, i) => {
-        const attack_parts: Array<AstNodeNumberResolved> = []
-        attack_parts.push(NODE.as_number_resolved(evaluate_token(instruction.attack)))
+        const attack_parts: Array<ExprNumberResolved> = []
+        attack_parts.push(EXPR.as_number_resolved(evaluate_token(instruction.attack)))
         attack_parts.push(roll_d(20))
 
         for (const {effect} of attacker.statuses)
@@ -76,7 +76,7 @@ export const interpret_attack_roll = ({
     context.add_instructions(new_instructions)
 }
 
-const COMBAT_ADVANTAGE: AstNodeNumberResolved = {
+const COMBAT_ADVANTAGE: ExprNumberResolved = {
     type: "number_resolved",
     value: 2,
     description: "Combat Advantage"
@@ -89,10 +89,10 @@ const log_attack_roll = (
     {context, attacker, attack, is_hit, defender, instruction, defense, action_log}: {
         context: PowerContext,
         attacker: Creature,
-        attack: AstNodeNumberResolved,
+        attack: ExprNumberResolved,
         is_hit: boolean,
         defender: Creature,
-        defense: AstNodeNumberResolved,
+        defense: ExprNumberResolved,
         instruction: InstructionAttackRoll
         action_log: ActionLog
     }) => action_log.add_new_action_log(

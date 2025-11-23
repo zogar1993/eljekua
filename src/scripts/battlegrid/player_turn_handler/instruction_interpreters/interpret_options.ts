@@ -2,7 +2,7 @@ import {InstructionOptions} from "scripts/expressions/tokenizer/transform_power_
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {NODE} from "scripts/expressions/token_evaluator/NODE";
+import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
 
 export const interpret_options = ({
                                       context,
@@ -16,7 +16,7 @@ export const interpret_options = ({
                 on_click: () => {
                     context.add_instructions(instructions)
                 },
-                disabled: condition ? !NODE.as_boolean(evaluate_token(condition)).value : false
+                disabled: condition ? !EXPR.as_boolean(evaluate_token(condition)).value : false
             })
         )
     })
