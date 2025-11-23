@@ -1,9 +1,9 @@
-import {Instruction} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {assert} from "scripts/assert";
 
-import {Expr} from "scripts/expressions/token_evaluator/types";
-import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
+import {Expr} from "scripts/expressions/evaluator/types";
+import {EXPR} from "scripts/expressions/evaluator/EXPR";
 
 export class PowerContext {
     private variables: Map<string, Expr> = new Map()

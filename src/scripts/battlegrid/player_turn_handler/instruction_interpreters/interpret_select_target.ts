@@ -4,7 +4,7 @@ import {
     positions_share_surface,
     positions_to_footprint_one
 } from "scripts/battlegrid/Position";
-import {InstructionSelectTarget} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+import {InstructionSelectTarget} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";

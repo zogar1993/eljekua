@@ -1,25 +1,25 @@
 import type {
     InstructionApplyStatus
-} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import type {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
+import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import type {PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import type {StatusDuration, StatusEffect} from "scripts/battlegrid/creatures/Creature";
-import {Token} from "scripts/expressions/tokenizer/tokens/AnyToken";
-import {Expr} from "scripts/expressions/token_evaluator/types";
+import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
+import {Expr} from "scripts/expressions/evaluator/types";
 
 export const interpret_apply_status = ({
                                            instruction,
                                            player_turn_handler,
-                                           evaluate_token,
+                                           evaluate_ast,
                                        }: InterpretInstructionProps<InstructionApplyStatus>) => {
-    const creatures = EXPR.as_creatures(evaluate_token(instruction.target))
+    const creatures = EXPR.as_creatures(evaluate_ast(instruction.target))
 
     for (const creature of creatures)
         creature.add_status({
-            effect: interpret_status({status: instruction.status, evaluate_token}),
+            effect: interpret_status({status: instruction.status, evaluate_ast}),
             durations: interpret_duration({duration: instruction.duration, player_turn_handler})
         })
 }
@@ -59,29 +59,29 @@ const interpret_duration = (
 }
 
 const interpret_status = (
-    {status, evaluate_token}:
+    {status, evaluate_ast}:
         {
             status: InstructionApplyStatus["status"],
-            evaluate_token: (token: Token) => Expr
+            evaluate_ast: (node: AstNode) => Expr
         }
 ): StatusEffect => {
     switch (status.type) {
         case "grant_combat_advantage":
             return {
                 type: "grant_combat_advantage",
-                against: EXPR.as_creatures(evaluate_token(status.against))
+                against: EXPR.as_creatures(evaluate_ast(status.against))
             }
         case "gain_attack_bonus":
             return {
                 type: "gain_attack_bonus",
-                against: EXPR.as_creatures(evaluate_token(status.against)),
-                value: EXPR.as_number_resolved(evaluate_token(status.value))
+                against: EXPR.as_creatures(evaluate_ast(status.against)),
+                value: EXPR.as_number_resolved(evaluate_ast(status.value))
             }
         case "gain_resistance":
             return {
                 type: "gain_resistance",
-                against: EXPR.as_creatures(evaluate_token(status.against)),
-                value: EXPR.as_number_resolved(evaluate_token(status.value))
+                against: EXPR.as_creatures(evaluate_ast(status.against)),
+                value: EXPR.as_number_resolved(evaluate_ast(status.value))
             }
         case "opportunity_action_used":
             return {

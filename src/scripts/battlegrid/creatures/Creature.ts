@@ -1,7 +1,7 @@
 import {CreatureVisual} from "scripts/battlegrid/creatures/CreatureVisual";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {AnimationQueue} from "scripts/AnimationQueue";
-import type {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
+import type {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 
 export class Creature {
     visual: CreatureVisual

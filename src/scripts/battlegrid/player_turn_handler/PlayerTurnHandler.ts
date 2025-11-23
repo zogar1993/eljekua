@@ -6,12 +6,12 @@ import {
     transform_position_to_footprint_one
 } from "scripts/battlegrid/Position";
 import {ActionLog} from "scripts/action_log/ActionLog";
-import {build_evaluate_token} from "scripts/expressions/token_evaluator/evaluate_token";
+import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {
     Instruction,
     InstructionSelectTarget
-} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {PowerContext} from "scripts/battlegrid/player_turn_handler/PowerContext";
 import {TurnContext} from "scripts/battlegrid/player_turn_handler/TurnContext";
 import {
@@ -21,7 +21,7 @@ import {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {ButtonOption} from "scripts/battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
-import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
+import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {get_reach} from "scripts/battlegrid/ranges/get_reach";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 import {bound_minmax} from "scripts/math/minmax";
@@ -55,7 +55,7 @@ export class PlayerTurnHandler {
     battle_grid: BattleGrid
     turn_context = new TurnContext()
     initiative_order: InitiativeOrder
-    evaluate_token = build_evaluate_token({player_turn_handler: this})
+    evaluate_ast = build_evaluate_ast({player_turn_handler: this})
     started = false
 
     selection_context: PlayerTurnHandlerContextSelect | null = null
@@ -186,7 +186,7 @@ export class PlayerTurnHandler {
                     const creatures = this.selection_context.target.value
                     creatures.forEach(defender => {
                         const attacker = next_instruction.attack
-                        const attack = EXPR.as_number_resolved(this.evaluate_token(attacker)).value
+                        const attack = EXPR.as_number_resolved(this.evaluate_ast(attacker)).value
 
                         const defense_code = next_instruction.defense
                         const defense = get_creature_defense({creature: defender, defense_code}).value
@@ -271,7 +271,7 @@ export class PlayerTurnHandler {
             instruction: instruction,
             origin: context.owner().data.position,
             battle_grid: this.battle_grid,
-            evaluate_token: this.evaluate_token
+            evaluate_ast: this.evaluate_ast
         })
 
         if (instruction.targeting_type === "area_burst")
@@ -283,8 +283,8 @@ export class PlayerTurnHandler {
         if (instruction.targeting_type === "movement") {
             const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
             if (instruction.destination_requirement) {
-                //TODO P3 move targeting and these evaluate token functions outside of the player turn handler
-                const possibilities = EXPR.as_positions(this.evaluate_token(instruction.destination_requirement))
+                //TODO P3 move targeting and these evaluate ast functions outside of the player turn handler
+                const possibilities = EXPR.as_positions(this.evaluate_ast(instruction.destination_requirement))
 
                 const restricted: Array<Position> = []
                 for (const position of valid_targets)
@@ -353,7 +353,7 @@ export class PlayerTurnHandler {
                 battle_grid: this.battle_grid,
                 action_log: this.action_log,
                 turn_context: this.turn_context,
-                evaluate_token: this.evaluate_token
+                evaluate_ast: this.evaluate_ast
             })
         }
     }

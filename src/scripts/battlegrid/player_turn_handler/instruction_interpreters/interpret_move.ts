@@ -3,12 +3,12 @@ import {BASIC_ATTACK_ACTIONS} from "scripts/powers/basic";
 import {
     Instruction,
     InstructionMovement
-} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
-import {tokenize} from "scripts/expressions/tokenizer/tokenize";
+import {EXPR} from "scripts/expressions/evaluator/EXPR";
+import {to_ast} from "scripts/expressions/parser/to_ast";
 
 export const interpret_move = ({
                                    instruction,
@@ -72,7 +72,7 @@ const add_option_for_opportunity_attack = (instructions: Array<Instruction>): Ar
                 instructions: [
                     {
                         type: "apply_status",
-                        target: tokenize("owner"),
+                        target: to_ast("owner"),
                         duration: ["until_start_of_next_turn"],
                         status: {type: "opportunity_action_used"}
                     },
@@ -85,7 +85,7 @@ const add_option_for_opportunity_attack = (instructions: Array<Instruction>): Ar
                     {
                         //TODO P2 make it so that we can forgo opportunity attack for a whole movement
                         type: "apply_status",
-                        target: tokenize("owner"),
+                        target: to_ast("owner"),
                         duration: ["until_start_of_next_turn"],
                         status: {type: "opportunity_action_used"}
                     }

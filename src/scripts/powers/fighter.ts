@@ -1,7 +1,7 @@
 import type {Power} from "scripts/types";
 import {
     transform_power_ir_into_vm_representation
-} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {power_resolute_shield} from "scripts/powers/fighter/resolute_shield";
 import {power_shield_faint} from "scripts/powers/fighter/shield_faint";
 

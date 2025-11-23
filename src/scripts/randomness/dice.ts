@@ -1,6 +1,6 @@
 import {assert} from "scripts/assert";
 
-import {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
+import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 
 (window as any).rig_dice_roll = (faces: number, result: number) => {
     const rigs = rigged_rolls[faces]

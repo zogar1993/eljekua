@@ -1,4 +1,4 @@
-import {Expr, ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
+import {Expr, ExprNumberResolved} from "scripts/expressions/evaluator/types";
 
 export class ActionLog {
     add_new_action_log = (...text: Array<string | Expr>) => {

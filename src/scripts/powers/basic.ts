@@ -1,5 +1,5 @@
 import type {Power} from "scripts/types.ts";
-import {transform_power_ir_into_vm_representation} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+import {transform_power_ir_into_vm_representation} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
 const shift: Power = {
     name: "Shift",

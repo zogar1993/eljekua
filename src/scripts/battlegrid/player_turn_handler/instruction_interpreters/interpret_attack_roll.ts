@@ -4,16 +4,16 @@ import {
     Instruction,
     InstructionAttackRoll,
     InstructionSaveVariable
-} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {PowerContext} from "scripts/battlegrid/player_turn_handler/PowerContext";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {ActionLog} from "scripts/action_log/ActionLog";
-import {add_numbers_resolved} from "scripts/expressions/token_evaluator/number_utils";
-import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
-import {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
+import {add_numbers_resolved} from "scripts/expressions/evaluator/number_utils";
+import {EXPR} from "scripts/expressions/evaluator/EXPR";
+import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 
@@ -22,7 +22,7 @@ export const interpret_attack_roll = ({
                                           context,
                                           action_log,
                                           battle_grid,
-                                          evaluate_token
+                                          evaluate_ast
                                       }: InterpretInstructionProps<InstructionAttackRoll>) => {
     const attacker = context.owner()
     const defenders = EXPR.as_creatures(context.get_variable(instruction.defender))
@@ -34,7 +34,7 @@ export const interpret_attack_roll = ({
 
     defenders.forEach((defender, i) => {
         const attack_parts: Array<ExprNumberResolved> = []
-        attack_parts.push(EXPR.as_number_resolved(evaluate_token(instruction.attack)))
+        attack_parts.push(EXPR.as_number_resolved(evaluate_ast(instruction.attack)))
         attack_parts.push(roll_d(20))
 
         for (const {effect} of attacker.statuses)

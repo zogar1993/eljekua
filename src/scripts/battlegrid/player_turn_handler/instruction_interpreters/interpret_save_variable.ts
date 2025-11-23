@@ -1,9 +1,9 @@
-import {InstructionSaveVariable} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+import {InstructionSaveVariable} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 
-export const interpret_save_variable = ({instruction, context, evaluate_token}: InterpretInstructionProps<InstructionSaveVariable>) => {
-    const expression = evaluate_token(instruction.value)
+export const interpret_save_variable = ({instruction, context, evaluate_ast}: InterpretInstructionProps<InstructionSaveVariable>) => {
+    const expression = evaluate_ast(instruction.value)
     context.set_variable(instruction.label, expression)
 }

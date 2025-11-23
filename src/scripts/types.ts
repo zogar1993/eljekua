@@ -85,7 +85,6 @@ export type IRInstructionApplyStatus = {
     }
 }
 
-
 enum StatusDurationEnum {
     "until_start_of_your_next_turn",
     "until_end_of_your_next_turn",
@@ -132,6 +131,3 @@ type IRInstructionSelectTargetAreaBurst = {
     distance: number
     radius: number
 }
-
-
-//TODO P3 Change namings for tokens, ast, and evaluation tree

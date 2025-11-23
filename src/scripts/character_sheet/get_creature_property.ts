@@ -1,6 +1,6 @@
 import {ATTRIBUTE_CODES} from "scripts/character_sheet/attributes";
 import type {Creature} from "scripts/battlegrid/creatures/Creature";
-import type {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
+import type {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {get_creature_attribute_mod} from "scripts/character_sheet/get_creature_attribute_mod";
 import {get_creature_half_level} from "scripts/character_sheet/get_creature_half_level";
 

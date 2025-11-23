@@ -1,5 +1,5 @@
 import type {Position} from "scripts/battlegrid/Position";
-import type {PowerVM} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+import type {PowerVM} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import type {AttributeCode} from "scripts/character_sheet/attributes";
 import type {Size} from "scripts/creatures/SIZES";
 

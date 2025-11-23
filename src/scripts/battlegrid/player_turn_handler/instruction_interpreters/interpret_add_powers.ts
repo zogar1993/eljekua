@@ -1,9 +1,9 @@
-import {Instruction, InstructionAddPowers} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+import {Instruction, InstructionAddPowers} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {tokenize} from "scripts/expressions/tokenizer/tokenize";
-import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
+import {to_ast} from "scripts/expressions/parser/to_ast";
+import {EXPR} from "scripts/expressions/evaluator/EXPR";
 
 export const interpret_add_powers = ({
                                          instruction,
@@ -25,7 +25,7 @@ export const interpret_add_powers = ({
                             power: power_name
                         }
                     ] as Array<Instruction>,
-                    condition: tokenize(`$has_valid_targets(${power_name})`)
+                    condition: to_ast(`$has_valid_targets(${power_name})`)
                 }
             }),
             {

@@ -1,14 +1,14 @@
-import {InstructionApplyDamage} from "scripts/expressions/tokenizer/transform_power_ir_into_vm_representation";
+import {InstructionApplyDamage} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {EXPR} from "scripts/expressions/token_evaluator/EXPR";
-import {ExprNumberResolved} from "scripts/expressions/token_evaluator/types";
+import {EXPR} from "scripts/expressions/evaluator/EXPR";
+import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {
     max_number_resolved,
     resolve_number,
     subtract_numbers_resolved
-} from "scripts/expressions/token_evaluator/number_utils";
+} from "scripts/expressions/evaluator/number_utils";
 import {StatusEffectGainResistance} from "scripts/battlegrid/creatures/Creature";
 
 export const interpret_apply_damage = ({
@@ -16,13 +16,13 @@ export const interpret_apply_damage = ({
                                            context,
                                            action_log,
                                            player_turn_handler,
-                                           evaluate_token
+                                           evaluate_ast
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
     const attacker = player_turn_handler.turn_context.get_current_context().owner()
     //TODO P3 we probably want to apply damage to a bunch of enemies at the same time
     const target = EXPR.as_creature(context.get_variable(instruction.target))
 
-    const damage = EXPR.as_number(evaluate_token(instruction.value))
+    const damage = EXPR.as_number(evaluate_ast(instruction.value))
 
     let result = resolve_number(damage)
 
