@@ -17,7 +17,6 @@ import {TurnContext} from "scripts/battlegrid/player_turn_handler/TurnContext";
 import {
     interpret_instruction
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
-import {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {ButtonOption} from "scripts/battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
