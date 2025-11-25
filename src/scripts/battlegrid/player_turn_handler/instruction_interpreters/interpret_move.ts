@@ -18,9 +18,7 @@ export const interpret_move = ({
                                }: InterpretInstructionProps<InstructionMovement>) => {
     const mover_creature = EXPR.as_creature(context.get_variable(instruction.target))
     const destination_label = instruction.destination
-    //TODO P4 this is a bit weird, we overwrite the values so
-    const path_expr = EXPR.as_positions_expr(context.get_variable(destination_label))
-    const path = path_expr.value
+    const path = EXPR.as_positions(context.get_variable(destination_label))
 
     for (let i = 0; i < path.length - 1; i++) {
         const current_position = path[i]
@@ -47,7 +45,7 @@ export const interpret_move = ({
             }
 
             context.add_instructions([{type: "move", target: instruction.target, destination: instruction.destination}])
-            context.set_variable(destination_label, {...path_expr, value: path.slice(i)})
+            context.set_variable(destination_label, {type: "positions", value: path.slice(i), description: "movement"})
             break
         }
     }

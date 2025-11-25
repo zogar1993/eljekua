@@ -52,10 +52,6 @@ export const EXPR = {
         if (expr.type === "positions") return expr.value
         return throw_could_not_cast({expr, to: "positions"})
     },
-    as_positions_expr: (expr: Expr): ExprPositions => {
-        if (expr.type === "positions") return expr
-        return throw_could_not_cast({expr, to: "positions"})
-    },
     as_string: (expr: Expr): ExprString => {
         if (expr.type === "string") return expr
         return throw_could_not_cast({expr, to: "string"})
