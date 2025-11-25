@@ -34,7 +34,6 @@ type PlayerTurnHandlerContextSelect =
 
 export type PlayerTurnHandlerContextSelectPosition = {
     type: "position_select"
-    owner: Creature
     clickable: Array<Position>
     highlighted: Array<HighlightedPosition>
     target: { type: "creatures", value: Array<Creature> } | { type: "positions", value: Array<Position> } | null
@@ -45,7 +44,6 @@ export type PlayerTurnHandlerContextSelectPosition = {
 
 type PlayerTurnHandlerContextSelectOption = {
     type: "option_select"
-    owner: Creature
     available_options: Array<ButtonOption>
 }
 
@@ -69,14 +67,9 @@ export class PlayerTurnHandler {
         this.initiative_order = initiative_order
     }
 
-    set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type" | "owner">) => {
-        const owner = this.turn_context.get_current_context().owner()
+    set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => {
         //TODO P3 this should be better on_hover
-        this.selection_context = {
-            type: "position_select",
-            owner,
-            ...context
-        }
+        this.selection_context = {type: "position_select", ...context}
 
         this.set_selected_indicator()
 
@@ -92,9 +85,9 @@ export class PlayerTurnHandler {
         }))
     }
 
-    set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type" | "owner">) => {
+    set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => {
         const owner = this.turn_context.get_current_context().owner()
-        this.selection_context = {type: "option_select", owner, ...context}
+        this.selection_context = {type: "option_select", ...context}
 
         this.set_selected_indicator()
 
@@ -232,22 +225,16 @@ export class PlayerTurnHandler {
         if (this.selection_context === null) return
 
         set_highlight_to_position({
-            position: this.selection_context.owner.data.position,
+            position: this.turn_context.get_current_context().owner().data.position,
             highlight: "none",
             battle_grid: this.battle_grid
         })
 
         if (this.selection_context.type === "position_select") {
-            this.selection_context.clickable.forEach(position => set_highlight_to_position({
-                position,
-                highlight: "none",
-                battle_grid: this.battle_grid
-            }))
-            this.selection_context.highlighted.forEach(({position}) => set_highlight_to_position({
-                position,
-                highlight: "none",
-                battle_grid: this.battle_grid
-            }))
+            for (const position of transform_positions_to_f1(this.selection_context.clickable))
+                this.battle_grid.get_square(position).visual.set_highlight("none")
+            for (const position of this.selection_context.highlighted.map(({position}) => position))
+                this.battle_grid.get_square(position).visual.set_highlight("none")
 
             if (this.selection_context.target) {
                 if (this.selection_context.target.type === "creatures") {
@@ -256,7 +243,7 @@ export class PlayerTurnHandler {
                 }
             }
         } else if (this.selection_context.type === "option_select") {
-            this.selection_context.owner.visual.remove_options()
+            this.turn_context.get_current_context().owner().visual.remove_options()
         }
 
         this.selection_context = null
@@ -357,6 +344,7 @@ export class PlayerTurnHandler {
     }
 }
 
+//TODO P3 standardize its usages and remove this
 const set_highlight_to_position = ({position, highlight, battle_grid}: {
     position: Position,
     highlight: SquareHighlight,
