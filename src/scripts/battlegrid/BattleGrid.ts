@@ -8,7 +8,7 @@ import {
     PositionFootprintOne,
     positions_equal_footprint_one,
     positions_share_surface,
-    transform_position_to_footprint_one
+    transform_position_to_f1
 } from "scripts/battlegrid/Position";
 import {AnimationQueue} from "scripts/AnimationQueue";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "scripts/powers/basic";
@@ -45,9 +45,9 @@ export const create_battle_grid = ({
 
 
     const is_terrain_occupied = (position: Position, {exclude}: { exclude?: Array<Creature> } = {}): boolean => {
-        for (const p1 of transform_position_to_footprint_one(position))
+        for (const p1 of transform_position_to_f1(position))
             for (const creature of creatures.filter(c => exclude ? !exclude.includes(c) : true))
-                for (const p2 of transform_position_to_footprint_one(creature.data.position))
+                for (const p2 of transform_position_to_f1(creature.data.position))
                     if (positions_equal_footprint_one(p1, p2)) return true
         return false
     }

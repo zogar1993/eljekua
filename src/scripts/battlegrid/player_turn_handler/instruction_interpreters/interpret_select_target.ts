@@ -1,8 +1,7 @@
 import {
     Position,
-    positions_of_same_footprint_equal,
     positions_share_surface,
-    positions_to_footprint_one
+    transform_positions_to_f1
 } from "scripts/battlegrid/Position";
 import {InstructionSelectTarget} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {
@@ -79,7 +78,7 @@ export const interpret_select_target = ({
 
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
-                highlighted: positions_to_footprint_one(area).map(position => ({position, highlight: "area"})),
+                highlighted: transform_positions_to_f1(area).map(position => ({position, highlight: "area"})),
                 target: {type: "creatures", value: targets}
             })
         } else if (instruction.targeting_type === "movement") {
@@ -87,7 +86,7 @@ export const interpret_select_target = ({
 
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
-                highlighted: positions_to_footprint_one(path).map(position => ({position, highlight: "path"})),
+                highlighted: transform_positions_to_f1(path).map(position => ({position, highlight: "path"})),
                 target: {type: "positions", value: path},
             })
         } else if (instruction.targeting_type === "push") {

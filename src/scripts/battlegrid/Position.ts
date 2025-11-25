@@ -54,7 +54,7 @@ export const positions_share_surface = (a: Position, b: Position) => {
     )
 }
 
-export const transform_position_to_footprint_one = (position: Position): Array<PositionFootprintOne> => {
+export const transform_position_to_f1 = (position: Position): Array<PositionFootprintOne> => {
     if (position.footprint === 1) return [position as PositionFootprintOne]
     const positions: Array<PositionFootprintOne> = []
     for (let x = position.x; x < position.x + position.footprint; x++)
@@ -63,10 +63,10 @@ export const transform_position_to_footprint_one = (position: Position): Array<P
     return positions
 }
 
-export const positions_to_footprint_one = (positions: Array<Position>): Array<PositionFootprintOne> => {
+export const transform_positions_to_f1 = (positions: Array<Position>): Array<PositionFootprintOne> => {
     const map: Map<string, PositionFootprintOne> = new Map()
     for(const position of positions)
-        for (const p of transform_position_to_footprint_one(position))
+        for (const p of transform_position_to_f1(position))
             map.set(`x${p.x}y${p.y}`, p)
     return [...map.values()]
 }

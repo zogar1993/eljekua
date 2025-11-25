@@ -3,7 +3,7 @@ import {
     Position, PositionFootprintOne,
     positions_of_same_footprint_equal,
     positions_share_surface,
-    transform_position_to_footprint_one
+    transform_position_to_f1, transform_positions_to_f1
 } from "scripts/battlegrid/Position";
 import {ActionLog} from "scripts/action_log/ActionLog";
 import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
@@ -162,18 +162,31 @@ export class PlayerTurnHandler {
 
         this.deselect()
         this.evaluate_instructions()
-
     }
 
 
     on_hover = ({position}: { position: Position | null }) => {
         if (this.selection_context?.type === "position_select") {
-            if (position) {
-                if (!this.selection_context.clickable.some(c => positions_of_same_footprint_equal(position, c))) return
+            const battle_grid = this.battle_grid
 
-                //TODO P3 this breaks the chance of hitting, where the chance stays on screen
-                clean_highlighted_status({selection_context: this.selection_context, battle_grid: this.battle_grid})
+            //TODO P2 remove indicators from creatures and tiles when you go out of the selectable space
 
+            const highlighted_positions = this.selection_context.highlighted.map(({position}) => position)
+
+            for (const position of highlighted_positions) {
+                battle_grid.get_square(position).visual.set_interaction_status("none")
+                battle_grid.get_square(position).visual.set_highlight("none")
+            }
+
+            for (const creature of this.battle_grid.creatures)
+                creature.visual.remove_hit_chance()
+
+            this.selection_context = {...this.selection_context, highlighted: []}
+
+            if (
+                position &&
+                this.selection_context.clickable.some(c => positions_of_same_footprint_equal(position, c))
+            ) {
                 this.selection_context.on_hover(position)
 
                 //TODO P3 this is all very untidy
@@ -197,26 +210,12 @@ export class PlayerTurnHandler {
                     })
                 }
 
-                //TODO P1 this line is wrong on many levels, but it gets us out of the way to test hovering
-                set_interaction_status_to_positions({
-                    positions: this.battle_grid.board.flatMap(x => x).map(x => x.position),
-                    value: "none",
-                    battle_grid: this.battle_grid
-                })
-                set_interaction_status_to_positions({
-                    positions: transform_position_to_footprint_one(position),
-                    value: "hover",
-                    battle_grid: this.battle_grid
-                })
-            } else {
-                //TODO P2 WIP remove indicators from creatures and tiles when you go out of the selectable space
-                this.battle_grid.creatures.map(creature => creature.visual.remove_hit_chance())
-                this.selection_context.highlighted.forEach(({position}) => set_highlight_to_position({
-                    position,
-                    highlight: "none",
-                    battle_grid: this.battle_grid
-                }))
+                for (const p of transform_position_to_f1(position))
+                    battle_grid.get_square(p).visual.set_interaction_status("hover")
 
+            } else {
+                for (const position of transform_positions_to_f1(this.selection_context.clickable))
+                    battle_grid.get_square(position).visual.set_highlight("available-target")
             }
         }
     }
@@ -359,31 +358,12 @@ export class PlayerTurnHandler {
     }
 }
 
-const clean_highlighted_status = ({selection_context, battle_grid}: {
-    selection_context: PlayerTurnHandlerContextSelectPosition,
-    battle_grid: BattleGrid
-}) => {
-    const highlighted_positions = selection_context.highlighted.map(({position}) => position)
-    set_interaction_status_to_positions({positions: highlighted_positions, value: "none", battle_grid})
-    battle_grid.get_creatures_in_positions(highlighted_positions).forEach(creature => creature.visual.remove_hit_chance())
-}
-
-const set_interaction_status_to_positions = ({positions, value, battle_grid}: {
-    positions: Array<PositionFootprintOne>,
-    value: Parameters<SquareVisual["set_interaction_status"]>[0],
-    battle_grid: BattleGrid
-}) => {
-    positions
-        .map(battle_grid.get_square)
-        .forEach(({visual}) => visual.set_interaction_status(value))
-}
-
 const set_highlight_to_position = ({position, highlight, battle_grid}: {
     position: Position,
     highlight: SquareHighlight,
     battle_grid: BattleGrid
 }) => {
-    transform_position_to_footprint_one(position)
+    transform_position_to_f1(position)
         .map(battle_grid.get_square)
         .forEach(({visual}) => visual.set_highlight(highlight))
 }
