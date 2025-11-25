@@ -28,6 +28,17 @@ export const EXPR = {
         if (expr.type === "creatures") return expr.value
         return throw_could_not_cast({expr, to: "creatures"})
     },
+    as_position: (expr: Expr): Position => {
+        if (expr.type === "positions") {
+            if(expr.value.length === 1) return expr.value[0]
+            throw Error("expected only one position in expression")
+        }
+        return throw_could_not_cast({expr, to: "position"})
+    },
+    as_positions: (expr: Expr): Array<Position> => {
+        if (expr.type === "positions") return expr.value
+        return throw_could_not_cast({expr, to: "positions"})
+    },
     as_number: (expr: Expr): ExprNumber => {
         if (expr.type === "number_resolved") return expr
         if (expr.type === "number_unresolved") return expr
@@ -40,17 +51,6 @@ export const EXPR = {
     as_boolean: (expr: Expr): ExprBoolean => {
         if (expr.type === "boolean") return expr
         return throw_could_not_cast({expr, to: "boolean"})
-    },
-    as_position: (expr: Expr): Position => {
-        if (expr.type === "positions") {
-            if(expr.value.length === 1) return expr.value[0]
-            throw Error("expected only one position in expression")
-        }
-        return throw_could_not_cast({expr, to: "position"})
-    },
-    as_positions: (expr: Expr): Array<Position> => {
-        if (expr.type === "positions") return expr.value
-        return throw_could_not_cast({expr, to: "positions"})
     },
     as_string: (expr: Expr): ExprString => {
         if (expr.type === "string") return expr
