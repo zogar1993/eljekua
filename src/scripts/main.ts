@@ -2,7 +2,7 @@ import {create_battle_grid} from "scripts/battlegrid/BattleGrid";
 import {create_visual_square} from "scripts/battlegrid/squares/SquareVisual";
 import {create_visual_creature} from "scripts/battlegrid/creatures/CreatureVisual";
 import {ClickableCoordinate, create_battle_grid_visual} from "scripts/battlegrid/BattleGridVisual";
-import {PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
+import {create_player_turn_handler, PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {ActionLog} from "scripts/action_log/ActionLog";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {ROGUE_POWERS} from "scripts/powers/rogue";
@@ -24,7 +24,7 @@ const battle_grid = create_battle_grid({
     create_battle_grid_visual,
     size: {x: 10, y: 10}
 })
-const player_turn_handler = new PlayerTurnHandler({battle_grid, action_log, initiative_order})
+const player_turn_handler = create_player_turn_handler({battle_grid, action_log, initiative_order})
 
 const ATTRIBUTES = {
         STRENGTH: "str",
@@ -126,14 +126,18 @@ const transform_clickable_coordinate_into_position = ({coordinate, footprint}: {
 
 
 let latest_position: Position | null = null
+
 battle_grid.visual.addOnMouseMoveHandler(coordinate => {
-    if (player_turn_handler.selection_context?.type !== "position_select") return
-    const footprint = player_turn_handler.selection_context.footprint
+    const selection_context = player_turn_handler.get_position_selection_context_or_null()
+    if (selection_context === null) return
 
     if (coordinate === null) {
         latest_position = null
     } else {
-        const position = transform_clickable_coordinate_into_position({coordinate, footprint})
+        const position = transform_clickable_coordinate_into_position({
+            coordinate,
+            footprint: selection_context.footprint
+        })
         if (latest_position === null || !positions_equal(latest_position, position)) {
             latest_position = position
             player_turn_handler.on_hover({position})
@@ -142,8 +146,9 @@ battle_grid.visual.addOnMouseMoveHandler(coordinate => {
 })
 
 battle_grid.visual.addOnClickHandler(coordinate => {
-    if (player_turn_handler.selection_context?.type !== "position_select") return
-    const footprint = player_turn_handler.selection_context.footprint
-    const position = transform_clickable_coordinate_into_position({coordinate, footprint})
+    const selection_context = player_turn_handler.get_position_selection_context_or_null()
+    if (selection_context === null) return
+
+    const position = transform_clickable_coordinate_into_position({coordinate, footprint: selection_context.footprint})
     player_turn_handler.on_click({position})
 })

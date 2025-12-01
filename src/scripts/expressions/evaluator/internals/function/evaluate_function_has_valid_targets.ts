@@ -1,16 +1,19 @@
-import type {ExprBoolean} from "scripts/expressions/evaluator/types";
+import type {Expr, ExprBoolean} from "scripts/expressions/evaluator/types";
 import type {AstNodeFunction} from "scripts/expressions/parser/nodes/AstNodeFunction";
 import {assert_parameters_amount_equals} from "scripts/expressions/evaluator/asserts";
 import {AST_NODE} from "scripts/expressions/parser/AST_NODE";
 import type {TurnContext} from "scripts/battlegrid/player_turn_handler/TurnContext";
-import type {PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
+import {get_valid_targets} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
+import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
+import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 
-export const evaluate_function_has_valid_targets = ({node, turn_context, player_turn_handler}:
+export const evaluate_function_has_valid_targets = ({node, turn_context, evaluate_ast, battle_grid}:
                                                         {
                                                             node: AstNodeFunction,
-                                                            turn_context: TurnContext
-                                                            player_turn_handler: PlayerTurnHandler
+                                                            turn_context: TurnContext,
+                                                            battle_grid: BattleGrid,
+                                                            evaluate_ast: (node: AstNode) => Expr
                                                         }): ExprBoolean => {
     assert_parameters_amount_equals(node, 1)
 
@@ -23,7 +26,7 @@ export const evaluate_function_has_valid_targets = ({node, turn_context, player_
     // If it does not need targets because it does not start with "select_target" we take as it's ok
     let has_valid_targets = true
     if (first_instruction.type === "select_target") {
-        const valid_targets = player_turn_handler.get_valid_targets({instruction: first_instruction, context})
+        const valid_targets = get_valid_targets({instruction: first_instruction, context, battle_grid, evaluate_ast})
         has_valid_targets = valid_targets.length > 0
     }
 

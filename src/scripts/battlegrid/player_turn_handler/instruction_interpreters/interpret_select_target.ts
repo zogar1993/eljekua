@@ -7,16 +7,20 @@ import {InstructionSelectTarget} from "scripts/expressions/parser/transform_powe
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {PlayerTurnHandlerContextSelectPosition} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
+import {
+    get_valid_targets,
+    PlayerTurnHandlerContextSelectPosition
+} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {get_reach_area_burst} from "scripts/battlegrid/ranges/get_reach_area_burst";
 
 export const interpret_select_target = ({
                                             instruction,
                                             context,
                                             player_turn_handler,
-                                            battle_grid
+                                            battle_grid,
+                                            evaluate_ast
                                         }: InterpretInstructionProps<InstructionSelectTarget>) => {
-    const clickable = player_turn_handler.get_valid_targets({instruction, context})
+    const clickable = get_valid_targets({instruction, context, battle_grid, evaluate_ast})
 
     if (clickable.length === 0) return
 

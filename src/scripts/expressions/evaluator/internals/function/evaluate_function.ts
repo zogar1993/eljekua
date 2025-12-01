@@ -16,12 +16,13 @@ import type {PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/Pla
 import {
     evaluate_function_is_greater_or_equal
 } from "scripts/expressions/evaluator/internals/function/evaluate_function_is_greater_or_equal";
+import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 
-export const build_evaluate_function = ({evaluate_ast, turn_context, player_turn_handler}:
+export const build_evaluate_function = ({evaluate_ast, turn_context, battle_grid}:
                                             {
                                                 evaluate_ast: (node: AstNode) => Expr,
                                                 turn_context: TurnContext,
-                                                player_turn_handler: PlayerTurnHandler
+                                                battle_grid: BattleGrid
                                             }
 ) => {
     return (node: AstNodeFunction): Expr => {
@@ -35,7 +36,7 @@ export const build_evaluate_function = ({evaluate_ast, turn_context, player_turn
             case "not_equals":
                 return evaluate_function_not_equals({node: node, evaluate_ast: evaluate_ast})
             case "has_valid_targets":
-                return evaluate_function_has_valid_targets({node: node, turn_context, player_turn_handler})
+                return evaluate_function_has_valid_targets({node: node, turn_context, evaluate_ast, battle_grid})
             case "or":
                 return evaluate_function_or({node: node, evaluate_ast: evaluate_ast})
             case "is_greater_or_equal":

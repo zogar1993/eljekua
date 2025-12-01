@@ -25,6 +25,8 @@ import {get_reach} from "scripts/battlegrid/ranges/get_reach";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 import {bound_minmax} from "scripts/math/minmax";
 import {SquareHighlight} from "scripts/battlegrid/squares/SquareHighlight";
+import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
+import {Expr} from "scripts/expressions/evaluator/types";
 
 type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
@@ -47,151 +49,150 @@ type PlayerTurnHandlerContextSelectOption = {
     available_options: Array<ButtonOption>
 }
 
-export class PlayerTurnHandler {
-    private readonly action_log: ActionLog
-    battle_grid: BattleGrid
-    turn_context = new TurnContext()
+export const create_player_turn_handler = ({
+                                               battle_grid,
+                                               action_log,
+                                               initiative_order
+                                           }: {
+    battle_grid: BattleGrid,
+    action_log: ActionLog,
     initiative_order: InitiativeOrder
-    evaluate_ast = build_evaluate_ast({player_turn_handler: this})
-    started = false
-
-    selection_context: PlayerTurnHandlerContextSelect | null = null
-
-    constructor({battle_grid, action_log, initiative_order}: {
-        battle_grid: BattleGrid,
-        action_log: ActionLog,
-        initiative_order: InitiativeOrder
-    }) {
-        this.battle_grid = battle_grid
-        this.action_log = action_log
-        this.initiative_order = initiative_order
+}): PlayerTurnHandler => {
+    const turn_context = new TurnContext()
+    const evaluate_ast = build_evaluate_ast({battle_grid, turn_context})
+    //TODO P3 there is probably better naming for this
+    const self = {
+        started: false,
+        selection_context: null as PlayerTurnHandlerContextSelect | null
     }
 
-    set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => {
+    const set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => {
         //TODO P3 this should be better on_hover
-        this.selection_context = {type: "position_select", ...context}
+        self.selection_context = {type: "position_select", ...context}
 
-        this.set_selected_indicator()
+        set_selected_indicator()
 
         context.clickable.forEach(position => set_highlight_to_position({
             position,
             highlight: "available-target",
-            battle_grid: this.battle_grid
+            battle_grid
         }))
         context.highlighted.forEach(({position, highlight}) => set_highlight_to_position({
             position,
             highlight,
-            battle_grid: this.battle_grid
+            battle_grid
         }))
     }
 
-    set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => {
-        const owner = this.turn_context.get_current_context().owner()
-        this.selection_context = {type: "option_select", ...context}
+    const set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => {
+        const owner = turn_context.get_current_context().owner()
+        self.selection_context = {type: "option_select", ...context}
 
-        this.set_selected_indicator()
+        set_selected_indicator()
 
         const options = context.available_options.map(option => ({
             ...option,
             on_click: () => {
                 option.on_click()
-                this.deselect()
-                this.evaluate_instructions()
+                deselect()
+                evaluate_instructions()
             }
         }))
+        //TODO P4 move display options outside of the character visual
         owner.visual.display_options(options)
     }
 
-    get_position_selection_context = (): PlayerTurnHandlerContextSelectPosition => {
-        const selection = this.selection_context
-        if (selection?.type !== "position_select")
+    const get_position_selection_context = (): PlayerTurnHandlerContextSelectPosition => {
+        if (self.selection_context?.type !== "position_select")
             throw Error("position_select selection_context not set")
-        return selection
+        return self.selection_context
+    }
+
+    const get_position_selection_context_or_null = (): PlayerTurnHandlerContextSelectPosition | null => {
+        if (self.selection_context?.type !== "position_select") return null
+        return self.selection_context
     }
 
 
-    add_creature = (data: CreatureData) => {
-        const creature = this.battle_grid.create_creature(data)
-        this.initiative_order.add_creature(creature)
+    const add_creature = (data: CreatureData) => {
+        const creature = battle_grid.create_creature(data)
+        initiative_order.add_creature(creature)
     }
 
-    start = () => {
-        this.started = true
-        this.initiative_order.start()
-        const creature = this.initiative_order.get_current_creature()
-        this.set_creature_as_current_turn(creature)
+    const start = () => {
+        self.started = true
+        initiative_order.start()
+        const creature = initiative_order.get_current_creature()
+        set_creature_as_current_turn(creature)
     }
 
-    set_creature_as_current_turn(creature: Creature) {
+    const set_creature_as_current_turn = (creature: Creature) => {
         const instructions: Array<Instruction> = [{type: "add_powers", creature: "owner"}]
-        this.turn_context.add_power_context({name: "Action Selection", instructions, owner: creature})
-        this.evaluate_instructions()
+        turn_context.add_power_context({name: "Action Selection", instructions, owner: creature})
+        evaluate_instructions()
     }
 
-    on_click = ({position}: { position: Position }) => {
+    const on_click = ({position}: { position: Position }) => {
         //TODO P0 big fellows break when moving to the edge of their movement
-        const selection = this.selection_context
-        if (selection?.type !== "position_select") return
-        if (selection.target === null) return
+        if (self.selection_context?.type !== "position_select") return
+        if (self.selection_context.target === null) return
 
-        if (selection.target.type === "positions") {
-            const path = selection.target.value
+        if (self.selection_context.target.type === "positions") {
+            const path = self.selection_context.target.value
             if (!positions_of_same_footprint_equal(position, path[path.length - 1]))
                 throw Error("position should be the end of the path")
         }
 
-        const power_context = this.turn_context.get_current_context()
-        power_context.set_variable(selection.target_label,
-            selection.target.type === "creatures" ? {
-                type: selection.target.type,
-                value: selection.target.value,
+        const power_context = turn_context.get_current_context()
+        power_context.set_variable(self.selection_context.target_label,
+            self.selection_context.target.type === "creatures" ? {
+                type: self.selection_context.target.type,
+                value: self.selection_context.target.value,
                 description: "target"
             } : {
-                type: selection.target.type,
-                value: selection.target.value,
+                type: self.selection_context.target.type,
+                value: self.selection_context.target.value,
                 description: "target"
             })
 
-        this.deselect()
-        this.evaluate_instructions()
+        deselect()
+        evaluate_instructions()
     }
 
 
-    on_hover = ({position}: { position: Position | null }) => {
-        if (this.selection_context?.type === "position_select") {
-            const battle_grid = this.battle_grid
-
+    const on_hover = ({position}: { position: Position | null }) => {
+        if (self.selection_context?.type === "position_select") {
             //TODO P2 remove indicators from creatures and tiles when you go out of the selectable space
 
-            const highlighted_positions = this.selection_context.highlighted.map(({position}) => position)
+            const highlighted_positions = self.selection_context.highlighted.map(({position}) => position)
 
             for (const position of highlighted_positions) {
                 battle_grid.get_square(position).visual.set_interaction_status("none")
                 battle_grid.get_square(position).visual.set_highlight("none")
             }
 
-            for (const creature of this.battle_grid.creatures)
+            for (const creature of battle_grid.creatures)
                 creature.visual.remove_hit_chance()
 
-            this.selection_context = {...this.selection_context, highlighted: []}
+            self.selection_context = {...self.selection_context, highlighted: []}
 
             if (
                 position &&
-                this.selection_context.clickable.some(c => positions_of_same_footprint_equal(position, c))
+                self.selection_context.clickable.some(c => positions_of_same_footprint_equal(position, c))
             ) {
-                this.selection_context.on_hover(position)
+                self.selection_context.on_hover(position)
 
                 //TODO P3 this is all very untidy
-                const next_instruction = this.turn_context.get_current_context().peek_instruction()
+                const next_instruction = turn_context.get_current_context().peek_instruction()
                 const needs_roll = next_instruction.type === "attack_roll"
-                if (needs_roll && this.selection_context.target) {
-                    if (this.selection_context.target.type !== "creatures")
+                if (needs_roll && self.selection_context.target) {
+                    if (self.selection_context.target.type !== "creatures")
                         throw Error("an attack roll needs to target creatures")
 
-                    const creatures = this.selection_context.target.value
+                    const creatures = self.selection_context.target.value
                     creatures.forEach(defender => {
                         const attacker = next_instruction.attack
-                        const attack = EXPR.as_number_resolved(this.evaluate_ast(attacker)).value
+                        const attack = EXPR.as_number_resolved(evaluate_ast(attacker)).value
 
                         const defense_code = next_instruction.defense
                         const defense = get_creature_defense({creature: defender, defense_code}).value
@@ -206,116 +207,84 @@ export class PlayerTurnHandler {
                     battle_grid.get_square(p).visual.set_interaction_status("hover")
 
             } else {
-                for (const position of transform_positions_to_f1(this.selection_context.clickable))
+                for (const position of transform_positions_to_f1(self.selection_context.clickable))
                     battle_grid.get_square(position).visual.set_highlight("available-target")
             }
         }
     }
 
-    set_selected_indicator() {
-        const creature = this.turn_context.get_current_context().owner()
+    const set_selected_indicator = () => {
+        const creature = turn_context.get_current_context().owner()
         set_highlight_to_position({
             position: creature.data.position,
             highlight: "selected",
-            battle_grid: this.battle_grid
+            battle_grid
         })
     }
 
-    deselect() {
-        if (this.selection_context === null) return
+    const deselect = () => {
+        if (self.selection_context === null) return
 
         set_highlight_to_position({
-            position: this.turn_context.get_current_context().owner().data.position,
+            position: turn_context.get_current_context().owner().data.position,
             highlight: "none",
-            battle_grid: this.battle_grid
+            battle_grid
         })
 
-        if (this.selection_context.type === "position_select") {
-            for (const position of transform_positions_to_f1(this.selection_context.clickable))
-                this.battle_grid.get_square(position).visual.set_highlight("none")
-            for (const position of this.selection_context.highlighted.map(({position}) => position))
-                this.battle_grid.get_square(position).visual.set_highlight("none")
+        if (self.selection_context.type === "position_select") {
+            for (const position of transform_positions_to_f1(self.selection_context.clickable))
+                battle_grid.get_square(position).visual.set_highlight("none")
+            for (const position of self.selection_context.highlighted.map(({position}) => position))
+                battle_grid.get_square(position).visual.set_highlight("none")
 
-            if (this.selection_context.target) {
-                if (this.selection_context.target.type === "creatures") {
-                    const creatures = this.selection_context.target.value
+            if (self.selection_context.target) {
+                if (self.selection_context.target.type === "creatures") {
+                    const creatures = self.selection_context.target.value
                     creatures.forEach(creature => creature.visual.remove_hit_chance())
                 }
             }
-        } else if (this.selection_context.type === "option_select") {
-            this.turn_context.get_current_context().owner().visual.remove_options()
+        } else if (self.selection_context.type === "option_select") {
+            turn_context.get_current_context().owner().visual.remove_options()
         }
 
-        this.selection_context = null
+        self.selection_context = null
     }
 
-    has_selected_creature = () => this.selection_context !== null
+    const has_selected_creature = () => self.selection_context !== null
 
-    get_valid_targets = ({instruction, context}: { instruction: InstructionSelectTarget, context: PowerContext }) => {
-        const in_range = get_reach({
-            instruction: instruction,
-            origin: context.owner().data.position,
-            battle_grid: this.battle_grid,
-            evaluate_ast: this.evaluate_ast
-        })
+    const player_turn_handler: PlayerTurnHandler = {
+        set_awaiting_position_selection,
+        set_awaiting_option_selection,
+        get_position_selection_context,
+        get_position_selection_context_or_null,
+        add_creature,
+        start,
+        set_creature_as_current_turn,
+        on_click,
+        on_hover,
+        set_selected_indicator,
+        deselect,
+        has_selected_creature,
 
-        if (instruction.targeting_type === "area_burst")
-            return in_range
-
-        if (instruction.targeting_type === "push")
-            return in_range
-
-        if (instruction.targeting_type === "movement") {
-            const valid_targets = in_range.filter(position => !this.battle_grid.is_terrain_occupied(position))
-            if (instruction.destination_requirement) {
-                //TODO P3 move targeting and these evaluate ast functions outside of the player turn handler
-                const possibilities = EXPR.as_positions(this.evaluate_ast(instruction.destination_requirement))
-
-                const restricted: Array<Position> = []
-                for (const position of valid_targets)
-                    for (const possibility of possibilities)
-                        if (positions_share_surface(position, possibility))
-                            restricted.push(position)
-                return restricted
-            } else
-                return valid_targets
-        }
-
-        const valid_targets = in_range.filter(position => {
-            if (instruction.target_type === "terrain")
-                return !this.battle_grid.is_terrain_occupied(position)
-            if (instruction.target_type === "enemy")
-                return this.battle_grid.is_terrain_occupied(position)
-            if (instruction.target_type === "creature")
-                return this.battle_grid.is_terrain_occupied(position)
-
-            throw `Target "${instruction.target_type}" not supported`
-        })
-
-        return valid_targets.filter(
-            target => !instruction.exclude.some(
-                //TODO P3 this one feels fishy
-                excluded => positions_of_same_footprint_equal(EXPR.as_creature(context.get_variable(excluded)).data.position, target)
-            )
-        )
+        turn_context,
     }
 
-    evaluate_instructions = () => {
-        while (!this.has_selected_creature()) {
-            const instruction = this.turn_context.next_instruction()
+    const evaluate_instructions = () => {
+        while (!has_selected_creature()) {
+            const instruction = turn_context.next_instruction()
 
             // Reached the end of all instructions
             if (instruction === null) {
-                const ending_turn_creature = this.initiative_order.get_current_creature()
+                const ending_turn_creature = initiative_order.get_current_creature()
 
-                this.battle_grid.creatures.forEach(creature => {
+                battle_grid.creatures.forEach(creature => {
                     creature.remove_statuses({type: "turn_end", creature: ending_turn_creature})
                 })
 
-                this.initiative_order.next_turn()
-                const initiating_turn_creature = this.initiative_order.get_current_creature()
+                initiative_order.next_turn()
+                const initiating_turn_creature = initiative_order.get_current_creature()
 
-                for (const creature of this.battle_grid.creatures) {
+                for (const creature of battle_grid.creatures) {
                     creature.remove_statuses({type: "turn_start", creature: initiating_turn_creature})
 
                     //TODO P3 a little mutation but whatever, we can clean up later
@@ -325,23 +294,41 @@ export class PlayerTurnHandler {
                                 duration.until = "turn_end"
                 }
 
-                this.set_creature_as_current_turn(initiating_turn_creature)
+                set_creature_as_current_turn(initiating_turn_creature)
                 return
             }
 
-            const context = this.turn_context.get_current_context()
+            const context = turn_context.get_current_context()
 
             interpret_instruction({
                 instruction,
                 context,
-                player_turn_handler: this,
-                battle_grid: this.battle_grid,
-                action_log: this.action_log,
-                turn_context: this.turn_context,
-                evaluate_ast: this.evaluate_ast
+                player_turn_handler,
+                battle_grid,
+                action_log,
+                turn_context,
+                evaluate_ast
             })
         }
     }
+
+    return player_turn_handler
+}
+
+export type PlayerTurnHandler = {
+    set_awaiting_position_selection: (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => void
+    set_awaiting_option_selection: (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => void
+    get_position_selection_context: () => PlayerTurnHandlerContextSelectPosition
+    get_position_selection_context_or_null: () => PlayerTurnHandlerContextSelectPosition | null
+    add_creature: (data: CreatureData) => void
+    start: () => void
+    set_creature_as_current_turn: (creature: Creature) => void
+    on_click: ({position}: { position: Position }) => void
+    on_hover: ({position}: { position: Position | null }) => void
+    set_selected_indicator: () => void
+    deselect: () => void
+    has_selected_creature: () => boolean
+    turn_context: TurnContext
 }
 
 //TODO P3 standardize its usages and remove this
@@ -353,4 +340,59 @@ const set_highlight_to_position = ({position, highlight, battle_grid}: {
     transform_position_to_f1(position)
         .map(battle_grid.get_square)
         .forEach(({visual}) => visual.set_highlight(highlight))
+}
+
+//TODO P3 move this to its own file
+export const get_valid_targets = ({instruction, context, battle_grid, evaluate_ast}: {
+    instruction: InstructionSelectTarget,
+    context: PowerContext,
+    battle_grid: BattleGrid,
+    evaluate_ast: (node: AstNode) => Expr
+}) => {
+    const in_range = get_reach({
+        instruction: instruction,
+        origin: context.owner().data.position,
+        battle_grid,
+        evaluate_ast
+    })
+
+    if (instruction.targeting_type === "area_burst")
+        return in_range
+
+    if (instruction.targeting_type === "push")
+        return in_range
+
+    if (instruction.targeting_type === "movement") {
+        const valid_targets = in_range.filter(position => !battle_grid.is_terrain_occupied(position))
+        if (instruction.destination_requirement) {
+            //TODO P3 move targeting and these evaluate ast functions outside of the player turn handler
+            const possibilities = EXPR.as_positions(evaluate_ast(instruction.destination_requirement))
+
+            const restricted: Array<Position> = []
+            for (const position of valid_targets)
+                for (const possibility of possibilities)
+                    if (positions_share_surface(position, possibility))
+                        restricted.push(position)
+            return restricted
+        } else
+            return valid_targets
+    }
+
+    const valid_targets = in_range.filter(position => {
+        if (instruction.target_type === "terrain")
+            return !battle_grid.is_terrain_occupied(position)
+        if (instruction.target_type === "enemy")
+            return battle_grid.is_terrain_occupied(position)
+        if (instruction.target_type === "creature")
+            return battle_grid.is_terrain_occupied(position)
+
+        throw `Target "${instruction.target_type}" not supported`
+    })
+
+    return valid_targets.filter(
+        target => !instruction.exclude.some(
+            //TODO P3 this one feels fishy
+            excluded => positions_of_same_footprint_equal(EXPR.as_creature(context.get_variable(excluded)).data.position, target)
+        )
+    )
 }
