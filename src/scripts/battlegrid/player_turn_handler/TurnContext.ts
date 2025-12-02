@@ -16,6 +16,7 @@ export class TurnContext {
 
     has_instructions = () => this.power_contexts.length > 0
 
+    //TODO P3 this is a bit confusing
     next_instruction = () => {
         while (this.power_contexts.length > 0) {
             const last = this.power_contexts[this.power_contexts.length - 1]
