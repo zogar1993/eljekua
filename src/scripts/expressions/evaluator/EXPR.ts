@@ -41,8 +41,8 @@ export const EXPR = {
         if (expr.type === "number_resolved") return expr
         return throw_could_not_cast({expr, to: "number_resolved"})
     },
-    as_boolean: (expr: Expr): ExprBoolean => {
-        if (expr.type === "boolean") return expr
+    as_boolean: (expr: Expr): boolean => {
+        if (expr.type === "boolean") return expr.value
         return throw_could_not_cast({expr, to: "boolean"})
     },
     as_string: (expr: Expr): string => {

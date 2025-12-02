@@ -16,7 +16,7 @@ export const interpret_options = ({
                 on_click: () => {
                     context.add_instructions(instructions)
                 },
-                disabled: condition ? !EXPR.as_boolean(evaluate_ast(condition)).value : false
+                disabled: condition ? !EXPR.as_boolean(evaluate_ast(condition)) : false
             })
         )
     })
