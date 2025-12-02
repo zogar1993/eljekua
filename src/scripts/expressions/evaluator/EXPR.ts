@@ -13,10 +13,6 @@ import {Position} from "scripts/battlegrid/Position";
 
 //TODO P3 refactor remaining non _expr as_ functions
 export const EXPR = {
-    as_creatures_expr: (expr: Expr): ExprCreatures => {
-        if (expr.type === "creatures") return expr
-        return throw_could_not_cast({expr, to: "creatures"})
-    },
     as_creature: (expr: Expr): Creature => {
         if (expr.type === "creatures") {
             if(expr.value.length === 1) return expr.value[0]
