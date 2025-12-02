@@ -3,7 +3,6 @@ import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Position} from "scripts/battlegrid/Position";
 import {PowerVM} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
-//TODO P3 refactor remaining non _expr as_ functions
 export const EXPR = {
     as_creature: (expr: Expr): Creature => {
         if (expr.type === "creatures") {
