@@ -10,6 +10,6 @@ export const interpret_save_resolved_number = ({
                                                    context,
                                                    evaluate_ast
                                                }: InterpretInstructionProps<InstructionSaveResolvedNumber>) => {
-    const value = resolve_number(EXPR.as_number(evaluate_ast(instruction.value)))
+    const value = resolve_number(EXPR.as_number_expr(evaluate_ast(instruction.value)))
     context.set_variable(instruction.label, value)
 }

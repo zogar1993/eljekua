@@ -22,21 +22,19 @@ export const interpret_apply_damage = ({
     //TODO P3 we probably want to apply damage to a bunch of enemies at the same time
     const target = EXPR.as_creature(context.get_variable(instruction.target))
 
-    const damage = EXPR.as_number(evaluate_ast(instruction.value))
-
-    let result = resolve_number(damage)
+    let damage = resolve_number(EXPR.as_number_expr(evaluate_ast(instruction.value)))
 
     const resistances = target.statuses
         .filter(({effect}) => effect.type === "gain_resistance" && effect.against.includes(attacker))
         .map(({effect}) => (effect as StatusEffectGainResistance).value)
     if (resistances.length > 0)
-        result = subtract_numbers_resolved(result, max_number_resolved(resistances))
+        damage = subtract_numbers_resolved(damage, max_number_resolved(resistances))
 
     if (instruction.half_damage)
-        result = apply_half_damage(result)
+        damage = apply_half_damage(damage)
 
-    target.receive_damage(result.value)
-    action_log.add_new_action_log(`${target.data.name} was dealt `, result, ` damage.`)
+    target.receive_damage(damage.value)
+    action_log.add_new_action_log(`${target.data.name} was dealt `, damage, ` damage.`)
 }
 
 const apply_half_damage = (number: ExprNumberResolved): ExprNumberResolved => ({

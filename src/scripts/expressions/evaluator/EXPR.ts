@@ -3,7 +3,6 @@ import {
     ExprBoolean,
     ExprNumber,
     ExprNumberResolved,
-    ExprString
 } from "scripts/expressions/evaluator/types";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Position} from "scripts/battlegrid/Position";
@@ -33,7 +32,7 @@ export const EXPR = {
         if (expr.type === "positions") return expr.value
         return throw_could_not_cast({expr, to: "positions"})
     },
-    as_number: (expr: Expr): ExprNumber => {
+    as_number_expr: (expr: Expr): ExprNumber => {
         if (expr.type === "number_resolved") return expr
         if (expr.type === "number_unresolved") return expr
         return throw_could_not_cast({expr, to: "number"})
