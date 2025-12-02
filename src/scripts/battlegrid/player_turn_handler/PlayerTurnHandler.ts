@@ -21,7 +21,7 @@ import {ButtonOption} from "scripts/battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
-import {get_reach} from "scripts/battlegrid/ranges/get_reach";
+import {get_reach} from "scripts/battlegrid/position/get_reach";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 import {bound_minmax} from "scripts/math/minmax";
 import {SquareHighlight} from "scripts/battlegrid/squares/SquareHighlight";

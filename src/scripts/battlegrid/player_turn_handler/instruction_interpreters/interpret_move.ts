@@ -1,4 +1,4 @@
-import {get_reach_adjacent} from "scripts/battlegrid/ranges/get_reach_adjacent";
+import {get_reach_adjacent} from "scripts/battlegrid/position/get_reach_adjacent";
 import {BASIC_ATTACK_ACTIONS} from "scripts/powers/basic";
 import {
     Instruction,

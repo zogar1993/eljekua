@@ -7,7 +7,7 @@ import {
     Position,
     positions_of_same_footprint_equal
 } from "scripts/battlegrid/Position";
-import {get_reach_adjacent} from "scripts/battlegrid/ranges/get_reach_adjacent";
+import {get_reach_adjacent} from "scripts/battlegrid/position/get_reach_adjacent";
 
 export const create_get_shortest_path = (battle_grid: BattleGrid) =>
     ({creature, destination}: { creature: Creature, destination: Position }) => {

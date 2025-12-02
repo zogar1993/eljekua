@@ -11,7 +11,7 @@ import {
     get_valid_targets,
     PlayerTurnHandlerContextSelectPosition
 } from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
-import {get_reach_area_burst} from "scripts/battlegrid/ranges/get_reach_area_burst";
+import {get_reach_area_burst} from "scripts/battlegrid/position/get_reach_area_burst";
 
 export const interpret_select_target = ({
                                             instruction,

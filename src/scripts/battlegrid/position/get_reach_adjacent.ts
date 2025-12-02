@@ -1,6 +1,6 @@
 import {Position} from "scripts/battlegrid/Position";
 import {BattleGrid} from "scripts/battlegrid/BattleGrid";
-import {get_positions_within_distance} from "scripts/battlegrid/ranges/get_positions_within_distance";
+import {get_positions_within_distance} from "scripts/battlegrid/position/get_positions_within_distance";
 
 export const get_reach_adjacent = ({battle_grid, position}: {
     position: Position,

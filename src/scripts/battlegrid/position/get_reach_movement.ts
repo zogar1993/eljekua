@@ -1,6 +1,6 @@
 import {Position, positions_of_same_footprint_equal} from "scripts/battlegrid/Position";
 import type {BattleGrid} from "scripts/battlegrid/BattleGrid";
-import {get_reach_adjacent} from "scripts/battlegrid/ranges/get_reach_adjacent";
+import {get_reach_adjacent} from "scripts/battlegrid/position/get_reach_adjacent";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import type {InstructionSelectTarget} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import type {Expr} from "scripts/expressions/evaluator/types";
