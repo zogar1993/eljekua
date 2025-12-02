@@ -19,7 +19,7 @@ export const evaluate_function_has_valid_targets = ({node, turn_context, evaluat
 
     const power_name = AST_NODE.as_keyword(node.parameters[0]).value
     const context = turn_context.get_current_context()
-    const power = EXPR.as_power(context.get_variable(power_name)).value
+    const power = EXPR.as_power(context.get_variable(power_name))
 
     const first_instruction = power.instructions[0]
 

@@ -9,6 +9,6 @@ export const interpret_execute_power = ({
                                             context,
                                             turn_context
                                         }: InterpretInstructionProps<InstructionExecutePower>) => {
-    const {name, instructions} = EXPR.as_power(context.get_variable(instruction.power)).value
+    const {name, instructions} = EXPR.as_power(context.get_variable(instruction.power))
     turn_context.add_power_context({name, instructions, owner: context.owner()})
 }

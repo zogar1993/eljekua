@@ -1,15 +1,13 @@
 import {
     Expr,
     ExprBoolean,
-    ExprCreatures,
     ExprNumber,
     ExprNumberResolved,
-    ExprPositions,
-    ExprPower,
     ExprString
 } from "scripts/expressions/evaluator/types";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Position} from "scripts/battlegrid/Position";
+import {PowerVM} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
 //TODO P3 refactor remaining non _expr as_ functions
 export const EXPR = {
@@ -52,8 +50,8 @@ export const EXPR = {
         if (expr.type === "string") return expr
         return throw_could_not_cast({expr, to: "string"})
     },
-    as_power: (expr: Expr): ExprPower => {
-        if (expr.type === "power") return expr
+    as_power: (expr: Expr): PowerVM => {
+        if (expr.type === "power") return expr.value
         return throw_could_not_cast({expr, to: "power"})
     }
 }
