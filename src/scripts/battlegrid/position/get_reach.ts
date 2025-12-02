@@ -28,17 +28,17 @@ export const get_reach = ({instruction, origin, battle_grid, evaluate_ast}: {
             case "adjacent":
                 return get_reach_adjacent({position: origin, battle_grid})
             case "ranged": {
-                const distance = EXPR.as_number_resolved(evaluate_ast(instruction.distance))
-                return get_reach_ranged({origin, distance: distance.value, battle_grid})
+                const distance = EXPR.as_number(evaluate_ast(instruction.distance))
+                return get_reach_ranged({origin, distance, battle_grid})
             }
             case "area_burst": {
-                const distance = EXPR.as_number_resolved(evaluate_ast(instruction.distance))
-                return get_reach_area_burst({origin, distance: distance.value, battle_grid})
+                const distance = EXPR.as_number(evaluate_ast(instruction.distance))
+                return get_reach_area_burst({origin, distance, battle_grid})
             }
             case "push": {
                 const anchor = EXPR.as_position(evaluate_ast(instruction.anchor))
                 const origin = EXPR.as_position(evaluate_ast(instruction.origin))
-                const distance = EXPR.as_number_resolved(evaluate_ast(instruction.distance)).value
+                const distance = EXPR.as_number(evaluate_ast(instruction.distance))
                 return get_reach_push({anchor, origin, distance, battle_grid})
             }
             default: {

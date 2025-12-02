@@ -192,7 +192,7 @@ export const create_player_turn_handler = ({
                     const creatures = self.selection_context.target.value
                     creatures.forEach(defender => {
                         const attacker = next_instruction.attack
-                        const attack = EXPR.as_number_resolved(evaluate_ast(attacker)).value
+                        const attack = EXPR.as_number(evaluate_ast(attacker))
 
                         const defense_code = next_instruction.defense
                         const defense = get_creature_defense({creature: defender, defense_code}).value

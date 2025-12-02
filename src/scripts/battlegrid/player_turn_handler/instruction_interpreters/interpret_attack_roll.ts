@@ -34,7 +34,7 @@ export const interpret_attack_roll = ({
 
     defenders.forEach((defender, i) => {
         const attack_parts: Array<ExprNumberResolved> = []
-        attack_parts.push(EXPR.as_number_resolved(evaluate_ast(instruction.attack)))
+        attack_parts.push(EXPR.as_number_resolved_expr(evaluate_ast(instruction.attack)))
         attack_parts.push(roll_d(20))
 
         for (const {effect} of attacker.statuses)

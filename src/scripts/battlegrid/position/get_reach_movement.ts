@@ -13,7 +13,7 @@ export const get_reach_movement = ({instruction, evaluate_ast, battle_grid}: {
     battle_grid: BattleGrid
 }): Array<Position> => {
     if (instruction.targeting_type !== "movement") throw Error()
-    const distance = EXPR.as_number_resolved(evaluate_ast(instruction.distance)).value
+    const distance = EXPR.as_number(evaluate_ast(instruction.distance))
     const creature = EXPR.as_creature(evaluate_ast(instruction.creature))
     const visited: Array<Position> = [creature.data.position]
     let last_ring: Array<Position> = [creature.data.position]

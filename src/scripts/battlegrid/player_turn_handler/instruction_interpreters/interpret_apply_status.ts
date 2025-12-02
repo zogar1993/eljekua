@@ -75,13 +75,13 @@ const interpret_status = (
             return {
                 type: "gain_attack_bonus",
                 against: EXPR.as_creatures(evaluate_ast(status.against)),
-                value: EXPR.as_number_resolved(evaluate_ast(status.value))
+                value: EXPR.as_number_resolved_expr(evaluate_ast(status.value))
             }
         case "gain_resistance":
             return {
                 type: "gain_resistance",
                 against: EXPR.as_creatures(evaluate_ast(status.against)),
-                value: EXPR.as_number_resolved(evaluate_ast(status.value))
+                value: EXPR.as_number_resolved_expr(evaluate_ast(status.value))
             }
         case "opportunity_action_used":
             return {
