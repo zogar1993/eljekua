@@ -46,8 +46,8 @@ export const EXPR = {
         if (expr.type === "boolean") return expr
         return throw_could_not_cast({expr, to: "boolean"})
     },
-    as_string: (expr: Expr): ExprString => {
-        if (expr.type === "string") return expr
+    as_string: (expr: Expr): string => {
+        if (expr.type === "string") return expr.value
         return throw_could_not_cast({expr, to: "string"})
     },
     as_power: (expr: Expr): PowerVM => {
