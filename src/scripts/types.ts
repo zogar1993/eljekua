@@ -62,7 +62,7 @@ export type IRInstruction =
     amount: number,
     target: string
 } | {
-    type: "save_resolved_number"
+    type: "save_number_as_resolved"
     value: string
     label: string
 } | IRInstructionApplyStatus
@@ -91,6 +91,7 @@ enum StatusDurationEnum {
     "until_start_of_next_turn",
     "until_your_next_attack_roll_against_target"
 }
+
 export type StatusDurationValue = keyof typeof StatusDurationEnum
 
 type IRStatusDuration = StatusDurationValue | Array<StatusDurationValue>

@@ -1,5 +1,7 @@
 import {Power} from "scripts/types";
-import {transform_power_ir_into_vm_representation} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import {
+    transform_power_ir_into_vm_representation
+} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
 const magic_missile: Power = {
     name: "Magic Missile",
@@ -44,7 +46,7 @@ const scorching_burst: Power = {
         defense: "reflex",
         before_instructions: [
             {
-                type: "save_resolved_number",
+                type: "save_number_as_resolved",
                 value: "$add({1d6},owner.int_mod)",
                 label: "primary_damage"
             }

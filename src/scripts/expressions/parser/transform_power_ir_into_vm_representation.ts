@@ -86,7 +86,7 @@ export type InstructionSaveVariable = {
 }
 
 export type InstructionSaveResolvedNumber = {
-    type: "save_resolved_number",
+    type: "save_number_as_resolved",
     value: AstNode,
     label: string
 }
@@ -212,9 +212,9 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 value: to_ast(instruction.value),
                 label: instruction.label
             }]
-        case "save_resolved_number":
+        case "save_number_as_resolved":
             return [{
-                type: "save_resolved_number",
+                type: "save_number_as_resolved",
                 label: instruction.label,
                 value: to_ast(instruction.value)
             }]

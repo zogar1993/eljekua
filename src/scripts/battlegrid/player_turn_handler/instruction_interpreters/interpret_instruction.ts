@@ -1,10 +1,20 @@
-import {interpret_select_target} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_select_target";
-import {interpret_attack_roll} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_attack_roll";
-import {interpret_apply_damage} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_apply_damage";
+import {
+    interpret_select_target
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_select_target";
+import {
+    interpret_attack_roll
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_attack_roll";
+import {
+    interpret_apply_damage
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_apply_damage";
 import {interpret_move} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_move";
 import {interpret_shift} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_shift";
-import {interpret_force_movement} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_force_movement";
-import {interpret_save_variable} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_save_variable";
+import {
+    interpret_force_movement
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_force_movement";
+import {
+    interpret_save_variable
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_save_variable";
 import {interpret_options} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_options";
 import {interpret_condition} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_condition";
 import type {Instruction} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
@@ -12,10 +22,14 @@ import type {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {
-    interpret_save_resolved_number
-} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_save_resolved_number";
-import {interpret_execute_power} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_execute_power";
-import {interpret_add_powers} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_add_powers";
+    interpret_save_number_as_resolved
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_save_number_as_resolved";
+import {
+    interpret_execute_power
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_execute_power";
+import {
+    interpret_add_powers
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_add_powers";
 import {
     interpret_clean_context_status
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_clean_context_status";
@@ -47,8 +61,8 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
         case "save_variable":
             interpret_save_variable({...props, instruction})
             break
-        case "save_resolved_number":
-            interpret_save_resolved_number({...props, instruction})
+        case "save_number_as_resolved":
+            interpret_save_number_as_resolved({...props, instruction})
             break
         case "options":
             interpret_options({...props, instruction})
