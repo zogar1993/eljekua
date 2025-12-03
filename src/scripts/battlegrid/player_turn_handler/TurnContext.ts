@@ -18,18 +18,20 @@ export const create_turn_context = (): TurnContext => {
 
     const get_current_context = () => state.power_contexts[state.power_contexts.length - 1]
 
-    //TODO P3 this is a bit confusing
     const next_instruction = () => {
         while (state.power_contexts.length > 0) {
             const current_power_context = get_current_context()
             if (current_power_context.has_instructions())
                 return current_power_context.next_instruction()
+
+            // We discard the current power context if it is empty and move on to the next.
+            // The reason powers contexts are not removed when the last instruction is removed is because
+            // an instruction can be added after that. This is a bit easier to handle.
             state.power_contexts = state.power_contexts.slice(0, state.power_contexts.length - 1)
         }
 
         return null
     }
-
 
     //TODO P3 there are two ways of getting the current turn owner
     const get_turn_owner = () => {
