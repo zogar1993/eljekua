@@ -4,9 +4,9 @@ import {assert_parameters_amount_equals} from "scripts/expressions/evaluator/ass
 import {AST_NODE} from "scripts/expressions/parser/AST_NODE";
 import type {TurnContext} from "scripts/battlegrid/player_turn_handler/TurnContext";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
-import {get_valid_targets} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {BattleGrid} from "scripts/battlegrid/BattleGrid";
+import {get_valid_targets} from "scripts/battlegrid/position/get_valid_targets";
 
 export const evaluate_function_has_valid_targets = ({node, turn_context, evaluate_ast, battle_grid}:
                                                         {

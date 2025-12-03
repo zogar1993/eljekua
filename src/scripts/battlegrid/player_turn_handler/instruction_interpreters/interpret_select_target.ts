@@ -8,10 +8,10 @@ import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {
-    get_valid_targets,
     PlayerTurnHandlerContextSelectPosition
 } from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {get_reach_area_burst} from "scripts/battlegrid/position/get_reach_area_burst";
+import {get_valid_targets} from "scripts/battlegrid/position/get_valid_targets";
 
 export const interpret_select_target = ({
                                             instruction,
