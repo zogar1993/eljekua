@@ -12,14 +12,14 @@ import type {AstNodeDice, AstNodeWeapon} from "scripts/expressions/parser/nodes/
 import type {AstNodeKeyword} from "scripts/expressions/parser/nodes/AstNodeKeyword";
 import type {AstNodeFunction} from "scripts/expressions/parser/nodes/AstNodeFunction";
 import {BattleGrid} from "scripts/battlegrid/BattleGrid";
-import {TurnContext} from "scripts/battlegrid/player_turn_handler/TurnContext";
+import {TurnState} from "scripts/battlegrid/player_turn_handler/TurnState";
 
 /*
     This is called "evaluate" instead on "interpret" to distinguish the expressions that evaluate to a value from the
     interpreting of instructions that affect the game context.
  */
-export const build_evaluate_ast = ({turn_context, battle_grid}: {
-    turn_context: TurnContext
+export const build_evaluate_ast = ({turn_state, battle_grid}: {
+    turn_state: TurnState
     battle_grid: BattleGrid
 }): (node: AstNode) => Expr => {
     const evaluate_ast = (node: AstNode) => {
@@ -28,8 +28,8 @@ export const build_evaluate_ast = ({turn_context, battle_grid}: {
         return evaluator_internals[node.type](node)
     }
 
-    const evaluate_keyword = build_evaluate_keyword({turn_context})
-    const evaluate_function = build_evaluate_function({evaluate_ast, turn_context, battle_grid})
+    const evaluate_keyword = build_evaluate_keyword({turn_state})
+    const evaluate_function = build_evaluate_function({evaluate_ast, turn_state, battle_grid})
 
     const evaluator_internals: Record<AstNode["type"], (node: AstNode) => Expr> = {
         "number": (node) => evaluate_number(node as AstNodeNumber),

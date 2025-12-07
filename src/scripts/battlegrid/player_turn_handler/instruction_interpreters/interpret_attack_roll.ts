@@ -22,9 +22,9 @@ export const interpret_attack_roll = ({
                                           action_log,
                                           battle_grid,
                                           evaluate_ast,
-                                          turn_context
+                                          turn_state
                                       }: InterpretInstructionProps<InstructionAttackRoll>) => {
-    const context = turn_context.get_current_context()
+    const context = turn_state.get_current_context()
     const attacker = context.owner()
     const defenders = EXPR.as_creatures(context.get_variable(instruction.defender))
 

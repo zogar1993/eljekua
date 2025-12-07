@@ -6,10 +6,10 @@ import {EXPR} from "scripts/expressions/evaluator/EXPR";
 
 export const interpret_condition = ({
                                         instruction,
-                                        turn_context,
+                                        turn_state,
                                         evaluate_ast
                                     }: InterpretInstructionProps<InstructionCondition>) => {
-    const context = turn_context.get_current_context()
+    const context = turn_state.get_current_context()
     const result = EXPR.as_boolean(evaluate_ast(instruction.condition))
     context.add_instructions(result ? instruction.instructions_true : instruction.instructions_false)
 }

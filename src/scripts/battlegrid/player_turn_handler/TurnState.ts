@@ -2,7 +2,7 @@ import {PowerContext} from "scripts/battlegrid/player_turn_handler/PowerContext"
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Instruction} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
-export const create_turn_context = (): TurnContext => {
+export const create_turn_state = (): TurnState => {
     const state = {
         power_contexts: [] as Array<PowerContext>
     }
@@ -48,7 +48,7 @@ export const create_turn_context = (): TurnContext => {
     }
 }
 
-export type TurnContext = {
+export type TurnState = {
     add_power_context: (_: { name: string, instructions: Array<Instruction>, owner: Creature }) => PowerContext
     get_current_context: () => PowerContext
     next_instruction: () => Instruction | null

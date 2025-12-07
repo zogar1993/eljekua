@@ -7,9 +7,9 @@ import {EXPR} from "scripts/expressions/evaluator/EXPR";
 
 export const interpret_add_powers = ({
                                          instruction,
-                                         turn_context,
+                                         turn_state,
                                      }: InterpretInstructionProps<InstructionAddPowers>) => {
-    const context = turn_context.get_current_context()
+    const context = turn_state.get_current_context()
     const creature = EXPR.as_creature(context.get_variable(instruction.creature))
 
     context.add_instructions([{

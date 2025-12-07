@@ -6,10 +6,10 @@ import {EXPR} from "scripts/expressions/evaluator/EXPR";
 
 export const interpret_shift = ({
                                     instruction,
-                                    turn_context,
+                                    turn_state,
                                     battle_grid
                                 }: InterpretInstructionProps<InstructionMovement>) => {
-    const context = turn_context.get_current_context()
+    const context = turn_state.get_current_context()
     const creature = EXPR.as_creature(context.get_variable(instruction.target))
     const path = EXPR.as_positions(context.get_variable(instruction.destination))
     for (const position of path)

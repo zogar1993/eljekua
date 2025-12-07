@@ -30,7 +30,7 @@ const interpret_duration = (
             duration: InstructionApplyStatus["duration"],
             player_turn_handler: PlayerTurnHandler
         }): Array<StatusDuration> => {
-    const owner = player_turn_handler.turn_context.get_current_context().owner()
+    const owner = player_turn_handler.turn_state.get_current_context().owner()
     return duration.map(duration => {
         switch (duration) {
             case "until_start_of_your_next_turn":

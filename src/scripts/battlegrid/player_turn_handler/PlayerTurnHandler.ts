@@ -9,7 +9,7 @@ import {ActionLog} from "scripts/action_log/ActionLog";
 import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Instruction} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
-import {create_turn_context, TurnContext} from "scripts/battlegrid/player_turn_handler/TurnContext";
+import {create_turn_state, TurnState} from "scripts/battlegrid/player_turn_handler/TurnState";
 import {
     interpret_instruction
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
@@ -51,8 +51,8 @@ export const create_player_turn_handler = ({
     action_log: ActionLog,
     initiative_order: InitiativeOrder
 }): PlayerTurnHandler => {
-    const turn_context = create_turn_context()
-    const evaluate_ast = build_evaluate_ast({battle_grid, turn_context})
+    const turn_state = create_turn_state()
+    const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
 
     const state = {
         started: false,
@@ -78,7 +78,7 @@ export const create_player_turn_handler = ({
     }
 
     const set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => {
-        const owner = turn_context.get_current_context().owner()
+        const owner = turn_state.get_current_context().owner()
         state.selection_context = {type: "option_select", ...context}
 
         set_selected_indicator()
@@ -121,7 +121,7 @@ export const create_player_turn_handler = ({
 
     const set_creature_as_current_turn = (creature: Creature) => {
         const instructions: Array<Instruction> = [{type: "add_powers", creature: "owner"}]
-        turn_context.add_power_context({name: "Action Selection", instructions, owner: creature})
+        turn_state.add_power_context({name: "Action Selection", instructions, owner: creature})
         evaluate_instructions()
     }
 
@@ -136,7 +136,7 @@ export const create_player_turn_handler = ({
                 throw Error("position should be the end of the path")
         }
 
-        const power_context = turn_context.get_current_context()
+        const power_context = turn_state.get_current_context()
         power_context.set_variable(state.selection_context.target_label,
             state.selection_context.target.type === "creatures" ? {
                 type: state.selection_context.target.type,
@@ -176,7 +176,7 @@ export const create_player_turn_handler = ({
                 state.selection_context.on_hover(position)
 
                 //TODO P3 this is all very untidy
-                const next_instruction = turn_context.get_current_context().peek_instruction()
+                const next_instruction = turn_state.get_current_context().peek_instruction()
                 const needs_roll = next_instruction.type === "attack_roll"
                 if (needs_roll && state.selection_context.target) {
                     if (state.selection_context.target.type !== "creatures")
@@ -207,7 +207,7 @@ export const create_player_turn_handler = ({
     }
 
     const set_selected_indicator = () => {
-        const creature = turn_context.get_current_context().owner()
+        const creature = turn_state.get_current_context().owner()
         set_highlight_to_position({
             position: creature.data.position,
             highlight: "selected",
@@ -219,7 +219,7 @@ export const create_player_turn_handler = ({
         if (state.selection_context === null) return
 
         set_highlight_to_position({
-            position: turn_context.get_current_context().owner().data.position,
+            position: turn_state.get_current_context().owner().data.position,
             highlight: "none",
             battle_grid
         })
@@ -237,7 +237,7 @@ export const create_player_turn_handler = ({
                 }
             }
         } else if (state.selection_context.type === "option_select") {
-            turn_context.get_current_context().owner().visual.remove_options()
+            turn_state.get_current_context().owner().visual.remove_options()
         }
 
         state.selection_context = null
@@ -259,12 +259,12 @@ export const create_player_turn_handler = ({
         deselect,
         has_selected_creature,
 
-        turn_context,
+        turn_state,
     }
 
     const evaluate_instructions = () => {
         while (!has_selected_creature()) {
-            const instruction = turn_context.next_instruction()
+            const instruction = turn_state.next_instruction()
 
             // Reached the end of all instructions
             if (instruction === null) {
@@ -296,7 +296,7 @@ export const create_player_turn_handler = ({
                 player_turn_handler,
                 battle_grid,
                 action_log,
-                turn_context,
+                turn_state,
                 evaluate_ast
             })
         }
@@ -318,7 +318,7 @@ export type PlayerTurnHandler = {
     set_selected_indicator: () => void
     deselect: () => void
     has_selected_creature: () => boolean
-    turn_context: TurnContext
+    turn_state: TurnState
 }
 
 //TODO P3 standardize its usages and remove this

@@ -8,9 +8,9 @@ export const interpret_options = ({
                                       instruction,
                                       player_turn_handler,
                                       evaluate_ast,
-                                      turn_context
+                                      turn_state
                                   }: InterpretInstructionProps<InstructionOptions>) => {
-    const context = turn_context.get_current_context()
+    const context = turn_state.get_current_context()
     player_turn_handler.set_awaiting_option_selection({
         available_options: instruction.options.map(({text, condition, instructions}) => ({
                 text: text,

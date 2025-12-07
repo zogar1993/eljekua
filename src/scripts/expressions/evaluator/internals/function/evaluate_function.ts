@@ -10,7 +10,7 @@ import {
 } from "scripts/expressions/evaluator/internals/function/evaluate_function_has_valid_targets";
 import {evaluate_function_or} from "scripts/expressions/evaluator/internals/function/evaluate_function_or";
 import type {AstNode} from "scripts/expressions/parser/nodes/AstNode";
-import type {TurnContext} from "scripts/battlegrid/player_turn_handler/TurnContext";
+import type {TurnState} from "scripts/battlegrid/player_turn_handler/TurnState";
 import {evaluate_function_exists} from "scripts/expressions/evaluator/internals/function/evaluate_function_exists";
 import type {PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {
@@ -18,10 +18,10 @@ import {
 } from "scripts/expressions/evaluator/internals/function/evaluate_function_is_greater_or_equal";
 import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 
-export const build_evaluate_function = ({evaluate_ast, turn_context, battle_grid}:
+export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                                             {
                                                 evaluate_ast: (node: AstNode) => Expr,
-                                                turn_context: TurnContext,
+                                                turn_state: TurnState,
                                                 battle_grid: BattleGrid
                                             }
 ) => {
@@ -30,13 +30,13 @@ export const build_evaluate_function = ({evaluate_ast, turn_context, battle_grid
             case "add":
                 return evaluate_function_add({node: node, evaluate_ast: evaluate_ast})
             case "exists":
-                return evaluate_function_exists({node: node, turn_context})
+                return evaluate_function_exists({node: node, turn_state})
             case "equipped":
                 return evaluate_function_equipped({node: node, evaluate_ast: evaluate_ast})
             case "not_equals":
                 return evaluate_function_not_equals({node: node, evaluate_ast: evaluate_ast})
             case "has_valid_targets":
-                return evaluate_function_has_valid_targets({node: node, turn_context, evaluate_ast, battle_grid})
+                return evaluate_function_has_valid_targets({node: node, turn_state, evaluate_ast, battle_grid})
             case "or":
                 return evaluate_function_or({node: node, evaluate_ast: evaluate_ast})
             case "is_greater_or_equal":
