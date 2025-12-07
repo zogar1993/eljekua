@@ -19,11 +19,12 @@ import {get_creature_defense} from "scripts/character_sheet/get_creature_defense
 
 export const interpret_attack_roll = ({
                                           instruction,
-                                          context,
                                           action_log,
                                           battle_grid,
-                                          evaluate_ast
+                                          evaluate_ast,
+                                          turn_context
                                       }: InterpretInstructionProps<InstructionAttackRoll>) => {
+    const context = turn_context.get_current_context()
     const attacker = context.owner()
     const defenders = EXPR.as_creatures(context.get_variable(instruction.defender))
 

@@ -14,6 +14,7 @@ export const create_turn_context = (): TurnContext => {
     }) => {
         const context = new PowerContext({instructions, name, owner})
         state.power_contexts.push(context)
+        return context
     }
 
     const get_current_context = () => state.power_contexts[state.power_contexts.length - 1]
@@ -48,7 +49,7 @@ export const create_turn_context = (): TurnContext => {
 }
 
 export type TurnContext = {
-    add_power_context: (_: { name: string, instructions: Array<Instruction>, owner: Creature }) => void
+    add_power_context: (_: { name: string, instructions: Array<Instruction>, owner: Creature }) => PowerContext
     get_current_context: () => PowerContext
     next_instruction: () => Instruction | null
     get_turn_owner: () => Creature

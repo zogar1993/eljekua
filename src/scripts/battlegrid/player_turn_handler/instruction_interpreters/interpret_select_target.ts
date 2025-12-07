@@ -15,11 +15,12 @@ import {get_valid_targets} from "scripts/battlegrid/position/get_valid_targets";
 
 export const interpret_select_target = ({
                                             instruction,
-                                            context,
+                                            turn_context,
                                             player_turn_handler,
                                             battle_grid,
                                             evaluate_ast
                                         }: InterpretInstructionProps<InstructionSelectTarget>) => {
+    const context = turn_context.get_current_context()
     const clickable = get_valid_targets({instruction, context, battle_grid, evaluate_ast})
 
     if (clickable.length === 0) return

@@ -3,7 +3,12 @@ import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 
-export const interpret_save_variable = ({instruction, context, evaluate_ast}: InterpretInstructionProps<InstructionSaveVariable>) => {
+export const interpret_save_variable = ({
+                                            instruction,
+                                            turn_context,
+                                            evaluate_ast
+                                        }: InterpretInstructionProps<InstructionSaveVariable>) => {
+    const context = turn_context.get_current_context()
     const expression = evaluate_ast(instruction.value)
     context.set_variable(instruction.label, expression)
 }

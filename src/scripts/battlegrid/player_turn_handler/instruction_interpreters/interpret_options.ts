@@ -5,11 +5,12 @@ import {
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 
 export const interpret_options = ({
-                                      context,
                                       instruction,
                                       player_turn_handler,
-                                      evaluate_ast
+                                      evaluate_ast,
+                                      turn_context
                                   }: InterpretInstructionProps<InstructionOptions>) => {
+    const context = turn_context.get_current_context()
     player_turn_handler.set_awaiting_option_selection({
         available_options: instruction.options.map(({text, condition, instructions}) => ({
                 text: text,

@@ -6,9 +6,9 @@ import {EXPR} from "scripts/expressions/evaluator/EXPR";
 
 export const interpret_execute_power = ({
                                             instruction,
-                                            context,
                                             turn_context
                                         }: InterpretInstructionProps<InstructionExecutePower>) => {
+    const context = turn_context.get_current_context()
     const {name, instructions} = EXPR.as_power(context.get_variable(instruction.power))
     turn_context.add_power_context({name, instructions, owner: context.owner()})
 }

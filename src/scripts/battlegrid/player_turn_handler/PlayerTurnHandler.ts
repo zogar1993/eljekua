@@ -291,11 +291,8 @@ export const create_player_turn_handler = ({
                 return
             }
 
-            const context = turn_context.get_current_context()
-
             interpret_instruction({
                 instruction,
-                context,
                 player_turn_handler,
                 battle_grid,
                 action_log,

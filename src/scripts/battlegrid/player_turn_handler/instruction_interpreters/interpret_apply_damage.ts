@@ -13,11 +13,12 @@ import {StatusEffectGainResistance} from "scripts/battlegrid/creatures/Creature"
 
 export const interpret_apply_damage = ({
                                            instruction,
-                                           context,
                                            action_log,
                                            player_turn_handler,
-                                           evaluate_ast
+                                           evaluate_ast,
+                                           turn_context
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
+    const context = turn_context.get_current_context()
     const attacker = player_turn_handler.turn_context.get_current_context().owner()
     //TODO P3 we probably want to apply damage to a bunch of enemies at the same time
     const target = EXPR.as_creature(context.get_variable(instruction.target))

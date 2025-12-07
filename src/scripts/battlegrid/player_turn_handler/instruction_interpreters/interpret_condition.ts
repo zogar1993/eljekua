@@ -4,7 +4,12 @@ import {
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 
-export const interpret_condition = ({instruction, context, evaluate_ast}: InterpretInstructionProps<InstructionCondition>) => {
+export const interpret_condition = ({
+                                        instruction,
+                                        turn_context,
+                                        evaluate_ast
+                                    }: InterpretInstructionProps<InstructionCondition>) => {
+    const context = turn_context.get_current_context()
     const result = EXPR.as_boolean(evaluate_ast(instruction.condition))
     context.add_instructions(result ? instruction.instructions_true : instruction.instructions_false)
 }

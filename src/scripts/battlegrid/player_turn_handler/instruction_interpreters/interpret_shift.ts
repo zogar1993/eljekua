@@ -4,7 +4,12 @@ import {
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 
-export const interpret_shift = ({instruction, context, battle_grid}: InterpretInstructionProps<InstructionMovement>) => {
+export const interpret_shift = ({
+                                    instruction,
+                                    turn_context,
+                                    battle_grid
+                                }: InterpretInstructionProps<InstructionMovement>) => {
+    const context = turn_context.get_current_context()
     const creature = EXPR.as_creature(context.get_variable(instruction.target))
     const path = EXPR.as_positions(context.get_variable(instruction.destination))
     for (const position of path)

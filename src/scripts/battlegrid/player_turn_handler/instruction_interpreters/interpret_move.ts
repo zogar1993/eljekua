@@ -12,10 +12,10 @@ import {to_ast} from "scripts/expressions/parser/to_ast";
 
 export const interpret_move = ({
                                    instruction,
-                                   context,
                                    battle_grid,
                                    turn_context,
                                }: InterpretInstructionProps<InstructionMovement>) => {
+    const context = turn_context.get_current_context()
     const mover_creature = EXPR.as_creature(context.get_variable(instruction.target))
     const destination_label = instruction.destination
     const path = EXPR.as_positions(context.get_variable(destination_label))
@@ -40,8 +40,8 @@ export const interpret_move = ({
                 const instructions = turn_power_into_opportunity_attack(BASIC_ATTACK_ACTIONS[0].instructions)
                 const name = BASIC_ATTACK_ACTIONS[0].name
                 //TODO P3 this may be easier to follow if the new context was returned, so that we can name each context
-                turn_context.add_power_context({name, instructions, owner: attacker})
-                turn_context.get_current_context().set_variable("primary_target", context.get_variable(instruction.target))
+                const new_power_context = turn_context.add_power_context({name, instructions, owner: attacker})
+                new_power_context.set_variable("primary_target", context.get_variable(instruction.target))
             }
 
             context.add_instructions([{type: "move", target: instruction.target, destination: instruction.destination}])

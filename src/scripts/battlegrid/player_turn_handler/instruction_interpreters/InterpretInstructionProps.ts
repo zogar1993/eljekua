@@ -9,7 +9,6 @@ import type {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 
 export type InterpretInstructionProps<T extends Instruction> = {
     instruction: T
-    context: PowerContext
     player_turn_handler: PlayerTurnHandler
     battle_grid: BattleGrid
     action_log: ActionLog

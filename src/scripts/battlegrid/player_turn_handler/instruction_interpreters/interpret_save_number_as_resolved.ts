@@ -7,9 +7,10 @@ import {resolve_number} from "scripts/expressions/evaluator/number_utils";
 
 export const interpret_save_number_as_resolved = ({
                                                       instruction,
-                                                      context,
+                                                      turn_context,
                                                       evaluate_ast
                                                   }: InterpretInstructionProps<InstructionSaveResolvedNumber>) => {
+    const context = turn_context.get_current_context()
     const value = resolve_number(EXPR.as_number_expr(evaluate_ast(instruction.value)))
     context.set_variable(instruction.label, value)
 }
