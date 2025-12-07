@@ -258,8 +258,6 @@ export const create_player_turn_handler = ({
         set_selected_indicator,
         deselect,
         has_selected_creature,
-
-        turn_state,
     }
 
     const evaluate_instructions = () => {
@@ -318,7 +316,6 @@ export type PlayerTurnHandler = {
     set_selected_indicator: () => void
     deselect: () => void
     has_selected_creature: () => boolean
-    turn_state: TurnState
 }
 
 //TODO P3 standardize its usages and remove this
