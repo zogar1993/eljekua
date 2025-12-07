@@ -9,7 +9,7 @@ import {ActionLog} from "scripts/action_log/ActionLog";
 import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Instruction} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
-import {create_turn_state, TurnState} from "scripts/battlegrid/player_turn_handler/TurnState";
+import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnState";
 import {
     interpret_instruction
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
