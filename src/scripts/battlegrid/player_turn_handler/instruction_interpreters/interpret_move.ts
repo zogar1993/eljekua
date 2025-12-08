@@ -39,7 +39,6 @@ export const interpret_move = ({
                 //TODO P1 allow for any attack that can be a melee basic attack
                 const instructions = turn_power_into_opportunity_attack(BASIC_ATTACK_ACTIONS[0].instructions)
                 const name = BASIC_ATTACK_ACTIONS[0].name
-                //TODO P3 this may be easier to follow if the new context was returned, so that we can name each context
                 const new_power_context = turn_state.add_power_context({name, instructions, owner: attacker})
                 new_power_context.set_variable("primary_target", context.get_variable(instruction.target))
             }
