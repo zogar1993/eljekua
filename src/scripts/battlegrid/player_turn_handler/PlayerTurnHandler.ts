@@ -158,7 +158,6 @@ export const create_player_turn_handler = ({
         evaluate_instructions()
     }
 
-
     let latest_position: Position | null = null
     const on_hover = ({coordinate}: { coordinate: ClickableCoordinate | null }) => {
         if (selection_context?.type !== "position_select") return
@@ -183,10 +182,7 @@ export const create_player_turn_handler = ({
 
         selection_context = {...selection_context, highlighted: []}
 
-        if (
-            position &&
-            selection_context.clickable.some(c => positions_of_same_footprint_equal(position, c))
-        ) {
+        if (position) {
             selection_context.on_hover(position)
 
             //TODO P3 this is all very untidy
