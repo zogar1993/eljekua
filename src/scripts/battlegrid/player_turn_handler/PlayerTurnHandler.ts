@@ -168,8 +168,6 @@ export const create_player_turn_handler = ({
         if (nullable_positions_equal(latest_position, position)) return;
         latest_position = position
 
-        //TODO P2 remove indicators from creatures and tiles when you go out of the selectable space
-
         const highlighted_positions = selection_context.highlighted.map(({position}) => position)
 
         for (const position of highlighted_positions) {
