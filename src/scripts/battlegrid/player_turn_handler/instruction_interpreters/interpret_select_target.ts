@@ -1,5 +1,6 @@
 import {
     Position,
+    position_is_footprint_one,
     positions_share_surface,
     transform_positions_to_f1
 } from "scripts/battlegrid/Position";
@@ -32,10 +33,12 @@ export const interpret_select_target = ({
             const position = clickable[0]
 
             if (instruction.targeting_type === "area_burst") {
+                if (!position_is_footprint_one(position)) throw Error("area burst must originate from a f1 position")
+
                 const distance = instruction.radius
                 const highlighted_area = get_reach_area_burst({origin: position, distance, battle_grid})
                 const target_positions = highlighted_area.filter(p => battle_grid.is_terrain_occupied(p))
-                const targets = target_positions.map(battle_grid.get_creature_by_position)
+                const targets = battle_grid.get_creatures_in_positions(target_positions)
 
                 context.set_variable(target_label, {type: "creatures", value: targets, description: target_label})
             } else if (instruction.targeting_type === "movement") {
@@ -76,14 +79,15 @@ export const interpret_select_target = ({
             return
 
         if (instruction.targeting_type === "area_burst") {
+            if (!position_is_footprint_one(position)) throw Error("area burst must originate from a f1 position")
             const distance = instruction.radius
             const area = get_reach_area_burst({origin: position, distance, battle_grid})
             const target_positions = area.filter(p => battle_grid.is_terrain_occupied(p))
-            const targets = target_positions.map(battle_grid.get_creature_by_position)
+            const targets = battle_grid.get_creatures_in_positions(target_positions)
 
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
-                highlighted: transform_positions_to_f1(area).map(position => ({position, highlight: "area"})),
+                highlighted: area.map(position => ({position, highlight: "area"})),
                 target: {type: "creatures", value: targets}
             })
         } else if (instruction.targeting_type === "movement") {

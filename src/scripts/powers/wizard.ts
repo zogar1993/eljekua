@@ -26,7 +26,6 @@ const magic_missile: Power = {
     ]
 }
 
-//TODO this is failing on large fellows, where it hits twice and the chance to hit remains on screen
 const scorching_burst: Power = {
     name: "Scorching Burst",
     description: "You create a vertical column of golden flames that burns all within.",
