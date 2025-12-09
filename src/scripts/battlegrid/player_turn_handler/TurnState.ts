@@ -3,9 +3,7 @@ import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Instruction} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
 export const create_turn_state = (): TurnState => {
-    const state = {
-        power_contexts: [] as Array<PowerContext>
-    }
+    let power_contexts: Array<PowerContext> = []
 
     const add_power_context = ({name, instructions, owner}: {
         name: string,
@@ -13,14 +11,14 @@ export const create_turn_state = (): TurnState => {
         owner: Creature
     }) => {
         const context = new PowerContext({instructions, name, owner})
-        state.power_contexts.push(context)
+        power_contexts.push(context)
         return context
     }
 
-    const get_current_context = () => state.power_contexts[state.power_contexts.length - 1]
+    const get_current_context = () => power_contexts[power_contexts.length - 1]
 
     const next_instruction = () => {
-        while (state.power_contexts.length > 0) {
+        while (power_contexts.length > 0) {
             const current_power_context = get_current_context()
             if (current_power_context.has_instructions())
                 return current_power_context.next_instruction()
@@ -28,7 +26,7 @@ export const create_turn_state = (): TurnState => {
             // We discard the current power context if it is empty and move on to the next.
             // The reason powers contexts are not removed when the last instruction is removed is because
             // an instruction can be added after that. This is a bit easier to handle.
-            state.power_contexts = state.power_contexts.slice(0, state.power_contexts.length - 1)
+            power_contexts = power_contexts.slice(0, power_contexts.length - 1)
         }
 
         return null
@@ -36,8 +34,8 @@ export const create_turn_state = (): TurnState => {
 
     //TODO P3 there are two ways of getting the current turn owner
     const get_turn_owner = () => {
-        if (state.power_contexts.length === 0) throw Error(`can't get owner without setting a power context`)
-        return state.power_contexts[0].owner()
+        if (power_contexts.length === 0) throw Error(`can't get owner without setting a power context`)
+        return power_contexts[0].owner()
     }
 
     return {
