@@ -1,6 +1,7 @@
 import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import {
-    Position, PositionFootprintOne,
+    Position,
+    PositionFootprintOne,
     positions_of_same_footprint_equal,
     transform_position_to_f1,
     transform_positions_to_f1
@@ -20,6 +21,11 @@ import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 import {bound_minmax} from "scripts/math/minmax";
 import {SquareHighlight} from "scripts/battlegrid/squares/SquareHighlight";
+import {
+    ClickableCoordinate,
+    get_position_by_coordinate,
+    nullable_positions_equal
+} from "scripts/battlegrid/coordinates/ClickableCoordinate";
 
 type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
@@ -56,7 +62,7 @@ export const create_player_turn_handler = ({
 
     const state = {
         started: false,
-        selection_context: null as PlayerTurnHandlerContextSelect | null
+        selection_context: null as PlayerTurnHandlerContextSelect | null,
     }
 
     const set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => {
@@ -125,10 +131,12 @@ export const create_player_turn_handler = ({
         evaluate_instructions()
     }
 
-    const on_click = ({position}: { position: Position }) => {
-        //TODO P0 big fellows break when moving to the edge of their movement
+    const on_click = ({coordinate}: { coordinate: ClickableCoordinate }) => {
         if (state.selection_context?.type !== "position_select") return
         if (state.selection_context.target === null) return
+        const position = get_position_by_coordinate({coordinate, positions: state.selection_context.clickable})
+        if (position === null) return null;
+
 
         if (state.selection_context.target.type === "positions") {
             const path = state.selection_context.target.value
@@ -153,56 +161,62 @@ export const create_player_turn_handler = ({
     }
 
 
-    const on_hover = ({position}: { position: Position | null }) => {
-        if (state.selection_context?.type === "position_select") {
-            //TODO P2 remove indicators from creatures and tiles when you go out of the selectable space
+    let latest_position: Position | null = null
+    const on_hover = ({coordinate}: { coordinate: ClickableCoordinate | null }) => {
+        if (state.selection_context?.type !== "position_select") return
 
-            const highlighted_positions = state.selection_context.highlighted.map(({position}) => position)
+        const position = coordinate &&
+            get_position_by_coordinate({positions: state.selection_context.clickable, coordinate})
 
-            for (const position of highlighted_positions) {
-                battle_grid.get_square(position).visual.set_interaction_status("none")
-                battle_grid.get_square(position).visual.set_highlight("none")
+        if (nullable_positions_equal(latest_position, position)) return;
+        latest_position = position
+
+        //TODO P2 remove indicators from creatures and tiles when you go out of the selectable space
+
+        const highlighted_positions = state.selection_context.highlighted.map(({position}) => position)
+
+        for (const position of highlighted_positions) {
+            battle_grid.get_square(position).visual.set_interaction_status("none")
+            battle_grid.get_square(position).visual.set_highlight("none")
+        }
+
+        for (const creature of battle_grid.creatures)
+            creature.visual.remove_hit_chance()
+
+        state.selection_context = {...state.selection_context, highlighted: []}
+
+        if (
+            position &&
+            state.selection_context.clickable.some(c => positions_of_same_footprint_equal(position, c))
+        ) {
+            state.selection_context.on_hover(position)
+
+            //TODO P3 this is all very untidy
+            const next_instruction = turn_state.get_current_context().peek_instruction()
+            const needs_roll = next_instruction.type === "attack_roll"
+            if (needs_roll && state.selection_context.target) {
+                if (state.selection_context.target.type !== "creatures")
+                    throw Error("an attack roll needs to target creatures")
+
+                const creatures = state.selection_context.target.value
+                creatures.forEach(defender => {
+                    const attacker = next_instruction.attack
+                    const attack = EXPR.as_number(evaluate_ast(attacker))
+
+                    const defense_code = next_instruction.defense
+                    const defense = get_creature_defense({creature: defender, defense_code}).value
+
+                    const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
+
+                    defender.visual.display_hit_chance({attack, defense, chance})
+                })
             }
 
-            for (const creature of battle_grid.creatures)
-                creature.visual.remove_hit_chance()
-
-            state.selection_context = {...state.selection_context, highlighted: []}
-
-            if (
-                position &&
-                state.selection_context.clickable.some(c => positions_of_same_footprint_equal(position, c))
-            ) {
-                state.selection_context.on_hover(position)
-
-                //TODO P3 this is all very untidy
-                const next_instruction = turn_state.get_current_context().peek_instruction()
-                const needs_roll = next_instruction.type === "attack_roll"
-                if (needs_roll && state.selection_context.target) {
-                    if (state.selection_context.target.type !== "creatures")
-                        throw Error("an attack roll needs to target creatures")
-
-                    const creatures = state.selection_context.target.value
-                    creatures.forEach(defender => {
-                        const attacker = next_instruction.attack
-                        const attack = EXPR.as_number(evaluate_ast(attacker))
-
-                        const defense_code = next_instruction.defense
-                        const defense = get_creature_defense({creature: defender, defense_code}).value
-
-                        const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
-
-                        defender.visual.display_hit_chance({attack, defense, chance})
-                    })
-                }
-
-                for (const p of transform_position_to_f1(position))
-                    battle_grid.get_square(p).visual.set_interaction_status("hover")
-
-            } else {
-                for (const position of transform_positions_to_f1(state.selection_context.clickable))
-                    battle_grid.get_square(position).visual.set_highlight("available-target")
-            }
+            for (const p of transform_position_to_f1(position))
+                battle_grid.get_square(p).visual.set_interaction_status("hover")
+        } else {
+            for (const position of transform_positions_to_f1(state.selection_context.clickable))
+                battle_grid.get_square(position).visual.set_highlight("available-target")
         }
     }
 
@@ -311,8 +325,8 @@ export type PlayerTurnHandler = {
     add_creature: (data: CreatureData) => void
     start: () => void
     set_creature_as_current_turn: (creature: Creature) => void
-    on_click: ({position}: { position: Position }) => void
-    on_hover: ({position}: { position: Position | null }) => void
+    on_click: ({coordinate}: { coordinate: ClickableCoordinate }) => void
+    on_hover: ({coordinate}: { coordinate: ClickableCoordinate | null }) => void
     set_selected_indicator: () => void
     deselect: () => void
     has_selected_creature: () => boolean

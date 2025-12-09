@@ -1,8 +1,8 @@
 import {create_battle_grid} from "scripts/battlegrid/BattleGrid";
 import {create_visual_square} from "scripts/battlegrid/squares/SquareVisual";
 import {create_visual_creature} from "scripts/battlegrid/creatures/CreatureVisual";
-import {ClickableCoordinate, create_battle_grid_visual} from "scripts/battlegrid/BattleGridVisual";
-import {create_player_turn_handler, PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
+import {create_battle_grid_visual} from "scripts/battlegrid/BattleGridVisual";
+import {create_player_turn_handler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {ActionLog} from "scripts/action_log/ActionLog";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {ROGUE_POWERS} from "scripts/powers/rogue";
@@ -11,7 +11,6 @@ import {WIZARD_POWERS} from "scripts/powers/wizard";
 import type {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {InitiativeOrderVisual} from "scripts/initiative_order/InitiativeOrderVisual";
-import {Position, positions_equal} from "scripts/battlegrid/Position";
 
 const visual_initiative_order = new InitiativeOrderVisual()
 
@@ -112,7 +111,7 @@ const build_character = (data:
         powers: data.powers ?? []
     }
 }
-
+/*
 const transform_clickable_coordinate_into_position = ({coordinate, footprint}: {
     coordinate: ClickableCoordinate,
     footprint: number
@@ -123,32 +122,12 @@ const transform_clickable_coordinate_into_position = ({coordinate, footprint}: {
     const y = Math.min(Math.max(0, raw_y), battle_grid.size.y - footprint)
     return {x, y, footprint}
 }
-
-
-let latest_position: Position | null = null
+ */
 
 battle_grid.visual.addOnMouseMoveHandler(coordinate => {
-    const selection_context = player_turn_handler.get_position_selection_context_or_null()
-    if (selection_context === null) return
-
-    if (coordinate === null) {
-        latest_position = null
-    } else {
-        const position = transform_clickable_coordinate_into_position({
-            coordinate,
-            footprint: selection_context.footprint
-        })
-        if (latest_position === null || !positions_equal(latest_position, position)) {
-            latest_position = position
-            player_turn_handler.on_hover({position})
-        }
-    }
+    player_turn_handler.on_hover({coordinate})
 })
 
 battle_grid.visual.addOnClickHandler(coordinate => {
-    const selection_context = player_turn_handler.get_position_selection_context_or_null()
-    if (selection_context === null) return
-
-    const position = transform_clickable_coordinate_into_position({coordinate, footprint: selection_context.footprint})
-    player_turn_handler.on_click({position})
+    player_turn_handler.on_click({coordinate})
 })

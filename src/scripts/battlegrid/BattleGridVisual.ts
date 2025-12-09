@@ -1,3 +1,5 @@
+import {ClickableCoordinate, coordinates_equal} from "scripts/battlegrid/coordinates/ClickableCoordinate";
+
 export const create_battle_grid_visual = ({width, height}: { width: number, height: number }): BattleGridVisual => {
     const html_board = document.querySelector(".board")! as HTMLDivElement
 
@@ -61,10 +63,6 @@ export const create_battle_grid_visual = ({width, height}: { width: number, heig
         }
     }
 }
-
-export type ClickableCoordinate = { x: number, y: number }
-
-const coordinates_equal = (a: ClickableCoordinate, b: ClickableCoordinate) => a.x === b.x && a.y === b.y
 
 type ClickableCoordinateFunction = (coordinate: ClickableCoordinate) => void
 type ClickableCoordinateOrNullFunction = (coordinate: ClickableCoordinate | null) => void
