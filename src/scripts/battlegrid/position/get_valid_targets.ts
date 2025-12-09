@@ -29,7 +29,6 @@ export const get_valid_targets = ({instruction, context, battle_grid, evaluate_a
     if (instruction.targeting_type === "movement") {
         const valid_targets = in_range.filter(position => !battle_grid.is_terrain_occupied(position))
         if (instruction.destination_requirement) {
-            //TODO P3 move targeting and these evaluate ast functions outside of the player turn handler
             const possibilities = EXPR.as_positions(evaluate_ast(instruction.destination_requirement))
 
             const restricted: Array<Position> = []
