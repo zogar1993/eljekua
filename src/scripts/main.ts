@@ -111,18 +111,6 @@ const build_character = (data:
         powers: data.powers ?? []
     }
 }
-/*
-const transform_clickable_coordinate_into_position = ({coordinate, footprint}: {
-    coordinate: ClickableCoordinate,
-    footprint: number
-}) => {
-    const raw_x = Math.floor((coordinate.x - footprint + 1) / 2)
-    const x = Math.min(Math.max(0, raw_x), battle_grid.size.x - footprint)
-    const raw_y = Math.floor((coordinate.y - footprint + 1) / 2)
-    const y = Math.min(Math.max(0, raw_y), battle_grid.size.y - footprint)
-    return {x, y, footprint}
-}
- */
 
 battle_grid.visual.addOnMouseMoveHandler(coordinate => {
     player_turn_handler.on_hover({coordinate})
