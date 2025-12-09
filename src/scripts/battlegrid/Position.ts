@@ -7,7 +7,7 @@ export const assert_positions_have_same_footprint = (a: Position, b: Position) =
 }
 
 export const positions_equal = (a: Position, b: Position) =>
-     a.x === b.x && a.y === b.y && a.footprint === b.footprint
+    a.x === b.x && a.y === b.y && a.footprint === b.footprint
 
 export const positions_of_same_footprint_equal = (a: Position, b: Position) => {
     assert_positions_have_same_footprint(a, b)
@@ -49,7 +49,7 @@ export const transform_position_to_f1 = (position: Position): Array<PositionFoot
 
 export const transform_positions_to_f1 = (positions: Array<Position>): Array<PositionFootprintOne> => {
     const map: Map<string, PositionFootprintOne> = new Map()
-    for(const position of positions)
+    for (const position of positions)
         for (const p of transform_position_to_f1(position))
             map.set(`x${p.x}y${p.y}`, p)
     return [...map.values()]
