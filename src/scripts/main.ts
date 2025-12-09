@@ -11,6 +11,7 @@ import {WIZARD_POWERS} from "scripts/powers/wizard";
 import type {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {InitiativeOrderVisual} from "scripts/initiative_order/InitiativeOrderVisual";
+import {create_option_buttons} from "scripts/battlegrid/OptionButtons";
 
 const visual_initiative_order = new InitiativeOrderVisual()
 
@@ -23,7 +24,10 @@ const battle_grid = create_battle_grid({
     create_battle_grid_visual,
     size: {x: 10, y: 10}
 })
-const player_turn_handler = create_player_turn_handler({battle_grid, action_log, initiative_order})
+
+const option_buttons = create_option_buttons()
+
+const player_turn_handler = create_player_turn_handler({battle_grid, action_log, initiative_order, option_buttons})
 
 const ATTRIBUTES = {
         STRENGTH: "str",

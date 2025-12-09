@@ -14,7 +14,6 @@ import {create_turn_state, TurnState} from "scripts/battlegrid/player_turn_handl
 import {
     interpret_instruction
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
-import {ButtonOption} from "scripts/battlegrid/creatures/CreatureVisual";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
@@ -28,6 +27,7 @@ import {
 } from "scripts/battlegrid/coordinates/ClickableCoordinate";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
+import {ButtonOption, OptionButtons} from "scripts/battlegrid/OptionButtons";
 
 type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
@@ -53,11 +53,13 @@ type PlayerTurnHandlerContextSelectOption = {
 export const create_player_turn_handler = ({
                                                battle_grid,
                                                action_log,
-                                               initiative_order
+                                               initiative_order,
+                                               option_buttons
                                            }: {
     battle_grid: BattleGrid,
     action_log: ActionLog,
-    initiative_order: InitiativeOrder
+    initiative_order: InitiativeOrder,
+    option_buttons: OptionButtons
 }): PlayerTurnHandler => {
     const turn_state = create_turn_state()
     const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
@@ -84,7 +86,6 @@ export const create_player_turn_handler = ({
     }
 
     const set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => {
-        const owner = turn_state.get_current_context().owner()
         selection_context = {type: "option_select", ...context}
 
         set_selected_indicator()
@@ -97,8 +98,8 @@ export const create_player_turn_handler = ({
                 evaluate_instructions()
             }
         }))
-        //TODO P4 move display options outside of the character visual
-        owner.visual.display_options(options)
+
+        option_buttons.display_options(options)
     }
 
     const get_position_selection_context = (): PlayerTurnHandlerContextSelectPosition => {
@@ -224,9 +225,8 @@ export const create_player_turn_handler = ({
                     creatures.forEach(creature => creature.visual.remove_hit_chance())
                 }
             }
-        } else if (selection_context.type === "option_select") {
-            turn_state.get_current_context().owner().visual.remove_options()
-        }
+        } else if (selection_context.type === "option_select")
+            option_buttons.remove_options()
 
         selection_context = null
     }

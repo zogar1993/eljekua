@@ -10,8 +10,6 @@ const create_visual_creature = (): CreatureVisual => ({
     push_to: () => 0,
     receive_damage: () => 0,
     display_miss: () => 0,
-    display_options: jest.fn(),
-    remove_options: jest.fn(),
     display_hit_chance: jest.fn(),
     remove_hit_chance: jest.fn(),
 })

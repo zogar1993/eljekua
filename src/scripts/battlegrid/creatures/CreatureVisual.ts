@@ -8,8 +8,6 @@ export type CreatureVisual = {
     push_to: (position: Position) => number
     receive_damage: ({hp, damage}: { hp: number, damage: number }) => number
     display_miss: () => number
-    display_options: (options: Array<ButtonOption>) => void
-    remove_options: () => void
     display_hit_chance: ({attack, defense, chance}: {
         attack: number,
         defense: number,
@@ -101,34 +99,9 @@ export const create_visual_creature = (data: CreatureData): CreatureVisual => {
             const hit_chance = html_creature.querySelector(".hit-chance")
             hit_chance?.remove()
         },
-        display_options: (options: Array<ButtonOption>) => {
-            const actions_menu = document.querySelector("#actions_menu")!
-
-            options.forEach(option => {
-                const button = document.createElement("button");
-                button.innerText = option.text
-
-                if (option.disabled)
-                    button.setAttribute("disabled", "")
-
-                button.addEventListener("click", option.on_click)
-
-                actions_menu.appendChild(button)
-            })
-        },
-        remove_options: () => {
-            const buttons = document.querySelectorAll("#actions_menu > button")
-            buttons.forEach(button => button.remove())
-        }
     }
 }
 
 const FADING_TEXT_ANIMATION_DURATION = 1500
 const MOVEMENT_ANIMATION_DURATION = 500
 const PUSH_ANIMATION_DURATION = 500
-
-export type ButtonOption = {
-    text: string,
-    on_click: () => void
-    disabled: boolean,
-}
