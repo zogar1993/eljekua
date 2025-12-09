@@ -10,7 +10,7 @@ import {ActionLog} from "scripts/action_log/ActionLog";
 import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Instruction} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
-import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnState";
+import {create_turn_state, TurnState} from "scripts/battlegrid/player_turn_handler/TurnState";
 import {
     interpret_instruction
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
@@ -26,6 +26,8 @@ import {
     get_position_by_coordinate,
     nullable_positions_equal
 } from "scripts/battlegrid/coordinates/ClickableCoordinate";
+import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
+import {Expr} from "scripts/expressions/evaluator/types";
 
 type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
@@ -182,27 +184,7 @@ export const create_player_turn_handler = ({
 
         if (position) {
             selection_context.on_hover(position)
-
-            //TODO P3 this is all very untidy
-            const next_instruction = turn_state.get_current_context().peek_instruction()
-            const needs_roll = next_instruction.type === "attack_roll"
-            if (needs_roll && selection_context.target) {
-                if (selection_context.target.type !== "creatures")
-                    throw Error("an attack roll needs to target creatures")
-
-                const creatures = selection_context.target.value
-                creatures.forEach(defender => {
-                    const attacker = next_instruction.attack
-                    const attack = EXPR.as_number(evaluate_ast(attacker))
-
-                    const defense_code = next_instruction.defense
-                    const defense = get_creature_defense({creature: defender, defense_code}).value
-
-                    const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
-
-                    defender.visual.display_hit_chance({attack, defense, chance})
-                })
-            }
+            show_attack_success_chance_if_needed({selection_context, evaluate_ast, turn_state})
 
             for (const p of transform_position_to_f1(position))
                 battle_grid.get_square(p).visual.set_interaction_status("hover")
@@ -333,4 +315,31 @@ const set_highlight_to_position = ({position, highlight, battle_grid}: {
     transform_position_to_f1(position)
         .map(battle_grid.get_square)
         .forEach(({visual}) => visual.set_highlight(highlight))
+}
+
+
+const show_attack_success_chance_if_needed = ({turn_state, selection_context, evaluate_ast}: {
+    turn_state: TurnState,
+    selection_context: PlayerTurnHandlerContextSelectPosition,
+    evaluate_ast: (node: AstNode) => Expr
+}) => {
+    const next_instruction = turn_state.get_current_context().peek_instruction()
+    const needs_roll = next_instruction.type === "attack_roll"
+    if (needs_roll && selection_context.target) {
+        if (selection_context.target.type !== "creatures")
+            throw Error("an attack roll needs to target creatures")
+
+        const creatures = selection_context.target.value
+        creatures.forEach(defender => {
+            const attacker = next_instruction.attack
+            const attack = EXPR.as_number(evaluate_ast(attacker))
+
+            const defense_code = next_instruction.defense
+            const defense = get_creature_defense({creature: defender, defense_code}).value
+
+            const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
+
+            defender.visual.display_hit_chance({attack, defense, chance})
+        })
+    }
 }
