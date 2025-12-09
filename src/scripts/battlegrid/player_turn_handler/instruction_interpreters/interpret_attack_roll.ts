@@ -16,7 +16,7 @@ import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
-
+//TODO p0 big fellas can attack themselves
 export const interpret_attack_roll = ({
                                           instruction,
                                           action_log,
