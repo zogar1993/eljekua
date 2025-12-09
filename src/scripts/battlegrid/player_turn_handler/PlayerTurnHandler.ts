@@ -60,14 +60,12 @@ export const create_player_turn_handler = ({
     const turn_state = create_turn_state()
     const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
 
-    const state = {
-        started: false,
-        selection_context: null as PlayerTurnHandlerContextSelect | null,
-    }
+    let started = false
+    let selection_context: PlayerTurnHandlerContextSelect | null = null
 
     const set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => {
         //TODO P3 this should be better on_hover
-        state.selection_context = {type: "position_select", ...context}
+        selection_context = {type: "position_select", ...context}
 
         set_selected_indicator()
 
@@ -85,7 +83,7 @@ export const create_player_turn_handler = ({
 
     const set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => {
         const owner = turn_state.get_current_context().owner()
-        state.selection_context = {type: "option_select", ...context}
+        selection_context = {type: "option_select", ...context}
 
         set_selected_indicator()
 
@@ -102,14 +100,14 @@ export const create_player_turn_handler = ({
     }
 
     const get_position_selection_context = (): PlayerTurnHandlerContextSelectPosition => {
-        if (state.selection_context?.type !== "position_select")
+        if (selection_context?.type !== "position_select")
             throw Error("position_select selection_context not set")
-        return state.selection_context
+        return selection_context
     }
 
     const get_position_selection_context_or_null = (): PlayerTurnHandlerContextSelectPosition | null => {
-        if (state.selection_context?.type !== "position_select") return null
-        return state.selection_context
+        if (selection_context?.type !== "position_select") return null
+        return selection_context
     }
 
 
@@ -119,7 +117,7 @@ export const create_player_turn_handler = ({
     }
 
     const start = () => {
-        state.started = true
+        started = true
         initiative_order.start()
         const creature = initiative_order.get_current_creature()
         set_creature_as_current_turn(creature)
@@ -132,27 +130,27 @@ export const create_player_turn_handler = ({
     }
 
     const on_click = ({coordinate}: { coordinate: ClickableCoordinate }) => {
-        if (state.selection_context?.type !== "position_select") return
-        if (state.selection_context.target === null) return
-        const position = get_position_by_coordinate({coordinate, positions: state.selection_context.clickable})
+        if (selection_context?.type !== "position_select") return
+        if (selection_context.target === null) return
+        const position = get_position_by_coordinate({coordinate, positions: selection_context.clickable})
         if (position === null) return null;
 
 
-        if (state.selection_context.target.type === "positions") {
-            const path = state.selection_context.target.value
+        if (selection_context.target.type === "positions") {
+            const path = selection_context.target.value
             if (!positions_of_same_footprint_equal(position, path[path.length - 1]))
                 throw Error("position should be the end of the path")
         }
 
         const power_context = turn_state.get_current_context()
-        power_context.set_variable(state.selection_context.target_label,
-            state.selection_context.target.type === "creatures" ? {
-                type: state.selection_context.target.type,
-                value: state.selection_context.target.value,
+        power_context.set_variable(selection_context.target_label,
+            selection_context.target.type === "creatures" ? {
+                type: selection_context.target.type,
+                value: selection_context.target.value,
                 description: "target"
             } : {
-                type: state.selection_context.target.type,
-                value: state.selection_context.target.value,
+                type: selection_context.target.type,
+                value: selection_context.target.value,
                 description: "target"
             })
 
@@ -163,17 +161,17 @@ export const create_player_turn_handler = ({
 
     let latest_position: Position | null = null
     const on_hover = ({coordinate}: { coordinate: ClickableCoordinate | null }) => {
-        if (state.selection_context?.type !== "position_select") return
+        if (selection_context?.type !== "position_select") return
 
         const position = coordinate &&
-            get_position_by_coordinate({positions: state.selection_context.clickable, coordinate})
+            get_position_by_coordinate({positions: selection_context.clickable, coordinate})
 
         if (nullable_positions_equal(latest_position, position)) return;
         latest_position = position
 
         //TODO P2 remove indicators from creatures and tiles when you go out of the selectable space
 
-        const highlighted_positions = state.selection_context.highlighted.map(({position}) => position)
+        const highlighted_positions = selection_context.highlighted.map(({position}) => position)
 
         for (const position of highlighted_positions) {
             battle_grid.get_square(position).visual.set_interaction_status("none")
@@ -183,22 +181,22 @@ export const create_player_turn_handler = ({
         for (const creature of battle_grid.creatures)
             creature.visual.remove_hit_chance()
 
-        state.selection_context = {...state.selection_context, highlighted: []}
+        selection_context = {...selection_context, highlighted: []}
 
         if (
             position &&
-            state.selection_context.clickable.some(c => positions_of_same_footprint_equal(position, c))
+            selection_context.clickable.some(c => positions_of_same_footprint_equal(position, c))
         ) {
-            state.selection_context.on_hover(position)
+            selection_context.on_hover(position)
 
             //TODO P3 this is all very untidy
             const next_instruction = turn_state.get_current_context().peek_instruction()
             const needs_roll = next_instruction.type === "attack_roll"
-            if (needs_roll && state.selection_context.target) {
-                if (state.selection_context.target.type !== "creatures")
+            if (needs_roll && selection_context.target) {
+                if (selection_context.target.type !== "creatures")
                     throw Error("an attack roll needs to target creatures")
 
-                const creatures = state.selection_context.target.value
+                const creatures = selection_context.target.value
                 creatures.forEach(defender => {
                     const attacker = next_instruction.attack
                     const attack = EXPR.as_number(evaluate_ast(attacker))
@@ -215,7 +213,7 @@ export const create_player_turn_handler = ({
             for (const p of transform_position_to_f1(position))
                 battle_grid.get_square(p).visual.set_interaction_status("hover")
         } else {
-            for (const position of transform_positions_to_f1(state.selection_context.clickable))
+            for (const position of transform_positions_to_f1(selection_context.clickable))
                 battle_grid.get_square(position).visual.set_highlight("available-target")
         }
     }
@@ -230,7 +228,7 @@ export const create_player_turn_handler = ({
     }
 
     const deselect = () => {
-        if (state.selection_context === null) return
+        if (selection_context === null) return
 
         set_highlight_to_position({
             position: turn_state.get_current_context().owner().data.position,
@@ -238,26 +236,26 @@ export const create_player_turn_handler = ({
             battle_grid
         })
 
-        if (state.selection_context.type === "position_select") {
-            for (const position of transform_positions_to_f1(state.selection_context.clickable))
+        if (selection_context.type === "position_select") {
+            for (const position of transform_positions_to_f1(selection_context.clickable))
                 battle_grid.get_square(position).visual.set_highlight("none")
-            for (const position of state.selection_context.highlighted.map(({position}) => position))
+            for (const position of selection_context.highlighted.map(({position}) => position))
                 battle_grid.get_square(position).visual.set_highlight("none")
 
-            if (state.selection_context.target) {
-                if (state.selection_context.target.type === "creatures") {
-                    const creatures = state.selection_context.target.value
+            if (selection_context.target) {
+                if (selection_context.target.type === "creatures") {
+                    const creatures = selection_context.target.value
                     creatures.forEach(creature => creature.visual.remove_hit_chance())
                 }
             }
-        } else if (state.selection_context.type === "option_select") {
+        } else if (selection_context.type === "option_select") {
             turn_state.get_current_context().owner().visual.remove_options()
         }
 
-        state.selection_context = null
+        selection_context = null
     }
 
-    const has_selected_creature = () => state.selection_context !== null
+    const has_selected_creature = () => selection_context !== null
 
     const player_turn_handler: PlayerTurnHandler = {
         set_awaiting_position_selection,
