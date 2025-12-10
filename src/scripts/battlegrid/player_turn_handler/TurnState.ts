@@ -32,7 +32,7 @@ export const create_turn_state = (): TurnState => {
         return null
     }
 
-    //TODO P3 there are two ways of getting the current turn owner
+    //TODO AP3 there are two ways of getting the current turn owner
     const get_turn_owner = () => {
         if (power_contexts.length === 0) throw Error(`can't get owner without setting a power context`)
         return power_contexts[0].owner()

@@ -65,7 +65,7 @@ const add_option_for_opportunity_attack = (instructions: Array<Instruction>): Ar
         options: [
             {
                 text: "Opportunity Attack",
-                //TODO P3 homogenize durations so that there is littler parsing
+                //TODO AP3 homogenize durations so that there is littler parsing
                 instructions: [
                     {
                         type: "apply_status",

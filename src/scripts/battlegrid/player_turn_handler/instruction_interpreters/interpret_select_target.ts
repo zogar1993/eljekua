@@ -127,7 +127,7 @@ export const interpret_select_target = ({
         highlighted: [],
         target: null,
         on_hover,
-        //TODO P3 clean up
+        //TODO AP3 clean up
         footprint: instruction.targeting_type === "movement" ? context.owner().data.position.footprint : 1
     }
 

@@ -54,7 +54,7 @@ export const get_valid_targets = ({instruction, context, battle_grid, evaluate_a
 
     return valid_targets.filter(
         target => !instruction.exclude.some(
-            //TODO P3 this one feels fishy
+            //TODO AP3 this one feels fishy
             excluded => positions_of_same_footprint_equal(EXPR.as_creature(context.get_variable(excluded)).data.position, target)
         )
     )

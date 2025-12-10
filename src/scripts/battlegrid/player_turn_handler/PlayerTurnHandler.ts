@@ -68,7 +68,7 @@ export const create_player_turn_handler = ({
     let selection_context: PlayerTurnHandlerContextSelect | null = null
 
     const set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => {
-        //TODO P3 this should be better on_hover
+        //TODO AP3 this should be better on_hover
         selection_context = {type: "position_select", ...context}
 
         set_selected_indicator()
@@ -266,7 +266,7 @@ export const create_player_turn_handler = ({
                 for (const creature of battle_grid.creatures) {
                     creature.remove_statuses({type: "turn_start", creature: initiating_turn_creature})
 
-                    //TODO P3 a little mutation but whatever, we can clean up later
+                    //TODO AP3 a little mutation but whatever, we can clean up later
                     for (const status of creature.statuses)
                         for (const duration of status.durations)
                             if (duration.until === "next_turn_end" && creature === duration.creature)
@@ -306,7 +306,7 @@ export type PlayerTurnHandler = {
     has_selected_creature: () => boolean
 }
 
-//TODO P3 standardize its usages and remove this
+//TODO AP3 standardize its usages and remove this
 const set_highlight_to_position = ({position, highlight, battle_grid}: {
     position: Position,
     highlight: SquareHighlight,

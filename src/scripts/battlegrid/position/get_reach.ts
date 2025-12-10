@@ -18,7 +18,7 @@ export const get_reach = ({instruction, origin, battle_grid, evaluate_ast}: {
     battle_grid: BattleGrid,
     evaluate_ast: (node: AstNode) => Expr
 }) => {
-    //TODO P3 remove origin position
+    //TODO AP3 remove origin position
     switch (instruction.targeting_type) {
         case "movement": {
             return get_reach_movement({instruction, evaluate_ast, battle_grid})
