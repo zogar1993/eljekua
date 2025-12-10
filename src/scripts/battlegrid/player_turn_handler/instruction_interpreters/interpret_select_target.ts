@@ -1,6 +1,6 @@
 import {
+    assert_is_footprint_one,
     Position,
-    position_is_footprint_one,
     positions_share_surface,
     transform_positions_to_f1
 } from "scripts/battlegrid/Position";
@@ -33,8 +33,7 @@ export const interpret_select_target = ({
             const position = clickable[0]
 
             if (instruction.targeting_type === "area_burst") {
-                if (!position_is_footprint_one(position)) throw Error("area burst must originate from a f1 position")
-
+                assert_is_footprint_one(position)
                 const distance = instruction.radius
                 const highlighted_area = get_reach_area_burst({origin: position, distance, battle_grid})
                 const target_positions = highlighted_area.filter(p => battle_grid.is_terrain_occupied(p))
@@ -79,7 +78,7 @@ export const interpret_select_target = ({
             return
 
         if (instruction.targeting_type === "area_burst") {
-            if (!position_is_footprint_one(position)) throw Error("area burst must originate from a f1 position")
+            assert_is_footprint_one(position)
             const distance = instruction.radius
             const area = get_reach_area_burst({origin: position, distance, battle_grid})
             const target_positions = area.filter(p => battle_grid.is_terrain_occupied(p))

@@ -14,7 +14,12 @@ export const positions_of_same_footprint_equal = (a: Position, b: Position) => {
     return a.x === b.x && a.y === b.y
 }
 
-export const position_is_footprint_one = (position: Position): position is PositionFootprintOne =>
+export function assert_is_footprint_one(p: Position): asserts p is PositionFootprintOne {
+    if (!position_is_footprint_one(p))
+        throw Error(`Expected position to be f1: ${JSON.stringify(p)}`)
+}
+
+const position_is_footprint_one = (position: Position): position is PositionFootprintOne =>
     position.footprint === 1
 
 export const positions_equal_footprint_one = (a: PositionFootprintOne, b: PositionFootprintOne) =>
