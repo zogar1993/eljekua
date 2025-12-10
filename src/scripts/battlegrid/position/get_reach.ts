@@ -10,28 +10,35 @@ import {get_reach_push} from "scripts/battlegrid/position/get_reach_push";
 import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
+import {AST} from "scripts/expressions/parser/AST_NODE";
 
 
-export const get_reach = ({instruction, origin, battle_grid, evaluate_ast}: {
+export const get_reach = ({instruction, battle_grid, evaluate_ast}: {
     instruction: InstructionSelectTarget,
-    origin: Position,
     battle_grid: BattleGrid,
     evaluate_ast: (node: AstNode) => Expr
 }) => {
-    //TODO AP3 remove origin position
     switch (instruction.targeting_type) {
         case "movement": {
-            return get_reach_movement({instruction, evaluate_ast, battle_grid})
+            const creature = EXPR.as_creature(evaluate_ast(AST.OWNER))
+            const distance = EXPR.as_number(evaluate_ast(instruction.distance))
+            return get_reach_movement({creature, distance, battle_grid})
         }
-        case "melee_weapon":
+        case "melee_weapon": {
+            const origin = EXPR.as_creature(evaluate_ast(AST.OWNER)).data.position
             return get_reach_melee({origin, battle_grid})
-        case "adjacent":
-            return get_reach_adjacent({position: origin, battle_grid})
+        }
+        case "adjacent": {
+            const origin = EXPR.as_creature(evaluate_ast(AST.OWNER)).data.position
+            return get_reach_adjacent({origin, battle_grid})
+        }
         case "ranged": {
+            const origin = EXPR.as_creature(evaluate_ast(AST.OWNER)).data.position
             const distance = EXPR.as_number(evaluate_ast(instruction.distance))
             return get_reach_ranged({origin, distance, battle_grid})
         }
         case "area_burst": {
+            const origin = EXPR.as_creature(evaluate_ast(AST.OWNER)).data.position
             assert_is_footprint_one(origin)
             const distance = EXPR.as_number(evaluate_ast(instruction.distance))
             return get_reach_area_burst({origin, distance, battle_grid})

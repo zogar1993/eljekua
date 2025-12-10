@@ -23,7 +23,7 @@ export const interpret_move = ({
     for (let i = 0; i < path.length - 1; i++) {
         const current_position = path[i]
         const potential_attackers = [...new Set(
-            get_reach_adjacent({position: current_position, battle_grid})
+            get_reach_adjacent({origin: current_position, battle_grid})
                 .filter(p => battle_grid.is_terrain_occupied(p))
                 .map(battle_grid.get_creature_by_position)
                 .filter(creature => creature !== mover_creature)

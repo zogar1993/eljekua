@@ -13,12 +13,7 @@ export const get_valid_targets = ({instruction, context, battle_grid, evaluate_a
     battle_grid: BattleGrid,
     evaluate_ast: (node: AstNode) => Expr
 }) => {
-    const in_range = get_reach({
-        instruction: instruction,
-        origin: context.owner().data.position,
-        battle_grid,
-        evaluate_ast
-    })
+    const in_range = get_reach({instruction, battle_grid, evaluate_ast})
 
     if (instruction.targeting_type === "area_burst")
         return in_range

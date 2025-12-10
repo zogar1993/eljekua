@@ -1,6 +1,6 @@
 import {Expr, ExprNumber, ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
-import {Position} from "scripts/battlegrid/Position";
+import {assert_is_footprint_one, Position, PositionFootprintOne} from "scripts/battlegrid/Position";
 import {PowerVM} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
 export const EXPR = {

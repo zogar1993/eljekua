@@ -287,7 +287,6 @@ export type InstructionSelectTargetAreaBurst = {
 export type InstructionSelectTargetMovement = {
     type: "select_target"
     targeting_type: "movement"
-    creature: AstNode
     distance: AstNode
     target_label: string
     destination_requirement: AstNode | null
@@ -347,7 +346,6 @@ const transform_select_target_ir = (ir: IRInstructionSelectTarget): InstructionS
         return {
             type: "select_target",
             targeting_type: ir.targeting_type,
-            creature: to_ast("owner"),
             distance: to_ast(ir.distance),
             target_label: ir.target_label,
             destination_requirement: ir.destination_requirement ? to_ast(ir.destination_requirement) : null,
