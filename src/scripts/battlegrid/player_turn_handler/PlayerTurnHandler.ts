@@ -42,6 +42,7 @@ export type PlayerTurnHandlerContextSelectPosition = {
     target: { type: "creatures", value: Array<Creature> } | { type: "positions", value: Array<Position> } | null
     target_label: string
     on_hover: (position: Position) => void
+    // TODO P0 2x2 cant move to square next to it
     footprint: number
 }
 
