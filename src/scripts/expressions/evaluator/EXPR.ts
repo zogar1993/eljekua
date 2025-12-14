@@ -19,11 +19,15 @@ export const EXPR = {
         if (expr.type === "positions") {
             if (expr.value.length === 1) return expr.value[0]
             throw Error("expected only one position in expression")
+        } else if (expr.type === "creatures") {
+            if (expr.value.length === 1) return expr.value[0].data.position
+            throw Error("expected only one creature in expression")
         }
         return throw_could_not_cast({expr, to: "position"})
     },
     as_positions: (expr: Expr): Array<Position> => {
         if (expr.type === "positions") return expr.value
+        else if (expr.type === "creatures") return expr.value.map(c => c.data.position)
         return throw_could_not_cast({expr, to: "positions"})
     },
     as_number: (expr: Expr): number => {

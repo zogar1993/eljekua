@@ -1,15 +1,13 @@
 import {InstructionSelectTarget} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
-import {PowerContext} from "scripts/battlegrid/player_turn_handler/PowerContext";
 import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {get_reach} from "scripts/battlegrid/position/get_reach";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
-import {Position, positions_of_same_footprint_equal, positions_share_surface} from "scripts/battlegrid/Position";
+import {Position, positions_share_surface} from "scripts/battlegrid/Position";
 
-export const get_valid_targets = ({instruction, context, battle_grid, evaluate_ast}: {
+export const get_valid_targets = ({instruction, battle_grid, evaluate_ast}: {
     instruction: InstructionSelectTarget,
-    context: PowerContext,
     battle_grid: BattleGrid,
     evaluate_ast: (node: AstNode) => Expr
 }) => {
@@ -47,10 +45,13 @@ export const get_valid_targets = ({instruction, context, battle_grid, evaluate_a
         throw `Target "${instruction.target_type}" not supported`
     })
 
-    return valid_targets.filter(
-        target => !instruction.exclude.some(
-            //TODO AP3 this one feels fishy
-            excluded => positions_of_same_footprint_equal(EXPR.as_creature(context.get_variable(excluded)).data.position, target)
-        )
-    )
+
+    const results: Array<Position> = []
+    const excluded_positions = instruction.exclude.flatMap(node => EXPR.as_positions(evaluate_ast(node)))
+    for (const position of valid_targets) {
+        if (excluded_positions.some(excluded => positions_share_surface(excluded, position))) continue
+        results.push(position)
+    }
+
+    return results
 }

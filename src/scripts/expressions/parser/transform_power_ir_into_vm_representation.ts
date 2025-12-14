@@ -262,7 +262,7 @@ export type InstructionSelectTargetRanged = {
     amount: 1
     distance: AstNode
     target_label: string
-    exclude: Array<string>
+    exclude: Array<AstNode>
 }
 
 export type InstructionSelectTargetMelee = {
@@ -270,7 +270,7 @@ export type InstructionSelectTargetMelee = {
     targeting_type: "adjacent" | "melee_weapon"
     target_type: "enemy" | "creature"
     amount: 1,
-    exclude: Array<string>
+    exclude: Array<AstNode>
     target_label: string
 }
 
@@ -358,7 +358,7 @@ const transform_select_target_ir = (ir: IRInstructionSelectTarget): InstructionS
             amount: ir.amount,
             target_label: ir.target_label,
             distance: to_ast(ir.distance),
-            exclude: ir.exclude || []
+            exclude: ir.exclude ? ir.exclude.map(x => to_ast(x)) : []
         }
     if (ir.targeting_type === "adjacent" || ir.targeting_type === "melee_weapon")
         return {
@@ -367,7 +367,7 @@ const transform_select_target_ir = (ir: IRInstructionSelectTarget): InstructionS
             target_type: ir.target_type,
             amount: ir.amount,
             target_label: ir.target_label,
-            exclude: ir.exclude || []
+            exclude: ir.exclude ? ir.exclude.map(x => to_ast(x)) : []
         }
     throw Error(`"${ir.targeting_type}" is not a valid "select_target" targeting_type`)
 }
