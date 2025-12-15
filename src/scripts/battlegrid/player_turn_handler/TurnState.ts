@@ -16,6 +16,7 @@ export const create_turn_state = (): TurnState => {
         return power_frame
     }
 
+    // TODO P3 Probably best to encapsulate this and not let it get out
     const get_current_power_frame = () => power_frames[power_frames.length - 1]
 
     const next_instruction = () => {
