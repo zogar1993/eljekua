@@ -55,12 +55,12 @@ export const create_turn_state = (): TurnState => {
 
     const set_variable = (name: string, value: Expr) => {
         const frame = get_current_power_frame()
-        return frame.set_variable(name, value)
+        frame.set_variable(name, value)
     }
 
     const add_instructions = (instructions: Array<Instruction>) => {
         const frame = get_current_power_frame()
-        return frame.add_instructions(instructions)
+        frame.add_instructions(instructions)
     }
 
     // TODO P4 refactor hit status values
