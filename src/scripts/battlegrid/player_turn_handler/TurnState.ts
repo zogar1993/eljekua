@@ -19,7 +19,7 @@ export const create_turn_state = (): TurnState => {
         return power_frame
     }
 
-    // TODO P3 Probably best to encapsulate this and not let it get out
+    // TODO AP3 Probably best to encapsulate this and not let it get out
     const get_current_power_frame = () => power_frames[power_frames.length - 1]
 
     const next_instruction = () => {
@@ -65,7 +65,7 @@ export const create_turn_state = (): TurnState => {
         frame.add_instructions(instructions)
     }
 
-    // TODO P4 refactor hit status values
+    // TODO AP4 refactor hit status values
     const set_hit_status = (value: "none" | "hit" | "miss") => {
         const frame = get_current_power_frame()
         frame.status = value

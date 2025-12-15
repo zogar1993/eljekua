@@ -31,7 +31,7 @@ export const interpret_move = ({
                 // Exclude turn owner from opportunity attackers, since it can't take opportunity actions
                 .filter(creature => creature !== turn_state.get_turn_owner())
                 .filter(creature => creature.has_opportunity_action())
-                //TODO P4 Maybe just remove opportunity action from creatures in their turns
+                //TODO AP4 Maybe just remove opportunity action from creatures in their turns
         )]
 
         if (potential_attackers.length === 0) {
