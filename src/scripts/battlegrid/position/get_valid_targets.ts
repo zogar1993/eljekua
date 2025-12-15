@@ -4,7 +4,8 @@ import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {get_reach} from "scripts/battlegrid/position/get_reach";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
-import {Position, positions_share_surface} from "scripts/battlegrid/Position";
+import {Position, positions_equal, positions_share_surface} from "scripts/battlegrid/Position";
+import {AST} from "scripts/expressions/parser/AST_NODE";
 
 export const get_valid_targets = ({instruction, battle_grid, evaluate_ast}: {
     instruction: InstructionSelectTarget,
@@ -20,7 +21,11 @@ export const get_valid_targets = ({instruction, battle_grid, evaluate_ast}: {
         return in_range
 
     if (instruction.targeting_type === "movement") {
-        const valid_targets = in_range.filter(position => !battle_grid.is_terrain_occupied(position))
+        const owner = EXPR.as_creature(evaluate_ast(AST.OWNER))
+        const valid_targets = in_range
+            .filter(position => !positions_equal(position, owner.data.position))
+            .filter(position => !battle_grid.is_terrain_occupied(position, {exclude: [owner]}))
+            
         if (instruction.destination_requirement) {
             const possibilities = EXPR.as_positions(evaluate_ast(instruction.destination_requirement))
 

@@ -78,7 +78,7 @@ const ATTRIBUTES = {
 
     const jenri = build_character({
         name: "Jenri",
-        position: {x: 8, y: 8, footprint: 2},
+        position: {x: 7, y: 7, footprint: 2},
         size: "large"
     })
 
