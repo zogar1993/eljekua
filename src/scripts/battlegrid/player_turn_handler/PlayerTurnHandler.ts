@@ -149,7 +149,6 @@ export const create_player_turn_handler = ({
             selection_context.target.type === "creatures" ? {
                 type: selection_context.target.type,
                 value: selection_context.target.value,
-                description: "target"
             } : {
                 type: selection_context.target.type,
                 value: selection_context.target.value,

@@ -39,7 +39,7 @@ export const interpret_select_target = ({
                 const target_positions = highlighted_area.filter(p => battle_grid.is_terrain_occupied(p))
                 const targets = battle_grid.get_creatures_in_positions(target_positions)
 
-                context.set_variable(target_label, {type: "creatures", value: targets, description: target_label})
+                context.set_variable(target_label, {type: "creatures", value: targets})
             } else if (instruction.targeting_type === "movement") {
                 // TODO P2 automatic resolution for movement feels odd when its a movement action, but not when its a secondary action
                 const path = battle_grid.get_shortest_path({creature: context.owner(), destination: position})
@@ -56,11 +56,7 @@ export const interpret_select_target = ({
                     })
                 } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
                     const creature = battle_grid.get_creature_by_position(position)
-                    context.set_variable(target_label, {
-                        type: "creatures",
-                        value: [creature],
-                        description: target_label
-                    })
+                    context.set_variable(target_label, {type: "creatures", value: [creature]})
                 } else {
                     throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
                 }

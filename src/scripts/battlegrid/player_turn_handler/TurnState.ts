@@ -6,12 +6,15 @@ import {Expr} from "scripts/expressions/evaluator/types";
 export const create_turn_state = (): TurnState => {
     let power_frames: Array<PowerFrame> = []
 
-    const add_power_frame = ({name, instructions, owner}: {
-        name: string,
-        instructions: Array<Instruction>,
+    const add_power_frame = ({name, instructions, owner, variables = {}}: {
+        name: string
+        instructions: Array<Instruction>
         owner: Creature
+        variables?: Record<string, Expr>
     }) => {
         const power_frame = new PowerFrame({instructions, name, owner})
+        for(const [key, value] of Object.entries(variables))
+            power_frame.set_variable(key, value)
         power_frames.push(power_frame)
         return power_frame
     }
@@ -81,7 +84,12 @@ export const create_turn_state = (): TurnState => {
 }
 
 export type TurnState = {
-    add_power_frame: (_: { name: string, instructions: Array<Instruction>, owner: Creature }) => PowerFrame
+    add_power_frame: (_: {
+        name: string,
+        instructions: Array<Instruction>,
+        owner: Creature,
+        variables?: Record<string, Expr>
+    }) => PowerFrame
     get_current_power_frame: () => PowerFrame
     next_instruction: () => Instruction | null
     get_turn_owner: () => Creature

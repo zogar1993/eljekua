@@ -36,7 +36,6 @@ export type ExprString = {
 export type ExprCreatures = {
     type: "creatures"
     value: Array<Creature>
-    description: string
 }
 
 export type ExprBoolean = {

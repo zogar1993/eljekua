@@ -31,7 +31,7 @@ export const interpret_attack_roll = ({
     const new_instructions: Array<Instruction> = []
     new_instructions.push(...instruction.before_instructions)
     const defenders_label = `${instruction.defender}(all)`
-    turn_state.set_variable(defenders_label, {type: "creatures", value: defenders, description: defenders_label})
+    turn_state.set_variable(defenders_label, {type: "creatures", value: defenders})
 
     defenders.forEach((defender, i) => {
         const attack_parts: Array<ExprNumberResolved> = []
@@ -56,7 +56,7 @@ export const interpret_attack_roll = ({
         const is_hit = attack.value >= defense.value
 
         const defender_label = `${instruction.defender}(${i + 1})`
-        context.set_variable(defender_label, {type: "creatures", value: [defender], description: defender_label})
+        context.set_variable(defender_label, {type: "creatures", value: [defender]})
         new_instructions.push(copy_variable_instruction(defender_label, instruction.defender))
 
         if (is_hit) {

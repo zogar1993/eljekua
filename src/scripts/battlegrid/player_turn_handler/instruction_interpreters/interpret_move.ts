@@ -9,6 +9,7 @@ import {
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {to_ast} from "scripts/expressions/parser/to_ast";
+import {Expr} from "scripts/expressions/evaluator/types";
 
 export const interpret_move = ({
                                    instruction,
@@ -16,9 +17,9 @@ export const interpret_move = ({
                                    turn_state,
                                }: InterpretInstructionProps<InstructionMovement>) => {
     const context = turn_state.get_current_power_frame()
-    const mover_creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
+    const mover_creature = EXPR.as_creature(context.get_variable(instruction.target))
     const destination_label = instruction.destination
-    const path = EXPR.as_positions(turn_state.get_variable(destination_label))
+    const path = EXPR.as_positions(context.get_variable(destination_label))
 
     for (let i = 0; i < path.length - 1; i++) {
         const current_position = path[i]
@@ -39,8 +40,9 @@ export const interpret_move = ({
                 //TODO P1 allow for any attack that can be a melee basic attack
                 const instructions = turn_power_into_opportunity_attack(BASIC_ATTACK_ACTIONS[0].instructions)
                 const name = BASIC_ATTACK_ACTIONS[0].name
-                const new_power_context = turn_state.add_power_frame({name, instructions, owner: attacker})
-                new_power_context.set_variable("primary_target", context.get_variable(instruction.target))
+
+                const variables: Record<string, Expr> = {"primary_target": {type: "creatures", value: [mover_creature]}}
+                turn_state.add_power_frame({name, instructions, owner: attacker, variables})
             }
 
             context.add_instructions([{type: "move", target: instruction.target, destination: instruction.destination}])
