@@ -17,7 +17,7 @@ export const interpret_apply_status = ({
                                            evaluate_ast,
                                        }: InterpretInstructionProps<InstructionApplyStatus>) => {
     const targets = EXPR.as_creatures(evaluate_ast(instruction.target))
-    const power_owner = turn_state.get_current_power_frame().owner()
+    const power_owner = turn_state.get_power_owner()
     
     for (const target of targets)
         target.add_status({

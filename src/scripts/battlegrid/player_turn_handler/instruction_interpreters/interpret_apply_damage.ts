@@ -17,8 +17,7 @@ export const interpret_apply_damage = ({
                                            evaluate_ast,
                                            turn_state
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
-    const context = turn_state.get_current_power_frame()
-    const attacker = context.owner()
+    const attacker = turn_state.get_power_owner()
     //TODO P3 we probably want to apply damage to a bunch of enemies at the same time
     const target = EXPR.as_creature(turn_state.get_variable(instruction.target))
 

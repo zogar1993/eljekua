@@ -43,6 +43,8 @@ export const create_turn_state = (): TurnState => {
         return power_frames[0].owner()
     }
 
+    const get_power_owner = () => get_current_power_frame().owner()
+
     const get_variable = (name: string) => {
         const frame = get_current_power_frame()
         return frame.get_variable(name)
@@ -75,6 +77,7 @@ export const create_turn_state = (): TurnState => {
         next_instruction,
         get_turn_owner,
 
+        get_power_owner,
         get_variable,
         has_variable,
         set_variable,
@@ -93,7 +96,7 @@ export type TurnState = {
     get_current_power_frame: () => PowerFrame
     next_instruction: () => Instruction | null
     get_turn_owner: () => Creature
-
+    get_power_owner: () => Creature
     get_variable: (name: string) => Expr
     has_variable: (name: string) => boolean,
     set_variable: (name: string, value: Expr) => void

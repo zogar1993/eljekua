@@ -194,22 +194,15 @@ export const create_player_turn_handler = ({
     }
 
     const set_selected_indicator = () => {
-        const creature = turn_state.get_current_power_frame().owner()
-        set_highlight_to_position({
-            position: creature.data.position,
-            highlight: "selected",
-            battle_grid
-        })
+        const position = turn_state.get_power_owner().data.position
+        set_highlight_to_position({position, highlight: "selected", battle_grid})
     }
 
     const deselect = () => {
         if (selection_context === null) return
 
-        set_highlight_to_position({
-            position: turn_state.get_current_power_frame().owner().data.position,
-            highlight: "none",
-            battle_grid
-        })
+        const position = turn_state.get_power_owner().data.position
+        set_highlight_to_position({position, highlight: "none", battle_grid})
 
         if (selection_context.type === "position_select") {
             for (const position of transform_positions_to_f1(selection_context.clickable))
