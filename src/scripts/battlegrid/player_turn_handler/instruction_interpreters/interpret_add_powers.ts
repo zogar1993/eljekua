@@ -9,15 +9,14 @@ export const interpret_add_powers = ({
                                          instruction,
                                          turn_state,
                                      }: InterpretInstructionProps<InstructionAddPowers>) => {
-    const context = turn_state.get_current_context()
-    const creature = EXPR.as_creature(context.get_variable(instruction.creature))
+    const creature = EXPR.as_creature(turn_state.get_variable(instruction.creature))
 
-    context.add_instructions([{
+    turn_state.add_instructions([{
         type: "options",
         options: [
             ...creature.data.powers.map(power => {
                 const power_name = `power_${power.name.replaceAll(" ", "_").toLowerCase()}`
-                context.set_variable(power_name, {type: "power", value: power})
+                turn_state.set_variable(power_name, {type: "power", value: power})
                 return {
                     text: power.name,
                     instructions: [

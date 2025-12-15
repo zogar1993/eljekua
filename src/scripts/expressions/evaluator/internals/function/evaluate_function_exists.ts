@@ -14,7 +14,7 @@ export const evaluate_function_exists = ({node, turn_state}:
 
     return {
         type: "boolean",
-        value: turn_state.get_current_context().has_variable(parameter.value),
+        value: turn_state.has_variable(parameter.value),
         description: `exists ${parameter.value}`,
     }
 }

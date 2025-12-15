@@ -8,7 +8,7 @@ export const interpret_execute_power = ({
                                             instruction,
                                             turn_state
                                         }: InterpretInstructionProps<InstructionExecutePower>) => {
-    const context = turn_state.get_current_context()
+    const context = turn_state.get_current_power_frame()
     const {name, instructions} = EXPR.as_power(context.get_variable(instruction.power))
-    turn_state.add_power_context({name, instructions, owner: context.owner()})
+    turn_state.add_power_frame({name, instructions, owner: context.owner()})
 }

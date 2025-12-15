@@ -5,7 +5,7 @@ import {assert} from "scripts/assert";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 
-export class PowerContext {
+export class PowerFrame {
     private variables: Map<string, Expr> = new Map()
     private instructions: Array<Instruction> = []
     readonly power_name

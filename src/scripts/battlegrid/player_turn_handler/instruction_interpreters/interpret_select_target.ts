@@ -21,7 +21,7 @@ export const interpret_select_target = ({
                                             battle_grid,
                                             evaluate_ast
                                         }: InterpretInstructionProps<InstructionSelectTarget>) => {
-    const context = turn_state.get_current_context()
+    const context = turn_state.get_current_power_frame()
     const clickable = get_valid_targets({instruction, battle_grid, evaluate_ast})
 
     if (clickable.length === 0) return

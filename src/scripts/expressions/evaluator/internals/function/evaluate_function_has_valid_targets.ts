@@ -18,15 +18,14 @@ export const evaluate_function_has_valid_targets = ({node, turn_state, evaluate_
     assert_parameters_amount_equals(node, 1)
 
     const power_name = AST_NODE.as_keyword(node.parameters[0]).value
-    const context = turn_state.get_current_context()
-    const power = EXPR.as_power(context.get_variable(power_name))
+    const power = EXPR.as_power(turn_state.get_variable(power_name))
 
     const first_instruction = power.instructions[0]
 
     // If it does not need targets because it does not start with "select_target" we take as it's ok
     let has_valid_targets = true
     if (first_instruction.type === "select_target") {
-        const valid_targets = get_valid_targets({instruction: first_instruction, context, battle_grid, evaluate_ast})
+        const valid_targets = get_valid_targets({instruction: first_instruction, battle_grid, evaluate_ast})
         has_valid_targets = valid_targets.length > 0
     }
 

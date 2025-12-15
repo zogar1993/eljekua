@@ -15,10 +15,10 @@ export const interpret_move = ({
                                    battle_grid,
                                    turn_state,
                                }: InterpretInstructionProps<InstructionMovement>) => {
-    const context = turn_state.get_current_context()
-    const mover_creature = EXPR.as_creature(context.get_variable(instruction.target))
+    const context = turn_state.get_current_power_frame()
+    const mover_creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
     const destination_label = instruction.destination
-    const path = EXPR.as_positions(context.get_variable(destination_label))
+    const path = EXPR.as_positions(turn_state.get_variable(destination_label))
 
     for (let i = 0; i < path.length - 1; i++) {
         const current_position = path[i]
@@ -39,7 +39,7 @@ export const interpret_move = ({
                 //TODO P1 allow for any attack that can be a melee basic attack
                 const instructions = turn_power_into_opportunity_attack(BASIC_ATTACK_ACTIONS[0].instructions)
                 const name = BASIC_ATTACK_ACTIONS[0].name
-                const new_power_context = turn_state.add_power_context({name, instructions, owner: attacker})
+                const new_power_context = turn_state.add_power_frame({name, instructions, owner: attacker})
                 new_power_context.set_variable("primary_target", context.get_variable(instruction.target))
             }
 

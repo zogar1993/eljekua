@@ -129,7 +129,7 @@ export const create_player_turn_handler = ({
 
     const set_creature_as_current_turn = (creature: Creature) => {
         const instructions: Array<Instruction> = [{type: "add_powers", creature: "owner"}]
-        turn_state.add_power_context({name: "Action Selection", instructions, owner: creature})
+        turn_state.add_power_frame({name: "Action Selection", instructions, owner: creature})
         evaluate_instructions()
     }
 
@@ -146,8 +146,7 @@ export const create_player_turn_handler = ({
                 throw Error("position should be the end of the path")
         }
 
-        const power_context = turn_state.get_current_context()
-        power_context.set_variable(selection_context.target_label,
+        turn_state.set_variable(selection_context.target_label,
             selection_context.target.type === "creatures" ? {
                 type: selection_context.target.type,
                 value: selection_context.target.value,
@@ -197,7 +196,7 @@ export const create_player_turn_handler = ({
     }
 
     const set_selected_indicator = () => {
-        const creature = turn_state.get_current_context().owner()
+        const creature = turn_state.get_current_power_frame().owner()
         set_highlight_to_position({
             position: creature.data.position,
             highlight: "selected",
@@ -209,7 +208,7 @@ export const create_player_turn_handler = ({
         if (selection_context === null) return
 
         set_highlight_to_position({
-            position: turn_state.get_current_context().owner().data.position,
+            position: turn_state.get_current_power_frame().owner().data.position,
             highlight: "none",
             battle_grid
         })
@@ -324,7 +323,7 @@ const show_attack_success_chance_if_needed = ({turn_state, selection_context, ev
     selection_context: PlayerTurnHandlerContextSelectPosition,
     evaluate_ast: (node: AstNode) => Expr
 }) => {
-    const next_instruction = turn_state.get_current_context().peek_instruction()
+    const next_instruction = turn_state.get_current_power_frame().peek_instruction()
     const needs_roll = next_instruction.type === "attack_roll"
     if (needs_roll && selection_context.target) {
         if (selection_context.target.type !== "creatures")

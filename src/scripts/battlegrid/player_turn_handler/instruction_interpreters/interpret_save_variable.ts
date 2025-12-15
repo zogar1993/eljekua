@@ -8,7 +8,6 @@ export const interpret_save_variable = ({
                                             turn_state,
                                             evaluate_ast
                                         }: InterpretInstructionProps<InstructionSaveVariable>) => {
-    const context = turn_state.get_current_context()
     const expression = evaluate_ast(instruction.value)
-    context.set_variable(instruction.label, expression)
+    turn_state.set_variable(instruction.label, expression)
 }

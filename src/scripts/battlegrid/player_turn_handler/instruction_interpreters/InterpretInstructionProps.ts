@@ -1,5 +1,4 @@
 import type {Instruction} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
-import type {PowerContext} from "scripts/battlegrid/player_turn_handler/PowerContext";
 import type {PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import type {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import type {ActionLog} from "scripts/action_log/ActionLog";

@@ -8,7 +8,7 @@ import {
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {PowerContext} from "scripts/battlegrid/player_turn_handler/PowerContext";
+import {PowerFrame} from "scripts/battlegrid/player_turn_handler/PowerFrame";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {ActionLog} from "scripts/action_log/ActionLog";
 import {add_numbers_resolved} from "scripts/expressions/evaluator/number_utils";
@@ -24,14 +24,14 @@ export const interpret_attack_roll = ({
                                           evaluate_ast,
                                           turn_state
                                       }: InterpretInstructionProps<InstructionAttackRoll>) => {
-    const context = turn_state.get_current_context()
+    const context = turn_state.get_current_power_frame()
     const attacker = context.owner()
-    const defenders = EXPR.as_creatures(context.get_variable(instruction.defender))
+    const defenders = EXPR.as_creatures(turn_state.get_variable(instruction.defender))
 
     const new_instructions: Array<Instruction> = []
     new_instructions.push(...instruction.before_instructions)
     const defenders_label = `${instruction.defender}(all)`
-    context.set_variable(defenders_label, {type: "creatures", value: defenders, description: defenders_label})
+    turn_state.set_variable(defenders_label, {type: "creatures", value: defenders, description: defenders_label})
 
     defenders.forEach((defender, i) => {
         const attack_parts: Array<ExprNumberResolved> = []
@@ -88,7 +88,7 @@ const copy_variable_instruction = (origin: string, destination: string): Instruc
 
 const log_attack_roll = (
     {context, attacker, attack, is_hit, defender, instruction, defense, action_log}: {
-        context: PowerContext,
+        context: PowerFrame,
         attacker: Creature,
         attack: ExprNumberResolved,
         is_hit: boolean,

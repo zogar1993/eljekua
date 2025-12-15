@@ -5,6 +5,6 @@ import {
 
 export const interpret_clean_context_status = ({turn_state}: InterpretInstructionProps<InstructionCleanContextStatus>) => {
     //TODO AP4 rename instruction since this is not longer called a context. Perhaps there is a better way to model this too.
-    const context = turn_state.get_current_context()
+    const context = turn_state.get_current_power_frame()
     context.status = "none"
 }

@@ -7,7 +7,7 @@ import {EXPR} from "scripts/expressions/evaluator/EXPR";
 export const build_evaluate_keyword = ({turn_state}: { turn_state: TurnState }) => {
     return (node: AstNodeKeyword): Expr => {
         const variable_name = node.value
-        const variable = turn_state.get_current_context().get_variable(variable_name)
+        const variable = turn_state.get_variable(variable_name)
 
         if (node.property) {
             const creature = EXPR.as_creature(variable)
