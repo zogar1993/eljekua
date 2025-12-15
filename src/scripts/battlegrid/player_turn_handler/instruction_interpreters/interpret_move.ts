@@ -26,9 +26,12 @@ export const interpret_move = ({
             get_reach_adjacent({origin: current_position, battle_grid})
                 .filter(p => battle_grid.is_terrain_occupied(p))
                 .map(battle_grid.get_creature_by_position)
+                // Exclude self from opportunity attackers
                 .filter(creature => creature !== mover_creature)
+                // Exclude turn owner from opportunity attackers, since it can't take opportunity actions
                 .filter(creature => creature !== turn_state.get_turn_owner())
                 .filter(creature => creature.has_opportunity_action())
+                //TODO P4 Maybe just remove opportunity action from creatures in their turns
         )]
 
         if (potential_attackers.length === 0) {
