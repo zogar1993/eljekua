@@ -31,8 +31,8 @@ import {
     interpret_add_powers
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_add_powers";
 import {
-    interpret_clean_context_status
-} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_clean_context_status";
+    interpret_set_power_frame_hit_status
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_set_power_frame_hit_status";
 import {
     interpret_apply_status
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_apply_status";
@@ -76,8 +76,8 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
         case "execute_power":
             interpret_execute_power({...props, instruction})
             break
-        case "clean_context_status":
-            interpret_clean_context_status({...props, instruction})
+        case "set_power_frame_hit_status":
+            interpret_set_power_frame_hit_status({...props, instruction})
             break
         case "apply_status":
             interpret_apply_status({...props, instruction})

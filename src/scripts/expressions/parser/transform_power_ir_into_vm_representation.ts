@@ -108,8 +108,9 @@ export type InstructionForceMovement = {
     destination: AstNode
 }
 
-export type InstructionCleanContextStatus = {
-    type: "clean_context_status"
+export type InstructionSetPowerFrameHitStatus = {
+    type: "set_power_frame_hit_status"
+    value: "none" | "hit" | "miss"
 }
 
 export type InstructionApplyStatus = {
@@ -143,7 +144,7 @@ export type Instruction =
     InstructionSaveResolvedNumber |
     InstructionAddPowers |
     InstructionExecutePower |
-    InstructionCleanContextStatus |
+    InstructionSetPowerFrameHitStatus |
     InstructionApplyStatus |
     InstructionForceMovement
 
