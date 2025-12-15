@@ -7,6 +7,5 @@ export const interpret_set_power_frame_hit_status = ({
                                                          instruction,
                                                          turn_state
                                                      }: InterpretInstructionProps<InstructionSetPowerFrameHitStatus>) => {
-    const context = turn_state.get_current_power_frame()
-    context.status = instruction.value
+    turn_state.set_hit_status(instruction.value)
 }
