@@ -84,10 +84,6 @@ const interpret_status = (
                 against: EXPR.as_creatures(evaluate_ast(status.against)),
                 value: EXPR.as_number_resolved_expr(evaluate_ast(status.value))
             }
-        case "opportunity_action_used":
-            return {
-                type: "opportunity_action_used",
-            }
         default:
             throw Error(`could not interpret status '${JSON.stringify(status)}'`)
     }

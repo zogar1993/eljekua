@@ -8,8 +8,8 @@ import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
-import {to_ast} from "scripts/expressions/parser/to_ast";
 import {Expr} from "scripts/expressions/evaluator/types";
+import {ACTION_TYPE} from "scripts/battlegrid/creatures/ActionType";
 
 export const interpret_move = ({
                                    instruction,
@@ -26,20 +26,24 @@ export const interpret_move = ({
             get_reach_adjacent({origin: current_position, battle_grid})
                 .filter(p => battle_grid.is_terrain_occupied(p))
                 .map(battle_grid.get_creature_by_position)
-                // Exclude self from opportunity attackers
                 .filter(creature => creature !== mover_creature)
-                // Exclude turn owner from opportunity attackers, since it can't take opportunity actions
-                .filter(creature => creature !== turn_state.get_turn_owner())
-                .filter(creature => creature.has_opportunity_action())
-                //TODO AP4 Maybe just remove opportunity action from creatures in their turns
+                .filter(creature => creature.has_action_available(ACTION_TYPE.OPPORTUNITY))
         )]
 
         if (potential_attackers.length === 0) {
             const new_position = path[i + 1]
             battle_grid.move_creature_one_square({creature: mover_creature, position: new_position})
         } else {
-            turn_state.set_variable(destination_label, {type: "positions", value: path.slice(i), description: "movement"})
-            turn_state.add_instructions([{type: "move", target: instruction.target, destination: instruction.destination}])
+            turn_state.set_variable(destination_label, {
+                type: "positions",
+                value: path.slice(i),
+                description: "movement"
+            })
+            turn_state.add_instructions([{
+                type: "move",
+                target: instruction.target,
+                destination: instruction.destination
+            }])
 
             for (const attacker of potential_attackers) {
                 //TODO P1 allow for any attack that can be a melee basic attack
@@ -70,27 +74,17 @@ const add_option_for_opportunity_attack = (instructions: Array<Instruction>): Ar
         options: [
             {
                 text: "Opportunity Attack",
-                //TODO AP3 homogenize durations so that there is littler parsing
+                //TODO AP3 homogenize durations so that there is littler parsing. See if this is still relevant as this is no longer a status
                 instructions: [
-                    {
-                        type: "apply_status",
-                        target: to_ast("owner"),
-                        duration: ["until_start_of_next_turn"],
-                        status: {type: "opportunity_action_used"}
-                    },
+                    {type: "expend_action", action_type: ACTION_TYPE.OPPORTUNITY},
                     ...instructions
                 ]
             },
             {
                 text: "Ignore",
                 instructions: [
-                    {
-                        //TODO P2 make it so that we can forgo opportunity attack for a whole movement
-                        type: "apply_status",
-                        target: to_ast("owner"),
-                        duration: ["until_start_of_next_turn"],
-                        status: {type: "opportunity_action_used"}
-                    }
+                    //TODO AP2 make it so that we can forgo opportunity attack for a whole movement
+                    {type: "expend_action", action_type: ACTION_TYPE.OPPORTUNITY},
                 ]
             },
         ],

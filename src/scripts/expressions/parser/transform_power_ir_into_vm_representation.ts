@@ -10,6 +10,7 @@ import {ATTRIBUTE_CODES} from "scripts/character_sheet/attributes";
 import type {IRInstructionApplyStatus} from "scripts/types";
 
 import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
+import {ActionType} from "scripts/battlegrid/creatures/ActionType";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
@@ -128,8 +129,6 @@ export type InstructionApplyStatus = {
         type: "gain_attack_bonus"
         value: AstNode
         against: AstNode,
-    } | {
-        type: "opportunity_action_used"
     }
 }
 
@@ -146,7 +145,8 @@ export type Instruction =
     InstructionExecutePower |
     InstructionSetPowerFrameHitStatus |
     InstructionApplyStatus |
-    InstructionForceMovement
+    InstructionForceMovement |
+    InstructionExpendAction
 
 const transform_primary_roll = (roll: Required<Power>["roll"]): InstructionAttackRoll => {
     return {
@@ -300,6 +300,12 @@ export type InstructionSelectTargetPush = {
     anchor: AstNode
     origin: AstNode
     target_label: string
+}
+
+//TODO P1 add action types
+export type InstructionExpendAction = {
+    type: "expend_action"
+    action_type: ActionType
 }
 
 const transform_primary_damage = (damage: NonNullable<Power["damage"]>): Array<Instruction> => {

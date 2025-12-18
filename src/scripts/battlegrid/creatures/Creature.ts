@@ -2,11 +2,13 @@ import {CreatureVisual} from "scripts/battlegrid/creatures/CreatureVisual";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {AnimationQueue} from "scripts/AnimationQueue";
 import type {ExprNumberResolved} from "scripts/expressions/evaluator/types";
+import {ActionType} from "scripts/battlegrid/creatures/ActionType";
 
 export class Creature {
     visual: CreatureVisual
     data: CreatureData
     statuses: Array<Status> = []
+    available_actions: Array<ActionType> = []
 
     constructor({data, visual}: { data: CreatureData, visual: CreatureVisual }) {
         this.data = data
@@ -40,8 +42,19 @@ export class Creature {
         this.statuses = new_statuses
     }
 
-    has_opportunity_action = () => {
-        return !this.statuses.some(({effect}) => effect.type === "opportunity_action_used")
+    set_available_actions = (actions: Array<ActionType>) => {
+        this.available_actions = [...actions]
+    }
+
+    has_action_available = (type: ActionType) => {
+        return this.available_actions.some(available_action => available_action === type)
+    }
+
+    expend_action = (action: ActionType) => {
+        const index = this.available_actions.indexOf(action)
+        if (index === -1) throw Error(`Expected "${action}" to be available for "${this.data.name}"`)
+        //TODO AP4 check splice occurrences and mutations
+        this.available_actions.splice(index)
     }
 }
 
@@ -55,8 +68,7 @@ export type StatusDuration = {
 export type StatusEffect =
     StatusEffectGrantCombatAdvantage |
     StatusEffectGainResistance |
-    StatusEffectGainAttackBonus |
-    StatusEffectOpportunityAttackUsed
+    StatusEffectGainAttackBonus
 
 export type StatusEffectGrantCombatAdvantage = {
     type: "grant_combat_advantage",
@@ -73,8 +85,4 @@ export type StatusEffectGainAttackBonus = {
     type: "gain_attack_bonus"
     value: ExprNumberResolved
     against: Array<Creature>,
-}
-
-export type StatusEffectOpportunityAttackUsed = {
-    type: "opportunity_action_used"
 }

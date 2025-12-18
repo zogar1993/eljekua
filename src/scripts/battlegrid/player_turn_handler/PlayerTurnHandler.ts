@@ -28,6 +28,7 @@ import {
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {ButtonOption, OptionButtons} from "scripts/battlegrid/OptionButtons";
+import {ACTION_TYPE} from "scripts/battlegrid/creatures/ActionType";
 
 type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
@@ -247,14 +248,20 @@ export const create_player_turn_handler = ({
             if (instruction === null) {
                 const ending_turn_creature = initiative_order.get_current_creature()
 
-                battle_grid.creatures.forEach(creature => {
+
+                for (const creature of battle_grid.creatures) {
                     creature.remove_statuses({type: "turn_end", creature: ending_turn_creature})
-                })
+                }
 
                 initiative_order.next_turn()
                 const initiating_turn_creature = initiative_order.get_current_creature()
 
                 for (const creature of battle_grid.creatures) {
+                    if (creature === initiating_turn_creature)
+                        creature.set_available_actions([ACTION_TYPE.STANDARD, ACTION_TYPE.MOVEMENT, ACTION_TYPE.MOVEMENT])
+                    else
+                        creature.set_available_actions([ACTION_TYPE.OPPORTUNITY])
+
                     creature.remove_statuses({type: "turn_start", creature: initiating_turn_creature})
 
                     //TODO AP3 a little mutation but whatever, we can clean up later
