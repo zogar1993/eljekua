@@ -257,6 +257,7 @@ export const create_player_turn_handler = ({
                 const initiating_turn_creature = initiative_order.get_current_creature()
 
                 for (const creature of battle_grid.creatures) {
+                //TODO AP0 this excludes first turn
                     if (creature === initiating_turn_creature)
                         creature.set_available_actions([ACTION_TYPE.STANDARD, ACTION_TYPE.MOVEMENT, ACTION_TYPE.MOVEMENT])
                     else
