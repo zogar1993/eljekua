@@ -258,6 +258,7 @@ export const create_player_turn_handler = ({
 
                 for (const creature of battle_grid.creatures) {
                 //TODO AP0 this excludes first turn
+                //TODO AP1 add several actions in a turn
                     if (creature === initiating_turn_creature)
                         creature.set_available_actions([ACTION_TYPE.STANDARD, ACTION_TYPE.MOVEMENT, ACTION_TYPE.MOVEMENT])
                     else
