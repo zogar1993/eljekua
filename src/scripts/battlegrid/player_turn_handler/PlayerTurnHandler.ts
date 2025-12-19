@@ -124,6 +124,7 @@ export const create_player_turn_handler = ({
         started = true
         initiative_order.start()
         const creature = initiative_order.get_current_creature()
+        run_start_of_turn_hooks({current_turn_creature: creature})
         set_creature_as_current_turn(creature)
     }
 
@@ -246,34 +247,13 @@ export const create_player_turn_handler = ({
 
             // Reached the end of all instructions
             if (instruction === null) {
-                const ending_turn_creature = initiative_order.get_current_creature()
-
-
-                for (const creature of battle_grid.creatures) {
-                    creature.remove_statuses({type: "turn_end", creature: ending_turn_creature})
-                }
+                run_end_of_turn_hooks({current_turn_creature: initiative_order.get_current_creature()})
 
                 initiative_order.next_turn()
-                const initiating_turn_creature = initiative_order.get_current_creature()
 
-                for (const creature of battle_grid.creatures) {
-                //TODO AP0 this excludes first turn
-                //TODO AP1 add several actions in a turn
-                    if (creature === initiating_turn_creature)
-                        creature.set_available_actions([ACTION_TYPE.STANDARD, ACTION_TYPE.MOVEMENT, ACTION_TYPE.MOVEMENT])
-                    else
-                        creature.set_available_actions([ACTION_TYPE.OPPORTUNITY])
+                run_start_of_turn_hooks({current_turn_creature: initiative_order.get_current_creature()})
 
-                    creature.remove_statuses({type: "turn_start", creature: initiating_turn_creature})
-
-                    //TODO AP3 a little mutation but whatever, we can clean up later
-                    for (const status of creature.statuses)
-                        for (const duration of status.durations)
-                            if (duration.until === "next_turn_end" && creature === duration.creature)
-                                duration.until = "turn_end"
-                }
-
-                set_creature_as_current_turn(initiating_turn_creature)
+                set_creature_as_current_turn(initiative_order.get_current_creature())
                 return
             }
 
@@ -285,6 +265,30 @@ export const create_player_turn_handler = ({
                 turn_state,
                 evaluate_ast
             })
+        }
+    }
+
+    const run_end_of_turn_hooks = ({current_turn_creature}: {current_turn_creature: Creature}) => {
+        for (const creature of battle_grid.creatures) {
+            creature.remove_statuses({type: "turn_end", creature: current_turn_creature})
+        }
+    }
+
+    const run_start_of_turn_hooks = ({current_turn_creature}: {current_turn_creature: Creature}) => {
+        for (const creature of battle_grid.creatures) {
+            //TODO AP1 add several actions in a turn
+            if (creature === current_turn_creature)
+                creature.set_available_actions([ACTION_TYPE.STANDARD, ACTION_TYPE.MOVEMENT, ACTION_TYPE.MOVEMENT])
+            else
+                creature.set_available_actions([ACTION_TYPE.OPPORTUNITY])
+
+            creature.remove_statuses({type: "turn_start", creature: current_turn_creature})
+
+            //TODO AP3 a little mutation but whatever, we can clean up later
+            for (const status of creature.statuses)
+                for (const duration of status.durations)
+                    if (duration.until === "next_turn_end" && creature === duration.creature)
+                        duration.until = "turn_end"
         }
     }
 
