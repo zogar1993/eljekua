@@ -111,7 +111,7 @@ export type InstructionForceMovement = {
 
 export type InstructionSetPowerFrameHitStatus = {
     type: "set_power_frame_hit_status"
-    value: "none" | "hit" | "miss"
+    value: HitStatus
 }
 
 export type InstructionApplyStatus = {

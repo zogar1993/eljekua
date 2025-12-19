@@ -60,14 +60,14 @@ export const interpret_attack_roll = ({
         new_instructions.push(copy_variable_instruction(defender_label, instruction.defender))
 
         if (is_hit) {
-            new_instructions.push({type: "set_power_frame_hit_status", value: "hit"})
+            new_instructions.push({type: "set_power_frame_hit_status", value: HIT_STATUS.HIT})
             new_instructions.push(...instruction.hit)
         } else {
             AnimationQueue.add_animation(defender.visual.display_miss)
-            new_instructions.push({type: "set_power_frame_hit_status", value: "miss"})
+            new_instructions.push({type: "set_power_frame_hit_status", value: HIT_STATUS.MISS})
             new_instructions.push(...instruction.miss)
         }
-        new_instructions.push({type: "set_power_frame_hit_status", value: "none"})
+        new_instructions.push({type: "set_power_frame_hit_status", value: HIT_STATUS.NONE})
 
         log_attack_roll({attacker, attack, is_hit, defender, defense, context, instruction, action_log})
     })

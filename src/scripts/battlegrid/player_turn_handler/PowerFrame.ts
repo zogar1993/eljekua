@@ -9,7 +9,7 @@ export class PowerFrame {
     private variables: Map<string, Expr> = new Map()
     private instructions: Array<Instruction> = []
     readonly power_name
-    status: "none" | "hit" | "miss" = "none"
+    status: HitStatus = HIT_STATUS.NONE
 
     constructor({name, instructions, owner}: {
         name: string,

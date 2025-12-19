@@ -65,8 +65,7 @@ export const create_turn_state = (): TurnState => {
         frame.add_instructions(instructions)
     }
 
-    // TODO AP4 refactor hit status values
-    const set_hit_status = (value: "none" | "hit" | "miss") => {
+    const set_hit_status = (value: HitStatus) => {
         const frame = get_current_power_frame()
         frame.status = value
     }
@@ -101,5 +100,5 @@ export type TurnState = {
     has_variable: (name: string) => boolean,
     set_variable: (name: string, value: Expr) => void
     add_instructions: (instructions: Array<Instruction>) => void
-    set_hit_status: (value: "none" | "hit" | "miss") => void
+    set_hit_status: (value: HitStatus) => void
 }
