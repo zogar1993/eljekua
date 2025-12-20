@@ -53,7 +53,6 @@ export class Creature {
     expend_action = (action: ActionType) => {
         const index = this.available_actions.indexOf(action)
         if (index === -1) throw Error(`Expected "${action}" to be available for "${this.data.name}"`)
-        //TODO AP4 check splice occurrences and mutations
         this.available_actions.splice(index)
     }
 }
