@@ -26,6 +26,7 @@ export const interpret_apply_status = ({
         })
 }
 
+//TODO AP3 homogenize durations so that there is littler parsing.
 const interpret_duration = (
     {duration, power_owner}:
         {

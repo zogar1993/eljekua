@@ -74,7 +74,6 @@ const add_option_for_opportunity_attack = (instructions: Array<Instruction>): Ar
         options: [
             {
                 text: "Opportunity Attack",
-                //TODO AP3 homogenize durations so that there is littler parsing. See if this is still relevant as this is no longer a status
                 instructions: [
                     {type: "expend_action", action_type: ACTION_TYPE.OPPORTUNITY},
                     ...instructions
