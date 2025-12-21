@@ -1,4 +1,3 @@
-import {InstructionSelectTarget} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {assert_is_footprint_one, Position} from "scripts/battlegrid/Position";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {get_reach_movement} from "scripts/battlegrid/position/get_reach_movement";
@@ -11,6 +10,7 @@ import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {AST} from "scripts/expressions/parser/AST_NODE";
+import {InstructionSelectTarget} from "scripts/expressions/parser/instructions";
 
 
 export const get_reach = ({instruction, battle_grid, evaluate_ast}: {

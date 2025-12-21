@@ -1,7 +1,4 @@
 import type {
-    InstructionApplyStatus
-} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
-import type {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
@@ -10,6 +7,7 @@ import type {StatusDuration, StatusEffect} from "scripts/battlegrid/creatures/Cr
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
+import {InstructionApplyStatus} from "scripts/expressions/parser/instructions";
 
 export const interpret_apply_status = ({
                                            instruction,

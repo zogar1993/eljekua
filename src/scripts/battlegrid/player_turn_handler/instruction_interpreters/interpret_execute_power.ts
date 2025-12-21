@@ -1,8 +1,8 @@
-import {InstructionExecutePower} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
+import {InstructionExecutePower} from "scripts/expressions/parser/instructions";
 
 export const interpret_execute_power = ({
                                             instruction,

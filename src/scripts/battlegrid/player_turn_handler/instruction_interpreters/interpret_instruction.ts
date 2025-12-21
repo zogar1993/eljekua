@@ -17,7 +17,6 @@ import {
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_save_variable";
 import {interpret_options} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_options";
 import {interpret_condition} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_condition";
-import type {Instruction} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import type {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
@@ -39,6 +38,7 @@ import {
 import {
     interpret_expend_action
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_expend_action";
+import {Instruction} from "scripts/expressions/parser/instructions";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>) => {
     const {instruction} = props

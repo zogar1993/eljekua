@@ -4,7 +4,6 @@ import {
     positions_share_surface,
     transform_positions_to_f1
 } from "scripts/battlegrid/Position";
-import {InstructionSelectTarget} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
@@ -13,6 +12,7 @@ import {
 } from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {get_reach_area_burst} from "scripts/battlegrid/position/get_reach_area_burst";
 import {get_valid_targets} from "scripts/battlegrid/position/get_valid_targets";
+import {InstructionSelectTarget} from "scripts/expressions/parser/instructions";
 
 export const interpret_select_target = ({
                                             instruction,

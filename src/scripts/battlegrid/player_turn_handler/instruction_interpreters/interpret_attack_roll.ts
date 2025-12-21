@@ -1,11 +1,6 @@
 import {roll_d} from "scripts/randomness/dice";
 import {AnimationQueue} from "scripts/AnimationQueue";
 import {
-    Instruction,
-    InstructionAttackRoll,
-    InstructionSaveVariable
-} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
-import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {PowerFrame} from "scripts/battlegrid/player_turn_handler/PowerFrame";
@@ -17,6 +12,7 @@ import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 import {HIT_STATUS} from "scripts/battlegrid/player_turn_handler/HitStatus";
+import {Instruction, InstructionAttackRoll, InstructionSaveVariable} from "scripts/expressions/parser/instructions";
 
 export const interpret_attack_roll = ({
                                           instruction,

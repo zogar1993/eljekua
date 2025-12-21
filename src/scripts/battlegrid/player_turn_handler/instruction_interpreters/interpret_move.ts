@@ -1,15 +1,12 @@
 import {get_reach_adjacent} from "scripts/battlegrid/position/get_reach_adjacent";
 import {BASIC_ATTACK_ACTIONS} from "scripts/powers/basic";
 import {
-    Instruction,
-    InstructionMovement
-} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
-import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {ACTION_TYPE} from "scripts/battlegrid/creatures/ActionType";
+import {Instruction, InstructionMovement} from "scripts/expressions/parser/instructions";
 
 export const interpret_move = ({
                                    instruction,
