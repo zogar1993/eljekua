@@ -284,7 +284,6 @@ export const create_player_turn_handler = ({
 
             creature.remove_statuses({type: "turn_start", creature: current_turn_creature})
 
-            //TODO AP3 a little mutation but whatever, we can clean up later
             for (const status of creature.statuses)
                 for (const duration of status.durations)
                     if (duration.until === "next_turn_end" && creature === duration.creature)
