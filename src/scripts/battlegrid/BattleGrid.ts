@@ -43,6 +43,10 @@ export const create_battle_grid = ({
         return board[y][x]
     }
 
+    const get_squares = (position: Position) => {
+        return transform_position_to_f1(position).map(p => get_square(p))
+    }
+
 
     const is_terrain_occupied = (position: Position, {exclude}: { exclude?: Array<Creature> } = {}): boolean => {
         for (const p1 of transform_position_to_f1(position))
@@ -90,6 +94,7 @@ export const create_battle_grid = ({
 
     battle_grid.create_creature = create_creature
     battle_grid.get_square = get_square
+    battle_grid.get_squares = get_squares
     battle_grid.is_terrain_occupied = is_terrain_occupied
     battle_grid.get_creature_by_position = get_creature_by_position
     battle_grid.get_creatures_in_positions = get_creatures_in_positions
@@ -108,6 +113,8 @@ export type BattleGrid = {
     board: Array<Array<Square>>
 
     get_square: (position: PositionFootprintOne) => Square
+    get_squares: (position: Position) => Array<Square>
+
     is_terrain_occupied: (position: Position, options?: { exclude?: Array<Creature> }) => boolean
     get_creature_by_position: (position: Position) => Creature
     get_creatures_in_positions: (positions: Array<PositionFootprintOne>) => Array<Creature>

@@ -74,16 +74,12 @@ export const create_player_turn_handler = ({
 
         set_selected_indicator()
 
-        context.clickable.forEach(position => set_highlight_to_position({
-            position,
-            highlight: "available-target",
-            battle_grid
-        }))
-        context.highlighted.forEach(({position, highlight}) => set_highlight_to_position({
-            position,
-            highlight,
-            battle_grid
-        }))
+        transform_positions_to_f1(context.clickable)
+            .map(battle_grid.get_square)
+            .forEach(({visual}) => visual.set_highlight("available-target"))
+
+        context.highlighted
+            .forEach(({position, highlight}) => battle_grid.get_square(position).visual.set_highlight(highlight))
     }
 
     const set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => {
@@ -197,14 +193,14 @@ export const create_player_turn_handler = ({
 
     const set_selected_indicator = () => {
         const position = turn_state.get_power_owner().data.position
-        set_highlight_to_position({position, highlight: "selected", battle_grid})
+        battle_grid.get_squares(position).forEach(({visual}) => visual.set_highlight("selected"))
     }
 
     const deselect = () => {
         if (selection_context === null) return
 
         const position = turn_state.get_power_owner().data.position
-        set_highlight_to_position({position, highlight: "none", battle_grid})
+        battle_grid.get_squares(position).forEach(({visual}) => visual.set_highlight("none"))
 
         if (selection_context.type === "position_select") {
             for (const position of transform_positions_to_f1(selection_context.clickable))
@@ -268,13 +264,13 @@ export const create_player_turn_handler = ({
         }
     }
 
-    const run_end_of_turn_hooks = ({current_turn_creature}: {current_turn_creature: Creature}) => {
+    const run_end_of_turn_hooks = ({current_turn_creature}: { current_turn_creature: Creature }) => {
         for (const creature of battle_grid.creatures) {
             creature.remove_statuses({type: "turn_end", creature: current_turn_creature})
         }
     }
 
-    const run_start_of_turn_hooks = ({current_turn_creature}: {current_turn_creature: Creature}) => {
+    const run_start_of_turn_hooks = ({current_turn_creature}: { current_turn_creature: Creature }) => {
         for (const creature of battle_grid.creatures) {
             //TODO AP1 add several actions in a turn
             if (creature === current_turn_creature)
@@ -308,18 +304,6 @@ export type PlayerTurnHandler = {
     deselect: () => void
     has_selected_creature: () => boolean
 }
-
-//TODO AP3 standardize its usages and remove this
-const set_highlight_to_position = ({position, highlight, battle_grid}: {
-    position: Position,
-    highlight: SquareHighlight,
-    battle_grid: BattleGrid
-}) => {
-    transform_position_to_f1(position)
-        .map(battle_grid.get_square)
-        .forEach(({visual}) => visual.set_highlight(highlight))
-}
-
 
 const show_attack_success_chance_if_needed = ({turn_state, selection_context, evaluate_ast}: {
     turn_state: TurnState,
