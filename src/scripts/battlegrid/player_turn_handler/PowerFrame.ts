@@ -1,9 +1,9 @@
 import {Instruction} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {assert} from "scripts/assert";
-
 import {Expr} from "scripts/expressions/evaluator/types";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
+import {HIT_STATUS, HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 
 export class PowerFrame {
     private variables: Map<string, Expr> = new Map()

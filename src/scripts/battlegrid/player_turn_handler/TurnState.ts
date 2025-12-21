@@ -2,6 +2,7 @@ import {PowerFrame} from "scripts/battlegrid/player_turn_handler/PowerFrame";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Instruction} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {Expr} from "scripts/expressions/evaluator/types";
+import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 
 export const create_turn_state = (): TurnState => {
     let power_frames: Array<PowerFrame> = []

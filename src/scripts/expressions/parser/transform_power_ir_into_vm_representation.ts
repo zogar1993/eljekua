@@ -11,6 +11,7 @@ import type {IRInstructionApplyStatus} from "scripts/types";
 
 import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
 import {ActionType} from "scripts/battlegrid/creatures/ActionType";
+import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
