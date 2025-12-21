@@ -1,11 +1,12 @@
 import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
+import {ActionType} from "scripts/battlegrid/creatures/ActionType";
 
 export type Power = {
     name: string
     description?: string
     keywords?: Array<"Invigorating" | "Martial" | "Weapon">
     type: {
-        action: "standard" | "movement" | "minor" | "free"
+        action: ActionType
         cooldown: "at-will" | "encounter" | "daily"
         attack: boolean
     }

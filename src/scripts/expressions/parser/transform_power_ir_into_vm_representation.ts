@@ -5,15 +5,17 @@ import {
     Instruction,
     InstructionApplyStatus,
     InstructionAttackRoll,
-    InstructionCondition,
+    InstructionCondition, InstructionExpendAction,
     InstructionSelectTarget
 } from "scripts/expressions/parser/instructions";
+import {ActionType} from "scripts/battlegrid/creatures/ActionType";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
 export const transform_power_ir_into_vm_representation = (power: Power): PowerVM => {
     const formatted_targeting = {type: "select_target", target_label: PRIMARY_TARGET_LABEL, ...power.targeting}
     const instructions: Array<Instruction> = [
+        transform_action_type(power),
         ...(power.damage ? transform_primary_damage(power.damage) : []),
         transform_select_target_ir(formatted_targeting as IRInstructionSelectTarget),
         ...(power.roll ? [transform_primary_roll(power.roll)] : []),
@@ -32,7 +34,7 @@ export type PowerVM = {
     name: string
     description?: string
     type: {
-        action: "standard" | "movement" | "minor" | "free"
+        action: ActionType
         cooldown: "at-will" | "encounter" | "daily"
         attack: boolean
     }
@@ -138,6 +140,12 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
             throw Error(`instruction invalid ${JSON.stringify(instruction)}`)
     }
 }
+const transform_action_type = (power: Power): InstructionExpendAction => {
+    return {
+        type: "expend_action",
+        action_type: power.type.action
+    }
+}
 
 const transform_primary_damage = (damage: NonNullable<Power["damage"]>): Array<Instruction> => {
     return [
@@ -209,7 +217,6 @@ const transform_select_target_ir = (ir: IRInstructionSelectTarget): InstructionS
         }
     throw Error(`"${ir.targeting_type}" is not a valid "select_target" targeting_type`)
 }
-
 
 const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApplyStatus["status"] => {
     const status = ir.status

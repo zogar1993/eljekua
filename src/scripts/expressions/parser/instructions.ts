@@ -164,7 +164,6 @@ export type InstructionSelectTargetPush = {
     target_label: string
 }
 
-//TODO AP1 add action types
 export type InstructionExpendAction = {
     type: "expend_action"
     action_type: ActionType
