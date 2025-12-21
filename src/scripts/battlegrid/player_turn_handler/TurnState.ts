@@ -37,12 +37,6 @@ export const create_turn_state = (): TurnState => {
         return null
     }
 
-    //TODO AP3 there are two ways of getting the current turn owner
-    const get_turn_owner = () => {
-        if (power_frames.length === 0) throw Error(`can't get owner without setting a power frame`)
-        return power_frames[0].owner()
-    }
-
     const get_power_owner = () => get_current_power_frame().owner()
 
     const get_variable = (name: string) => {
@@ -74,7 +68,6 @@ export const create_turn_state = (): TurnState => {
         add_power_frame,
         get_current_power_frame,
         next_instruction,
-        get_turn_owner,
 
         get_power_owner,
         get_variable,
@@ -94,7 +87,6 @@ export type TurnState = {
     }) => PowerFrame
     get_current_power_frame: () => PowerFrame
     next_instruction: () => Instruction | null
-    get_turn_owner: () => Creature
     get_power_owner: () => Creature
     get_variable: (name: string) => Expr
     has_variable: (name: string) => boolean,
