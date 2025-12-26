@@ -94,7 +94,7 @@ export const interpret_select_target = ({
                 target: {type: "positions", value: path},
             })
         } else if (instruction.targeting_type === "push") {
-            //TODO P0 fix push that was changed from position to positions
+            //TODO AP0 fix push that was changed from position to positions
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
                 target: {type: "positions", value: [position]}
