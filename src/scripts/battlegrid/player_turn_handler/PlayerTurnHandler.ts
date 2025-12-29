@@ -220,8 +220,6 @@ export const create_player_turn_handler = ({
         selection_context = null
     }
 
-    const has_selected_creature = () => selection_context !== null
-
     const player_turn_handler: PlayerTurnHandler = {
         set_awaiting_position_selection,
         set_awaiting_option_selection,
@@ -234,11 +232,10 @@ export const create_player_turn_handler = ({
         on_hover,
         set_selected_indicator,
         deselect,
-        has_selected_creature,
     }
 
     const evaluate_instructions = () => {
-        while (!has_selected_creature()) {
+        while (selection_context === null) {
             const instruction = turn_state.next_instruction()
 
             // Reached the end of all instructions
@@ -302,7 +299,6 @@ export type PlayerTurnHandler = {
     on_hover: ({coordinate}: { coordinate: ClickableCoordinate | null }) => void
     set_selected_indicator: () => void
     deselect: () => void
-    has_selected_creature: () => boolean
 }
 
 const show_attack_success_chance_if_needed = ({turn_state, selection_context, evaluate_ast}: {
