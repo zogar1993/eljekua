@@ -227,7 +227,6 @@ export const create_player_turn_handler = ({
         get_position_selection_context_or_null,
         add_creature,
         start,
-        set_creature_as_current_turn,
         on_click,
         on_hover,
         set_selected_indicator,
@@ -240,6 +239,7 @@ export const create_player_turn_handler = ({
 
             // Reached the end of all instructions
             if (instruction === null) {
+
                 run_end_of_turn_hooks({current_turn_creature: initiative_order.get_current_creature()})
 
                 initiative_order.next_turn()
@@ -294,7 +294,6 @@ export type PlayerTurnHandler = {
     get_position_selection_context_or_null: () => PlayerTurnHandlerContextSelectPosition | null
     add_creature: (data: CreatureData) => void
     start: () => void
-    set_creature_as_current_turn: (creature: Creature) => void
     on_click: ({coordinate}: { coordinate: ClickableCoordinate }) => void
     on_hover: ({coordinate}: { coordinate: ClickableCoordinate | null }) => void
     set_selected_indicator: () => void
