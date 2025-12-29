@@ -21,8 +21,6 @@ export class PowerFrame {
         this.set_variable("owner", {type: "creatures", value: [owner]})
     }
 
-    owner = () => EXPR.as_creature(this.get_variable("owner"))
-
     set_variable = (name: string, variable: Expr) => {
         this.variables.set(name, variable)
     }

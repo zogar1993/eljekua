@@ -17,3 +17,7 @@ export const AST_NODE = {
 export const AST = {
     OWNER: to_ast("owner")
 } as const
+
+export const SYSTEM_KEYWORD = {
+    OWNER: "owner"
+} as const

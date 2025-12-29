@@ -13,6 +13,7 @@ import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 import {HIT_STATUS} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {Instruction, InstructionAttackRoll, InstructionSaveVariable} from "scripts/expressions/parser/instructions";
+import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 
 export const interpret_attack_roll = ({
                                           instruction,
@@ -22,7 +23,7 @@ export const interpret_attack_roll = ({
                                           turn_state
                                       }: InterpretInstructionProps<InstructionAttackRoll>) => {
     const context = turn_state.get_current_power_frame()
-    const attacker = context.owner()
+    const attacker = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
     const defenders = EXPR.as_creatures(turn_state.get_variable(instruction.defender))
 
     const new_instructions: Array<Instruction> = []

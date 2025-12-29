@@ -3,6 +3,8 @@ import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {Instruction} from "scripts/expressions/parser/instructions";
+import {EXPR} from "scripts/expressions/evaluator/EXPR";
+import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 
 export const create_turn_state = (): TurnState => {
     let power_frames: Array<PowerFrame> = []
@@ -38,7 +40,7 @@ export const create_turn_state = (): TurnState => {
         return null
     }
 
-    const get_power_owner = () => get_current_power_frame().owner()
+    const get_power_owner = () => EXPR.as_creature(get_current_power_frame().get_variable(SYSTEM_KEYWORD.OWNER))
 
     const get_variable = (name: string) => {
         const frame = get_current_power_frame()

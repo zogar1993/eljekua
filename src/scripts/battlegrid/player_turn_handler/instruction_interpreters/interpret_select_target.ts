@@ -13,6 +13,8 @@ import {
 import {get_reach_area_burst} from "scripts/battlegrid/position/get_reach_area_burst";
 import {get_valid_targets} from "scripts/battlegrid/position/get_valid_targets";
 import {InstructionSelectTarget} from "scripts/expressions/parser/instructions";
+import {EXPR} from "scripts/expressions/evaluator/EXPR";
+import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 
 export const interpret_select_target = ({
                                             instruction,
@@ -26,6 +28,7 @@ export const interpret_select_target = ({
 
     if (clickable.length === 0) return
 
+    const owner = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
     const target_label = instruction.target_label
 
     if (clickable.length === 1) {
@@ -42,7 +45,7 @@ export const interpret_select_target = ({
                 context.set_variable(target_label, {type: "creatures", value: targets})
             } else if (instruction.targeting_type === "movement") {
                 // TODO P2 automatic resolution for movement feels odd when its a movement action, but not when its a secondary action
-                const path = battle_grid.get_shortest_path({creature: context.owner(), destination: position})
+                const path = battle_grid.get_shortest_path({creature: owner, destination: position})
 
                 context.set_variable(target_label, {type: "positions", value: path, description: target_label})
             } else if (instruction.targeting_type === "push") {
@@ -86,7 +89,7 @@ export const interpret_select_target = ({
                 target: {type: "creatures", value: targets}
             })
         } else if (instruction.targeting_type === "movement") {
-            const path = battle_grid.get_shortest_path({creature: context.owner(), destination: position})
+            const path = battle_grid.get_shortest_path({creature: owner, destination: position})
 
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,
@@ -124,7 +127,7 @@ export const interpret_select_target = ({
         target: null,
         on_hover,
         //TODO AP3 clean up
-        footprint: instruction.targeting_type === "movement" ? context.owner().data.position.footprint : 1
+        footprint: instruction.targeting_type === "movement" ? owner.data.position.footprint : 1
     }
 
     player_turn_handler.set_awaiting_position_selection(selection_base)
