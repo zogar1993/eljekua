@@ -56,13 +56,17 @@ export const interpret_move = ({
     }
 }
 
-const turn_power_into_opportunity_attack = (instructions: Array<Instruction>) =>
-    add_option_for_opportunity_attack(remove_first_targeting(instructions))
+const turn_power_into_opportunity_attack = (instructions: Array<Instruction>) => {
+    let new_instructions = instructions
+    new_instructions = exclude_first_instruction_of_type(new_instructions, "expend_action")
+    new_instructions = exclude_first_instruction_of_type(new_instructions, "select_target")
+    return add_option_for_opportunity_attack(new_instructions)
+}
 
-const remove_first_targeting = (instructions: Array<Instruction>) => {
-    if (instructions[0].type === "select_target")
-        return instructions.slice(1)
-    throw Error("targeting needed for removing it")
+const exclude_first_instruction_of_type = (instructions: Array<Instruction>, type: Instruction["type"]) => {
+    const i = instructions.findIndex(instruction => instruction.type === type)
+    if (i === -1) throw Error(`instruction of type "${type}" not found`)
+    return [...instructions.slice(0, i), ...instructions.slice(i + 1)]
 }
 
 const add_option_for_opportunity_attack = (instructions: Array<Instruction>): Array<Instruction> => [
