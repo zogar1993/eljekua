@@ -1,57 +1,76 @@
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {assert} from "scripts/assert";
-import {Expr} from "scripts/expressions/evaluator/types";
-import {EXPR} from "scripts/expressions/evaluator/EXPR";
+import {Expr} from "scripts/expressions/evaluator/types";7
 import {HIT_STATUS, HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {Instruction} from "scripts/expressions/parser/instructions";
+import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 
-export class PowerFrame {
-    private variables: Map<string, Expr> = new Map()
-    private instructions: Array<Instruction> = []
-    readonly power_name
-    status: HitStatus = HIT_STATUS.NONE
-
-    constructor({name, instructions, owner}: {
-        name: string,
-        instructions: Array<Instruction>,
-        owner: Creature
-    }) {
-        this.instructions = instructions
-        this.power_name = name
-        this.set_variable("owner", {type: "creatures", value: [owner]})
+export const create_power_frame = ({name, instructions, owner}: {
+    name: string,
+    instructions: Array<Instruction>,
+    owner: Creature
+}): PowerFrame => {
+    const self = {
+        instructions: [...instructions],
+        status: HIT_STATUS.NONE as HitStatus,
+        variables: new Map<string, Expr>(),
     }
 
-    set_variable = (name: string, variable: Expr) => {
-        this.variables.set(name, variable)
+    const set_variable = (name: string, variable: Expr) => {
+        self.variables.set(name, variable)
     }
 
-    peek_instruction = (): Instruction => {
-        assert(this.instructions.length > 0, () => "no instructions left when calling peek instruction")
-        return this.instructions[0]
+    const peek_instruction = (): Instruction => {
+        assert(self.instructions.length > 0, () => "no instructions left when calling peek instruction")
+        return self.instructions[0]
     }
 
-    next_instruction = (): Instruction => {
-        assert(this.instructions.length > 0, () => "no instructions left when calling next instruction")
-        const [next, ...instructions] = this.instructions
-        this.instructions = instructions
+    const next_instruction = (): Instruction => {
+        assert(self.instructions.length > 0, () => "no instructions left when calling next instruction")
+        const [next, ...instructions] = self.instructions
+        self.instructions = instructions
         return next
     }
 
-    has_instructions = (): boolean => {
-        return this.instructions.length > 0
+    const has_instructions = (): boolean => {
+        return self.instructions.length > 0
     }
 
-    has_variable = (name: string): boolean => {
-        return this.variables.has(name)
+    const has_variable = (name: string): boolean => {
+        return self.variables.has(name)
     }
 
-    add_instructions = (instructions: Array<Instruction>): void => {
-        this.instructions = [...instructions, ...this.instructions]
+    const add_instructions = (instructions: Array<Instruction>): void => {
+        self.instructions = [...instructions, ...self.instructions]
     }
 
-    get_variable = (name: string) => {
-        const variable = this.variables.get(name)
+    const get_variable = (name: string): Expr => {
+        const variable = self.variables.get(name)
         if (!variable) throw Error(`variable ${name} not found in context`)
         return variable
     }
+
+    set_variable(SYSTEM_KEYWORD.OWNER, {type: "creatures", value: [owner]})
+
+    return {
+        set_variable,
+        peek_instruction,
+        next_instruction,
+        has_instructions,
+        has_variable,
+        add_instructions,
+        get_variable,
+        power_name: name,
+    }
+}
+
+export type PowerFrame = {
+    set_variable: (name: string, variable: Expr) => void
+    peek_instruction: () => Instruction
+    next_instruction: () => Instruction
+    has_instructions: () => boolean
+    has_variable: (name: string) => boolean
+    add_instructions: (instructions: Array<Instruction>) => void
+    get_variable: (name: string) => Expr
+    power_name: string
 }

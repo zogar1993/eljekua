@@ -1,7 +1,6 @@
-import {PowerFrame} from "scripts/battlegrid/player_turn_handler/PowerFrame";
+import {create_power_frame, PowerFrame} from "scripts/battlegrid/player_turn_handler/PowerFrame";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Expr} from "scripts/expressions/evaluator/types";
-import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {Instruction} from "scripts/expressions/parser/instructions";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
@@ -15,7 +14,7 @@ export const create_turn_state = (): TurnState => {
         owner: Creature
         variables?: Record<string, Expr>
     }) => {
-        const power_frame = new PowerFrame({instructions, name, owner})
+        const power_frame = create_power_frame({instructions, name, owner})
         for(const [key, value] of Object.entries(variables))
             power_frame.set_variable(key, value)
         power_frames.push(power_frame)
@@ -62,11 +61,6 @@ export const create_turn_state = (): TurnState => {
         frame.add_instructions(instructions)
     }
 
-    const set_hit_status = (value: HitStatus) => {
-        const frame = get_current_power_frame()
-        frame.status = value
-    }
-
     return {
         add_power_frame,
         get_current_power_frame,
@@ -77,7 +71,6 @@ export const create_turn_state = (): TurnState => {
         has_variable,
         set_variable,
         add_instructions,
-        set_hit_status
     }
 }
 
@@ -95,5 +88,4 @@ export type TurnState = {
     has_variable: (name: string) => boolean,
     set_variable: (name: string, value: Expr) => void
     add_instructions: (instructions: Array<Instruction>) => void
-    set_hit_status: (value: HitStatus) => void
 }

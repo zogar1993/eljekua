@@ -1,6 +1,7 @@
 import type {Creature} from "scripts/battlegrid/creatures/Creature";
 import type {Position} from "scripts/battlegrid/Position";
 import {PowerVM} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 
 export type Expr =
     ExprNumber
@@ -9,6 +10,7 @@ export type Expr =
     | ExprCreatures
     | ExprPositions
     | ExprPower
+    | ExprHitStatus
 
 export type ExprNumber = ExprNumberUnresolved | ExprNumberResolved
 
@@ -55,4 +57,9 @@ export type ExprPositions = {
 export type ExprPower = {
     type: "power"
     value: PowerVM
+}
+
+export type ExprHitStatus = {
+    type: "hit_status"
+    value: HitStatus
 }
