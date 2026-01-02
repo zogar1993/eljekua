@@ -125,5 +125,4 @@ battle_grid.visual.addOnClickHandler(coordinate => {
 })
 
 //TODO AP1 big fellows are not painted totally when targeted for attack
-//TODO AP1 using a standard action doesn't let you use a movement action afterwards
 //TODO AP1 using a movement action can be used with a standard action
