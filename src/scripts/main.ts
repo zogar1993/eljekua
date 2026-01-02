@@ -123,5 +123,3 @@ battle_grid.visual.addOnMouseMoveHandler(coordinate => {
 battle_grid.visual.addOnClickHandler(coordinate => {
     player_turn_handler.on_click({coordinate})
 })
-
-//TODO AP1 big fellows are not painted totally when targeted for attack

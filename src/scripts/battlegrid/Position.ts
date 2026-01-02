@@ -19,6 +19,11 @@ export function assert_is_footprint_one(p: Position): asserts p is PositionFootp
         throw Error(`Expected position to be f1: ${JSON.stringify(p)}`)
 }
 
+export function assert_are_footprint_one(positions: Array<Position>): asserts positions is Array<PositionFootprintOne> {
+    if (positions.every(position => position_is_footprint_one(position))) return
+    throw Error(`Expected positions to be f1: ${JSON.stringify(positions)}`)
+}
+
 const position_is_footprint_one = (position: Position): position is PositionFootprintOne =>
     position.footprint === 1
 
