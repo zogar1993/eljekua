@@ -16,11 +16,7 @@ export const evaluate_function_or = ({node, evaluate_ast}:
     if (!parameters.every(parameter => parameter.type === "boolean"))
         throw Error(`Expected all '$or()' parameters to evaluate to booleans, but found '${JSON.stringify(parameters)}'`)
 
-    let result
-    for (const parameter of parameters)
-        if (parameter.value)
-            result = true
-    result = false
+    const result = parameters.some(parameter => parameter.value)
 
     return {
         type: "boolean",
