@@ -128,4 +128,3 @@ export const distance_between_positions = (a: Position, b: Position) => {
     assert_positions_have_same_footprint(a, b)
     return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
 }
-
