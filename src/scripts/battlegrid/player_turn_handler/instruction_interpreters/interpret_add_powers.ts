@@ -32,7 +32,7 @@ export const interpret_add_powers = ({
                         parameters: [
                             {
                                 type: "function",
-                                name: "has_valid_targets",
+                                name: "has_valid_targeting",
                                 parameters: [{type: "keyword", value: power_name}]
                             },
                             {
