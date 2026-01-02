@@ -32,7 +32,7 @@ export const run_start_of_turn_hooks = ({current_turn_creature, battle_grid}: {
 }) => {
     for (const creature of battle_grid.creatures) {
         if (creature === current_turn_creature)
-            creature.set_available_actions([ACTION_TYPE.STANDARD, ACTION_TYPE.MOVEMENT, ACTION_TYPE.MOVEMENT])
+            creature.set_available_actions([ACTION_TYPE.STANDARD, ACTION_TYPE.MOVEMENT, ACTION_TYPE.MINOR])
         else
             creature.set_available_actions([ACTION_TYPE.OPPORTUNITY])
 
