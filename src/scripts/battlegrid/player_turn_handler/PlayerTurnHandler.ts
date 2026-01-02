@@ -17,7 +17,7 @@ import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
-import {bound_minmax} from "scripts/math/minmax";
+import {bound_minmax} from "scripts/ts_utils/bound_minmax";
 import {SquareHighlight} from "scripts/battlegrid/squares/SquareHighlight";
 import {
     ClickableCoordinate,
