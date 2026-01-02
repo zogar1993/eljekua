@@ -13,8 +13,6 @@ import {
 import {AnimationQueue} from "scripts/AnimationQueue";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "scripts/powers/basic";
 import type {BattleGridVisual} from "scripts/battlegrid/BattleGridVisual";
-import {create_is_flanking} from "scripts/battlegrid/queries/is_flanking";
-import {create_get_shortest_path} from "scripts/battlegrid/queries/get_shortest_path";
 
 export const create_battle_grid = ({
                                        create_visual_square,
@@ -85,25 +83,21 @@ export const create_battle_grid = ({
         AnimationQueue.add_animation(() => creature.visual.push_to(position))
     }
 
-    const battle_grid = {} as BattleGrid
+    return {
+        visual,
+        size,
+        creatures,
+        board,
 
-    battle_grid.visual = visual
-    battle_grid.size = size
-    battle_grid.creatures = creatures
-    battle_grid.board = board
-
-    battle_grid.create_creature = create_creature
-    battle_grid.get_square = get_square
-    battle_grid.get_squares = get_squares
-    battle_grid.is_terrain_occupied = is_terrain_occupied
-    battle_grid.get_creature_by_position = get_creature_by_position
-    battle_grid.get_creatures_in_positions = get_creatures_in_positions
-    battle_grid.push_creature = push_creature
-    battle_grid.move_creature_one_square = move_creature_one_square
-    battle_grid.is_flanking = create_is_flanking(battle_grid)
-    battle_grid.get_shortest_path = create_get_shortest_path(battle_grid)
-
-    return battle_grid
+        create_creature,
+        get_square,
+        get_squares,
+        is_terrain_occupied,
+        get_creature_by_position,
+        get_creatures_in_positions,
+        push_creature,
+        move_creature_one_square
+    }
 }
 
 export type BattleGrid = {
@@ -122,9 +116,6 @@ export type BattleGrid = {
     create_creature: (data: CreatureData) => Creature
     push_creature: (props: { position: Position, creature: Creature }) => void
     move_creature_one_square: (props: { position: Position, creature: Creature }) => void
-
-    is_flanking: ({attacker, defender}: { attacker: Creature, defender: Creature }) => boolean
-    get_shortest_path: ({creature, destination}: { creature: Creature, destination: Position }) => Array<Position>
 }
 
 

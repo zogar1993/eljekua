@@ -15,6 +15,7 @@ import {get_valid_targets} from "scripts/battlegrid/position/get_valid_targets";
 import {InstructionSelectTarget} from "scripts/expressions/parser/instructions";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
+import {get_shortest_path} from "scripts/battlegrid/queries/get_shortest_path";
 
 export const interpret_select_target = ({
                                             instruction,
@@ -45,7 +46,7 @@ export const interpret_select_target = ({
                 context.set_variable(target_label, {type: "creatures", value: targets})
             } else if (instruction.targeting_type === "movement") {
                 // TODO P2 automatic resolution for movement feels odd when its a movement action, but not when its a secondary action
-                const path = battle_grid.get_shortest_path({creature: owner, destination: position})
+                const path = get_shortest_path({creature: owner, destination: position, battle_grid})
 
                 context.set_variable(target_label, {type: "positions", value: path, description: target_label})
             } else if (instruction.targeting_type === "push") {
@@ -89,7 +90,7 @@ export const interpret_select_target = ({
                 target: {type: "creatures", value: targets}
             })
         } else if (instruction.targeting_type === "movement") {
-            const path = battle_grid.get_shortest_path({creature: owner, destination: position})
+            const path = get_shortest_path({creature: owner, destination: position, battle_grid})
 
             player_turn_handler.set_awaiting_position_selection({
                 ...selection_base,

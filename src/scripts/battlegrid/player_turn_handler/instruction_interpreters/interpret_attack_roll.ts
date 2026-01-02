@@ -14,6 +14,7 @@ import {get_creature_defense} from "scripts/character_sheet/get_creature_defense
 import {HIT_STATUS} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {Instruction, InstructionAttackRoll, InstructionSaveVariable} from "scripts/expressions/parser/instructions";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
+import {is_flanking} from "scripts/battlegrid/queries/is_flanking";
 
 export const interpret_attack_roll = ({
                                           instruction,
@@ -43,7 +44,7 @@ export const interpret_attack_roll = ({
         attacker.remove_statuses({type: "next_attack_roll_against_target", creature: defender})
 
         if (
-            battle_grid.is_flanking({attacker, defender}) ||
+            is_flanking({attacker, defender, battle_grid}) ||
             defender.statuses.some(({effect}) => effect.type === "grant_combat_advantage" && effect.against.includes(attacker))
         ) attack_parts.push(COMBAT_ADVANTAGE)
 
