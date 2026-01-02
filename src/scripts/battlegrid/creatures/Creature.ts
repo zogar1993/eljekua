@@ -2,7 +2,7 @@ import {CreatureVisual} from "scripts/battlegrid/creatures/CreatureVisual";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {AnimationQueue} from "scripts/AnimationQueue";
 import type {ExprNumberResolved} from "scripts/expressions/evaluator/types";
-import {ActionType} from "scripts/battlegrid/creatures/ActionType";
+import {ACTION_TYPE_EXPENDITURE_ORDER, ActionType} from "scripts/battlegrid/creatures/ActionType";
 import {remove_from_array} from "scripts/ts_utils/remove_from_array";
 
 export class Creature {
@@ -47,14 +47,23 @@ export class Creature {
         this.available_actions = [...actions]
     }
 
-    has_action_available = (type: ActionType) => {
-        return this.available_actions.some(available_action => available_action === type)
+    has_action_available = (action: ActionType) => {
+        for (const expenditure of ACTION_TYPE_EXPENDITURE_ORDER[action])
+            if (this.available_actions.some(available => available === expenditure))
+                return true
+        return false
     }
 
     expend_action = (action: ActionType) => {
-        const index = this.available_actions.indexOf(action)
-        if (index === -1) throw Error(`Expected "${action}" to be available for "${this.data.name}"`)
-        this.available_actions = remove_from_array(this.available_actions, index)
+        for (const expenditure of ACTION_TYPE_EXPENDITURE_ORDER[action]) {
+            const index = this.available_actions.indexOf(expenditure)
+
+            if (index >= 0) {
+                this.available_actions = remove_from_array(this.available_actions, index)
+                return
+            }
+        }
+        throw Error(`Expected "${action}" to be available for "${this.data.name}"`)
     }
 }
 
