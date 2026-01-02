@@ -182,8 +182,8 @@ export const create_player_turn_handler = ({
             for (const p of transform_position_to_f1(position))
                 battle_grid.get_square(p).visual.set_interaction_status("hover")
         } else {
-            for (const position of transform_positions_to_f1(selection_context.clickable))
-                battle_grid.get_square(position).visual.set_highlight("available-target")
+            for (const p of transform_positions_to_f1(selection_context.clickable))
+                battle_grid.get_square(p).visual.set_highlight("available-target")
         }
     }
 
