@@ -6,11 +6,11 @@ import {to_ast} from "scripts/expressions/parser/to_ast";
 export const AST_NODE = {
     as_keyword: (node: AstNode): AstNodeKeyword => {
         if (node.type === "keyword") return node
-        throw Error(`Cannot cast ast node to "keyword"`)
+        throw Error(`Cannot cast ast node ${JSON.stringify(node)} to "keyword"`)
     },
     as_string: (node: AstNode): AstNodeString => {
         if (node.type === "string") return node
-        throw Error(`Cannot cast ast node to "string"`)
+        throw Error(`Cannot cast ast node ${JSON.stringify(node)} to "string"`)
     }
 }
 
