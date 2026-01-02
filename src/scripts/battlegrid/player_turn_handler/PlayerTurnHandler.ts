@@ -233,7 +233,6 @@ export const create_player_turn_handler = ({
         while (selection_context === null) {
             const instruction = turn_state.next_instruction()
 
-            // Reached the end of all instructions
             if (instruction === null) {
                 const instruction = {type: "add_powers", creature: AST.OWNER, action_type: TURN_ACTION_TYPES} as const
                 const owner = initiative_order.get_current_creature()
