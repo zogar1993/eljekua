@@ -3,6 +3,7 @@ import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {AnimationQueue} from "scripts/AnimationQueue";
 import type {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {ActionType} from "scripts/battlegrid/creatures/ActionType";
+import {remove_from_array} from "scripts/ts_utils/remove_from_array";
 
 export class Creature {
     visual: CreatureVisual
@@ -35,7 +36,7 @@ export class Creature {
 
     remove_statuses = ({type, creature}: { type: StatusDuration["until"], creature: Creature | undefined }) => {
         const new_statuses: Array<Status> = []
-        for(const status of this.statuses)
+        for (const status of this.statuses)
             if (!status.durations.some((d) => d.until == type && d.creature === undefined || d.creature === creature))
                 new_statuses.push(status)
 
@@ -53,7 +54,7 @@ export class Creature {
     expend_action = (action: ActionType) => {
         const index = this.available_actions.indexOf(action)
         if (index === -1) throw Error(`Expected "${action}" to be available for "${this.data.name}"`)
-        this.available_actions.splice(index)
+        this.available_actions = remove_from_array(this.available_actions, index)
     }
 }
 

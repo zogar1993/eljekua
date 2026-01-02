@@ -7,6 +7,7 @@ import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {ACTION_TYPE} from "scripts/battlegrid/creatures/ActionType";
 import {Instruction, InstructionMovement} from "scripts/expressions/parser/instructions";
+import {remove_from_array} from "scripts/ts_utils/remove_from_array";
 
 export const interpret_move = ({
                                    instruction,
@@ -66,7 +67,7 @@ const turn_power_into_opportunity_attack = (instructions: Array<Instruction>) =>
 const exclude_first_instruction_of_type = (instructions: Array<Instruction>, type: Instruction["type"]) => {
     const i = instructions.findIndex(instruction => instruction.type === type)
     if (i === -1) throw Error(`instruction of type "${type}" not found`)
-    return [...instructions.slice(0, i), ...instructions.slice(i + 1)]
+    return remove_from_array(instructions, i)
 }
 
 const add_option_for_opportunity_attack = (instructions: Array<Instruction>): Array<Instruction> => [
