@@ -27,8 +27,11 @@ import {
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {ButtonOption, OptionButtons} from "scripts/battlegrid/OptionButtons";
-import {ACTION_TYPE} from "scripts/battlegrid/creatures/ActionType";
-import {Instruction} from "scripts/expressions/parser/instructions";
+import {
+    run_start_of_turn_hooks
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_end_turn";
+import {AST} from "scripts/expressions/parser/AST_NODE";
+import {TURN_ACTION_TYPES} from "scripts/battlegrid/creatures/ActionType";
 
 type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
@@ -120,13 +123,7 @@ export const create_player_turn_handler = ({
         started = true
         initiative_order.start()
         const creature = initiative_order.get_current_creature()
-        run_start_of_turn_hooks({current_turn_creature: creature})
-        set_creature_as_current_turn(creature)
-    }
-
-    const set_creature_as_current_turn = (creature: Creature) => {
-        const instructions: Array<Instruction> = [{type: "add_powers", creature: "owner"}]
-        turn_state.add_power_frame({name: "Action Selection", instructions, owner: creature})
+        run_start_of_turn_hooks({current_turn_creature: creature, battle_grid})
         evaluate_instructions()
     }
 
@@ -135,7 +132,6 @@ export const create_player_turn_handler = ({
         if (selection_context.target === null) return
         const position = get_position_by_coordinate({coordinate, positions: selection_context.clickable})
         if (position === null) return null;
-
 
         if (selection_context.target.type === "positions") {
             const path = selection_context.target.value
@@ -239,48 +235,20 @@ export const create_player_turn_handler = ({
 
             // Reached the end of all instructions
             if (instruction === null) {
-
-                run_end_of_turn_hooks({current_turn_creature: initiative_order.get_current_creature()})
-
-                initiative_order.next_turn()
-
-                run_start_of_turn_hooks({current_turn_creature: initiative_order.get_current_creature()})
-
-                set_creature_as_current_turn(initiative_order.get_current_creature())
-                return
+                const instruction = {type: "add_powers", creature: AST.OWNER, action_type: TURN_ACTION_TYPES} as const
+                const owner = initiative_order.get_current_creature()
+                turn_state.add_power_frame({name: "Action Selection", instructions: [instruction], owner})
+            } else {
+                interpret_instruction({
+                    instruction,
+                    player_turn_handler,
+                    battle_grid,
+                    action_log,
+                    turn_state,
+                    evaluate_ast,
+                    initiative_order
+                })
             }
-
-            interpret_instruction({
-                instruction,
-                player_turn_handler,
-                battle_grid,
-                action_log,
-                turn_state,
-                evaluate_ast
-            })
-        }
-    }
-
-    const run_end_of_turn_hooks = ({current_turn_creature}: { current_turn_creature: Creature }) => {
-        for (const creature of battle_grid.creatures) {
-            creature.remove_statuses({type: "turn_end", creature: current_turn_creature})
-        }
-    }
-
-    const run_start_of_turn_hooks = ({current_turn_creature}: { current_turn_creature: Creature }) => {
-        for (const creature of battle_grid.creatures) {
-            //TODO AP1 add several actions in a turn
-            if (creature === current_turn_creature)
-                creature.set_available_actions([ACTION_TYPE.STANDARD, ACTION_TYPE.MOVEMENT, ACTION_TYPE.MOVEMENT])
-            else
-                creature.set_available_actions([ACTION_TYPE.OPPORTUNITY])
-
-            creature.remove_statuses({type: "turn_start", creature: current_turn_creature})
-
-            for (const status of creature.statuses)
-                for (const duration of status.durations)
-                    if (duration.until === "next_turn_end" && creature === duration.creature)
-                        duration.until = "turn_end"
         }
     }
 

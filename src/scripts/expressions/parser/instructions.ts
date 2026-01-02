@@ -56,7 +56,7 @@ export type InstructionSaveResolvedNumber = {
 
 export type InstructionAddPowers = {
     type: "add_powers",
-    creature: string
+    creature: AstNode
 }
 
 export type InstructionExecutePower = {
@@ -108,7 +108,8 @@ export type Instruction =
     InstructionSetPowerFrameHitStatus |
     InstructionApplyStatus |
     InstructionForceMovement |
-    InstructionExpendAction
+    InstructionExpendAction |
+    InstructionEndTurn
 
 export type InstructionSelectTarget =
     InstructionSelectTargetRanged |
@@ -167,4 +168,8 @@ export type InstructionSelectTargetPush = {
 export type InstructionExpendAction = {
     type: "expend_action"
     action_type: ActionType
+}
+
+export type InstructionEndTurn = {
+    type: "end_turn"
 }

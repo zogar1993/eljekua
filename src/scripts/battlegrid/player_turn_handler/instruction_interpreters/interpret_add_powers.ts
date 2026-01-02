@@ -1,15 +1,16 @@
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {to_ast} from "scripts/expressions/parser/to_ast";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {Instruction, InstructionAddPowers} from "scripts/expressions/parser/instructions";
+import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 
 export const interpret_add_powers = ({
                                          instruction,
                                          turn_state,
+                                         evaluate_ast
                                      }: InterpretInstructionProps<InstructionAddPowers>) => {
-    const creature = EXPR.as_creature(turn_state.get_variable(instruction.creature))
+    const creature = EXPR.as_creature(evaluate_ast(instruction.creature))
 
     turn_state.add_instructions([{
         type: "options",
@@ -25,12 +26,31 @@ export const interpret_add_powers = ({
                             power: power_name
                         }
                     ] as Array<Instruction>,
-                    condition: to_ast(`$has_valid_targets(${power_name})`)
+                    condition: {
+                        type: "function",
+                        name: "and",
+                        parameters: [
+                            {
+                                type: "function",
+                                name: "has_valid_targets",
+                                parameters: [{type: "keyword", value: power_name}]
+                            },
+                            {
+                                type: "function",
+                                name: "can_expend_action_type",
+                                parameters: [instruction.creature, {type: "string", value: power.type.action}]
+                            }
+                        ]
+                    } as AstNode
                 }
             }),
             {
-                text: "Cancel",
-                instructions: [],
+                text: "End turn",
+                instructions: [
+                    {
+                        type: "end_turn"
+                    }
+                ],
             }
         ]
     }])

@@ -39,6 +39,7 @@ import {
     interpret_expend_action
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_expend_action";
 import {Instruction} from "scripts/expressions/parser/instructions";
+import {interpret_end_turn} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_end_turn";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>) => {
     const {instruction} = props
@@ -87,6 +88,9 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             break
         case "expend_action":
             interpret_expend_action({...props, instruction})
+            break
+        case "end_turn":
+            interpret_end_turn({...props, instruction})
             break
         default:
             throw Error("instruction not implemented " + JSON.stringify(instruction))
