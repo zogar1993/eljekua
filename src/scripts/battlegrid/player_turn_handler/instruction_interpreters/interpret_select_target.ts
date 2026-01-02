@@ -120,14 +120,15 @@ export const interpret_select_target = ({
         }
     }
 
-    const selection_base: Omit<PlayerTurnHandlerContextSelectPosition, "owner" | "type"> = {
+    const footprint = instruction.targeting_type === "movement" ? owner.data.position.footprint : 1
+
+    const selection_base: Omit<PlayerTurnHandlerContextSelectPosition,  "type"> = {
         target_label,
         clickable,
         highlighted: [],
         target: null,
         on_hover,
-        //TODO AP3 clean up
-        footprint: instruction.targeting_type === "movement" ? owner.data.position.footprint : 1
+        footprint
     }
 
     player_turn_handler.set_awaiting_position_selection(selection_base)
