@@ -3,7 +3,6 @@ import {AnimationQueue} from "scripts/AnimationQueue";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {PowerFrame} from "scripts/battlegrid/player_turn_handler/PowerFrame";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {ActionLog} from "scripts/action_log/ActionLog";
 import {add_numbers_resolved} from "scripts/expressions/evaluator/number_utils";
@@ -15,6 +14,7 @@ import {HIT_STATUS} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {Instruction, InstructionAttackRoll, InstructionSaveVariable} from "scripts/expressions/parser/instructions";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 import {is_flanking} from "scripts/battlegrid/queries/is_flanking";
+import {TurnState} from "scripts/battlegrid/player_turn_handler/TurnState";
 
 export const interpret_attack_roll = ({
                                           instruction,
@@ -23,7 +23,6 @@ export const interpret_attack_roll = ({
                                           evaluate_ast,
                                           turn_state
                                       }: InterpretInstructionProps<InstructionAttackRoll>) => {
-    const context = turn_state.get_current_power_frame()
     const attacker = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
     const defenders = EXPR.as_creatures(turn_state.get_variable(instruction.defender))
 
@@ -55,7 +54,7 @@ export const interpret_attack_roll = ({
         const is_hit = attack.value >= defense.value
 
         const defender_label = `${instruction.defender}(${i + 1})`
-        context.set_variable(defender_label, {type: "creatures", value: [defender]})
+        turn_state.set_variable(defender_label, {type: "creatures", value: [defender]})
         new_instructions.push(copy_variable_instruction(defender_label, instruction.defender))
 
         if (is_hit) {
@@ -68,12 +67,12 @@ export const interpret_attack_roll = ({
         }
         new_instructions.push({type: "set_power_frame_hit_status", value: HIT_STATUS.NONE})
 
-        log_attack_roll({attacker, attack, is_hit, defender, defense, context, instruction, action_log})
+        log_attack_roll({attacker, attack, is_hit, defender, defense, turn_state, instruction, action_log})
     })
 
     new_instructions.push(copy_variable_instruction(`${instruction.defender}(all)`, instruction.defender))
 
-    context.add_instructions(new_instructions)
+    turn_state.add_instructions(new_instructions)
 }
 
 const COMBAT_ADVANTAGE: ExprNumberResolved = {
@@ -86,8 +85,8 @@ const copy_variable_instruction = (origin: string, destination: string): Instruc
     ({type: "save_variable", value: {type: "keyword", value: origin}, label: destination})
 
 const log_attack_roll = (
-    {context, attacker, attack, is_hit, defender, instruction, defense, action_log}: {
-        context: PowerFrame,
+    {turn_state, attacker, attack, is_hit, defender, instruction, defense, action_log}: {
+        turn_state: TurnState,
         attacker: Creature,
         attack: ExprNumberResolved,
         is_hit: boolean,
@@ -96,7 +95,7 @@ const log_attack_roll = (
         instruction: InstructionAttackRoll
         action_log: ActionLog
     }) => action_log.add_new_action_log(
-    `${attacker.data.name}'s ${context.power_name} (`,
+    `${attacker.data.name}'s ${turn_state.get_power_name()} (`,
     attack,
     `) ${is_hit ? "hits" : "misses"} against ${defender.data.name}'s ${instruction.defense} (`,
     defense,

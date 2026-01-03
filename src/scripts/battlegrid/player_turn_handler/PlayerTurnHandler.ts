@@ -272,7 +272,7 @@ const show_attack_success_chance_if_needed = ({turn_state, selection_context, ev
     selection_context: PlayerTurnHandlerContextSelectPosition,
     evaluate_ast: (node: AstNode) => Expr
 }) => {
-    const next_instruction = turn_state.get_current_power_frame().peek_instruction()
+    const next_instruction = turn_state.peek_instruction()
     const needs_roll = next_instruction.type === "attack_roll"
     if (needs_roll && selection_context.target) {
         if (selection_context.target.type !== "creatures")

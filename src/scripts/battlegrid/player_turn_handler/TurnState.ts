@@ -15,14 +15,21 @@ export const create_turn_state = (): TurnState => {
         variables?: Record<string, Expr>
     }) => {
         const power_frame = create_power_frame({instructions, name, owner})
-        for(const [key, value] of Object.entries(variables))
+        for (const [key, value] of Object.entries(variables))
             power_frame.set_variable(key, value)
         power_frames.push(power_frame)
         return power_frame
     }
 
-    // TODO AP3 Probably best to encapsulate this and not let it get out
-    const get_current_power_frame = () => power_frames[power_frames.length - 1]
+    const get_current_power_frame = () => {
+        if (power_frames.length === 0) throw Error("No power frames available")
+        return power_frames[power_frames.length - 1]
+    }
+
+    const peek_instruction = (): Instruction => {
+        const current_power_frame = get_current_power_frame()
+        return current_power_frame.peek_instruction()
+    }
 
     const next_instruction = () => {
         while (power_frames.length > 0) {
@@ -40,6 +47,8 @@ export const create_turn_state = (): TurnState => {
     }
 
     const get_power_owner = () => EXPR.as_creature(get_current_power_frame().get_variable(SYSTEM_KEYWORD.OWNER))
+
+    const get_power_name = () => get_current_power_frame().power_name
 
     const get_variable = (name: string) => {
         const frame = get_current_power_frame()
@@ -63,14 +72,17 @@ export const create_turn_state = (): TurnState => {
 
     return {
         add_power_frame,
-        get_current_power_frame,
+
+        peek_instruction,
         next_instruction,
+        add_instructions,
 
         get_power_owner,
+        get_power_name,
+
         get_variable,
-        has_variable,
         set_variable,
-        add_instructions,
+        has_variable,
     }
 }
 
@@ -81,9 +93,10 @@ export type TurnState = {
         owner: Creature,
         variables?: Record<string, Expr>
     }) => PowerFrame
-    get_current_power_frame: () => PowerFrame
+    peek_instruction: () => Instruction
     next_instruction: () => Instruction | null
     get_power_owner: () => Creature
+    get_power_name: () => string
     get_variable: (name: string) => Expr
     has_variable: (name: string) => boolean,
     set_variable: (name: string, value: Expr) => void
