@@ -34,19 +34,7 @@ export const positions_share_surface = (a: Position, b: Position) => {
     if (position_is_footprint_one(a) && position_is_footprint_one(b))
         return positions_equal_footprint_one(a, b)
 
-    const a_min_y = a.y
-    const a_min_x = a.x
-    const a_max_y = a.y + a.footprint - 1
-    const a_max_x = a.x + a.footprint - 1
-    const b_min_y = b.y
-    const b_min_x = b.x
-    const b_max_y = b.y + b.footprint - 1
-    const b_max_x = b.x + b.footprint - 1
-
-    return (
-        !(b_max_x < a_min_x || a_max_x < b_min_x) &&
-        !(b_max_y < a_min_y || a_max_y < b_min_y)
-    )
+    return surfaces_overlap(position_to_surface(a), position_to_surface(b))
 }
 
 export const transform_position_to_f1 = (position: Position): Array<PositionFootprintOne> => {
@@ -70,16 +58,31 @@ export const distance_between_positions = (a: Position, b: Position) => {
     if (position_is_footprint_one(a) && position_is_footprint_one(b))
         return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
 
-    const a_min_y = a.y
-    const a_min_x = a.x
-    const a_max_y = a.y + a.footprint - 1
-    const a_max_x = a.x + a.footprint - 1
-    const b_min_y = b.y
-    const b_min_x = b.x
-    const b_max_y = b.y + b.footprint - 1
-    const b_max_x = b.x + b.footprint - 1
+    const aa = position_to_surface(a)
+    const bb = position_to_surface(b)
 
-    const x_distance = Math.min(Math.abs(a_min_x - b_max_x), Math.abs(b_min_x - a_max_x))
-    const y_distance = Math.min(Math.abs(a_min_y - b_max_y), Math.abs(b_min_y - a_max_y))
+    if (surfaces_overlap(aa, bb))
+        return 0
+
+    const x_distance = Math.min(Math.abs(aa.min_x - bb.max_x), Math.abs(bb.min_x - aa.max_x))
+    const y_distance = Math.min(Math.abs(aa.min_y - bb.max_y), Math.abs(bb.min_y - aa.max_y))
     return Math.max(x_distance, y_distance)
 }
+
+type Surface = {
+    min_x: number
+    max_x: number,
+    min_y: number
+    max_y: number
+}
+
+const position_to_surface = (p: Position): Surface => ({
+    min_x: p.x,
+    max_x: p.x + p.footprint - 1,
+    min_y: p.y,
+    max_y: p.y + p.footprint - 1,
+})
+
+const surfaces_overlap = (a: Surface, b: Surface) =>
+    !(b.max_x < a.min_x || a.max_x < b.min_x) &&
+    !(b.max_y < a.min_y || a.max_y < b.min_y)
