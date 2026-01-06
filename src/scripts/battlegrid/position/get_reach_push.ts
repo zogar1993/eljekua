@@ -1,7 +1,6 @@
-import {Position, positions_of_same_footprint_equal} from "scripts/battlegrid/Position";
+import {distance_between_positions, Position, positions_of_same_footprint_equal} from "scripts/battlegrid/Position";
 import {get_reach_adjacent} from "scripts/battlegrid/position/get_reach_adjacent";
 import type {BattleGrid} from "scripts/battlegrid/BattleGrid";
-import {distance_between_positions} from "scripts/battlegrid/BattleGrid";
 
 export const get_reach_push = ({anchor, origin, distance, battle_grid}: {
         anchor: Position,

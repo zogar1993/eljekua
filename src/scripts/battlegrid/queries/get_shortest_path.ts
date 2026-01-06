@@ -1,9 +1,8 @@
 import {Creature} from "scripts/battlegrid/creatures/Creature";
-import {get_flanker_positions} from "scripts/battlegrid/position/get_flanker_positions";
-import {are_creatures_allied} from "scripts/creatures/are_creatures_allied";
-import {BattleGrid, distance_between_positions} from "scripts/battlegrid/BattleGrid";
+import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import {
     assert_positions_have_same_footprint,
+    distance_between_positions,
     Position,
     positions_of_same_footprint_equal
 } from "scripts/battlegrid/Position";

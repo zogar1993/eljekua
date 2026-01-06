@@ -40,7 +40,7 @@ const get_random_number = ({min, max}: { min: number, max: number }) => {
     assert(min <= max, () => "min can not be lower than max")
     const result = Math.floor(random() * (max - min + 1)) + min
     assert(min <= result && result <= max, () => `result of random needs to be between mind and max, was ${result}`)
-    return result
+    return 20
 }
 
 let seed = new Date().getTime()

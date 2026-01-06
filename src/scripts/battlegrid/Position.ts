@@ -33,6 +33,7 @@ export const positions_equal_footprint_one = (a: PositionFootprintOne, b: Positi
 export const positions_share_surface = (a: Position, b: Position) => {
     if (position_is_footprint_one(a) && position_is_footprint_one(b))
         return positions_equal_footprint_one(a, b)
+
     const a_min_y = a.y
     const a_min_x = a.x
     const a_max_y = a.y + a.footprint - 1
@@ -63,4 +64,22 @@ export const transform_positions_to_f1 = (positions: Array<Position>): Array<Pos
         for (const p of transform_position_to_f1(position))
             map.set(`x${p.x}y${p.y}`, p)
     return [...map.values()]
+}
+
+export const distance_between_positions = (a: Position, b: Position) => {
+    if (position_is_footprint_one(a) && position_is_footprint_one(b))
+        return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y))
+
+    const a_min_y = a.y
+    const a_min_x = a.x
+    const a_max_y = a.y + a.footprint - 1
+    const a_max_x = a.x + a.footprint - 1
+    const b_min_y = b.y
+    const b_min_x = b.x
+    const b_max_y = b.y + b.footprint - 1
+    const b_max_x = b.x + b.footprint - 1
+
+    const x_distance = Math.min(Math.abs(a_min_x - b_max_x), Math.abs(b_min_x - a_max_x))
+    const y_distance = Math.min(Math.abs(a_min_y - b_max_y), Math.abs(b_min_y - a_max_y))
+    return Math.max(x_distance, y_distance)
 }
