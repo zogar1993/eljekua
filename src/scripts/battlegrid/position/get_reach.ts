@@ -45,9 +45,9 @@ export const get_reach = ({instruction, battle_grid, evaluate_ast}: {
         }
         case "push": {
             const anchor = EXPR.as_position(evaluate_ast(instruction.anchor))
-            const origin = EXPR.as_position(evaluate_ast(instruction.origin))
+            const defender = EXPR.as_creature(evaluate_ast(instruction.defender))
             const distance = EXPR.as_number(evaluate_ast(instruction.distance))
-            return get_reach_push({anchor, origin, distance, battle_grid})
+            return get_reach_push({anchor, defender, distance, battle_grid})
         }
         default: {
             throw `targeting type '${(instruction as InstructionSelectTarget).type}' not supported`

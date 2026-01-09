@@ -161,7 +161,7 @@ export type InstructionSelectTargetPush = {
     targeting_type: "push"
     distance: AstNode
     anchor: AstNode
-    origin: AstNode
+    defender: AstNode
     target_label: string
 }
 

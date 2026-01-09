@@ -119,7 +119,7 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                     targeting_type: "push",
                     distance: to_ast(instruction.amount),
                     anchor: to_ast("owner.position"),
-                    origin: to_ast(`${instruction.target}.position`),
+                    defender: to_ast(instruction.target),
                     target_label: "push_position"
                 },
                 {

@@ -12,8 +12,8 @@ export const interpret_force_movement = ({
     const creature = EXPR.as_creature(evaluate_ast(instruction.target))
     switch (instruction.movement_type) {
         case "push": {
-            const destination = EXPR.as_position(evaluate_ast(instruction.destination))
-            battle_grid.push_creature({creature, position: destination})
+            const destination = EXPR.as_positions(evaluate_ast(instruction.destination))
+            battle_grid.push_creature({creature, position: destination[destination.length - 1]})
             break
         }
         default:
