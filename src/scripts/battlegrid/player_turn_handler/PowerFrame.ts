@@ -46,7 +46,8 @@ export const create_power_frame = ({name, instructions, owner}: {
 
     const get_variable = (name: string): Expr => {
         const variable = self.variables.get(name)
-        if (!variable) throw Error(`variable ${name} not found in context`)
+        //TODO P3 make error handling smoother everywhere
+        if (!variable) throw Error(`variable ${name} not found in context. Context: ${JSON.stringify(self.variables, null, 2)}`)
         return variable
     }
 
