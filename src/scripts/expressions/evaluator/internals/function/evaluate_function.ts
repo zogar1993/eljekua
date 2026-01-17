@@ -20,6 +20,9 @@ import {
     evaluate_function_can_expend_action_type
 } from "scripts/expressions/evaluator/internals/function/evaluate_function_can_expend_action_type";
 import {evaluate_function_and} from "scripts/expressions/evaluator/internals/function/evaluate_function_and";
+import {
+    evaluate_function_is_lower_or_equal
+} from "scripts/expressions/evaluator/internals/function/evaluate_function_is_lower_or_equal";
 
 export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                                             {
@@ -48,6 +51,8 @@ export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                 return evaluate_function_and({node, evaluate_ast})
             case "is_greater_or_equal":
                 return evaluate_function_is_greater_or_equal({node, evaluate_ast})
+            case "is_lower_or_equal":
+                return evaluate_function_is_lower_or_equal({node, evaluate_ast})
             default:
                 throw Error(`function name '${node.name}' not supported when evaluating node`)
         }

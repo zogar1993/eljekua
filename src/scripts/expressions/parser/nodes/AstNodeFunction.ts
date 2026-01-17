@@ -37,6 +37,7 @@ const FUNCTION_NAMES = [
     "or",
     "and",
     "add",
+    "is_lower_or_equal",
     "is_greater_or_equal",
     "not_equals",
     "equipped",
