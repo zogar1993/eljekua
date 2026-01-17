@@ -24,6 +24,9 @@ import {
     evaluate_function_is_lower_or_equal
 } from "scripts/expressions/evaluator/internals/function/evaluate_function_is_lower_or_equal";
 import {evaluate_function_distance} from "scripts/expressions/evaluator/internals/function/evaluate_function_distance";
+import {
+    evaluate_function_opportunity_attack_range
+} from "scripts/expressions/evaluator/internals/function/evaluate_function_opportunity_attack_range";
 
 export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                                             {
@@ -48,6 +51,8 @@ export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                 return evaluate_function_can_expend_action_type({node, evaluate_ast})
             case "distance":
                 return evaluate_function_distance({node, evaluate_ast})
+            case "opportunity_attack_range":
+                return evaluate_function_opportunity_attack_range({node, evaluate_ast})
             case "or":
                 return evaluate_function_or({node, evaluate_ast})
             case "and":

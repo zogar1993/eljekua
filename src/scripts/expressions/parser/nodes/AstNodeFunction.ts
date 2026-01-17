@@ -42,7 +42,8 @@ const FUNCTION_NAMES = [
     "is_greater_or_equal",
     "not_equals",
     "equipped",
-    "has_valid_targeting"
+    "has_valid_targeting",
+    "opportunity_attack_range"
 ]
 
 export type AstNodeFunction = {
