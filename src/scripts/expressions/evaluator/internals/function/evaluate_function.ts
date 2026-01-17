@@ -23,6 +23,7 @@ import {evaluate_function_and} from "scripts/expressions/evaluator/internals/fun
 import {
     evaluate_function_is_lower_or_equal
 } from "scripts/expressions/evaluator/internals/function/evaluate_function_is_lower_or_equal";
+import {evaluate_function_distance} from "scripts/expressions/evaluator/internals/function/evaluate_function_distance";
 
 export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                                             {
@@ -45,6 +46,8 @@ export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                 return evaluate_function_has_valid_targeting({node, turn_state, evaluate_ast, battle_grid})
             case "can_expend_action_type":
                 return evaluate_function_can_expend_action_type({node, evaluate_ast})
+            case "distance":
+                return evaluate_function_distance({node, evaluate_ast})
             case "or":
                 return evaluate_function_or({node, evaluate_ast})
             case "and":
