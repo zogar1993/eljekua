@@ -38,6 +38,7 @@ const FUNCTION_NAMES = [
     "and",
     "add",
     "distance",
+    "are_enemies",
     "is_lower_or_equal",
     "is_greater_or_equal",
     "not_equals",
