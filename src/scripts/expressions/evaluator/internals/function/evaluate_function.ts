@@ -30,6 +30,9 @@ import {
 import {
     evaluate_function_are_enemies
 } from "scripts/expressions/evaluator/internals/function/evaluate_function_are_enemies";
+import {
+    evaluate_function_has_action_type_available
+} from "scripts/expressions/evaluator/internals/function/evaluate_function_has_action_type_available";
 
 export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                                             {
@@ -46,6 +49,8 @@ export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                 return evaluate_function_exists({node, turn_state})
             case "equipped":
                 return evaluate_function_equipped({node, evaluate_ast})
+            case "has_action_type_available":
+                return evaluate_function_has_action_type_available({node, evaluate_ast})
             case "not_equals":
                 return evaluate_function_not_equals({node, evaluate_ast})
             case "has_valid_targeting":

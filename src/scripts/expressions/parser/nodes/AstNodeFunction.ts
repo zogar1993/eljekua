@@ -32,6 +32,7 @@ export const parse_function = (scanner: Scanner): AstNodeFunction => {
     }
 }
 
+//TODO P4 simplify this
 const FUNCTION_NAMES = [
     "exists",
     "or",
@@ -39,6 +40,7 @@ const FUNCTION_NAMES = [
     "add",
     "distance",
     "are_enemies",
+    "has_action_type_available",
     "is_lower_or_equal",
     "is_greater_or_equal",
     "not_equals",
