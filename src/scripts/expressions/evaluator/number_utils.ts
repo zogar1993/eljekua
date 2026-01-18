@@ -23,7 +23,7 @@ export const subtract_numbers_resolved = (a: ExprNumberResolved, b: ExprNumberRe
 export const max_number_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved =>
     numbers.reduce((previous, current) => previous.value > current.value ? previous : current)
 
-export const number_utils = (numbers: Array<ExprNumber>): ExprNumberUnresolved => ({
+export const add_numbers = (numbers: Array<ExprNumber>): ExprNumberUnresolved => ({
     type: "number_unresolved",
     min: numbers.reduce((accum, num) => (is_number_resolved(num) ? num.value : num.min) + accum, 0),
     max: numbers.reduce((accum, num) => (is_number_resolved(num) ? num.value : num.max) + accum, 0),
