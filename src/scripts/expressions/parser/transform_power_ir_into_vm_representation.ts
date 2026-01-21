@@ -5,31 +5,34 @@ import {
     Instruction,
     InstructionApplyStatus,
     InstructionAttackRoll,
-    InstructionCondition, InstructionExpendAction,
+    InstructionCondition,
     InstructionSelectTarget
 } from "scripts/expressions/parser/instructions";
 import {ActionType} from "scripts/battlegrid/creatures/ActionType";
+import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
 export const transform_power_ir_into_vm_representation = (power: Power): PowerVM => {
-    const formatted_targeting = {type: "select_target", target_label: PRIMARY_TARGET_LABEL, ...power.targeting}
     const instructions: Array<Instruction> = [
-        transform_action_type(power),
         ...(power.damage ? transform_primary_damage(power.damage) : []),
-        transform_select_target_ir(formatted_targeting as IRInstructionSelectTarget),
+        ...(power.targeting ? [transform_select_target_ir(power.targeting)] : []),
         ...(power.roll ? [transform_primary_roll(power.roll)] : []),
         ...transform_instructions(power.effect)
     ]
+
     return {
         name: power.name,
         description: power.description,
-        type: power.type,
+        trigger: power.trigger ? transform_trigger(power.trigger) : null,
+        type: {
+            ...power.type,
+            traits: power.type.traits || []
+        },
         instructions: instructions
     }
-
 }
-
+//TODO P4 rename power vm so that it is power
 export type PowerVM = {
     name: string
     description?: string
@@ -37,8 +40,16 @@ export type PowerVM = {
         action: ActionType
         cooldown: "at-will" | "encounter" | "daily"
         attack: boolean
+        traits: Array<"melee_basic_attack">
     }
+    trigger: Trigger | null
     instructions: Array<Instruction>
+}
+
+export type Trigger = {
+    type: "interruption" | "reaction"
+    intercepts: Array<"movement">
+    conditions: Array<AstNode>
 }
 
 const transform_primary_roll = (roll: Required<Power>["roll"]): InstructionAttackRoll => {
@@ -136,14 +147,15 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 duration: typeof instruction.duration === "string" ? [instruction.duration] : instruction.duration,
                 status: transform_apply_status_ir(instruction)
             }]
+        case "add_powers":
+            return [{
+                type: "add_powers",
+                cost: instruction.cost,
+                filter: instruction.filter,
+                creature: to_ast(instruction.creature)
+            }]
         default:
             throw Error(`instruction invalid ${JSON.stringify(instruction)}`)
-    }
-}
-const transform_action_type = (power: Power): InstructionExpendAction => {
-    return {
-        type: "expend_action",
-        action_type: power.type.action
     }
 }
 
@@ -177,7 +189,17 @@ const transform_primary_damage = (damage: NonNullable<Power["damage"]>): Array<I
     ]
 }
 
-const transform_select_target_ir = (ir: IRInstructionSelectTarget): InstructionSelectTarget => {
+const transform_trigger = (trigger: NonNullable<Power["trigger"]>): Trigger => {
+    return {
+        type: trigger.type,
+        intercepts: trigger.intercepts,
+        conditions: trigger.conditions.map(x => to_ast(x))
+    }
+}
+
+const transform_select_target_ir = (props: Omit<IRInstructionSelectTarget, "type" | "target_label">): InstructionSelectTarget => {
+    const ir = {type: "select_target", target_label: PRIMARY_TARGET_LABEL, ...props} as IRInstructionSelectTarget
+
     if (ir.targeting_type === "area_burst")
         return {
             type: "select_target",

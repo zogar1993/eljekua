@@ -9,6 +9,7 @@ export type Power = {
         action: ActionType
         cooldown: "at-will" | "encounter" | "daily"
         attack: boolean
+        traits?: Array<"melee_basic_attack">
     }
     prerequisites?: Array<string>,
     damage?: {
@@ -16,7 +17,8 @@ export type Power = {
         lvl_11?: string,
         lvl_21?: string
     }
-    targeting: Targeting,
+    targeting?: Targeting,
+    trigger?: IRTrigger,
     roll?: {
         attack: string
         defense: DefenseCode
@@ -67,6 +69,12 @@ export type IRInstruction =
     value: string
     label: string
 } | IRInstructionApplyStatus
+ | {
+    type: "add_powers"
+    creature: string,
+    cost: "normal" | "opportunity",
+    filter: "turn" | "melee_basic_attack"
+ }
 
 export type IRInstructionApplyStatus = {
     type: "apply_status",
@@ -132,4 +140,10 @@ type IRInstructionSelectTargetAreaBurst = {
     amount: "all"
     distance: number
     radius: number
+}
+
+type IRTrigger = {
+    type: "interruption" | "reaction"
+    intercepts: Array<"movement">
+    conditions: Array<string>
 }

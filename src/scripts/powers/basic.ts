@@ -1,5 +1,7 @@
 import type {Power} from "scripts/types.ts";
-import {transform_power_ir_into_vm_representation} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import {
+    transform_power_ir_into_vm_representation
+} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
 const shift: Power = {
     name: "Shift",
@@ -47,6 +49,7 @@ const melee_basic_attack: Power = {
         action: "standard",
         cooldown: "at-will",
         attack: true,
+        traits: ["melee_basic_attack"]
     },
     targeting: {
         targeting_type: "melee_weapon",
@@ -66,9 +69,25 @@ const melee_basic_attack: Power = {
     },
 }
 
-
-//holy strike
-//furious smash
+const opportunity_attack: Power = {
+    name: "Opportunity Attack",
+    type: {
+        action: "opportunity",
+        cooldown: "at-will",
+        attack: true,
+    },
+    trigger: {
+        type: "interruption",
+        intercepts: ["movement"],
+        conditions: [
+            `$is_lower_or_equal($distance(triggerer,owner),$opportunity_attack_range(owner))`,
+            `$are_enemies(triggerer,owner)`,
+        ],
+    },
+    effect: [
+        {type: "add_powers", creature: "owner", cost: "opportunity", filter: "melee_basic_attack"}
+    ]
+}
 
 export const BASIC_MOVEMENT_ACTIONS = [movement, shift].map(transform_power_ir_into_vm_representation)
-export const BASIC_ATTACK_ACTIONS = [melee_basic_attack].map(transform_power_ir_into_vm_representation)
+export const BASIC_ATTACK_ACTIONS = [melee_basic_attack, opportunity_attack].map(transform_power_ir_into_vm_representation)

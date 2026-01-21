@@ -31,7 +31,7 @@ import {
     run_start_of_turn_hooks
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_end_turn";
 import {AST} from "scripts/expressions/parser/AST_NODE";
-import {TURN_ACTION_TYPES} from "scripts/battlegrid/creatures/ActionType";
+import {InstructionAddPowers} from "scripts/expressions/parser/instructions";
 
 type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
@@ -234,7 +234,12 @@ export const create_player_turn_handler = ({
             const instruction = turn_state.next_instruction()
 
             if (instruction === null) {
-                const instruction = {type: "add_powers", creature: AST.OWNER, action_type: TURN_ACTION_TYPES} as const
+                const instruction: InstructionAddPowers = {
+                    type: "add_powers",
+                    creature: AST.OWNER,
+                    cost: "normal",
+                    filter: "turn"
+                }
                 const owner = initiative_order.get_current_creature()
                 turn_state.add_power_frame({name: "Action Selection", instructions: [instruction], owner})
             } else {

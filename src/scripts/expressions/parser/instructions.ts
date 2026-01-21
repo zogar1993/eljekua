@@ -56,7 +56,9 @@ export type InstructionSaveResolvedNumber = {
 
 export type InstructionAddPowers = {
     type: "add_powers",
-    creature: AstNode
+    creature: AstNode,
+    cost: "normal" | "opportunity",
+    filter: "turn" | "melee_basic_attack"
 }
 
 export type InstructionExecutePower = {
