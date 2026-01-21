@@ -24,6 +24,9 @@ export const transform_power_ir_into_vm_representation = (power: Power): PowerVM
     if (TURN_ACTION_TYPES.includes(power.type.action) && power.targeting === undefined)
         throw Error(`Power '${power.name}' does not have a targeting defined despite being a turn action`)
 
+    if (power.type.action === "opportunity" && power.trigger === undefined)
+        throw Error(`Power '${power.name}' does not have a trigger defined despite being an opportunity action`)
+
     return {
         name: power.name,
         description: power.description,
