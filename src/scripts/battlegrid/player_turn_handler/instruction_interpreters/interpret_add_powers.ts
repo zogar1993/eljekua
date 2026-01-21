@@ -4,7 +4,7 @@ import {
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {Instruction, InstructionAddPowers} from "scripts/expressions/parser/instructions";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
-import {ACTION_TYPE, ActionType} from "scripts/battlegrid/creatures/ActionType";
+import {TURN_ACTION_TYPES} from "scripts/battlegrid/creatures/ActionType";
 import {PowerVM} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
 export const interpret_add_powers = ({
@@ -63,7 +63,6 @@ export const interpret_add_powers = ({
     }])
 }
 
-const TURN_ACTION_TYPES: Array<ActionType> = [ACTION_TYPE.MINOR, ACTION_TYPE.MOVEMENT, ACTION_TYPE.STANDARD]
 const filter_powers = ({powers, filter}: { powers: Array<PowerVM>, filter: InstructionAddPowers["filter"] }) => {
     switch (filter) {
         case "turn":

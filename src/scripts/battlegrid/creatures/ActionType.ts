@@ -21,3 +21,5 @@ export function assert_is_action_type(value: string): asserts value is ActionTyp
         if (action_type === value) return
     throw Error(`"${value}" is not an action type`)
 }
+
+export const TURN_ACTION_TYPES: Array<ActionType> = [ACTION_TYPE.MINOR, ACTION_TYPE.MOVEMENT, ACTION_TYPE.STANDARD]

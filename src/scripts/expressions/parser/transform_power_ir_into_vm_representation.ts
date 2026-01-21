@@ -8,7 +8,7 @@ import {
     InstructionCondition,
     InstructionSelectTarget
 } from "scripts/expressions/parser/instructions";
-import {ActionType} from "scripts/battlegrid/creatures/ActionType";
+import {ActionType, TURN_ACTION_TYPES} from "scripts/battlegrid/creatures/ActionType";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
@@ -20,6 +20,9 @@ export const transform_power_ir_into_vm_representation = (power: Power): PowerVM
         ...(power.roll ? [transform_primary_roll(power.roll)] : []),
         ...transform_instructions(power.effect)
     ]
+
+    if (TURN_ACTION_TYPES.includes(power.type.action) && power.targeting === undefined)
+        throw Error(`Power '${power.name}' does not have a targeting defined despite being a turn action`)
 
     return {
         name: power.name,
