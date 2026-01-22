@@ -7,6 +7,7 @@ import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {TURN_ACTION_TYPES} from "scripts/battlegrid/creatures/ActionType";
 import {PowerVM} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
+//TODO rename into "add powers to select from" or something like it
 export const interpret_add_powers = ({
                                          instruction,
                                          turn_state,
