@@ -1,6 +1,7 @@
 import {CreatureVisual} from "scripts/battlegrid/creatures/CreatureVisual";
 import {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {BattleGridVisual} from "scripts/battlegrid/BattleGridVisual";
+import {ActionLog} from "scripts/action_log/ActionLog";
 
 const create_visual_creature = (): CreatureVisual => ({
     place_at: jest.fn(),
@@ -22,8 +23,13 @@ const create_battle_grid_visual = (): BattleGridVisual => ({
     addOnClickHandler: jest.fn(),
 })
 
-export const visual_mocks = {
+const create_action_log = (): ActionLog => ({
+     add_new_action_log: jest.fn()
+})
+
+export const dependency_mocks = {
     create_visual_square,
     create_visual_creature,
     create_battle_grid_visual,
+    create_action_log
 }
