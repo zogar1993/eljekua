@@ -3,7 +3,7 @@ import {create_visual_square} from "scripts/battlegrid/squares/SquareVisual";
 import {create_visual_creature} from "scripts/battlegrid/creatures/CreatureVisual";
 import {create_battle_grid_visual} from "scripts/battlegrid/BattleGridVisual";
 import {create_player_turn_handler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
-import {ActionLog} from "scripts/action_log/ActionLog";
+import {create_action_log} from "scripts/action_log/ActionLog";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {ROGUE_POWERS} from "scripts/powers/rogue";
 import {FIGHTER_POWERS} from "scripts/powers/fighter";
@@ -12,11 +12,12 @@ import type {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {InitiativeOrderVisual} from "scripts/initiative_order/InitiativeOrderVisual";
 import {create_option_buttons} from "scripts/battlegrid/OptionButtons";
+import {ATTRIBUTES} from "scripts/character_sheet/attributes";
 
 const visual_initiative_order = new InitiativeOrderVisual()
 
 const initiative_order = new InitiativeOrder(visual_initiative_order)
-const action_log = new ActionLog()
+const action_log = create_action_log()
 
 const battle_grid = create_battle_grid({
     create_visual_square,
@@ -28,15 +29,6 @@ const battle_grid = create_battle_grid({
 const option_buttons = create_option_buttons()
 
 const player_turn_handler = create_player_turn_handler({battle_grid, action_log, initiative_order, option_buttons})
-
-const ATTRIBUTES = {
-        STRENGTH: "str",
-        CONSTITUTION: "con",
-        DEXTERITY: "dex",
-        INTELLIGENCE: "int",
-        WISDOM: "wis",
-        CHARISMA: "cha",
-    } as const
 
 ;(window as any).init_demo = () => {
     const bob = build_character({
@@ -98,9 +90,9 @@ const ATTRIBUTES = {
     player_turn_handler.start()
 }
 
-const build_character = (data:
-                             Omit<Partial<CreatureData>, "position"> &
-                             Pick<CreatureData, "name" | "position">): CreatureData => {
+const build_character = (
+data: Omit<Partial<CreatureData>, "position"> & Pick<CreatureData, "name" | "position">
+): CreatureData => {
     return {
         name: data.name,
         position: data.position,
@@ -123,3 +115,21 @@ battle_grid.visual.addOnMouseMoveHandler(coordinate => {
 battle_grid.visual.addOnClickHandler(coordinate => {
     player_turn_handler.on_click({coordinate})
 })
+
+const build_monster = (
+data: Omit<Partial<CreatureData>, "position"> & Pick<CreatureData, "name" | "position">
+): CreatureData => {
+    return {
+        name: data.name,
+        position: data.position,
+        size: data.size ?? "medium",
+        image: data.image ?? `url("/public/saber-and-pistol.svg")`,
+        movement: data.movement ?? 5,
+        hp_current: data.hp_current ?? 10,
+        hp_max: data.hp_max ?? 10,
+        level: data.level ?? 1,
+        team: data.team ?? null,
+        attributes: data.attributes ?? Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
+        powers: data.powers ?? []
+    }
+}

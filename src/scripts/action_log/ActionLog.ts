@@ -1,7 +1,7 @@
 import {Expr, ExprNumberResolved} from "scripts/expressions/evaluator/types";
 
-export class ActionLog {
-    add_new_action_log = (...text: Array<string | Expr>) => {
+export const create_action_log = (): ActionLog => ({
+    add_new_action_log: (...text: Array<string | Expr>) => {
         const action_log = document.querySelector("#action_log")!
 
         const action_log_entry = document.createElement("div");
@@ -51,6 +51,10 @@ export class ActionLog {
 
         action_log.appendChild(action_log_entry)
     }
+})
+
+export type ActionLog = {
+    add_new_action_log: (...text: Array<string | Expr>) => void
 }
 
 const is_typed = (entry: string | Expr): entry is Expr => {
