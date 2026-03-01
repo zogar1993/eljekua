@@ -1,16 +1,20 @@
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {roll_d} from "scripts/randomness/dice";
-import {CreatureInitiativeVisual, InitiativeOrderVisual} from "scripts/initiative_order/InitiativeOrderVisual";
 import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {insert_to_array} from "scripts/ts_utils/insert_to_array";
+import {InitiativeEntryVisual} from "scripts/initiative_order/InitiativeEntryVisual";
 
-export const create_initiative_order = ({visual_initiative_order}: {
-    visual_initiative_order: InitiativeOrderVisual
+export const create_initiative_order = ({create_initiative_entry_visual}: {
+    create_initiative_entry_visual: (props: {
+        creature: Creature,
+        initiative: ExprNumberResolved,
+        index: number
+    }) => InitiativeEntryVisual
 }) => {
     let initiatives: Array<{
         creature: Creature,
         initiative: ExprNumberResolved,
-        visual: CreatureInitiativeVisual
+        visual: InitiativeEntryVisual
     }> = []
     let current_index = 0
 
@@ -26,9 +30,9 @@ export const create_initiative_order = ({visual_initiative_order}: {
                 break
             index++
         }
-        const visual_creature = visual_initiative_order.create_creature({creature, initiative, index})
-        const new_entry = {creature, initiative, visual: visual_creature}
-        insert_to_array(initiatives, new_entry, index)
+        const visual_initiative_entry = create_initiative_entry_visual({creature, initiative, index})
+        const new_entry = {creature, initiative, visual: visual_initiative_entry}
+        initiatives = insert_to_array(initiatives, new_entry, index)
     }
 
     const get_current_creature = (): Creature => {

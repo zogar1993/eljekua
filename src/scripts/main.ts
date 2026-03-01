@@ -10,12 +10,11 @@ import {FIGHTER_POWERS} from "scripts/powers/fighter";
 import {WIZARD_POWERS} from "scripts/powers/wizard";
 import type {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {create_initiative_order} from "scripts/initiative_order/InitiativeOrder";
-import {create_visual_initiative_order} from "scripts/initiative_order/InitiativeOrderVisual";
 import {create_option_buttons} from "scripts/battlegrid/OptionButtons";
 import {ATTRIBUTES} from "scripts/character_sheet/attributes";
+import {create_initiative_entry_visual} from "scripts/initiative_order/InitiativeEntryVisual";
 
-const visual_initiative_order = create_visual_initiative_order()
-const initiative_order = create_initiative_order({visual_initiative_order})
+const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
 
 const battle_grid = create_battle_grid({
