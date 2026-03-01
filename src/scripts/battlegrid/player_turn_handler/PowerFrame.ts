@@ -1,12 +1,12 @@
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {assert} from "scripts/assert";
-import {Expr} from "scripts/expressions/evaluator/types";7
+import {Expr} from "scripts/expressions/evaluator/types";
 import {HIT_STATUS, HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {Instruction} from "scripts/expressions/parser/instructions";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 
-export const create_power_frame = ({name, instructions, owner}: {
-    name: string,
+export const create_power_frame = ({power_name, instructions, owner}: {
+    power_name: string,
     instructions: Array<Instruction>,
     owner: Creature
 }): PowerFrame => {
@@ -47,7 +47,8 @@ export const create_power_frame = ({name, instructions, owner}: {
     const get_variable = (name: string): Expr => {
         const variable = self.variables.get(name)
         //TODO P3 make error handling smoother everywhere
-        if (!variable) throw Error(`variable ${name} not found in context. Context: ${JSON.stringify(self.variables, null, 2)}`)
+        if (!variable)
+            throw Error(`variable '${name}' not found in context. Context: ${to_formatted_json_string(self.variables)}. Power: '${power_name}.'`)
         return variable
     }
 
@@ -61,7 +62,7 @@ export const create_power_frame = ({name, instructions, owner}: {
         has_variable,
         add_instructions,
         get_variable,
-        power_name: name,
+        power_name,
     }
 }
 
@@ -75,3 +76,5 @@ export type PowerFrame = {
     get_variable: (name: string) => Expr
     power_name: string
 }
+
+const to_formatted_json_string = (obj: object) => JSON.stringify(obj, null, 2)
