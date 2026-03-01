@@ -68,7 +68,6 @@ export const create_player_turn_handler = ({
     const turn_state = create_turn_state()
     const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
 
-    let started = false
     let selection_context: PlayerTurnHandlerContextSelect | null = null
 
     const set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => {
@@ -120,7 +119,6 @@ export const create_player_turn_handler = ({
     }
 
     const start = () => {
-        started = true
         initiative_order.start()
         const creature = initiative_order.get_current_creature()
         run_start_of_turn_hooks({current_turn_creature: creature, battle_grid})
