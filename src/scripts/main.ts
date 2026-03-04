@@ -10,7 +10,8 @@ import {FIGHTER_POWERS} from "scripts/powers/fighter";
 import {WIZARD_POWERS} from "scripts/powers/wizard";
 import type {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {create_initiative_order} from "scripts/initiative_order/InitiativeOrder";
-import {create_option_buttons} from "scripts/battlegrid/OptionButtons";
+import {create_option_buttons} from "scripts/battlegrid/option_buttons/OptionButtons";
+import {create_option_button_visual} from "scripts/battlegrid/option_buttons/OptionButtonVisual";
 import {ATTRIBUTES} from "scripts/character_sheet/attributes";
 import {create_initiative_entry_visual} from "scripts/initiative_order/InitiativeEntryVisual";
 
@@ -24,7 +25,7 @@ const battle_grid = create_battle_grid({
     size: {x: 10, y: 10}
 })
 
-const option_buttons = create_option_buttons()
+const option_buttons = create_option_buttons({create_option_button_visual})
 
 const player_turn_handler = create_player_turn_handler({battle_grid, action_log, initiative_order, option_buttons})
 

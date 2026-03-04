@@ -26,7 +26,7 @@ import {
 } from "scripts/battlegrid/coordinates/ClickableCoordinate";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
-import {ButtonOption, OptionButtons} from "scripts/battlegrid/OptionButtons";
+import {OptionButton, OptionButtons} from "scripts/battlegrid/option_buttons/OptionButtons";
 import {
     run_start_of_turn_hooks
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_end_turn";
@@ -51,7 +51,7 @@ export type PlayerTurnHandlerContextSelectPosition = {
 
 type PlayerTurnHandlerContextSelectOption = {
     type: "option_select"
-    available_options: Array<ButtonOption>
+    available_options: Array<OptionButton>
 }
 
 export const create_player_turn_handler = ({
