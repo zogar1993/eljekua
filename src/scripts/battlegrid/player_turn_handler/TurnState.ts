@@ -14,7 +14,7 @@ export const create_turn_state = (): TurnState => {
         owner: Creature
         variables?: Record<string, Expr>
     }) => {
-        const power_frame = create_power_frame({instructions, name, owner})
+        const power_frame = create_power_frame({instructions, power_name: name, owner})
         for (const [key, value] of Object.entries(variables))
             power_frame.set_variable(key, value)
         power_frames.push(power_frame)
