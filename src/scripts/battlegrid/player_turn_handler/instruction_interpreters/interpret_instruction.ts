@@ -30,9 +30,6 @@ import {
     interpret_add_powers_as_options
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_add_powers_as_options";
 import {
-    interpret_set_power_frame_hit_status
-} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_set_power_frame_hit_status";
-import {
     interpret_apply_status
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_apply_status";
 import {
@@ -68,8 +65,6 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             return interpret_add_powers_as_options({...props, instruction})
         case "execute_power":
             return interpret_execute_power({...props, instruction})
-        case "set_power_frame_hit_status":
-            return interpret_set_power_frame_hit_status({...props, instruction})
         case "apply_status":
             return interpret_apply_status({...props, instruction})
         case "expend_action":

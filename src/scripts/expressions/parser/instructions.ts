@@ -1,7 +1,6 @@
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
 import {StatusDurationValue} from "scripts/types";
-import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {ActionType} from "scripts/battlegrid/creatures/ActionType";
 
 export type InstructionAttackRoll = {
@@ -73,11 +72,6 @@ export type InstructionForceMovement = {
     destination: AstNode
 }
 
-export type InstructionSetPowerFrameHitStatus = {
-    type: "set_power_frame_hit_status"
-    value: HitStatus
-}
-
 export type InstructionApplyStatus = {
     type: "apply_status",
     target: AstNode,
@@ -107,7 +101,6 @@ export type Instruction =
     InstructionSaveResolvedNumber |
     InstructionAddPowers |
     InstructionExecutePower |
-    InstructionSetPowerFrameHitStatus |
     InstructionApplyStatus |
     InstructionForceMovement |
     InstructionExpendAction |
