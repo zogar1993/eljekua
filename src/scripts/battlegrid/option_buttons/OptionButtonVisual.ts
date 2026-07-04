@@ -13,7 +13,7 @@ export const create_option_button_visual = (option: OptionButton): OptionButtonV
     html_element.appendChild(button)
 
     return {
-        remove: () => html_element.remove()
+        remove: () => button.remove()
     }
 }
 
