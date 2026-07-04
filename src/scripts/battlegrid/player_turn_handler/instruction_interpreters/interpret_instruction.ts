@@ -41,57 +41,41 @@ import {
 import {Instruction} from "scripts/expressions/parser/instructions";
 import {interpret_end_turn} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_end_turn";
 
-export const interpret_instruction = (props: InterpretInstructionProps<Instruction>) => {
+export const interpret_instruction = (props: InterpretInstructionProps<Instruction>): void => {
     const {instruction} = props
     switch (instruction.type) {
         case "select_target":
-            interpret_select_target({...props, instruction})
-            break
+            return interpret_select_target({...props, instruction})
         case "attack_roll":
-            interpret_attack_roll({...props, instruction})
-            break
+            return interpret_attack_roll({...props, instruction})
         case "apply_damage":
-            interpret_apply_damage({...props, instruction})
-            break
+            return interpret_apply_damage({...props, instruction})
         case "move":
-            interpret_move({...props, instruction})
-            break
+            return interpret_move({...props, instruction})
         case "shift":
-            interpret_shift({...props, instruction})
-            break
+            return interpret_shift({...props, instruction})
         case "force_movement":
-            interpret_force_movement({...props, instruction})
-            break
+            return interpret_force_movement({...props, instruction})
         case "save_variable":
-            interpret_save_variable({...props, instruction})
-            break
+            return interpret_save_variable({...props, instruction})
         case "save_number_as_resolved":
-            interpret_save_number_as_resolved({...props, instruction})
-            break
+            return interpret_save_number_as_resolved({...props, instruction})
         case "options":
-            interpret_options({...props, instruction})
-            break;
+            return interpret_options({...props, instruction})
         case "condition":
-            interpret_condition({...props, instruction})
-            break
+            return interpret_condition({...props, instruction})
         case "add_powers":
-            interpret_add_powers({...props, instruction})
-            break
+            return interpret_add_powers({...props, instruction})
         case "execute_power":
-            interpret_execute_power({...props, instruction})
-            break
+            return interpret_execute_power({...props, instruction})
         case "set_power_frame_hit_status":
-            interpret_set_power_frame_hit_status({...props, instruction})
-            break
+            return interpret_set_power_frame_hit_status({...props, instruction})
         case "apply_status":
-            interpret_apply_status({...props, instruction})
-            break
+            return interpret_apply_status({...props, instruction})
         case "expend_action":
-            interpret_expend_action({...props, instruction})
-            break
+            return interpret_expend_action({...props, instruction})
         case "end_turn":
-            interpret_end_turn({...props, instruction})
-            break
+            return interpret_end_turn({...props, instruction})
         default:
             throw Error("instruction not implemented " + JSON.stringify(instruction))
     }
