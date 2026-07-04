@@ -1,32 +1,37 @@
-import {get_reach_adjacent} from "scripts/battlegrid/position/get_reach_adjacent";
-import {BASIC_ATTACK_ACTIONS} from "scripts/powers/basic";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {Expr} from "scripts/expressions/evaluator/types";
-import {ACTION_TYPE} from "scripts/battlegrid/creatures/ActionType";
 import {Instruction, InstructionMovement} from "scripts/expressions/parser/instructions";
-import {remove_from_array} from "scripts/ts_utils/remove_from_array";
 
 export const interpret_move = ({
                                    instruction,
                                    battle_grid,
                                    turn_state,
+                                   evaluate_ast,
                                }: InterpretInstructionProps<InstructionMovement>) => {
     const mover_creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
     const destination_label = instruction.destination
     const path = EXPR.as_positions(turn_state.get_variable(destination_label))
+    turn_state.set_variable("trigger_activator", {type: "creatures", value: [mover_creature]})
+
 
     for (let i = 0; i < path.length - 1; i++) {
-        const current_position = path[i]
-        const potential_attackers = [...new Set(
-            get_reach_adjacent({origin: current_position, battle_grid})
-                .filter(p => battle_grid.is_terrain_occupied(p))
-                .map(battle_grid.get_creature_by_position)
+        const potential_attackers =
+            battle_grid.creatures
                 .filter(creature => creature !== mover_creature)
-                .filter(creature => creature.has_action_available(ACTION_TYPE.OPPORTUNITY))
-        )]
+                .map(creature => {
+                    turn_state.set_variable("trigger_owner", {type: "creatures", value: [creature]})
+                    const powers = creature.data.powers.filter(power => {
+                        if (!power.trigger) return false
+                        if (!power.trigger.intercepts.includes("movement")) return false
+                        if (!creature.has_action_available(power.type.action)) return false
+                        return power.trigger.conditions.every(condition => EXPR.as_boolean(evaluate_ast(condition)))
+                    })
+                    return {creature, powers}
+                })
+                .filter(({powers}) => powers.length > 0)
 
         if (potential_attackers.length === 0) {
             const new_position = path[i + 1]
@@ -43,51 +48,29 @@ export const interpret_move = ({
                 destination: instruction.destination
             }])
 
-            for (const attacker of potential_attackers) {
-                //TODO P1 allow for any attack that can be a melee basic attack
-                const instructions = turn_power_into_opportunity_attack(BASIC_ATTACK_ACTIONS[0].instructions)
-                const name = BASIC_ATTACK_ACTIONS[0].name
 
-                const variables: Record<string, Expr> = {"primary_target": {type: "creatures", value: [mover_creature]}}
-                turn_state.add_power_frame({name, instructions, owner: attacker, variables})
+            for (const {creature: attacker, powers} of potential_attackers) {
+                const instructions: Array<Instruction> = [
+                    {
+                        type: "options",
+                        options: [
+                            ...powers.map(power => ({
+                                text: power.name,
+                                instructions: power.instructions
+                            })),
+                            {
+                                //TODO AP2 make it so that we can forgo opportunity attack for a whole movement
+                                text: "Ignore",
+                                instructions: []
+                            }
+                        ]
+                    },
+                ]
+                const variables: Record<string, Expr> = {"triggerer": {type: "creatures", value: [mover_creature]}}
+                turn_state.add_power_frame({name: "Select Trigger", instructions, owner: attacker, variables})
             }
 
             break
         }
     }
 }
-
-const turn_power_into_opportunity_attack = (instructions: Array<Instruction>) => {
-    let new_instructions = instructions
-    new_instructions = exclude_first_instruction_of_type(new_instructions, "expend_action")
-    new_instructions = exclude_first_instruction_of_type(new_instructions, "select_target")
-    return add_option_for_opportunity_attack(new_instructions)
-}
-
-const exclude_first_instruction_of_type = (instructions: Array<Instruction>, type: Instruction["type"]) => {
-    const i = instructions.findIndex(instruction => instruction.type === type)
-    if (i === -1) throw Error(`instruction of type "${type}" not found`)
-    return remove_from_array(instructions, i)
-}
-
-const add_option_for_opportunity_attack = (instructions: Array<Instruction>): Array<Instruction> => [
-    {
-        type: "options",
-        options: [
-            {
-                text: "Opportunity Attack",
-                instructions: [
-                    {type: "expend_action", action_type: ACTION_TYPE.OPPORTUNITY},
-                    ...instructions
-                ]
-            },
-            {
-                text: "Ignore",
-                instructions: [
-                    //TODO AP2 make it so that we can forgo opportunity attack for a whole movement
-                    {type: "expend_action", action_type: ACTION_TYPE.OPPORTUNITY},
-                ]
-            },
-        ],
-    }
-]

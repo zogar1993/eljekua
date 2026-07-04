@@ -80,8 +80,8 @@ const opportunity_attack: Power = {
         type: "interruption",
         intercepts: ["movement"],
         conditions: [
-            `$is_lower_or_equal($distance(triggerer,owner),$opportunity_attack_range(owner))`,
-            `$are_enemies(triggerer,owner)`,
+            `$is_lower_or_equal($distance(trigger_activator,trigger_owner),$opportunity_attack_range(trigger_owner))`,
+            `$are_enemies(trigger_activator,trigger_owner)`,
         ],
     },
     effect: [

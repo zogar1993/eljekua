@@ -27,9 +27,16 @@ export const transform_power_ir_into_vm_representation = (power: Power): PowerVM
     if (power.type.action === "opportunity" && power.trigger === undefined)
         throw Error(`Power '${power.name}' does not have a trigger defined despite being an opportunity action`)
 
+    if (power.trigger) {
+        if (power.type.action !== "opportunity")
+            throw Error(`Power '${power.name}' with trigger needs to be of type 'opportunity'.`)
+        //TODO P4 check that no owner can be set on conditions so that we avoid confusing the trigger owner with the triggering power owner
+    }
+
     return {
         name: power.name,
         description: power.description,
+        targeting: power.targeting ? transform_select_target_ir(power.targeting) : null,
         trigger: power.trigger ? transform_trigger(power.trigger) : null,
         type: {
             ...power.type,
@@ -48,6 +55,7 @@ export type PowerVM = {
         attack: boolean
         traits: Array<"melee_basic_attack">
     }
+    targeting: InstructionSelectTarget | null
     trigger: Trigger | null
     instructions: Array<Instruction>
 }
