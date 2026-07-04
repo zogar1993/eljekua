@@ -132,3 +132,5 @@ data: Omit<Partial<CreatureData>, "position"> & Pick<CreatureData, "name" | "pos
         powers: data.powers ?? []
     }
 }
+
+(window as any).init_demo()
