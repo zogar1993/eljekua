@@ -20,5 +20,6 @@ export const AST = {
 
 export const SYSTEM_KEYWORD = {
     OWNER: "owner",
-    HIT_STATUS: "hit_status"
+    HIT_STATUS: "hit_status",
+    EXCLUDED_FROM_REACTING: "excluded_from_reacting"
 } as const

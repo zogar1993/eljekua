@@ -4,6 +4,7 @@ import {
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {Instruction, InstructionMovement} from "scripts/expressions/parser/instructions";
+import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 
 export const interpret_move = ({
                                    instruction,
@@ -16,11 +17,17 @@ export const interpret_move = ({
     const path = EXPR.as_positions(turn_state.get_variable(destination_label))
     turn_state.set_variable("trigger_activator", {type: "creatures", value: [mover_creature]})
 
-
     for (let i = 0; i < path.length - 1; i++) {
+        // We exclude the ones who already were potential attackers for this power.
+        // This is a little redundant in most cases, but without it, we wouldn't
+        // disregard those who ignored the chance to make an opportunity attack.
+        const excluded = turn_state.has_variable(SYSTEM_KEYWORD.EXCLUDED_FROM_REACTING) ?
+            EXPR.as_creatures(turn_state.get_variable(SYSTEM_KEYWORD.EXCLUDED_FROM_REACTING)) : []
+
         const potential_attackers =
             battle_grid.creatures
                 .filter(creature => creature !== mover_creature)
+                .filter(creature => !excluded.includes(creature))
                 .map(creature => {
                     turn_state.set_variable("trigger_owner", {type: "creatures", value: [creature]})
                     const powers = creature.data.powers.filter(power => {
@@ -32,6 +39,9 @@ export const interpret_move = ({
                     return {creature, powers}
                 })
                 .filter(({powers}) => powers.length > 0)
+
+        const new_excluded = [...excluded, ...potential_attackers.map(({creature}) => creature)]
+        turn_state.set_variable(SYSTEM_KEYWORD.EXCLUDED_FROM_REACTING, {type: "creatures", value: new_excluded})
 
         if (potential_attackers.length === 0) {
             const new_position = path[i + 1]
@@ -59,7 +69,6 @@ export const interpret_move = ({
                                 instructions: power.instructions
                             })),
                             {
-                                //TODO AP2 make it so that we can forgo opportunity attack for a whole movement
                                 text: "Ignore",
                                 instructions: []
                             }
