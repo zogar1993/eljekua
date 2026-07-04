@@ -70,7 +70,7 @@ export type IRInstruction =
     label: string
 } | IRInstructionApplyStatus
  | {
-    type: "add_powers"
+    type: "add_powers_as_options"
     creature: string,
     cost: "normal" | "opportunity",
     filter: "turn" | "melee_basic_attack"

@@ -85,7 +85,7 @@ const opportunity_attack: Power = {
         ],
     },
     effect: [
-        {type: "add_powers", creature: "owner", cost: "opportunity", filter: "melee_basic_attack"}
+        {type: "add_powers_as_options", creature: "owner", cost: "opportunity", filter: "melee_basic_attack"}
     ]
 }
 

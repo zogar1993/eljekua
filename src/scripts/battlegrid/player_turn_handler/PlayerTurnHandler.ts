@@ -233,7 +233,7 @@ export const create_player_turn_handler = ({
 
             if (instruction === null) {
                 const instruction: InstructionAddPowers = {
-                    type: "add_powers",
+                    type: "add_powers_as_options",
                     creature: AST.OWNER,
                     cost: "normal",
                     filter: "turn"

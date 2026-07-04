@@ -161,9 +161,9 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 duration: typeof instruction.duration === "string" ? [instruction.duration] : instruction.duration,
                 status: transform_apply_status_ir(instruction)
             }]
-        case "add_powers":
+        case "add_powers_as_options":
             return [{
-                type: "add_powers",
+                type: "add_powers_as_options",
                 cost: instruction.cost,
                 filter: instruction.filter,
                 creature: to_ast(instruction.creature)
