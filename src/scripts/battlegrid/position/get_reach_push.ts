@@ -18,7 +18,6 @@ export const get_reach_push = ({anchor, defender, distance, battle_grid}: {
         const evaluating = next_ring
         for (const position of evaluating) {
             const distance = distance_between_positions(position, anchor)
-            console.log(position, distance)
             const adjacent = get_reach_adjacent({origin: position, battle_grid})
             const exclude_occupied = adjacent.filter(x => !battle_grid.is_terrain_occupied(x, {exclude: [defender]}))
             const exclude_visited = exclude_occupied.filter(a => visited.every(v => !positions_of_same_footprint_equal(a, v)))
