@@ -3,7 +3,7 @@ import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {AnimationQueue} from "scripts/AnimationQueue";
 import type {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {ACTION_TYPE_EXPENDITURE_ORDER, ActionType} from "scripts/battlegrid/creatures/ActionType";
-import {remove_from_array} from "scripts/ts_utils/remove_from_array";
+import {remove_from_array_by_index} from "scripts/ts_utils/remove_from_array_by_index";
 
 export class Creature {
     visual: CreatureVisual
@@ -59,7 +59,7 @@ export class Creature {
             const index = this.available_actions.indexOf(expenditure)
 
             if (index >= 0) {
-                this.available_actions = remove_from_array(this.available_actions, index)
+                this.available_actions = remove_from_array_by_index(this.available_actions, index)
                 return
             }
         }
