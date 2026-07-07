@@ -14,6 +14,7 @@ import {create_option_buttons} from "scripts/battlegrid/option_buttons/OptionBut
 import {create_option_button_visual} from "scripts/battlegrid/option_buttons/OptionButtonVisual";
 import {ATTRIBUTES} from "scripts/character_sheet/attributes";
 import {create_initiative_entry_visual} from "scripts/initiative_order/InitiativeEntryVisual";
+import {create_add_creature_to_game} from "scripts/use_cases/add_creature_to_game";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
@@ -28,6 +29,8 @@ const battle_grid = create_battle_grid({
 const option_buttons = create_option_buttons({create_option_button_visual})
 
 const player_turn_handler = create_player_turn_handler({battle_grid, action_log, initiative_order, option_buttons})
+
+const add_creature = create_add_creature_to_game({battle_grid, initiative_order})
 
 ;(window as any).init_demo = () => {
     const bob = build_character({
@@ -73,16 +76,16 @@ const player_turn_handler = create_player_turn_handler({battle_grid, action_log,
         size: "large"
     })
 
-    player_turn_handler.add_creature(bob)
-    player_turn_handler.add_creature(maik)
-    player_turn_handler.add_creature(yeims)
-    player_turn_handler.add_creature(jenri)
+    add_creature({data: bob})
+    add_creature({data: maik})
+    add_creature({data: yeims})
+    add_creature({data: jenri})
 
     player_turn_handler.start()
 }
 
 ;(window as any).add_character = (data: CreatureData) => {
-    player_turn_handler.add_creature(data)
+    add_creature({data})
 }
 
 ;(window as any).start = () => {

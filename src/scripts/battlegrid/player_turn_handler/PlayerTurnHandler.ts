@@ -112,12 +112,6 @@ export const create_player_turn_handler = ({
         return selection_context
     }
 
-
-    const add_creature = (data: CreatureData) => {
-        const creature = battle_grid.create_creature(data)
-        initiative_order.add_creature(creature)
-    }
-
     const start = () => {
         initiative_order.start()
         const creature = initiative_order.get_current_creature()
@@ -219,7 +213,6 @@ export const create_player_turn_handler = ({
         set_awaiting_option_selection,
         get_position_selection_context,
         get_position_selection_context_or_null,
-        add_creature,
         start,
         on_click,
         on_hover,
@@ -262,7 +255,6 @@ export type PlayerTurnHandler = {
     set_awaiting_option_selection: (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => void
     get_position_selection_context: () => PlayerTurnHandlerContextSelectPosition
     get_position_selection_context_or_null: () => PlayerTurnHandlerContextSelectPosition | null
-    add_creature: (data: CreatureData) => void
     start: () => void
     on_click: ({coordinate}: { coordinate: ClickableCoordinate }) => void
     on_hover: ({coordinate}: { coordinate: ClickableCoordinate | null }) => void
