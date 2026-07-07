@@ -14,7 +14,6 @@ import {
     interpret_instruction
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
-import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 import {bound_minmax} from "scripts/ts_utils/bound_minmax";
