@@ -164,7 +164,7 @@ const wait_until = (
         return reject(err);
       }
       if (timeout != null && Date.now() - start >= timeout) {
-        return reject(new Error("waitFor: timed out"));
+        return reject(new Error("wait_for: timed out"));
       }
       setTimeout(check, interval);
     };
