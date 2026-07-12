@@ -14,18 +14,29 @@ import {create_add_creature_to_game} from "scripts/use_cases/add_creature_to_gam
 import {create_start_battle} from "scripts/use_cases/start_battle";
 import {create_set_current_turn_to_creature} from "scripts/use_cases/set_current_turn_to_creature";
 import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnState";
+import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
+import {create_instruction_loop} from "scripts/instruction_loop";
 
 const turn_state = create_turn_state();
 const battle_grid = create_battle_grid({...dependency_mocks, create_battle_grid_visual, size: {x: 10, y: 10}})
 const initiative_order = create_initiative_order({...dependency_mocks})
 const option_buttons = create_option_buttons({create_option_button_visual})
+const evaluate_ast = build_evaluate_ast({turn_state, battle_grid})
 const player_turn_handler = create_player_turn_handler({
     ...dependency_mocks,
     battle_grid,
     initiative_order,
     option_buttons,
-    turn_state
+    turn_state,
+    evaluate_ast
 })
+const instruction_loop = create_instruction_loop({
+    ...dependency_mocks,
+    initiative_order,
+    evaluate_ast,
+    turn_state,
+    battle_grid,
+    player_turn_handler})
 
 battle_grid.visual.addOnMouseMoveHandler(coordinate => {
     player_turn_handler.on_hover({coordinate})
@@ -36,7 +47,7 @@ battle_grid.visual.addOnClickHandler(coordinate => {
 })
 
 const add_creature_to_game = create_add_creature_to_game({battle_grid, initiative_order})
-const start_battle = create_start_battle({battle_grid, initiative_order, player_turn_handler})
+const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop})
 const set_current_turn_to_creature = create_set_current_turn_to_creature({
     player_turn_handler,
     initiative_order,
@@ -44,16 +55,16 @@ const set_current_turn_to_creature = create_set_current_turn_to_creature({
 })
 
 describe("when an enemy leaves a space adjacent to a creature", () => {
-    test(`the creature can perform an opportunity attack`, () => {
+    test(`the creature can perform an opportunity attack`, async () => {
         given_a_creature_is_created({name: "linuar", team: 1, position: {x: 0, y: 0, footprint: 1}})
         given_a_creature_is_created({name: "ragoz", team: 2, position: {x: 1, y: 0, footprint: 1}})
         start_battle()
         given_creature("ragoz").is_in_its_turn()
 
-        when_creature("ragoz").moves_to({x: 2, y: 0})
+        await when_creature("ragoz").moves_to({x: 2, y: 0})
 
-        then_creature("ragoz").is_at_position({x: 1, y: 0}) //hasn't moved yet
-        then_creature("linuar").has_action("Opportunity Attack")
+        await then_creature("ragoz").is_at_position({x: 1, y: 0}) //hasn't moved yet
+        await then_creature("linuar").has_action("Opportunity Attack")
     })
 })
 
@@ -113,8 +124,10 @@ const when_creature = (creature_name: string) => {
     if (!creature) throw Error(`creature name "${creature_name}" not found`)
 
     return {
-        moves_to: (position: Omit<Position, "footprint">) => {
+        moves_to: async (position: Omit<Position, "footprint">) => {
+            await wait_until(() => player_turn_handler.get_selection_context()?.type === "option_select")
             option_buttons_test_ui.click("Move")
+            await wait_until(() => player_turn_handler.get_selection_context()?.type === "position_select")
             battle_grid_test_ui.click(position)
         }
     }
@@ -126,12 +139,35 @@ const then_creature = (creature_name: string) => {
     if (!creature) throw Error(`creature name "${creature_name}" not found`)
 
     return {
-        is_at_position: (position: Omit<Position, "footprint">) => {
+        is_at_position: async (position: Omit<Position, "footprint">) => {
             expect(creature.data.position).toEqual({...position, footprint: 1})
         },
-        has_action(action_name: string) {
-            expect(turn_state.get_power_owner()).toEqual(creature)
+        has_action: async (action_name: string) => {
+            await wait_until(() => turn_state.get_power_owner() === creature)
             expect(option_buttons_test_ui.has_button(action_name)).toEqual(true)
         }
     }
+}
+
+const wait_until = (
+  condition: () => boolean | Promise<boolean>,
+): Promise<void> => {
+    const interval = 20
+    const timeout = 1000
+
+  const start = Date.now();
+  return new Promise((resolve, reject) => {
+    const check = async () => {
+      try {
+        if (await condition()) return resolve();
+      } catch (err) {
+        return reject(err);
+      }
+      if (timeout != null && Date.now() - start >= timeout) {
+        return reject(new Error("waitFor: timed out"));
+      }
+      setTimeout(check, interval);
+    };
+    check();
+  });
 }

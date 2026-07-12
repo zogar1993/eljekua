@@ -23,5 +23,4 @@ export const create_set_current_turn_to_creature = (
     run_start_of_turn_hooks({current_turn_creature: initiative_order.get_current_creature(), battle_grid})
 
     player_turn_handler.set_action_selection_for_current_character()
-    player_turn_handler.evaluate_instructions()
 }
