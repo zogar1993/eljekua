@@ -1,5 +1,4 @@
 import {Creature} from "scripts/battlegrid/creatures/Creature";
-import {roll_d} from "scripts/randomness/dice";
 import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {insert_to_array} from "scripts/ts_utils/insert_to_array";
 import {InitiativeEntryVisual} from "scripts/initiative_order/InitiativeEntryVisual";
@@ -10,7 +9,7 @@ export const create_initiative_order = ({create_initiative_entry_visual}: {
         initiative: ExprNumberResolved,
         index: number
     }) => InitiativeEntryVisual
-}) => {
+}): InitiativeOrder => {
     let initiatives: Array<{
         creature: Creature,
         initiative: ExprNumberResolved,
@@ -18,10 +17,8 @@ export const create_initiative_order = ({create_initiative_entry_visual}: {
     }> = []
     let current_index = 0
 
-    const add_creature = (creature: Creature) => {
-        //TODO contemplate current creature changing mid turn?
+    const add_entry = ({creature, initiative}: {creature: Creature, initiative: ExprNumberResolved}) => {
         //TODO contemplate same initiative
-        const initiative = roll_d(20)
 
         let index = 0
         while (index < initiatives.length) {
@@ -54,8 +51,16 @@ export const create_initiative_order = ({create_initiative_entry_visual}: {
         initiatives[current_index].visual.set_current_turn(true)
     }
 
+    const set_current_turn = (creature: Creature) => {
+        const index = initiatives.findIndex(entry => creature === entry.creature)
+        initiatives[current_index].visual.set_current_turn(false)
+        current_index = index
+        initiatives[current_index].visual.set_current_turn(false)
+    }
+
     return {
-        add_creature,
+        add_entry,
+        set_current_turn,
         get_current_creature,
         next_turn,
         start
@@ -63,7 +68,8 @@ export const create_initiative_order = ({create_initiative_entry_visual}: {
 }
 
 export type InitiativeOrder = {
-    add_creature: (creature: Creature) => void
+    add_entry: (props: {creature: Creature, initiative: ExprNumberResolved}) => void
+    set_current_turn: (creature: Creature) => void
     get_current_creature: () => Creature
     next_turn: () => void
     start: () => void
