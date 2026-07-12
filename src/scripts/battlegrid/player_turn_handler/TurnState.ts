@@ -70,8 +70,13 @@ export const create_turn_state = (): TurnState => {
         frame.add_instructions(instructions)
     }
 
+    const clear = () => {
+        power_frames = []
+    }
+
     return {
         add_power_frame,
+        clear,
 
         peek_instruction,
         next_instruction,
@@ -101,4 +106,5 @@ export type TurnState = {
     has_variable: (name: string) => boolean,
     set_variable: (name: string, value: Expr) => void
     add_instructions: (instructions: Array<Instruction>) => void
+    clear: () => void
 }

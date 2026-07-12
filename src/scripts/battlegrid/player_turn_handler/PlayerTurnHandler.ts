@@ -26,9 +26,6 @@ import {
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {OptionButton, OptionButtons} from "scripts/battlegrid/option_buttons/OptionButtons";
-import {
-    run_start_of_turn_hooks
-} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_end_turn";
 import {AST} from "scripts/expressions/parser/AST_NODE";
 import {InstructionAddPowers} from "scripts/expressions/parser/instructions";
 
@@ -109,13 +106,6 @@ export const create_player_turn_handler = ({
     const get_position_selection_context_or_null = (): PlayerTurnHandlerContextSelectPosition | null => {
         if (selection_context?.type !== "position_select") return null
         return selection_context
-    }
-
-    const start = () => {
-        initiative_order.start()
-        const creature = initiative_order.get_current_creature()
-        run_start_of_turn_hooks({current_turn_creature: creature, battle_grid})
-        evaluate_instructions()
     }
 
     const on_click = ({coordinate}: { coordinate: ClickableCoordinate }) => {
@@ -207,16 +197,22 @@ export const create_player_turn_handler = ({
         selection_context = null
     }
 
+    const clear_turn_state = () => {
+        turn_state.clear()
+    }
+
     const player_turn_handler: PlayerTurnHandler = {
         set_awaiting_position_selection,
         set_awaiting_option_selection,
         get_position_selection_context,
         get_position_selection_context_or_null,
-        start,
         on_click,
         on_hover,
         set_selected_indicator,
         deselect,
+        clear_turn_state,
+        //TODO extract instructions from player turn handler
+        evaluate_instructions: () => {}
     }
 
     const evaluate_instructions = () => {
@@ -245,6 +241,7 @@ export const create_player_turn_handler = ({
             }
         }
     }
+    player_turn_handler.evaluate_instructions = evaluate_instructions
 
     return player_turn_handler
 }
@@ -254,11 +251,12 @@ export type PlayerTurnHandler = {
     set_awaiting_option_selection: (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => void
     get_position_selection_context: () => PlayerTurnHandlerContextSelectPosition
     get_position_selection_context_or_null: () => PlayerTurnHandlerContextSelectPosition | null
-    start: () => void
     on_click: ({coordinate}: { coordinate: ClickableCoordinate }) => void
     on_hover: ({coordinate}: { coordinate: ClickableCoordinate | null }) => void
     set_selected_indicator: () => void
     deselect: () => void
+    clear_turn_state: () => void
+    evaluate_instructions: () => void
 }
 
 const show_attack_success_chance_if_needed = ({turn_state, selection_context, evaluate_ast}: {
