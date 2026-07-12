@@ -2,7 +2,6 @@ import type {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
-import type {PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import type {StatusDuration, StatusEffect} from "scripts/battlegrid/creatures/Creature";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
