@@ -130,7 +130,7 @@ const then_creature = (creature_name: string) => {
             expect(creature.data.position).toEqual({...position, footprint: 1})
         },
         has_action(action_name: string) {
-            //TODO add creature assosiation to triggerer
+            expect(turn_state.get_power_owner()).toEqual(creature)
             expect(option_buttons_test_ui.has_button(action_name)).toEqual(true)
         }
     }
