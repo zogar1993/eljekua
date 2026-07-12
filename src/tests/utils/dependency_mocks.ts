@@ -3,7 +3,6 @@ import {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {BattleGridVisual} from "scripts/battlegrid/BattleGridVisual";
 import {ActionLog} from "scripts/action_log/ActionLog";
 import {InitiativeEntryVisual} from "scripts/initiative_order/InitiativeEntryVisual";
-import {OptionButtonVisual} from "scripts/battlegrid/option_buttons/OptionButtonVisual";
 
 const create_visual_creature = (): CreatureVisual => ({
     place_at: jest.fn(),
@@ -29,10 +28,6 @@ const create_initiative_entry_visual = (): InitiativeEntryVisual => ({
     set_current_turn: jest.fn()
 })
 
-const create_option_button_visual = (): OptionButtonVisual => ({
-    remove: jest.fn(),
-})
-
 const action_log: ActionLog = {
     add_new_action_log: jest.fn
 }
@@ -42,6 +37,5 @@ export const dependency_mocks = {
     create_visual_creature,
     create_battle_grid_visual,
     create_initiative_entry_visual,
-    create_option_button_visual,
     action_log,
 }
