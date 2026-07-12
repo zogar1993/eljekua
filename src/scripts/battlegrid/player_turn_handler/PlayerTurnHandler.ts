@@ -47,14 +47,12 @@ type PlayerTurnHandlerContextSelectOption = {
 
 export const create_player_turn_handler = ({
                                                battle_grid,
-                                               action_log,
                                                initiative_order,
                                                option_buttons,
                                                turn_state,
                                                evaluate_ast
                                            }: {
     battle_grid: BattleGrid,
-    action_log: ActionLog,
     initiative_order: InitiativeOrder,
     option_buttons: OptionButtons
     turn_state: TurnState
