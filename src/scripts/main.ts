@@ -16,6 +16,7 @@ import {ATTRIBUTES} from "scripts/character_sheet/attributes";
 import {create_initiative_entry_visual} from "scripts/initiative_order/InitiativeEntryVisual";
 import {create_add_creature_to_game} from "scripts/use_cases/add_creature_to_game";
 import {create_start_battle} from "scripts/use_cases/start_battle";
+import {create_set_current_turn_to_creature} from "scripts/use_cases/set_current_turn_to_creature";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
@@ -33,10 +34,15 @@ const player_turn_handler = create_player_turn_handler({battle_grid, action_log,
 
 const add_creature = create_add_creature_to_game({battle_grid, initiative_order})
 const start_battle = create_start_battle({player_turn_handler, battle_grid, initiative_order})
+const set_current_turn_to_creature = create_set_current_turn_to_creature({
+        player_turn_handler,
+        initiative_order,
+        battle_grid
+    })
 
 ;(window as any).init_demo = () => {
     const bob = build_character({
-        name: "Bob",
+        name: "axe",
         position: {x: 1, y: 2, footprint: 1},
         image: `url("/public/war-axe.svg")`,
         movement: 5,
@@ -48,7 +54,7 @@ const start_battle = create_start_battle({player_turn_handler, battle_grid, init
         team: 1
     })
     const maik = build_character({
-        name: "Maik",
+        name: "staff",
         position: {x: 0, y: 1, footprint: 1},
         image: `url("/public/wizard-staff.svg")`,
         movement: 2,
@@ -60,7 +66,7 @@ const start_battle = create_start_battle({player_turn_handler, battle_grid, init
         team: 1
     })
     const yeims = build_character({
-        name: "Yeims",
+        name: "crossbow",
         position: {x: 1, y: 0, footprint: 1},
         image: `url("/public/crossbow.svg")`,
         movement: 10,
@@ -73,9 +79,10 @@ const start_battle = create_start_battle({player_turn_handler, battle_grid, init
     })
 
     const jenri = build_character({
-        name: "Jenri",
+        name: "pirate",
         position: {x: 7, y: 7, footprint: 2},
-        size: "large"
+        size: "large",
+        image: `url("/public/saber-and-pistol.svg")`,
     })
 
     add_creature({data: bob})
@@ -94,8 +101,17 @@ const start_battle = create_start_battle({player_turn_handler, battle_grid, init
     start_battle()
 }
 
+;(window as any).set_current_turn = (name: string) => {
+    const creature = battle_grid.creatures.find(creature => creature.data.name === name)
+    if (!creature) {
+        console.log(`Creature with name '${name}' not found`)
+        return
+    }
+    set_current_turn_to_creature({creature})
+}
+
 const build_character = (
-data: Omit<Partial<CreatureData>, "position"> & Pick<CreatureData, "name" | "position">
+    data: Omit<Partial<CreatureData>, "position"> & Pick<CreatureData, "name" | "position">
 ): CreatureData => {
     return {
         name: data.name,
@@ -121,7 +137,7 @@ battle_grid.visual.addOnClickHandler(coordinate => {
 })
 
 const build_monster = (
-data: Omit<Partial<CreatureData>, "position"> & Pick<CreatureData, "name" | "position">
+    data: Omit<Partial<CreatureData>, "position"> & Pick<CreatureData, "name" | "position">
 ): CreatureData => {
     return {
         name: data.name,

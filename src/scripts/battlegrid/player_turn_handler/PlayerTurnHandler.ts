@@ -27,7 +27,6 @@ import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {OptionButton, OptionButtons} from "scripts/battlegrid/option_buttons/OptionButtons";
 import {AST} from "scripts/expressions/parser/AST_NODE";
-import {InstructionAddPowers} from "scripts/expressions/parser/instructions";
 
 type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
@@ -198,7 +197,19 @@ export const create_player_turn_handler = ({
     }
 
     const clear_turn_state = () => {
+        deselect()
         turn_state.clear()
+    }
+
+    function set_action_selection_for_current_character() {
+        const instruction = {
+            type: "add_powers_as_options",
+            creature: AST.OWNER,
+            cost: "normal",
+            filter: "turn"
+        } as const
+        const owner = initiative_order.get_current_creature()
+        turn_state.add_power_frame({name: "Action Selection", instructions: [instruction], owner})
     }
 
     const player_turn_handler: PlayerTurnHandler = {
@@ -211,8 +222,10 @@ export const create_player_turn_handler = ({
         set_selected_indicator,
         deselect,
         clear_turn_state,
+        set_action_selection_for_current_character,
         //TODO extract instructions from player turn handler
-        evaluate_instructions: () => {}
+        evaluate_instructions: () => {
+        }
     }
 
     const evaluate_instructions = () => {
@@ -220,14 +233,7 @@ export const create_player_turn_handler = ({
             const instruction = turn_state.next_instruction()
 
             if (instruction === null) {
-                const instruction: InstructionAddPowers = {
-                    type: "add_powers_as_options",
-                    creature: AST.OWNER,
-                    cost: "normal",
-                    filter: "turn"
-                }
-                const owner = initiative_order.get_current_creature()
-                turn_state.add_power_frame({name: "Action Selection", instructions: [instruction], owner})
+                set_action_selection_for_current_character();
             } else {
                 interpret_instruction({
                     instruction,
@@ -256,6 +262,7 @@ export type PlayerTurnHandler = {
     set_selected_indicator: () => void
     deselect: () => void
     clear_turn_state: () => void
+    set_action_selection_for_current_character: () => void
     evaluate_instructions: () => void
 }
 
