@@ -55,9 +55,13 @@ const set_current_turn_to_creature = create_set_current_turn_to_creature({
 })
 
 describe("when an enemy leaves a space adjacent to a creature", () => {
-    test(`the creature can perform an opportunity attack`, async () => {
+    test(`the creature can perform an opportunity attack to it`, async () => {
+        // Both ragoz and calendula are next to linuar.
+        // When ragoz moves, the opportunity attack should target him automatically.
+        // The reason for calendula being here is so we have multiple basic attack valid targets
         given_a_creature_is_created({name: "linuar", team: 1, position: {x: 0, y: 0, footprint: 1}})
         given_a_creature_is_created({name: "ragoz", team: 2, position: {x: 1, y: 0, footprint: 1}})
+        given_a_creature_is_created({name: "calendula", team: 2, position: {x: 1, y: 1, footprint: 1}})
         start_battle()
         given_creature("ragoz").is_in_its_turn()
 
@@ -65,6 +69,13 @@ describe("when an enemy leaves a space adjacent to a creature", () => {
 
         await then_creature("ragoz").is_at_position({x: 1, y: 0}) //hasn't moved yet
         await then_creature("linuar").has_action("Opportunity Attack")
+
+        await when_creature("linuar").selects_action("Opportunity Attack")
+        await when_creature("linuar").selects_action("Melee Basic Attack")
+
+        await then_creature("linuar").has_performed_action("Melee Basic Attack", {target: "ragoz"})
+
+        await then_creature("ragoz").is_at_position({x: 2, y: 0})
     })
 })
 
@@ -129,6 +140,10 @@ const when_creature = (creature_name: string) => {
             option_buttons_test_ui.click("Move")
             await wait_until(() => player_turn_handler.get_selection_context()?.type === "position_select")
             battle_grid_test_ui.click(position)
+        },
+        selects_action: async (action_name: string) => {
+            await wait_until(() => player_turn_handler.get_selection_context()?.type === "option_select")
+            option_buttons_test_ui.click(action_name)
         }
     }
 }
@@ -145,6 +160,9 @@ const then_creature = (creature_name: string) => {
         has_action: async (action_name: string) => {
             await wait_until(() => turn_state.get_power_owner() === creature)
             expect(option_buttons_test_ui.has_button(action_name)).toEqual(true)
+        },
+        has_performed_action: async (action_name: string, options: any) => {
+            throw Error("'has_performed_action' has not been implemented yet")
         }
     }
 }
