@@ -18,6 +18,8 @@ import {create_add_creature_to_game} from "scripts/use_cases/add_creature_to_gam
 import {create_start_battle} from "scripts/use_cases/start_battle";
 import {create_set_current_turn_to_creature} from "scripts/use_cases/set_current_turn_to_creature";
 import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnState";
+import {create_instruction_loop} from "scripts/instruction_loop";
+import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
@@ -32,21 +34,33 @@ const battle_grid = create_battle_grid({
 
 const option_buttons = create_option_buttons({create_option_button_visual})
 
+const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
+
 const player_turn_handler = create_player_turn_handler({
     battle_grid,
     action_log,
     initiative_order,
     option_buttons,
-    turn_state
+    turn_state,
+    evaluate_ast,
 })
 
-const add_creature = create_add_creature_to_game({battle_grid, initiative_order})
-const start_battle = create_start_battle({player_turn_handler, battle_grid, initiative_order})
-const set_current_turn_to_creature = create_set_current_turn_to_creature({
+const instruction_loop = create_instruction_loop({
         player_turn_handler,
-        initiative_order,
-        battle_grid
+        battle_grid,
+        action_log,
+        turn_state,
+        evaluate_ast,
+        initiative_order
     })
+
+const add_creature = create_add_creature_to_game({battle_grid, initiative_order})
+const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop})
+const set_current_turn_to_creature = create_set_current_turn_to_creature({
+    player_turn_handler,
+    initiative_order,
+    battle_grid
+})
 
 ;(window as any).init_demo = () => {
     const bob = build_character({

@@ -7,12 +7,8 @@ import {
     transform_positions_to_f1
 } from "scripts/battlegrid/Position";
 import {ActionLog} from "scripts/action_log/ActionLog";
-import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {TurnState} from "scripts/battlegrid/player_turn_handler/TurnState";
-import {
-    interpret_instruction
-} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
@@ -55,15 +51,15 @@ export const create_player_turn_handler = ({
                                                initiative_order,
                                                option_buttons,
                                                turn_state,
+                                               evaluate_ast
                                            }: {
     battle_grid: BattleGrid,
     action_log: ActionLog,
     initiative_order: InitiativeOrder,
     option_buttons: OptionButtons
     turn_state: TurnState
+    evaluate_ast: (expr: AstNode) => Expr
 }): PlayerTurnHandler => {
-    const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
-
     let selection_context: PlayerTurnHandlerContextSelect | null = null
 
     const set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => {
@@ -90,7 +86,6 @@ export const create_player_turn_handler = ({
             on_click: () => {
                 option.on_click()
                 deselect()
-                evaluate_instructions()
             }
         }))
 
@@ -131,7 +126,6 @@ export const create_player_turn_handler = ({
             })
 
         deselect()
-        evaluate_instructions()
     }
 
     let latest_position: Position | null = null
@@ -213,7 +207,11 @@ export const create_player_turn_handler = ({
         turn_state.add_power_frame({name: "Action Selection", instructions: [instruction], owner})
     }
 
-    const player_turn_handler: PlayerTurnHandler = {
+    function get_selection_context() {
+        return selection_context
+    }
+
+    return {
         set_awaiting_position_selection,
         set_awaiting_option_selection,
         get_position_selection_context,
@@ -224,33 +222,8 @@ export const create_player_turn_handler = ({
         deselect,
         clear_turn_state,
         set_action_selection_for_current_character,
-        //TODO extract instructions from player turn handler
-        evaluate_instructions: () => {
-        }
+        get_selection_context
     }
-
-    const evaluate_instructions = () => {
-        while (selection_context === null) {
-            const instruction = turn_state.next_instruction()
-
-            if (instruction === null) {
-                set_action_selection_for_current_character();
-            } else {
-                interpret_instruction({
-                    instruction,
-                    player_turn_handler,
-                    battle_grid,
-                    action_log,
-                    turn_state,
-                    evaluate_ast,
-                    initiative_order
-                })
-            }
-        }
-    }
-    player_turn_handler.evaluate_instructions = evaluate_instructions
-
-    return player_turn_handler
 }
 
 export type PlayerTurnHandler = {
@@ -264,7 +237,7 @@ export type PlayerTurnHandler = {
     deselect: () => void
     clear_turn_state: () => void
     set_action_selection_for_current_character: () => void
-    evaluate_instructions: () => void
+    get_selection_context: () => PlayerTurnHandlerContextSelect | null
 }
 
 const show_attack_success_chance_if_needed = ({turn_state, selection_context, evaluate_ast}: {
