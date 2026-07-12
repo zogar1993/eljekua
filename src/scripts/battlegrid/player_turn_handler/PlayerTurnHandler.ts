@@ -53,14 +53,15 @@ export const create_player_turn_handler = ({
                                                battle_grid,
                                                action_log,
                                                initiative_order,
-                                               option_buttons
+                                               option_buttons,
+                                               turn_state,
                                            }: {
     battle_grid: BattleGrid,
     action_log: ActionLog,
     initiative_order: InitiativeOrder,
     option_buttons: OptionButtons
+    turn_state: TurnState
 }): PlayerTurnHandler => {
-    const turn_state = create_turn_state()
     const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
 
     let selection_context: PlayerTurnHandlerContextSelect | null = null

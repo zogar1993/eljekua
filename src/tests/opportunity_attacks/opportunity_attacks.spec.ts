@@ -13,7 +13,9 @@ import {create_battle_grid_visual, battle_grid_test_ui} from "tests/utils/battle
 import {create_add_creature_to_game} from "scripts/use_cases/add_creature_to_game";
 import {create_start_battle} from "scripts/use_cases/start_battle";
 import {create_set_current_turn_to_creature} from "scripts/use_cases/set_current_turn_to_creature";
+import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnState";
 
+const turn_state = create_turn_state();
 const battle_grid = create_battle_grid({...dependency_mocks, create_battle_grid_visual, size: {x: 10, y: 10}})
 const initiative_order = create_initiative_order({...dependency_mocks})
 const option_buttons = create_option_buttons({create_option_button_visual})
@@ -21,7 +23,8 @@ const player_turn_handler = create_player_turn_handler({
     ...dependency_mocks,
     battle_grid,
     initiative_order,
-    option_buttons
+    option_buttons,
+    turn_state
 })
 
 battle_grid.visual.addOnMouseMoveHandler(coordinate => {

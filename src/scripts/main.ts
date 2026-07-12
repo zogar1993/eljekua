@@ -17,9 +17,11 @@ import {create_initiative_entry_visual} from "scripts/initiative_order/Initiativ
 import {create_add_creature_to_game} from "scripts/use_cases/add_creature_to_game";
 import {create_start_battle} from "scripts/use_cases/start_battle";
 import {create_set_current_turn_to_creature} from "scripts/use_cases/set_current_turn_to_creature";
+import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnState";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
+const turn_state = create_turn_state()
 
 const battle_grid = create_battle_grid({
     create_visual_square,
@@ -30,7 +32,13 @@ const battle_grid = create_battle_grid({
 
 const option_buttons = create_option_buttons({create_option_button_visual})
 
-const player_turn_handler = create_player_turn_handler({battle_grid, action_log, initiative_order, option_buttons})
+const player_turn_handler = create_player_turn_handler({
+    battle_grid,
+    action_log,
+    initiative_order,
+    option_buttons,
+    turn_state
+})
 
 const add_creature = create_add_creature_to_game({battle_grid, initiative_order})
 const start_battle = create_start_battle({player_turn_handler, battle_grid, initiative_order})
