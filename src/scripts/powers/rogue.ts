@@ -1,4 +1,4 @@
-import {Power} from "scripts/types";
+import {IRPower} from "scripts/types";
 import {transform_power_ir_into_vm_representation} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
 const sly_flourish = {
@@ -26,7 +26,7 @@ const sly_flourish = {
     },
 }
 
-const piercing_strike: Power = {
+const piercing_strike: IRPower = {
     name: "Piercing Strike",
     description: "You drive your weapon past your foe's guard and into a tender spot.",
     type: {

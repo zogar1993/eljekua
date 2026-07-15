@@ -1,5 +1,5 @@
 import {to_ast} from "scripts/expressions/parser/to_ast";
-import type {IRInstruction, IRInstructionApplyStatus, IRInstructionSelectTarget, Power} from "scripts/types";
+import type {IRInstruction, IRInstructionApplyStatus, IRInstructionSelectTarget, IRPower} from "scripts/types";
 import {ATTRIBUTE_CODES} from "scripts/character_sheet/attributes";
 import {
     Instruction,
@@ -13,7 +13,7 @@ import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
-export const transform_power_ir_into_vm_representation = (power: Power): PowerVM => {
+export const transform_power_ir_into_vm_representation = (power: IRPower): PowerVM => {
     const instructions: Array<Instruction> = [
         ...(power.damage ? transform_primary_damage(power.damage) : []),
         ...(power.targeting ? [transform_select_target_ir(power.targeting)] : []),
@@ -66,7 +66,7 @@ export type Trigger = {
     conditions: Array<AstNode>
 }
 
-const transform_primary_roll = (roll: Required<Power>["roll"]): InstructionAttackRoll => {
+const transform_primary_roll = (roll: Required<IRPower>["roll"]): InstructionAttackRoll => {
     return {
         type: "attack_roll",
         attack: to_ast(standardize_attack(roll.attack)),
@@ -173,7 +173,7 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
     }
 }
 
-const transform_primary_damage = (damage: NonNullable<Power["damage"]>): Array<Instruction> => {
+const transform_primary_damage = (damage: NonNullable<IRPower["damage"]>): Array<Instruction> => {
     return [
         {
             type: "save_variable",
@@ -203,7 +203,7 @@ const transform_primary_damage = (damage: NonNullable<Power["damage"]>): Array<I
     ]
 }
 
-const transform_trigger = (trigger: NonNullable<Power["trigger"]>): Trigger => {
+const transform_trigger = (trigger: NonNullable<IRPower["trigger"]>): Trigger => {
     return {
         type: trigger.type,
         intercepts: trigger.intercepts,

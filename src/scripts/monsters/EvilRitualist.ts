@@ -1,7 +1,7 @@
 import {Size} from "scripts/creatures/SIZES";
 import {AttributeCode} from "scripts/character_sheet/attributes";
 import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
-import {Power} from "scripts/types";
+import {IRPower} from "scripts/types";
 
 const evil_ritualist: any = {
     template: "Evil Ritualist",
@@ -88,7 +88,7 @@ type Monster = {
     hp: number //TODO P1 a missed attack never damages a minion.
     defenses: Record<DefenseCode, number>
     speed: number
-    powers: Power
+    powers: IRPower
     attributes: Record<AttributeCode, number>
     triggers: [
         {

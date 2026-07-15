@@ -1,7 +1,7 @@
 import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
 import {ActionType} from "scripts/battlegrid/creatures/ActionType";
 
-export type Power = {
+export type IRPower = {
     name: string
     description?: string
     keywords?: Array<"Invigorating" | "Martial" | "Weapon">

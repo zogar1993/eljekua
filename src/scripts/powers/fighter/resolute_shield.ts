@@ -1,6 +1,6 @@
-import type {Power} from "scripts/types";
+import type {IRPower} from "scripts/types";
 
-export const power_resolute_shield: Power = {
+export const power_resolute_shield: IRPower = {
     name: "Resolute Shield",
     description: "As you slash into your foe, you pull your shield into a defensive position between the two of you, guaranteeing that it absorbs at least some of your enemy's attack.",
     keywords: ["Martial", "Weapon"],

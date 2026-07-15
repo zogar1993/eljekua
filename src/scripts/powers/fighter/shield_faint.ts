@@ -1,6 +1,6 @@
-import type {Power} from "scripts/types";
+import type {IRPower} from "scripts/types";
 
-export const power_shield_faint: Power = {
+export const power_shield_faint: IRPower = {
     name: "Shield Feint",
     description: "With subtle movements and misdirection, you use your shield to keep your opponent unsure about your next attack.",
     keywords: ["Martial", "Weapon"],

@@ -1,11 +1,11 @@
-import type {Power} from "scripts/types";
+import type {IRPower} from "scripts/types";
 import {
     transform_power_ir_into_vm_representation
 } from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {power_resolute_shield} from "scripts/powers/fighter/resolute_shield";
 import {power_shield_faint} from "scripts/powers/fighter/shield_faint";
 
-const sure_strike: Power = {
+const sure_strike: IRPower = {
     name: "Sure Strike",
     description: "You trade power for precision.",
     type: {
@@ -31,7 +31,7 @@ const sure_strike: Power = {
     },
 }
 
-const cleave: Power = {
+const cleave: IRPower = {
     name: "Cleave",
     description: "You hit one enemy, then cleave into another.",
     type: {
@@ -76,7 +76,7 @@ const cleave: Power = {
     },
 }
 
-const reaping_strike: Power = {
+const reaping_strike: IRPower = {
     name: "Reaping Strike",
     description: "You punctuate your scything attacks with wicked jabs and small cutting blows that slip through your enemy's defenses.",
     type: {
@@ -123,7 +123,7 @@ const reaping_strike: Power = {
     },
 }
 
-const tide_of_iron: Power = {
+const tide_of_iron: IRPower = {
     name: "Tide of Iron",
     description: "You punctuate your scything attacks with wicked jabs and small cutting blows that slip through your enemy's defenses.",
     type: {
@@ -208,7 +208,7 @@ const tide_of_iron: Power = {
     },
 }
 
-const brash_strike: Power = {
+const brash_strike: IRPower = {
     name: "Brash Strike",
     description: "With a battle cry, you throw your whole body behind your attack.",
     type: {
@@ -256,7 +256,7 @@ const brash_strike: Power = {
     ]
 }
 
-const crushing_surge: Power = {
+const crushing_surge: IRPower = {
     name: "Crushing Surge",
     description: "The feel of your weapon crunching against the enemy puts your heart back in the fight.",
     keywords: ["Invigorating", "Martial", "Weapon"],

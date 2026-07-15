@@ -1,9 +1,9 @@
-import type {Power} from "scripts/types.ts";
+import type {IRPower} from "scripts/types.ts";
 import {
     transform_power_ir_into_vm_representation
 } from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
-const shift: Power = {
+const shift: IRPower = {
     name: "Shift",
     type: {
         action: "movement",
@@ -23,7 +23,7 @@ const shift: Power = {
     ]
 }
 
-const movement: Power = {
+const movement: IRPower = {
     name: "Move",
     type: {
         action: "movement",
@@ -43,7 +43,7 @@ const movement: Power = {
     ]
 }
 
-const melee_basic_attack: Power = {
+const melee_basic_attack: IRPower = {
     name: "Melee Basic Attack",
     type: {
         action: "standard",
@@ -69,7 +69,7 @@ const melee_basic_attack: Power = {
     },
 }
 
-const opportunity_attack: Power = {
+const opportunity_attack: IRPower = {
     name: "Opportunity Attack",
     type: {
         action: "opportunity",

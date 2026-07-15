@@ -1,9 +1,9 @@
-import {Power} from "scripts/types";
+import {IRPower} from "scripts/types";
 import {
     transform_power_ir_into_vm_representation
 } from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
-const magic_missile: Power = {
+const magic_missile: IRPower = {
     name: "Magic Missile",
     type: {
         action: "standard",
@@ -26,7 +26,7 @@ const magic_missile: Power = {
     ]
 }
 
-const scorching_burst: Power = {
+const scorching_burst: IRPower = {
     name: "Scorching Burst",
     description: "You create a vertical column of golden flames that burns all within.",
     type: {
