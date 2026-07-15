@@ -5,7 +5,7 @@ import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {Instruction, InstructionAddPowers, InstructionOptionsItem} from "scripts/expressions/parser/instructions";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {TURN_ACTION_TYPES} from "scripts/battlegrid/creatures/ActionType";
-import {PowerVM} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import {Power} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
 export const interpret_add_powers_as_options = ({
                                                     instruction,
@@ -61,7 +61,7 @@ export const interpret_add_powers_as_options = ({
     }])
 }
 
-const filter_powers = ({powers, filter}: { powers: Array<PowerVM>, filter: InstructionAddPowers["filter"] }) => {
+const filter_powers = ({powers, filter}: { powers: Array<Power>, filter: InstructionAddPowers["filter"] }) => {
     switch (filter) {
         case "turn":
             return powers.filter(power => TURN_ACTION_TYPES.includes(power.type.action))

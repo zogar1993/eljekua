@@ -1,6 +1,6 @@
 import type {Creature} from "scripts/battlegrid/creatures/Creature";
 import type {Position} from "scripts/battlegrid/Position";
-import {PowerVM} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import {Power} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
 export type Expr =
     ExprNumber
@@ -54,5 +54,5 @@ export type ExprPositions = {
 
 export type ExprPower = {
     type: "power"
-    value: PowerVM
+    value: Power
 }

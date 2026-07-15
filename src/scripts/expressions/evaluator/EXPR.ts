@@ -1,7 +1,7 @@
 import {Expr, ExprNumber, ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Position} from "scripts/battlegrid/Position";
-import {PowerVM} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import {Power} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 
 export const EXPR = {
     as_creature: (expr: Expr): Creature => {
@@ -42,7 +42,7 @@ export const EXPR = {
         if (expr.type === "string") return expr.value
         return throw_could_not_cast({expr, to: "string"})
     },
-    as_power: (expr: Expr): PowerVM => {
+    as_power: (expr: Expr): Power => {
         if (expr.type === "power") return expr.value
         return throw_could_not_cast({expr, to: "power"})
     },

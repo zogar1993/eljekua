@@ -1,5 +1,5 @@
 import type {Position} from "scripts/battlegrid/Position";
-import type {PowerVM} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import type {Power} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import type {AttributeCode} from "scripts/character_sheet/attributes";
 import type {Size} from "scripts/creatures/SIZES";
 
@@ -14,5 +14,5 @@ export type CreatureData = {
     hp_current: number
     hp_max: number
     team: number | null
-    powers: Array<PowerVM>
+    powers: Array<Power>
 }

@@ -13,7 +13,7 @@ import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
-export const transform_power_ir_into_vm_representation = (power: IRPower): PowerVM => {
+export const transform_power_ir_into_vm_representation = (power: IRPower): Power => {
     const instructions: Array<Instruction> = [
         ...(power.damage ? transform_primary_damage(power.damage) : []),
         ...(power.targeting ? [transform_select_target_ir(power.targeting)] : []),
@@ -45,8 +45,7 @@ export const transform_power_ir_into_vm_representation = (power: IRPower): Power
         instructions: instructions
     }
 }
-//TODO P4 rename power vm so that it is power
-export type PowerVM = {
+export type Power = {
     name: string
     description?: string
     type: {
