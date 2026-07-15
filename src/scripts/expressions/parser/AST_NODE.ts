@@ -14,12 +14,12 @@ export const AST_NODE = {
     }
 }
 
-export const AST = {
-    OWNER: to_ast("owner")
-} as const
-
 export const SYSTEM_KEYWORD = {
     OWNER: "owner",
     HIT_STATUS: "hit_status",
     EXCLUDED_FROM_REACTING: "excluded_from_reacting"
+} as const
+
+export const AST = {
+    OWNER: to_ast(SYSTEM_KEYWORD.OWNER)
 } as const
