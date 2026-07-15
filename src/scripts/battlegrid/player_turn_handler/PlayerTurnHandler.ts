@@ -6,7 +6,6 @@ import {
     transform_position_to_f1,
     transform_positions_to_f1
 } from "scripts/battlegrid/Position";
-import {ActionLog} from "scripts/action_log/ActionLog";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {TurnState} from "scripts/battlegrid/player_turn_handler/TurnState";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
