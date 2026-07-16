@@ -75,7 +75,7 @@ export const interpret_move = ({
                         ]
                     },
                 ]
-                const variables: Record<string, Expr> = {"triggerer": {type: "creatures", value: [mover_creature]}}
+                const variables: Record<string, Expr> = {[SYSTEM_KEYWORD.TRIGGERER]: {type: "creatures", value: [mover_creature]}}
                 turn_state.add_power_frame({name: "Select Trigger", instructions, owner: attacker, variables})
             }
 

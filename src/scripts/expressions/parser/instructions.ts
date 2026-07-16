@@ -62,7 +62,8 @@ export type InstructionAddPowers = {
 
 export type InstructionExecutePower = {
     type: "execute_power",
-    power: string
+    power: string,
+    initialization?: Array<{from: string, to: string}>,
 }
 
 export type InstructionForceMovement = {

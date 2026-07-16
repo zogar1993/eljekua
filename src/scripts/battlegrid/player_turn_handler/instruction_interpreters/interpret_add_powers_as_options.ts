@@ -6,6 +6,8 @@ import {Instruction, InstructionAddPowers, InstructionOptionsItem} from "scripts
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {TURN_ACTION_TYPES} from "scripts/battlegrid/creatures/ActionType";
 import {Power} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import {remove_from_array_by_index} from "scripts/ts_utils/remove_from_array_by_index";
+import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 
 export const interpret_add_powers_as_options = ({
                                                     instruction,
@@ -19,10 +21,15 @@ export const interpret_add_powers_as_options = ({
 
     for (const power of filtered_powers) {
         const power_name = `power_${power.name.replaceAll(" ", "_").toLowerCase()}`
-        const action_type_cost = instruction.cost === "opportunity" ? "opportunity" : power.type.action
+        const is_opportunity_attack = instruction.cost === "opportunity"
+        const action_type_cost = is_opportunity_attack ? "opportunity" : power.type.action
+        const initialization = is_opportunity_attack ? [{
+            from: SYSTEM_KEYWORD.TRIGGERER,
+            to: SYSTEM_KEYWORD.PRIMARY_TARGET
+        }] : []
         const instructions: Array<Instruction> = [
             {type: "expend_action", action_type: action_type_cost},
-            {type: "execute_power", power: power_name}
+            {type: "execute_power", power: power_name, initialization}
         ]
         const condition: AstNode = {
             type: "function",
@@ -41,7 +48,13 @@ export const interpret_add_powers_as_options = ({
             ]
         }
 
-        turn_state.set_variable(power_name, {type: "power", value: power})
+        if (is_opportunity_attack) {
+            const modified_power = {...power, instructions: remove_default_targeting_instruction(power.instructions)}
+            turn_state.set_variable(power_name, {type: "power", value: modified_power})
+        } else {
+            turn_state.set_variable(power_name, {type: "power", value: power})
+        }
+
         options.push({text: power.name, instructions, condition})
     }
 
@@ -70,4 +83,13 @@ const filter_powers = ({powers, filter}: { powers: Array<Power>, filter: Instruc
         default:
             throw Error(`Can't filter but trait '${filter}'`)
     }
+}
+
+const remove_default_targeting_instruction = (instructions: Array<Instruction>) => {
+    const index = instructions.findIndex(instruction =>
+        instruction.type === "select_target" &&
+        instruction.target_label === SYSTEM_KEYWORD.PRIMARY_TARGET
+    )
+    if (index === -1) return instructions
+    return remove_from_array_by_index(instructions, index)
 }
