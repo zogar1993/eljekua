@@ -3,7 +3,52 @@ import {AttributeCode} from "scripts/character_sheet/attributes";
 import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
 import {IRPower} from "scripts/types";
 
-const evil_ritualist: any = {
+const sacrificial_dagger: IRPower = {
+    name: "Sacrificial Dagger",
+    type: {
+        action: "standard",
+        cooldown: "at-will",
+        attack: true,
+    },
+    targeting: {
+        targeting_type: "melee_weapon",
+        target_type: "enemy",
+        amount: 1
+    },
+    roll: {
+        attack: "6",
+        defense: "ac",
+        hit: [
+            {
+                type: "apply_damage",
+                value: "4",
+                target: "primary_target"
+            }
+        ]
+    },
+}
+
+const unholy_vigor: IRPower = {
+    name: "Unholy Vigor",
+    type: {
+        action: "opportunity",
+        cooldown: "at-will",
+        attack: true,
+    },
+    trigger: {
+        type: "reaction",
+        intercepts: ["critical_hit"],
+        conditions: [
+            `$is_lower_or_equal($distance($triggerer(),owner),5)`,
+            `$or($is_ally($triggerer()),$is_monster_template(owner.template))`,
+        ],
+    },
+    effect: [
+        {type: "add_powers_as_options", creature: "owner", cost: "free_attack", filter: "melee_basic_attack"}
+    ]
+}
+
+const evil_ritualist: Monster = {
     template: "Evil Ritualist",
     size: "medium",
     race: "human",
@@ -26,30 +71,9 @@ const evil_ritualist: any = {
     },
     speed: 6,
     powers: [
-        {
-            name: "Sacrificial Dagger",
-            type: {
-                action: "standard",
-                cooldown: "at-will",
-                attack: true,
-            },
-            targeting: {
-                targeting_type: "melee_weapon",
-                target_type: "enemy",
-                amount: 1
-            },
-            roll: {
-                attack: "6",
-                defense: "ac",
-                hit: [
-                    {
-                        type: "apply_damage",
-                        value: "4",
-                        target: "primary_target"
-                    }
-                ]
-            },
-        }
+        sacrificial_dagger,
+unholy_vigor
+
     ],
     attributes: {
         str: 10,
@@ -58,19 +82,7 @@ const evil_ritualist: any = {
         int: 10,
         wis: 10,
         cha: 10
-    },
-    triggers: [
-        {
-            name: "Unholy Vigor",
-            type: "immediate_reaction",
-            intercepts: "critical_hit",
-            conditions: [
-                `$is_lower_or_equal($distance($triggerer(),owner),5)`,
-                `$or($is_ally($triggerer()),$is_monster_template(owner.template))`,
-            ]
-            //TODO P1 melee basic attack against an adjacent enemy
-        }
-    ]
+    }
 }
 
 type Monster = {
@@ -88,17 +100,6 @@ type Monster = {
     hp: number
     defenses: Record<DefenseCode, number>
     speed: number
-    powers: IRPower
+    powers: Array<IRPower>
     attributes: Record<AttributeCode, number>
-    triggers: [
-        {
-            name: "Unholy Vigor",
-            type: "immediate_reaction",
-            intercepts: "critical_hit",
-            conditions: [
-                `$is_lower_or_equal($distance(triggerer,owner),5)`,
-                `$or($is_ally(triggerer),$is_monster_template(owner.template))`,
-            ]
-        }
-    ]
 }
