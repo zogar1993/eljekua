@@ -85,7 +85,7 @@ type Monster = {
     senses: Record<string, number>
     alignment: string
     languages: Array<string>
-    hp: number //TODO P1 a missed attack never damages a minion.
+    hp: number
     defenses: Record<DefenseCode, number>
     speed: number
     powers: IRPower
@@ -96,10 +96,9 @@ type Monster = {
             type: "immediate_reaction",
             intercepts: "critical_hit",
             conditions: [
-                `$is_lower_or_equal($distance($triggerer(),owner),5)`,
-                `$or($is_ally($triggerer()),$is_monster_template(owner.template))`,
+                `$is_lower_or_equal($distance(triggerer,owner),5)`,
+                `$or($is_ally(triggerer),$is_monster_template(owner.template))`,
             ]
-            //TODO P1 melee basic attack against an adjacent enemy
         }
     ]
 }
