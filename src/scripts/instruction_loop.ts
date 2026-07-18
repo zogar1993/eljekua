@@ -8,6 +8,7 @@ import type {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import type {Expr} from "scripts/expressions/evaluator/types";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {ActionLog} from "scripts/action_log/ActionLog";
+import {InstructionVisualizer} from "scripts/instruction_visualizer/instruction_visualizer";
 
 export const create_instruction_loop = ({
                                            player_turn_handler,
@@ -15,7 +16,8 @@ export const create_instruction_loop = ({
                                            battle_grid,
                                            action_log,
                                            evaluate_ast,
-                                           initiative_order
+                                           initiative_order,
+                                           instruction_visualizer
                                        }: {
     player_turn_handler: PlayerTurnHandler,
     turn_state: TurnState,
@@ -23,10 +25,11 @@ export const create_instruction_loop = ({
     action_log: ActionLog,
     evaluate_ast: (node: AstNode) => Expr,
     initiative_order: InitiativeOrder
-
+    instruction_visualizer: InstructionVisualizer
 }) => {
     const evaluate_instructions = () => {
         while (player_turn_handler.get_selection_context() === null) {
+            instruction_visualizer.show(turn_state)
             const instruction = turn_state.next_instruction()
 
             if (instruction === null) {

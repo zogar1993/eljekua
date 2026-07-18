@@ -54,6 +54,9 @@ export const create_power_frame = ({power_name, instructions, owner}: {
 
     set_variable(SYSTEM_KEYWORD.OWNER, {type: "creatures", value: [owner]})
 
+    const get_instructions = (): Array<Instruction> => self.instructions
+    const get_variables = (): Map<string, Expr> => self.variables
+
     return {
         set_variable,
         peek_instruction,
@@ -63,6 +66,8 @@ export const create_power_frame = ({power_name, instructions, owner}: {
         add_instructions,
         get_variable,
         power_name,
+        get_instructions,
+        get_variables
     }
 }
 
@@ -75,6 +80,10 @@ export type PowerFrame = {
     add_instructions: (instructions: Array<Instruction>) => void
     get_variable: (name: string) => Expr
     power_name: string
+
+    //TODO this is ugly, separate church from state
+    get_instructions: () => Array<Instruction>
+    get_variables: () => Map<string, Expr>
 }
 
 const to_formatted_json_string = (obj: object) => JSON.stringify(obj, null, 2)

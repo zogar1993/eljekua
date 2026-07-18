@@ -74,6 +74,8 @@ export const create_turn_state = (): TurnState => {
         power_frames = []
     }
 
+    const get_power_frames = () => power_frames
+
     return {
         add_power_frame,
         clear,
@@ -88,6 +90,7 @@ export const create_turn_state = (): TurnState => {
         get_variable,
         set_variable,
         has_variable,
+        get_power_frames
     }
 }
 
@@ -107,4 +110,7 @@ export type TurnState = {
     set_variable: (name: string, value: Expr) => void
     add_instructions: (instructions: Array<Instruction>) => void
     clear: () => void
+
+    //TODO this is rather ugly, we can separate state from operations
+    get_power_frames: () => Array<PowerFrame>
 }
