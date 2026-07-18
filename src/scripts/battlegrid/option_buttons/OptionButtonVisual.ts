@@ -1,8 +1,9 @@
 import {OptionButton} from "scripts/battlegrid/option_buttons/OptionButtons";
+import {create_html_element} from "web_components/utils/create_html_element";
 
 const html_element = document.querySelector("#actions_menu")!
 export const create_option_button_visual = (option: OptionButton): OptionButtonVisual => {
-    const button = document.createElement("button");
+    const button = create_html_element("button", "option-button");
     button.innerText = option.text
 
     if (option.disabled)

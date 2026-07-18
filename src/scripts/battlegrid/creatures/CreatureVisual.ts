@@ -1,6 +1,7 @@
 import {Position} from "scripts/battlegrid/Position";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {SIZE} from "scripts/creatures/SIZES";
+import {create_html_element} from "web_components/utils/create_html_element";
 
 export type CreatureVisual = {
     place_at: (position: Position) => void
@@ -17,10 +18,9 @@ export type CreatureVisual = {
 }
 
 export const create_visual_creature = (data: CreatureData): CreatureVisual => {
-    const html_creature = document.createElement("div")
+    const html_creature = create_html_element("div", "creature")
 
     html_creature.setAttribute("id", data.name.toLowerCase())
-    html_creature.classList.add("creature")
     html_creature.style.setProperty("--creature__image", data.image)
 
     html_creature.style.setProperty("--creature_size", `${SIZE[data.size]}`)
@@ -33,12 +33,10 @@ export const create_visual_creature = (data: CreatureData): CreatureVisual => {
 
     html_creature.style.setProperty("--fading-text_animation-duration", `${FADING_TEXT_ANIMATION_DURATION}ms`)
 
-    const html_sprite = document.createElement("div")
-    html_sprite.classList.add("creature__image")
+    const html_sprite = create_html_element("div", "creature__image")
     html_creature.appendChild(html_sprite)
 
-    const html_lifebar = document.createElement("div")
-    html_lifebar.classList.add("creature__lifebar")
+    const html_lifebar = create_html_element("div", "creature__lifebar")
     html_creature.appendChild(html_lifebar)
 
     const html_creatures = document.getElementById("creatures")!
@@ -68,8 +66,7 @@ export const create_visual_creature = (data: CreatureData): CreatureVisual => {
         receive_damage: ({hp, damage}: { hp: number, damage: number }) => {
             html_creature.style.setProperty("--creature__lifebar_current-hp", `${hp}`)
 
-            const fading_number = document.createElement("div")
-            fading_number.classList.add("fading-number")
+            const fading_number = create_html_element("div", "fading-number")
             fading_number.textContent = `${damage}`
             html_creature.appendChild(fading_number)
 
@@ -77,8 +74,7 @@ export const create_visual_creature = (data: CreatureData): CreatureVisual => {
             return FADING_TEXT_ANIMATION_DURATION / 2
         },
         display_miss: () => {
-            const fading_miss = document.createElement("div")
-            fading_miss.classList.add("fading-miss")
+            const fading_miss = create_html_element("div", "fading-miss")
             fading_miss.textContent = `miss`
             html_creature.appendChild(fading_miss)
 
@@ -90,8 +86,7 @@ export const create_visual_creature = (data: CreatureData): CreatureVisual => {
             defense: number,
             chance: number
         }) => {
-            const hit_chance = document.createElement("div")
-            hit_chance.classList.add("hit-chance")
+            const hit_chance = create_html_element("div", "hit-chance")
             hit_chance.textContent = `${attack} vs ${defense}: ${chance}%`
             html_creature.appendChild(hit_chance)
         },
