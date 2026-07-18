@@ -1,15 +1,15 @@
-.action-log__value {
+.expression {
     position: relative;
     font-weight: bold;
     color: dodgerblue;
     text-decoration-line: underline;
 }
 
-.action-log__value:not(:hover) .action-log-details {
+.expression:not(:hover) .expression__details {
     display: none;
 }
 
-.action-log-details {
+.expression__details {
     top: 100%;
     left: 0;
     background-color: white;
@@ -20,6 +20,6 @@
     z-index: 1;
 }
 
-.action-log-details__sub-details {
+.expression__sub-details {
     padding-left: 8px;
 }
