@@ -1,7 +1,6 @@
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {assert} from "scripts/assert";
 import {Expr} from "scripts/expressions/evaluator/types";
-import {HIT_STATUS, HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {Instruction} from "scripts/expressions/parser/instructions";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 
@@ -12,7 +11,6 @@ export const create_power_frame = ({power_name, instructions, owner}: {
 }): PowerFrame => {
     const self = {
         instructions: [...instructions],
-        status: HIT_STATUS.NONE as HitStatus,
         variables: new Map<string, Expr>(),
     }
 
