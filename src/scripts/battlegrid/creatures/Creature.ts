@@ -3,43 +3,12 @@ import type {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {ACTION_TYPE_EXPENDITURE_ORDER, ActionType} from "scripts/battlegrid/creatures/ActionType";
 import {remove_from_array_by_index} from "scripts/ts_utils/remove_from_array_by_index";
 import {Position} from "scripts/battlegrid/Position";
+import {create_event_with_params} from "scripts/events/event_with_params";
+import {create_event_without_params} from "scripts/events/event_without_params";
 
-type EventHandlerMoved = {position: Position, movement_type: "move" | "push"};
-type EventHandlerReceivedDamage = {hp: number, damage: number};
-type EventHandlerIsTargeted = {attack: number, defense: number, chance: number};
-
-type EventHandler<T> = (_: T) => void;
-
-type EventManagerWithParams<T> = { raise: (props: T) => void, add_handler: (handler: EventHandler<T>) => void }
-
-const create_event_with_params = <T>(): EventManagerWithParams<T> => {
-    const handlers: Array<EventHandler<T>> = []
-
-    return {
-            raise: (props: T) => {
-                for(const handler of handlers)
-                    handler(props)
-            },
-            add_handler: (handler: EventHandler<T>) => {
-                handlers.push(handler)
-            }
-    }
-}
-
-type EventManagerWithoutParams = { raise: () => void, add_handler: (handler: () => void) => void }
-const create_event_without_params = (): EventManagerWithoutParams => {
-    const handlers: Array<() => void> = []
-
-    return {
-            raise: () => {
-                for(const handler of handlers)
-                    handler()
-            },
-            add_handler: (handler: () => void) => {
-                handlers.push(handler)
-            }
-    }
-}
+type EventHandlerMoved = { position: Position, movement_type: "move" | "push" };
+type EventHandlerReceivedDamage = { hp: number, damage: number };
+type EventHandlerIsTargeted = { attack: number, defense: number, chance: number };
 
 export class Creature {
     data: CreatureData
