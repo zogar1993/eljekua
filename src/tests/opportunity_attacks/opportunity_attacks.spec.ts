@@ -36,7 +36,8 @@ const instruction_loop = create_instruction_loop({
     evaluate_ast,
     turn_state,
     battle_grid,
-    player_turn_handler})
+    player_turn_handler,
+})
 
 battle_grid.visual.addOnMouseMoveHandler(coordinate => {
     player_turn_handler.on_hover({coordinate})
@@ -46,7 +47,7 @@ battle_grid.visual.addOnClickHandler(coordinate => {
     player_turn_handler.on_click({coordinate})
 })
 
-const add_creature_to_game = create_add_creature_to_game({battle_grid, initiative_order})
+const add_creature_to_game = create_add_creature_to_game({battle_grid, initiative_order, on_creature_added_to_game: []})
 const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop})
 const set_current_turn_to_creature = create_set_current_turn_to_creature({
     player_turn_handler,
@@ -168,24 +169,24 @@ const then_creature = (creature_name: string) => {
 }
 
 const wait_until = (
-  condition: () => boolean | Promise<boolean>,
+    condition: () => boolean | Promise<boolean>,
 ): Promise<void> => {
     const interval = 20
     const timeout = 1000
 
-  const start = Date.now();
-  return new Promise((resolve, reject) => {
-    const check = async () => {
-      try {
-        if (await condition()) return resolve();
-      } catch (err) {
-        return reject(err);
-      }
-      if (timeout != null && Date.now() - start >= timeout) {
-        return reject(new Error("wait_for: timed out"));
-      }
-      setTimeout(check, interval);
-    };
-    check();
-  });
+    const start = Date.now();
+    return new Promise((resolve, reject) => {
+        const check = async () => {
+            try {
+                if (await condition()) return resolve();
+            } catch (err) {
+                return reject(err);
+            }
+            if (timeout != null && Date.now() - start >= timeout) {
+                return reject(new Error("wait_for: timed out"));
+            }
+            setTimeout(check, interval);
+        };
+        check();
+    });
 }
