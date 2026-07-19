@@ -143,7 +143,7 @@ export const create_player_turn_handler = ({
         }
 
         for (const creature of battle_grid.creatures)
-            creature.visual.remove_hit_chance()
+            creature.events.is_untargeted.raise()
 
         selection_context = {...selection_context, highlighted: []}
 
@@ -179,7 +179,8 @@ export const create_player_turn_handler = ({
             if (selection_context.target) {
                 if (selection_context.target.type === "creatures") {
                     const creatures = selection_context.target.value
-                    creatures.forEach(creature => creature.visual.remove_hit_chance())
+
+                    creatures.forEach(creature => creature.events.is_untargeted.raise())
                 }
             }
         } else if (selection_context.type === "option_select")
@@ -258,7 +259,7 @@ const show_attack_success_chance_if_needed = ({turn_state, selection_context, ev
 
             const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
 
-            defender.visual.display_hit_chance({attack, defense, chance})
+            defender.events.is_targeted.raise({attack, defense, chance})
         })
     }
 }

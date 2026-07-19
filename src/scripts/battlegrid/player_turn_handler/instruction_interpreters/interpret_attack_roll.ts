@@ -64,7 +64,7 @@ export const interpret_attack_roll = ({
             new_instructions.push(create_save_hit_status_instruction(HIT_STATUS.HIT))
             new_instructions.push(...instruction.hit)
         } else {
-            AnimationQueue.add_animation(defender.visual.display_miss)
+            defender.events.is_missed.raise()
             new_instructions.push(create_save_hit_status_instruction(HIT_STATUS.MISS))
             new_instructions.push(...instruction.miss)
         }

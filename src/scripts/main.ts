@@ -21,6 +21,8 @@ import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnStat
 import {create_instruction_loop} from "scripts/instruction_loop";
 import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {create_instruction_visualizer} from "scripts/instruction_visualizer/instruction_visualizer";
+import {AnimationQueue} from "scripts/AnimationQueue";
+import {Position} from "scripts/battlegrid/Position";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
@@ -28,7 +30,6 @@ const turn_state = create_turn_state()
 
 const battle_grid = create_battle_grid({
     create_visual_square,
-    create_visual_creature,
     create_battle_grid_visual,
     size: {x: 10, y: 10}
 })
@@ -48,22 +49,56 @@ const player_turn_handler = create_player_turn_handler({
 const instruction_visualizer = create_instruction_visualizer()
 
 const instruction_loop = create_instruction_loop({
-        player_turn_handler,
-        battle_grid,
-        action_log,
-        turn_state,
-        evaluate_ast,
-        initiative_order,
-        instruction_visualizer
-    })
+    player_turn_handler,
+    battle_grid,
+    action_log,
+    turn_state,
+    evaluate_ast,
+    initiative_order,
+    instruction_visualizer
+})
 
-const add_creature = create_add_creature_to_game({battle_grid, initiative_order})
+
+const on_creature_added_to_game: Array<(creature: Creature) => void> = [
+    ({data, events}: Creature) => {
+        const visual = create_visual_creature(data)
+
+        events.moved.add_handler(({position, movement_type}) => {
+            switch (movement_type) {
+                case "move":
+                    AnimationQueue.add_animation(() => visual.move_one_square(position))
+                    break
+                case "push":
+                    AnimationQueue.add_animation(() => visual.push_to(position))
+                    break
+            }
+        })
+
+        events.received_damage.add_handler(({damage}) => {
+            AnimationQueue.add_animation(() => visual.receive_damage({hp: data.hp_current, damage}))
+        })
+
+        events.is_untargeted.add_handler(()  => {
+            visual.remove_hit_chance()
+        })
+
+        events.is_missed.add_handler(()  => {
+            AnimationQueue.add_animation(visual.display_miss)
+        })
+
+        events.is_targeted.add_handler(({attack, defense, chance})  => {
+            visual.display_hit_chance({attack, defense, chance})
+        })
+    }
+]
+
+const add_creature = create_add_creature_to_game({battle_grid, initiative_order, on_creature_added_to_game})
 const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop})
 const set_current_turn_to_creature = create_set_current_turn_to_creature({
-    player_turn_handler,
-    initiative_order,
-    battle_grid
-})
+        player_turn_handler,
+        initiative_order,
+        battle_grid
+    })
 
 ;(window as any).init_demo = () => {
     const bob = build_character({

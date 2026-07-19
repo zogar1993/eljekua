@@ -1,24 +1,66 @@
-import {CreatureVisual} from "scripts/battlegrid/creatures/CreatureVisual";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
-import {AnimationQueue} from "scripts/AnimationQueue";
 import type {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {ACTION_TYPE_EXPENDITURE_ORDER, ActionType} from "scripts/battlegrid/creatures/ActionType";
 import {remove_from_array_by_index} from "scripts/ts_utils/remove_from_array_by_index";
+import {Position} from "scripts/battlegrid/Position";
+
+type EventHandlerMoved = {position: Position, movement_type: "move" | "push"};
+type EventHandlerReceivedDamage = {hp: number, damage: number};
+type EventHandlerIsTargeted = {attack: number, defense: number, chance: number};
+
+type EventHandler<T> = (_: T) => void;
+
+type EventManagerWithParams<T> = { raise: (props: T) => void, add_handler: (handler: EventHandler<T>) => void }
+
+const create_event_with_params = <T>(): EventManagerWithParams<T> => {
+    const handlers: Array<EventHandler<T>> = []
+
+    return {
+            raise: (props: T) => {
+                for(const handler of handlers)
+                    handler(props)
+            },
+            add_handler: (handler: EventHandler<T>) => {
+                handlers.push(handler)
+            }
+    }
+}
+
+type EventManagerWithoutParams = { raise: () => void, add_handler: (handler: () => void) => void }
+const create_event_without_params = (): EventManagerWithoutParams => {
+    const handlers: Array<() => void> = []
+
+    return {
+            raise: () => {
+                for(const handler of handlers)
+                    handler()
+            },
+            add_handler: (handler: () => void) => {
+                handlers.push(handler)
+            }
+    }
+}
 
 export class Creature {
-    visual: CreatureVisual
     data: CreatureData
     statuses: Array<Status> = []
     available_actions: Array<ActionType> = []
 
-    constructor({data, visual}: { data: CreatureData, visual: CreatureVisual }) {
+    events = {
+        moved: create_event_with_params<EventHandlerMoved>(),
+        received_damage: create_event_with_params<EventHandlerReceivedDamage>(),
+        is_targeted: create_event_with_params<EventHandlerIsTargeted>(),
+        is_untargeted: create_event_without_params(),
+        is_missed: create_event_without_params(),
+    }
+
+    constructor({data}: { data: CreatureData }) {
         this.data = data
-        this.visual = visual
     }
 
     receive_damage(value: number) {
         this.data.hp_current -= value
-        AnimationQueue.add_animation(() => this.visual.receive_damage({hp: this.data.hp_current, damage: value}))
+        this.events.received_damage.raise({hp: this.data.hp_current, damage: value})
     }
 
     //P1 add weapon types

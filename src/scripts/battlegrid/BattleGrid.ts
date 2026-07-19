@@ -1,7 +1,6 @@
 import {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
-import {CreatureVisual} from "scripts/battlegrid/creatures/CreatureVisual";
 import {
     Position,
     PositionFootprintOne,
@@ -9,19 +8,16 @@ import {
     positions_share_surface,
     transform_position_to_f1
 } from "scripts/battlegrid/Position";
-import {AnimationQueue} from "scripts/AnimationQueue";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "scripts/powers/basic";
 import type {BattleGridVisual} from "scripts/battlegrid/BattleGridVisual";
 
 export const create_battle_grid = ({
                                        create_visual_square,
-                                       create_visual_creature,
                                        create_battle_grid_visual,
                                        size,
                                    }: {
     create_battle_grid_visual: ({width, height}: { width: number, height: number }) => BattleGridVisual
     create_visual_square: (square: { x: number, y: number }) => SquareVisual,
-    create_visual_creature: (creature: CreatureData) => CreatureVisual,
     size: { x: number, y: number }
 }): BattleGrid => {
     const visual: BattleGridVisual = create_battle_grid_visual({width: size.x, height: size.y})
@@ -66,20 +62,19 @@ export const create_battle_grid = ({
 
     const create_creature = (data: CreatureData) => {
         const d = {...data, powers: [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS, ...data.powers]}
-        const visual = create_visual_creature(d)
-        const creature = new Creature({data: d, visual})
+        const creature = new Creature({data: d})
         creatures.push(creature)
         return creature
     }
 
     const move_creature_one_square = ({position, creature}: { position: Position, creature: Creature }) => {
         creature.data.position = position
-        AnimationQueue.add_animation(() => creature.visual.move_one_square(position))
+        creature.events.moved.raise({position, movement_type: "move"})
     }
 
     const push_creature = ({position, creature}: { position: Position, creature: Creature }) => {
         creature.data.position = position
-        AnimationQueue.add_animation(() => creature.visual.push_to(position))
+        creature.events.moved.raise({position, movement_type: "push"})
     }
 
     return {
