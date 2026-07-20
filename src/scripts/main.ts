@@ -1,6 +1,6 @@
 import {create_battle_grid} from "scripts/battlegrid/BattleGrid";
 import {create_visual_square} from "scripts/battlegrid/squares/SquareVisual";
-import {create_visual_creature} from "web_components/expression/CreatureVisual";
+import {create_visual_creature} from "web_components/creature/CreatureVisual";
 import {create_battle_grid_visual} from "scripts/battlegrid/BattleGridVisual";
 import {create_player_turn_handler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {create_action_log} from "scripts/action_log/ActionLog";
