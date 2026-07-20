@@ -61,7 +61,7 @@ export type Power = {
 
 export type Trigger = {
     type: "interruption" | "reaction"
-    intercepts: Array<"movement">
+    intercepts: Array<"movement" | "critical_hit">
     conditions: Array<AstNode>
 }
 
