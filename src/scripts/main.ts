@@ -22,7 +22,6 @@ import {create_instruction_loop} from "scripts/instruction_loop";
 import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {create_instruction_visualizer} from "scripts/instruction_visualizer/instruction_visualizer";
 import {AnimationQueue} from "scripts/AnimationQueue";
-import {Position} from "scripts/battlegrid/Position";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
