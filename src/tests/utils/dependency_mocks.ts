@@ -1,4 +1,4 @@
-import {CreatureVisual} from "scripts/battlegrid/creatures/CreatureVisual";
+import {CreatureVisual} from "web_components/expression/CreatureVisual";
 import {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {BattleGridVisual} from "scripts/battlegrid/BattleGridVisual";
 import {ActionLog} from "scripts/action_log/ActionLog";
