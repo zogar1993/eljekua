@@ -1,5 +1,4 @@
 import {roll_d} from "scripts/randomness/dice";
-import {AnimationQueue} from "scripts/AnimationQueue";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
