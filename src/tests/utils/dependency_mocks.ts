@@ -1,20 +1,8 @@
-import {CreatureVisual} from "web_components/expression/CreatureVisual";
 import {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {BattleGridVisual} from "scripts/battlegrid/BattleGridVisual";
 import {ActionLog} from "scripts/action_log/ActionLog";
 import {InitiativeEntryVisual} from "scripts/initiative_order/InitiativeEntryVisual";
-import {InstructionLoop} from "scripts/instruction_loop";
 import {InstructionVisualizer} from "scripts/instruction_visualizer/instruction_visualizer";
-
-const create_visual_creature = (): CreatureVisual => ({
-    place_at: jest.fn(),
-    move_one_square: () => 0,
-    push_to: () => 0,
-    receive_damage: () => 0,
-    display_miss: () => 0,
-    display_hit_chance: jest.fn(),
-    remove_hit_chance: jest.fn(),
-})
 
 const create_visual_square = (): SquareVisual => ({
     set_highlight: jest.fn(),
@@ -40,7 +28,6 @@ const action_log: ActionLog = {
 
 export const dependency_mocks = {
     create_visual_square,
-    create_visual_creature,
     create_battle_grid_visual,
     create_initiative_entry_visual,
     instruction_visualizer,
