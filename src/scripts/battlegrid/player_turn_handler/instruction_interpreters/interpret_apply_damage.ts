@@ -34,7 +34,7 @@ export const interpret_apply_damage = ({
 
     target.data.hp_current -= damage.value
 
-    target.events.received_damage.raise({hp: target.data.hp_current, damage: damage.value})
+    target.events.received_damage.raise({damage: damage.value})
 
     action_log.add_new_action_log(`${target.data.name} was dealt `, damage, ` damage.`)
 }
