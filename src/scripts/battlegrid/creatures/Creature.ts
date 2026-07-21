@@ -7,7 +7,7 @@ import {create_event_with_params} from "scripts/events/event_with_params";
 import {create_event_without_params} from "scripts/events/event_without_params";
 
 type EventHandlerMoved = { position: Position, movement_type: "move" | "push" };
-type EventHandlerReceivedDamage = { damage: number };
+type EventHandlerReceivedDamage = { damage: ExprNumberResolved };
 type EventHandlerIsTargeted = { attack: number, defense: number, chance: number };
 
 export class Creature {

@@ -13,7 +13,6 @@ import {InstructionApplyDamage} from "scripts/expressions/parser/instructions";
 
 export const interpret_apply_damage = ({
                                            instruction,
-                                           action_log,
                                            evaluate_ast,
                                            turn_state
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
@@ -34,9 +33,7 @@ export const interpret_apply_damage = ({
 
     target.data.hp_current -= damage.value
 
-    target.events.received_damage.raise({damage: damage.value})
-
-    action_log.add_new_action_log(`${target.data.name} was dealt `, damage, ` damage.`)
+    target.events.received_damage.raise({damage})
 }
 
 const apply_half_damage = (number: ExprNumberResolved): ExprNumberResolved => ({

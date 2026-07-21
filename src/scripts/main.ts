@@ -80,18 +80,22 @@ const on_creature_added_to_game: Array<(creature: Creature) => void> = [
         })
 
         events.received_damage.add_handler(({damage}) => {
-            AnimationQueue.add_animation(() => visual.receive_damage({hp: data.hp_current, damage}))
+            AnimationQueue.add_animation(() => visual.receive_damage({hp: data.hp_current, damage: damage.value}))
         })
 
-        events.is_untargeted.add_handler(()  => {
+        events.received_damage.add_handler(({damage}) => {
+            action_log.add_new_action_log(`${data.name} was dealt `, damage, ` damage.`)
+        })
+
+        events.is_untargeted.add_handler(() => {
             visual.remove_hit_chance()
         })
 
-        events.is_missed.add_handler(()  => {
+        events.is_missed.add_handler(() => {
             AnimationQueue.add_animation(visual.display_miss)
         })
 
-        events.is_targeted.add_handler(({attack, defense, chance})  => {
+        events.is_targeted.add_handler(({attack, defense, chance}) => {
             visual.display_hit_chance({attack, defense, chance})
         })
     }
