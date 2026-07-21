@@ -32,7 +32,10 @@ export const interpret_apply_damage = ({
     if (instruction.half_damage)
         damage = apply_half_damage(damage)
 
-    target.receive_damage(damage.value)
+    target.data.hp_current -= damage.value
+
+    target.events.received_damage.raise({hp: target.data.hp_current, damage: damage.value})
+
     action_log.add_new_action_log(`${target.data.name} was dealt `, damage, ` damage.`)
 }
 
@@ -42,4 +45,3 @@ const apply_half_damage = (number: ExprNumberResolved): ExprNumberResolved => ({
     params: [number],
     description: "half damage"
 })
-

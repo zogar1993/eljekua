@@ -27,11 +27,6 @@ export class Creature {
         this.data = data
     }
 
-    receive_damage(value: number) {
-        this.data.hp_current -= value
-        this.events.received_damage.raise({hp: this.data.hp_current, damage: value})
-    }
-
     //P1 add weapon types
     has_equipped = (weapon_type: string) => false
 
