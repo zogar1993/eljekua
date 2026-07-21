@@ -15,5 +15,4 @@ export type InterpretInstructionProps<T extends Instruction> = {
     turn_state: TurnState
     evaluate_ast: (node: AstNode) => Expr
     initiative_order: InitiativeOrder
-    gameplay_use_cases: GameplayUseCases
 }

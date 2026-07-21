@@ -11,7 +11,6 @@ export const interpret_move = ({
                                    battle_grid,
                                    turn_state,
                                    evaluate_ast,
-                                   gameplay_use_cases,
                                }: InterpretInstructionProps<InstructionMovement>) => {
     const mover_creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
     const destination_label = instruction.destination
