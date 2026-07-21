@@ -12,10 +12,10 @@ export const interpret_move = ({
                                    turn_state,
                                    evaluate_ast,
                                }: InterpretInstructionProps<InstructionMovement>) => {
-    const mover_creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
+    const moving_creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
     const destination_label = instruction.destination
     const path = EXPR.as_positions(turn_state.get_variable(destination_label))
-    turn_state.set_variable("trigger_activator", {type: "creatures", value: [mover_creature]})
+    turn_state.set_variable("trigger_activator", {type: "creatures", value: [moving_creature]})
 
     for (let i = 0; i < path.length - 1; i++) {
         // We exclude the ones who already were potential attackers for this power.
@@ -26,7 +26,7 @@ export const interpret_move = ({
 
         const potential_attackers =
             battle_grid.creatures
-                .filter(creature => creature !== mover_creature)
+                .filter(creature => creature !== moving_creature)
                 .filter(creature => !excluded.includes(creature))
                 .map(creature => {
                     turn_state.set_variable("trigger_owner", {type: "creatures", value: [creature]})
@@ -45,8 +45,8 @@ export const interpret_move = ({
 
         if (potential_attackers.length === 0) {
             const new_position = path[i + 1]
-            mover_creature.data.position = new_position
-            mover_creature.events.moved.raise({position: new_position, movement_type: "move"})
+            moving_creature.data.position = new_position
+            moving_creature.events.moved.raise({position: new_position, movement_type: "move"})
         } else {
             turn_state.set_variable(destination_label, {
                 type: "positions",
@@ -79,7 +79,7 @@ export const interpret_move = ({
                 const variables: Record<string, Expr> = {
                     [SYSTEM_KEYWORD.TRIGGERER]: {
                         type: "creatures",
-                        value: [mover_creature]
+                        value: [moving_creature]
                     }
                 }
                 turn_state.add_power_frame({name: "Select Trigger", instructions, owner: attacker, variables})
