@@ -22,14 +22,9 @@ const instruction_visualizer: InstructionVisualizer = {
     show: jest.fn()
 }
 
-const action_log: ActionLog = {
-    add_new_action_log: jest.fn
-}
-
 export const dependency_mocks = {
     create_visual_square,
     create_battle_grid_visual,
     create_initiative_entry_visual,
     instruction_visualizer,
-    action_log,
 }

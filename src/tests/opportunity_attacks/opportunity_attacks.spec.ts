@@ -45,7 +45,6 @@ const instruction_loop = create_instruction_loop({
     turn_state,
     battle_grid,
     player_turn_handler,
-    gameplay_use_cases
 })
 
 battle_grid.visual.addOnMouseMoveHandler(coordinate => {

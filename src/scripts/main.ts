@@ -53,12 +53,10 @@ const gameplay_use_cases = create_gameplay_use_cases({
 const instruction_loop = create_instruction_loop({
     player_turn_handler,
     battle_grid,
-    action_log,
     turn_state,
     evaluate_ast,
     initiative_order,
     instruction_visualizer,
-    gameplay_use_cases
 })
 
 
