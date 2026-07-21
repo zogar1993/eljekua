@@ -12,10 +12,11 @@ import {create_option_button_visual, option_buttons_test_ui} from "tests/utils/o
 import {create_battle_grid_visual, battle_grid_test_ui} from "tests/utils/battle_grid_test_ui";
 import {create_add_creature_to_game} from "scripts/use_cases/add_creature_to_game";
 import {create_start_battle} from "scripts/use_cases/start_battle";
-import {create_set_current_turn_to_creature} from "scripts/use_cases/set_current_turn_to_creature";
+import {create_set_current_turn_to_creature} from "scripts/use_cases/gameplay/set_current_turn_to_creature";
 import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnState";
 import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {create_instruction_loop} from "scripts/instruction_loop";
+import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use_cases";
 
 const turn_state = create_turn_state();
 const battle_grid = create_battle_grid({...dependency_mocks, create_battle_grid_visual, size: {x: 10, y: 10}})
@@ -30,6 +31,13 @@ const player_turn_handler = create_player_turn_handler({
     turn_state,
     evaluate_ast
 })
+
+const gameplay_use_cases = create_gameplay_use_cases({
+    battle_grid,
+    initiative_order,
+    player_turn_handler
+})
+
 const instruction_loop = create_instruction_loop({
     ...dependency_mocks,
     initiative_order,
@@ -37,6 +45,7 @@ const instruction_loop = create_instruction_loop({
     turn_state,
     battle_grid,
     player_turn_handler,
+    gameplay_use_cases
 })
 
 battle_grid.visual.addOnMouseMoveHandler(coordinate => {
@@ -49,11 +58,6 @@ battle_grid.visual.addOnClickHandler(coordinate => {
 
 const add_creature_to_game = create_add_creature_to_game({battle_grid, initiative_order, on_creature_added_to_game: []})
 const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop})
-const set_current_turn_to_creature = create_set_current_turn_to_creature({
-    player_turn_handler,
-    initiative_order,
-    battle_grid
-})
 
 describe("when an enemy leaves a space adjacent to a creature", () => {
     test(`the creature can perform an opportunity attack to it`, async () => {
@@ -125,7 +129,7 @@ const given_creature = (creature_name: string) => {
 
     return {
         is_in_its_turn: () => {
-            set_current_turn_to_creature({creature})
+            gameplay_use_cases.set_current_turn_to_creature({creature})
         }
     }
 }

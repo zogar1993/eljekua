@@ -16,12 +16,13 @@ import {ATTRIBUTES} from "scripts/character_sheet/attributes";
 import {create_initiative_entry_visual} from "scripts/initiative_order/InitiativeEntryVisual";
 import {create_add_creature_to_game} from "scripts/use_cases/add_creature_to_game";
 import {create_start_battle} from "scripts/use_cases/start_battle";
-import {create_set_current_turn_to_creature} from "scripts/use_cases/set_current_turn_to_creature";
+import {create_set_current_turn_to_creature} from "scripts/use_cases/gameplay/set_current_turn_to_creature";
 import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnState";
 import {create_instruction_loop} from "scripts/instruction_loop";
 import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {create_instruction_visualizer} from "scripts/instruction_visualizer/instruction_visualizer";
 import {AnimationQueue} from "scripts/AnimationQueue";
+import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use_cases";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
@@ -47,6 +48,10 @@ const player_turn_handler = create_player_turn_handler({
 
 const instruction_visualizer = create_instruction_visualizer()
 
+const gameplay_use_cases = create_gameplay_use_cases({
+    battle_grid, player_turn_handler, initiative_order
+})
+
 const instruction_loop = create_instruction_loop({
     player_turn_handler,
     battle_grid,
@@ -54,7 +59,8 @@ const instruction_loop = create_instruction_loop({
     turn_state,
     evaluate_ast,
     initiative_order,
-    instruction_visualizer
+    instruction_visualizer,
+    gameplay_use_cases
 })
 
 
@@ -93,11 +99,6 @@ const on_creature_added_to_game: Array<(creature: Creature) => void> = [
 
 const add_creature = create_add_creature_to_game({battle_grid, initiative_order, on_creature_added_to_game})
 const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop})
-const set_current_turn_to_creature = create_set_current_turn_to_creature({
-        player_turn_handler,
-        initiative_order,
-        battle_grid
-    })
 
 ;(window as any).init_demo = () => {
     const bob = build_character({
@@ -166,7 +167,7 @@ const set_current_turn_to_creature = create_set_current_turn_to_creature({
         console.log(`Creature with name '${name}' not found`)
         return
     }
-    set_current_turn_to_creature({creature})
+    gameplay_use_cases.set_current_turn_to_creature({creature})
 }
 
 const build_character = (

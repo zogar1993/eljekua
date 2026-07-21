@@ -6,6 +6,7 @@ import type {Expr} from "scripts/expressions/evaluator/types";
 import type {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Instruction} from "scripts/expressions/parser/instructions";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
+import {GameplayUseCases} from "scripts/use_cases/gameplay/gameplay_use_cases";
 
 export type InterpretInstructionProps<T extends Instruction> = {
     instruction: T
@@ -15,4 +16,5 @@ export type InterpretInstructionProps<T extends Instruction> = {
     turn_state: TurnState
     evaluate_ast: (node: AstNode) => Expr
     initiative_order: InitiativeOrder
+    gameplay_use_cases: GameplayUseCases
 }

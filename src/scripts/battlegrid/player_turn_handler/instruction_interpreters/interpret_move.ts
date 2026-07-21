@@ -11,6 +11,7 @@ export const interpret_move = ({
                                    battle_grid,
                                    turn_state,
                                    evaluate_ast,
+                                   gameplay_use_cases,
                                }: InterpretInstructionProps<InstructionMovement>) => {
     const mover_creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
     const destination_label = instruction.destination
@@ -45,7 +46,7 @@ export const interpret_move = ({
 
         if (potential_attackers.length === 0) {
             const new_position = path[i + 1]
-            battle_grid.move_creature_one_square({creature: mover_creature, position: new_position})
+            gameplay_use_cases.move_creature({creature: mover_creature, position: new_position})
         } else {
             turn_state.set_variable(destination_label, {
                 type: "positions",
@@ -75,7 +76,12 @@ export const interpret_move = ({
                         ]
                     },
                 ]
-                const variables: Record<string, Expr> = {[SYSTEM_KEYWORD.TRIGGERER]: {type: "creatures", value: [mover_creature]}}
+                const variables: Record<string, Expr> = {
+                    [SYSTEM_KEYWORD.TRIGGERER]: {
+                        type: "creatures",
+                        value: [mover_creature]
+                    }
+                }
                 turn_state.add_power_frame({name: "Select Trigger", instructions, owner: attacker, variables})
             }
 

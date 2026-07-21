@@ -67,11 +67,6 @@ export const create_battle_grid = ({
         return creature
     }
 
-    const move_creature_one_square = ({position, creature}: { position: Position, creature: Creature }) => {
-        creature.data.position = position
-        creature.events.moved.raise({position, movement_type: "move"})
-    }
-
     const push_creature = ({position, creature}: { position: Position, creature: Creature }) => {
         creature.data.position = position
         creature.events.moved.raise({position, movement_type: "push"})
@@ -90,7 +85,6 @@ export const create_battle_grid = ({
         get_creature_by_position,
         get_creatures_in_positions,
         push_creature,
-        move_creature_one_square
     }
 }
 
@@ -109,9 +103,7 @@ export type BattleGrid = {
 
     create_creature: (data: CreatureData) => Creature
     push_creature: (props: { position: Position, creature: Creature }) => void
-    move_creature_one_square: (props: { position: Position, creature: Creature }) => void
 }
-
 
 export type Square = {
     visual: SquareVisual,
