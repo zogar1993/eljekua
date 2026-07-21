@@ -16,14 +16,12 @@ import {ATTRIBUTES} from "scripts/character_sheet/attributes";
 import {create_initiative_entry_visual} from "scripts/initiative_order/InitiativeEntryVisual";
 import {create_add_creature_to_game} from "scripts/use_cases/add_creature_to_game";
 import {create_start_battle} from "scripts/use_cases/start_battle";
-import {create_set_current_turn_to_creature} from "scripts/use_cases/gameplay/set_current_turn_to_creature";
 import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnState";
 import {create_instruction_loop} from "scripts/instruction_loop";
 import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {create_instruction_visualizer} from "scripts/instruction_visualizer/instruction_visualizer";
 import {AnimationQueue} from "scripts/AnimationQueue";
 import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use_cases";
-
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
 const turn_state = create_turn_state()
@@ -83,10 +81,6 @@ const on_creature_added_to_game: Array<(creature: Creature) => void> = [
             AnimationQueue.add_animation(() => visual.receive_damage({hp: data.hp_current, damage: damage.value}))
         })
 
-        events.received_damage.add_handler(({damage}) => {
-            action_log.add_new_action_log(`${data.name} was dealt `, damage, ` damage.`)
-        })
-
         events.is_untargeted.add_handler(() => {
             visual.remove_hit_chance()
         })
@@ -97,6 +91,20 @@ const on_creature_added_to_game: Array<(creature: Creature) => void> = [
 
         events.is_targeted.add_handler(({attack, defense, chance}) => {
             visual.display_hit_chance({attack, defense, chance})
+        })
+    },
+    ({data, events}: Creature) => {
+        events.received_damage.add_handler(({damage}) => {
+            action_log.add_new_action_log(`${data.name} was dealt `, damage, ` damage.`)
+        })
+
+        events.has_attacked.add_handler(({attack, defense, is_hit, defender, instruction}) => {
+            action_log.add_new_action_log(
+                `${data.name}'s ${turn_state.get_power_name()} (`,
+                attack,
+                `) ${is_hit ? "hits" : "misses"} against ${defender.data.name}'s ${instruction.defense} (`,
+                defense,
+                `).`)
         })
     }
 ]

@@ -5,10 +5,18 @@ import {remove_from_array_by_index} from "scripts/ts_utils/remove_from_array_by_
 import {Position} from "scripts/battlegrid/Position";
 import {create_event_with_params} from "scripts/events/event_with_params";
 import {create_event_without_params} from "scripts/events/event_without_params";
+import {InstructionAttackRoll} from "scripts/expressions/parser/instructions";
 
 type EventHandlerMoved = { position: Position, movement_type: "move" | "push" };
 type EventHandlerReceivedDamage = { damage: ExprNumberResolved };
 type EventHandlerIsTargeted = { attack: number, defense: number, chance: number };
+type EventHandlerHasAttacked = {
+    attack: ExprNumberResolved,
+    is_hit: boolean,
+    defender: Creature,
+    defense: ExprNumberResolved,
+    instruction: InstructionAttackRoll
+}
 
 export class Creature {
     data: CreatureData
@@ -21,6 +29,7 @@ export class Creature {
         is_targeted: create_event_with_params<EventHandlerIsTargeted>(),
         is_untargeted: create_event_without_params(),
         is_missed: create_event_without_params(),
+        has_attacked: create_event_with_params<EventHandlerHasAttacked>(),
     }
 
     constructor({data}: { data: CreatureData }) {

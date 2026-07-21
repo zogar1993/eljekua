@@ -20,7 +20,6 @@ import {
 
 export const interpret_attack_roll = ({
                                           instruction,
-                                          action_log,
                                           battle_grid,
                                           evaluate_ast,
                                           turn_state
@@ -69,7 +68,7 @@ export const interpret_attack_roll = ({
         }
         new_instructions.push(create_save_hit_status_instruction(HIT_STATUS.NONE))
 
-        log_attack_roll({attacker, attack, is_hit, defender, defense, turn_state, instruction, action_log})
+        attacker.events.has_attacked.raise({attack, is_hit, defender, defense, instruction})
     })
 
     new_instructions.push(copy_variable_instruction(`${instruction.defender}(all)`, instruction.defender))
@@ -86,20 +85,3 @@ const COMBAT_ADVANTAGE: ExprNumberResolved = {
 const copy_variable_instruction = (origin: string, destination: string): InstructionSaveVariable =>
     ({type: "save_variable", value: {type: "keyword", value: origin}, label: destination})
 
-const log_attack_roll = (
-    {turn_state, attacker, attack, is_hit, defender, instruction, defense, action_log}: {
-        turn_state: TurnState,
-        attacker: Creature,
-        attack: ExprNumberResolved,
-        is_hit: boolean,
-        defender: Creature,
-        defense: ExprNumberResolved,
-        instruction: InstructionAttackRoll
-        action_log: ActionLog
-    }) => action_log.add_new_action_log(
-    `${attacker.data.name}'s ${turn_state.get_power_name()} (`,
-    attack,
-    `) ${is_hit ? "hits" : "misses"} against ${defender.data.name}'s ${instruction.defense} (`,
-    defense,
-    `).`
-)

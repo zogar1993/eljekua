@@ -12,7 +12,6 @@ export type InterpretInstructionProps<T extends Instruction> = {
     instruction: T
     player_turn_handler: PlayerTurnHandler
     battle_grid: BattleGrid
-    action_log: ActionLog
     turn_state: TurnState
     evaluate_ast: (node: AstNode) => Expr
     initiative_order: InitiativeOrder
