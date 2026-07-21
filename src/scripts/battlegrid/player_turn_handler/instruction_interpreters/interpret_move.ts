@@ -46,7 +46,8 @@ export const interpret_move = ({
 
         if (potential_attackers.length === 0) {
             const new_position = path[i + 1]
-            gameplay_use_cases.move_creature({creature: mover_creature, position: new_position})
+            mover_creature.data.position = new_position
+            mover_creature.events.moved.raise({position: new_position, movement_type: "move"})
         } else {
             turn_state.set_variable(destination_label, {
                 type: "positions",

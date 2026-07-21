@@ -7,10 +7,11 @@ import {InstructionMovement} from "scripts/expressions/parser/instructions";
 export const interpret_shift = ({
                                     instruction,
                                     turn_state,
-                                    gameplay_use_cases
                                 }: InterpretInstructionProps<InstructionMovement>) => {
     const creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
     const path = EXPR.as_positions(turn_state.get_variable(instruction.destination))
-    for (const position of path)
-        gameplay_use_cases.move_creature({creature, position})
+    for (const position of path) {
+        creature.data.position = position
+        creature.events.moved.raise({position, movement_type: "move"})
+    }
 }
