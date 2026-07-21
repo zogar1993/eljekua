@@ -1,4 +1,3 @@
-
 import {create_set_current_turn_to_creature} from "scripts/use_cases/gameplay/set_current_turn_to_creature";
 import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";

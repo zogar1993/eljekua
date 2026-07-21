@@ -6,7 +6,6 @@ import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {
     assert_are_footprint_one,
     Position,
-    PositionFootprintOne,
     positions_equal,
     positions_share_surface,
 } from "scripts/battlegrid/Position";

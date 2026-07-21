@@ -2,9 +2,7 @@ import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {InstructionEndTurn} from "scripts/expressions/parser/instructions";
-import {
-    run_start_of_turn_hooks
-} from "scripts/battlegrid/player_turn_handler/run_start_of_turn_hooks";
+import {run_start_of_turn_hooks} from "scripts/battlegrid/player_turn_handler/run_start_of_turn_hooks";
 import {run_end_of_turn_hooks} from "scripts/battlegrid/player_turn_handler/run_end_of_turn_hooks";
 
 export const interpret_end_turn = ({

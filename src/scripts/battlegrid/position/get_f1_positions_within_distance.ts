@@ -1,6 +1,6 @@
 import type {Position, PositionFootprintOne} from "scripts/battlegrid/Position";
-import type {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import {positions_share_surface} from "scripts/battlegrid/Position";
+import type {BattleGrid} from "scripts/battlegrid/BattleGrid";
 
 export const get_f1_positions_within_distance = ({battle_grid, position, distance}: {
     position: Position,

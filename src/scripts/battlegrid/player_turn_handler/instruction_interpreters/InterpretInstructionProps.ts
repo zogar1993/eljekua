@@ -1,12 +1,10 @@
 import type {PlayerTurnHandler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import type {BattleGrid} from "scripts/battlegrid/BattleGrid";
-import type {ActionLog} from "scripts/action_log/ActionLog";
 import type {TurnState} from "scripts/battlegrid/player_turn_handler/TurnState";
 import type {Expr} from "scripts/expressions/evaluator/types";
 import type {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Instruction} from "scripts/expressions/parser/instructions";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
-import {GameplayUseCases} from "scripts/use_cases/gameplay/gameplay_use_cases";
 
 export type InterpretInstructionProps<T extends Instruction> = {
     instruction: T

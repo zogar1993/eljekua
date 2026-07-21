@@ -1,6 +1,5 @@
 import {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {BattleGridVisual} from "scripts/battlegrid/BattleGridVisual";
-import {ActionLog} from "scripts/action_log/ActionLog";
 import {InitiativeEntryVisual} from "scripts/initiative_order/InitiativeEntryVisual";
 import {InstructionVisualizer} from "scripts/instruction_visualizer/instruction_visualizer";
 

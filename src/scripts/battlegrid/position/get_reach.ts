@@ -1,4 +1,4 @@
-import {assert_is_footprint_one, Position} from "scripts/battlegrid/Position";
+import {assert_is_footprint_one} from "scripts/battlegrid/Position";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {get_reach_movement} from "scripts/battlegrid/position/get_reach_movement";
 import {get_reach_melee} from "scripts/battlegrid/position/get_reach_melee";

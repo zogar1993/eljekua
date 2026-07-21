@@ -3,9 +3,9 @@ import type {
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import type {StatusDuration, StatusEffect} from "scripts/battlegrid/creatures/Creature";
+import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
-import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {InstructionApplyStatus} from "scripts/expressions/parser/instructions";
 
 export const interpret_apply_status = ({

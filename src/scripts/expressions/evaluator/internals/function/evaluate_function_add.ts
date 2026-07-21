@@ -1,4 +1,4 @@
-import type {ExprNumber} from "scripts/expressions/evaluator/types";
+import type {Expr, ExprNumber} from "scripts/expressions/evaluator/types";
 import type {AstNodeFunction} from "scripts/expressions/parser/nodes/AstNodeFunction";
 import {
     add_numbers,
@@ -7,7 +7,6 @@ import {
     is_number_resolved
 } from "scripts/expressions/evaluator/number_utils";
 import type {AstNode} from "scripts/expressions/parser/nodes/AstNode";
-import type {Expr} from "scripts/expressions/evaluator/types";
 
 export const evaluate_function_add = ({node, evaluate_ast}:
                                           {

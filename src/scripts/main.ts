@@ -22,6 +22,7 @@ import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {create_instruction_visualizer} from "scripts/instruction_visualizer/instruction_visualizer";
 import {AnimationQueue} from "scripts/AnimationQueue";
 import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use_cases";
+
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
 const turn_state = create_turn_state()

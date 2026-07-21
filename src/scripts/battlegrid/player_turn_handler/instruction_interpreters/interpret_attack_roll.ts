@@ -2,8 +2,6 @@ import {roll_d} from "scripts/randomness/dice";
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {Creature} from "scripts/battlegrid/creatures/Creature";
-import {ActionLog} from "scripts/action_log/ActionLog";
 import {add_numbers_resolved} from "scripts/expressions/evaluator/number_utils";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
@@ -13,7 +11,6 @@ import {HIT_STATUS} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {Instruction, InstructionAttackRoll, InstructionSaveVariable} from "scripts/expressions/parser/instructions";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 import {is_flanking} from "scripts/battlegrid/queries/is_flanking";
-import {TurnState} from "scripts/battlegrid/player_turn_handler/TurnState";
 import {
     create_save_hit_status_instruction
 } from "scripts/expressions/parser/syntax_sugar/create_save_hit_status_instruction";

@@ -1,6 +1,6 @@
 import {AstNodeNumber, parse_number} from "scripts/expressions/parser/nodes/AstNodeNumber";
 import {AstNodeKeyword, parse_keyword} from "scripts/expressions/parser/nodes/AstNodeKeyword";
-import {AstNodeDice, parse_roll, AstNodeWeapon} from "scripts/expressions/parser/nodes/AstNodeRoll";
+import {AstNodeDice, AstNodeWeapon, parse_roll} from "scripts/expressions/parser/nodes/AstNodeRoll";
 import {AstNodeFunction, parse_function} from "scripts/expressions/parser/nodes/AstNodeFunction";
 import {Scanner} from "scripts/expressions/parser/scanner";
 import {is_non_numeric_character, is_numeric_character} from "scripts/expressions/parser/regexes";

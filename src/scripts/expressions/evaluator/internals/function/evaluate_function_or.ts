@@ -1,8 +1,7 @@
 import type {AstNodeFunction} from "scripts/expressions/parser/nodes/AstNodeFunction";
-import type {ExprBoolean} from "scripts/expressions/evaluator/types";
+import type {Expr, ExprBoolean} from "scripts/expressions/evaluator/types";
 import {assert_parameters_amount_is_at_least} from "scripts/expressions/evaluator/asserts";
 import type {AstNode} from "scripts/expressions/parser/nodes/AstNode";
-import type {Expr} from "scripts/expressions/evaluator/types";
 
 export const evaluate_function_or = ({node, evaluate_ast}:
                                          {

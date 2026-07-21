@@ -1,9 +1,4 @@
-import {
-    Expr,
-    ExprNumber,
-    ExprNumberResolved,
-    ExprNumberUnresolved
-} from "scripts/expressions/evaluator/types";
+import {Expr, ExprNumber, ExprNumberResolved, ExprNumberUnresolved} from "scripts/expressions/evaluator/types";
 import {roll_d} from "scripts/randomness/dice";
 
 export const add_numbers_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved => ({

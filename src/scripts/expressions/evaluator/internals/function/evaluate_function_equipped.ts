@@ -1,10 +1,9 @@
-import type {ExprBoolean} from "scripts/expressions/evaluator/types";
+import type {Expr, ExprBoolean} from "scripts/expressions/evaluator/types";
 import type {AstNodeFunction} from "scripts/expressions/parser/nodes/AstNodeFunction";
 import {assert_parameters_amount_equals} from "scripts/expressions/evaluator/asserts";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {AST_NODE} from "scripts/expressions/parser/AST_NODE";
 import type {AstNode} from "scripts/expressions/parser/nodes/AstNode";
-import type {Expr} from "scripts/expressions/evaluator/types";
 
 export const evaluate_function_equipped = ({node, evaluate_ast}:
                                                {
