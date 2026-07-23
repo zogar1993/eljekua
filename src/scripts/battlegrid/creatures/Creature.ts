@@ -3,8 +3,7 @@ import type {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {ACTION_TYPE_EXPENDITURE_ORDER, ActionType} from "scripts/battlegrid/creatures/ActionType";
 import {remove_from_array_by_index} from "scripts/ts_utils/remove_from_array_by_index";
 import {Position} from "scripts/battlegrid/Position";
-import {create_event_with_params} from "scripts/events/event_with_params";
-import {create_event_without_params} from "scripts/events/event_without_params";
+import {create_event_manager} from "scripts/events/event_manager";
 import {InstructionAttackRoll} from "scripts/expressions/parser/instructions";
 
 type EventHandlerMoved = { position: Position, movement_type: "move" | "push" };
@@ -24,12 +23,12 @@ export class Creature {
     available_actions: Array<ActionType> = []
 
     events = {
-        moved: create_event_with_params<EventHandlerMoved>(),
-        received_damage: create_event_with_params<EventHandlerReceivedDamage>(),
-        is_targeted: create_event_with_params<EventHandlerIsTargeted>(),
-        is_untargeted: create_event_without_params(),
-        is_missed: create_event_without_params(),
-        has_attacked: create_event_with_params<EventHandlerHasAttacked>(),
+        moved: create_event_manager<EventHandlerMoved>(),
+        received_damage: create_event_manager<EventHandlerReceivedDamage>(),
+        is_targeted: create_event_manager<EventHandlerIsTargeted>(),
+        is_untargeted: create_event_manager(),
+        is_missed: create_event_manager(),
+        has_attacked: create_event_manager<EventHandlerHasAttacked>(),
     }
 
     constructor({data}: { data: CreatureData }) {
