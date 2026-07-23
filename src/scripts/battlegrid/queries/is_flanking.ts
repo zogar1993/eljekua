@@ -1,6 +1,6 @@
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {get_flanker_positions} from "scripts/battlegrid/position/get_flanker_positions";
-import {are_creatures_allied} from "scripts/creatures/are_creatures_allied";
+import {are_creatures_allied} from "scripts/battlegrid/creatures/are_creatures_allied";
 import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 
 export const is_flanking = ({attacker, defender, battle_grid}: {

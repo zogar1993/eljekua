@@ -1,4 +1,4 @@
-import {Size} from "scripts/creatures/SIZES";
+import {Size} from "scripts/battlegrid/creatures/SIZES";
 import {AttributeCode} from "scripts/character_sheet/attributes";
 import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
 import {IRPower} from "scripts/types";
