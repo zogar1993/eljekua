@@ -22,6 +22,7 @@ import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {create_instruction_visualizer} from "scripts/instruction_visualizer/instruction_visualizer";
 import {AnimationQueue} from "scripts/AnimationQueue";
 import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use_cases";
+import {HIT_STATUS, HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
@@ -97,11 +98,17 @@ const on_creature_added_to_game: Array<(creature: Creature) => void> = [
             action_log.add_new_action_log(`${data.name} was dealt `, damage, ` damage.`)
         })
 
-        events.has_attacked.add_handler(({attack, defense, is_hit, defender, instruction}) => {
+        const HIT_STATUS_TEXT = new Map<HitStatus, string>([
+            [HIT_STATUS.MISS, "misses"],
+            [HIT_STATUS.HIT, "hits"],
+            [HIT_STATUS.CRIT, "crits"]
+        ])
+
+        events.has_attacked.add_handler(({attack, defense, hit_status, defender, instruction}) => {
             action_log.add_new_action_log(
                 `${data.name}'s ${turn_state.get_power_name()} (`,
                 attack,
-                `) ${is_hit ? "hits" : "misses"} against ${defender.data.name}'s ${instruction.defense} (`,
+                `) ${HIT_STATUS_TEXT.get(hit_status)} against ${defender.data.name}'s ${instruction.defense} (`,
                 defense,
                 `).`)
         })

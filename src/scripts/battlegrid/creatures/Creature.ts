@@ -5,13 +5,14 @@ import {remove_from_array_by_index} from "scripts/ts_utils/remove_from_array_by_
 import {Position} from "scripts/battlegrid/Position";
 import {create_event_manager} from "scripts/events/event_manager";
 import {InstructionAttackRoll} from "scripts/expressions/parser/instructions";
+import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 
 type EventHandlerMoved = { position: Position, movement_type: "move" | "push" };
 type EventHandlerReceivedDamage = { damage: ExprNumberResolved };
 type EventHandlerIsTargeted = { attack: number, defense: number, chance: number };
 type EventHandlerHasAttacked = {
     attack: ExprNumberResolved,
-    is_hit: boolean,
+    hit_status: HitStatus,
     defender: Creature,
     defense: ExprNumberResolved,
     instruction: InstructionAttackRoll

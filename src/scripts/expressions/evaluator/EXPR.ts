@@ -2,6 +2,7 @@ import {Expr, ExprNumber, ExprNumberResolved} from "scripts/expressions/evaluato
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Position} from "scripts/battlegrid/Position";
 import {Power} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 
 export const EXPR = {
     as_creature: (expr: Expr): Creature => {
@@ -55,6 +56,10 @@ export const EXPR = {
         if (expr.type === "number_resolved") return expr
         return throw_could_not_cast({expr, to: "number"})
     },
+    as_attack_rolls: (expr: Expr): Map<Creature, HitStatus> => {
+        if (expr.type === "attack_rolls") return expr.value
+        return throw_could_not_cast({expr, to: "attack_rolls"})
+    }
 }
 
 const throw_could_not_cast = ({expr, to}: { expr: Expr, to: string }): never => {
