@@ -71,7 +71,7 @@ const transform_primary_roll = (roll: Required<IRPower>["roll"]): Array<Instruct
         defense: roll.defense,
         defender: PRIMARY_TARGET_LABEL,
     },
-        ...transform_instructions(roll.before_instructions),
+        ...transform_instructions(roll.before_consequences),
     {
         type: "attack_roll_consequence",
         defender: PRIMARY_TARGET_LABEL,

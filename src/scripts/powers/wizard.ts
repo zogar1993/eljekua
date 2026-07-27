@@ -44,7 +44,7 @@ const scorching_burst: IRPower = {
     roll: {
         attack: "int",
         defense: "reflex",
-        before_instructions: [
+        before_consequences: [
             {
                 type: "save_number_as_resolved",
                 value: "$add({1d6},owner.int_mod)",

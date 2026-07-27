@@ -22,7 +22,7 @@ export type IRPower = {
     roll?: {
         attack: string
         defense: DefenseCode
-        before_instructions?: Array<IRInstruction>
+        before_consequences?: Array<IRInstruction>
         hit: Array<IRInstruction>
         miss?: Array<IRInstruction>
     }
