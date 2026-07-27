@@ -16,7 +16,6 @@ export const interpret_attack_roll_consequence = (props: InterpretInstructionPro
     const attack_rolls = EXPR.as_attack_rolls(turn_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
     const entries = [...attack_rolls.entries()]
 
-
     const new_instructions: Array<Instruction> = []
 
     entries.forEach(([defender, hit_status], i) => {
@@ -33,7 +32,6 @@ export const interpret_attack_roll_consequence = (props: InterpretInstructionPro
             defender.events.is_missed.raise()
             new_instructions.push(...instruction.miss)
         }
-
     })
 
     turn_state.add_instructions(new_instructions)
