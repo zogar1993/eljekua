@@ -46,7 +46,8 @@ const FUNCTION_NAMES = [
     "not_equals",
     "equipped",
     "has_valid_targeting",
-    "opportunity_attack_range"
+    "opportunity_attack_range",
+    "creature_by_id"
 ]
 
 export type AstNodeFunction = {

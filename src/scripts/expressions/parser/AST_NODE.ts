@@ -2,6 +2,7 @@ import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {AstNodeKeyword} from "scripts/expressions/parser/nodes/AstNodeKeyword";
 import {AstNodeString} from "scripts/expressions/parser/nodes/AstNodeString";
 import {to_ast} from "scripts/expressions/parser/to_ast";
+import {AstNodeNumber} from "scripts/expressions/parser/nodes/AstNodeNumber";
 
 export const AST_NODE = {
     as_keyword: (node: AstNode): AstNodeKeyword => {
@@ -11,6 +12,10 @@ export const AST_NODE = {
     as_string: (node: AstNode): AstNodeString => {
         if (node.type === "string") return node
         throw Error(`Cannot cast ast node ${JSON.stringify(node)} to "string"`)
+    },
+    as_number: (node: AstNode): AstNodeNumber => {
+        if (node.type === "number") return node
+        throw Error(`Cannot cast ast node ${JSON.stringify(node)} to "number"`)
     }
 }
 

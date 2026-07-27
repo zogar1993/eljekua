@@ -4,7 +4,7 @@ import {ACTION_TYPE_EXPENDITURE_ORDER, ActionType} from "scripts/battlegrid/crea
 import {remove_from_array_by_index} from "scripts/ts_utils/remove_from_array_by_index";
 import {Position} from "scripts/battlegrid/Position";
 import {create_event_manager} from "scripts/events/event_manager";
-import {InstructionAttackRoll} from "scripts/expressions/parser/instructions";
+import {InstructionAttackDiceRoll} from "scripts/expressions/parser/instructions";
 import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 
 type EventHandlerMoved = { position: Position, movement_type: "move" | "push" };
@@ -15,10 +15,11 @@ type EventHandlerHasAttacked = {
     hit_status: HitStatus,
     defender: Creature,
     defense: ExprNumberResolved,
-    instruction: InstructionAttackRoll
+    instruction: InstructionAttackDiceRoll
 }
 
 export class Creature {
+    id: number
     data: CreatureData
     statuses: Array<Status> = []
     available_actions: Array<ActionType> = []
@@ -32,8 +33,9 @@ export class Creature {
         has_attacked: create_event_manager<EventHandlerHasAttacked>(),
     }
 
-    constructor({data}: { data: CreatureData }) {
+    constructor({id, data}: { id: number, data: CreatureData }) {
         this.data = data
+        this.id = id
     }
 
     //P1 add weapon types

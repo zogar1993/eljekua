@@ -62,7 +62,7 @@ export const create_battle_grid = ({
 
     const create_creature = (data: CreatureData) => {
         const d = {...data, powers: [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS, ...data.powers]}
-        const creature = new Creature({data: d})
+        const creature = new Creature({id: creatures.length, data: d})
         creatures.push(creature)
         return creature
     }

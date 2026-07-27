@@ -33,6 +33,9 @@ import {
 import {
     evaluate_function_has_action_type_available
 } from "scripts/expressions/evaluator/internals/function/evaluate_function_has_action_type_available";
+import {
+    evaluate_function_creature_by_id
+} from "scripts/expressions/evaluator/internals/function/evaluate_function_creature_by_id";
 
 export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                                             {
@@ -71,6 +74,8 @@ export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                 return evaluate_function_is_greater_or_equal({node, evaluate_ast})
             case "is_lower_or_equal":
                 return evaluate_function_is_lower_or_equal({node, evaluate_ast})
+            case "creature_by_id":
+                return evaluate_function_creature_by_id({node, battle_grid})
             default:
                 throw Error(`function name '${node.name}' not supported when evaluating node`)
         }
