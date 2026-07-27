@@ -18,14 +18,10 @@ export const interpret_attack_roll_consequence = (props: InterpretInstructionPro
 
     const new_instructions: Array<Instruction> = []
 
-    entries.forEach(([defender, hit_status], i) => {
+    entries.forEach(([defender, hit_status]) => {
+        new_instructions.push(save_variable_instruction(defender.id, instruction.defender))
+
         const is_hit = hit_status >= HIT_STATUS.HIT
-
-        //TODO this could be shortened with a dedicated instruction
-        const defender_label = `${instruction.defender}(${i})`
-        turn_state.set_variable(defender_label, {type: "creatures", value: [defender]})
-        new_instructions.push(save_variable_instruction(defender_label, instruction.defender))
-
         if (is_hit) {
             new_instructions.push(...instruction.hit)
         } else {
@@ -37,5 +33,8 @@ export const interpret_attack_roll_consequence = (props: InterpretInstructionPro
     turn_state.add_instructions(new_instructions)
 }
 
-const save_variable_instruction = (origin: string, destination: string): InstructionSaveVariable =>
-    ({type: INSTRUCTION_TYPE.SAVE_VARIABLE, value: {type: "keyword", value: origin}, label: destination})
+const save_variable_instruction = (origin: number, destination: string): InstructionSaveVariable => ({
+    type: INSTRUCTION_TYPE.SAVE_VARIABLE,
+    value: {type: "function", name: "creature_by_id", parameters: [{type: "number", value: origin}]},
+    label: destination
+})
