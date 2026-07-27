@@ -2,8 +2,8 @@ import {
     interpret_select_target
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_select_target";
 import {
-    interpret_attack_roll
-} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_attack_roll";
+    interpret_attack_dice_roll,
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_attack_dice_roll";
 import {
     interpret_apply_damage
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_apply_damage";
@@ -37,14 +37,19 @@ import {
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_expend_action";
 import {Instruction} from "scripts/expressions/parser/instructions";
 import {interpret_end_turn} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_end_turn";
+import {
+    interpret_attack_roll_consequence
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_attack_roll_consequence";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>): void => {
     const {instruction} = props
     switch (instruction.type) {
         case "select_target":
             return interpret_select_target({...props, instruction})
-        case "attack_roll":
-            return interpret_attack_roll({...props, instruction})
+        case "attack_dice_roll":
+            return interpret_attack_dice_roll({...props, instruction})
+        case "attack_roll_consequence":
+            return interpret_attack_roll_consequence({...props, instruction})
         case "apply_damage":
             return interpret_apply_damage({...props, instruction})
         case "move":

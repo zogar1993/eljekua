@@ -244,7 +244,7 @@ const show_attack_success_chance_if_needed = ({turn_state, selection_context, ev
     evaluate_ast: (node: AstNode) => Expr
 }) => {
     const next_instruction = turn_state.peek_instruction()
-    const needs_roll = next_instruction.type === "attack_roll"
+    const needs_roll = next_instruction.type === "attack_dice_roll"
     if (needs_roll && selection_context.target) {
         if (selection_context.target.type !== "creatures")
             throw Error("an attack roll needs to target creatures")

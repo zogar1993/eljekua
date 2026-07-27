@@ -4,7 +4,6 @@ import {ATTRIBUTE_CODES} from "scripts/character_sheet/attributes";
 import {
     Instruction,
     InstructionApplyStatus,
-    InstructionAttackRoll,
     InstructionCondition,
     InstructionSelectTarget
 } from "scripts/expressions/parser/instructions";
@@ -17,7 +16,7 @@ export const transform_power_ir_into_vm_representation = (power: IRPower): Power
     const instructions: Array<Instruction> = [
         ...(power.damage ? transform_primary_damage(power.damage) : []),
         ...(power.targeting ? [transform_select_target_ir(power.targeting)] : []),
-        ...(power.roll ? [transform_primary_roll(power.roll)] : []),
+        ...(power.roll ? transform_primary_roll(power.roll) : []),
         ...transform_instructions(power.effect)
     ]
 
@@ -65,17 +64,21 @@ export type Trigger = {
     conditions: Array<AstNode>
 }
 
-const transform_primary_roll = (roll: Required<IRPower>["roll"]): InstructionAttackRoll => {
-    return {
-        type: "attack_roll",
+const transform_primary_roll = (roll: Required<IRPower>["roll"]): Array<Instruction> => [
+    {
+        type: "attack_dice_roll",
         attack: to_ast(standardize_attack(roll.attack)),
         defense: roll.defense,
         defender: PRIMARY_TARGET_LABEL,
-        before_instructions: transform_instructions(roll.before_instructions),
+    },
+        ...transform_instructions(roll.before_instructions),
+    {
+        type: "attack_roll_consequence",
+        defender: PRIMARY_TARGET_LABEL,
         hit: transform_instructions(roll.hit),
         miss: transform_instructions(roll.miss)
     }
-}
+]
 
 const standardize_attack = (text: string) =>
     ATTRIBUTE_CODES.reduce((text, attribute) => text.replaceAll(attribute, `owner.${attribute}_mod_lvl`), text)

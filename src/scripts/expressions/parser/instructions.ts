@@ -3,12 +3,17 @@ import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
 import {StatusDurationValue} from "scripts/types";
 import {ActionType} from "scripts/battlegrid/creatures/ActionType";
 
-export type InstructionAttackRoll = {
-    type: "attack_roll"
+export type InstructionAttackDiceRoll = {
+    type: "attack_dice_roll"
     attack: AstNode
     defense: DefenseCode
     defender: string
-    before_instructions: Array<Instruction>
+}
+
+export type InstructionAttackRollConsequence = {
+//TODO this duplication of defender should be not needed
+    defender: string
+    type: "attack_roll_consequence"
     hit: Array<Instruction>
     miss: Array<Instruction>
 }
@@ -94,7 +99,6 @@ export type InstructionApplyStatus = {
 export type Instruction =
     InstructionApplyDamage |
     InstructionSelectTarget |
-    InstructionAttackRoll |
     InstructionCondition |
     InstructionMovement |
     InstructionOptions |
@@ -105,7 +109,9 @@ export type Instruction =
     InstructionApplyStatus |
     InstructionForceMovement |
     InstructionExpendAction |
-    InstructionEndTurn
+    InstructionEndTurn |
+    InstructionAttackDiceRoll |
+    InstructionAttackRollConsequence
 
 export type InstructionSelectTarget =
     InstructionSelectTargetRanged |

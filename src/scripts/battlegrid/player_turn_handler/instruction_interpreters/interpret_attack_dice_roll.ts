@@ -5,18 +5,12 @@ import {
 import {add_numbers_resolved} from "scripts/expressions/evaluator/number_utils";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
-
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 import {HIT_STATUS, HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
-import {Instruction, InstructionAttackRoll, InstructionSaveVariable} from "scripts/expressions/parser/instructions";
+import {InstructionAttackDiceRoll} from "scripts/expressions/parser/instructions";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 import {is_flanking} from "scripts/battlegrid/queries/is_flanking";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
-
-export const interpret_attack_roll = (props: InterpretInstructionProps<InstructionAttackRoll>) => {
-    interpret_attack_dice_roll(props)
-    interpret_attack_roll_result(props)
-}
 
 const COMBAT_ADVANTAGE: ExprNumberResolved = {
     type: "number_resolved",
@@ -24,16 +18,12 @@ const COMBAT_ADVANTAGE: ExprNumberResolved = {
     description: "Combat Advantage"
 }
 
-const save_variable_instruction = (origin: string, destination: string): InstructionSaveVariable =>
-    ({type: "save_variable", value: {type: "keyword", value: origin}, label: destination})
-
-
 export const interpret_attack_dice_roll = ({
                                                instruction,
                                                battle_grid,
                                                evaluate_ast,
                                                turn_state
-                                           }: InterpretInstructionProps<InstructionAttackRoll>) => {
+                                           }: InterpretInstructionProps<InstructionAttackDiceRoll>) => {
     const attacker = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
     const defenders = EXPR.as_creatures(turn_state.get_variable(instruction.defender))
 
@@ -71,33 +61,4 @@ export const interpret_attack_dice_roll = ({
 
         attacker.events.has_attacked.raise({attack, hit_status, defender, defense, instruction})
     })
-}
-
-export const interpret_attack_roll_result = (props: InterpretInstructionProps<InstructionAttackRoll>) => {
-    const {instruction, turn_state} = props
-    const attack_rolls = EXPR.as_attack_rolls(turn_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
-    const entries = [...attack_rolls.entries()]
-
-
-    const new_instructions: Array<Instruction> = []
-    new_instructions.push(...instruction.before_instructions)
-
-    entries.forEach(([defender, hit_status], i) => {
-        const is_hit = hit_status >= HIT_STATUS.HIT
-
-        //TODO this could be shortened with a dedicated instruction
-        const defender_label = `${instruction.defender}(${i})`
-        turn_state.set_variable(defender_label, {type: "creatures", value: [defender]})
-        new_instructions.push(save_variable_instruction(defender_label, instruction.defender))
-
-        if (is_hit) {
-            new_instructions.push(...instruction.hit)
-        } else {
-            defender.events.is_missed.raise()
-            new_instructions.push(...instruction.miss)
-        }
-
-    })
-
-    turn_state.add_instructions(new_instructions)
 }
