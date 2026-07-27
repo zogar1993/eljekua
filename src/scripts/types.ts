@@ -1,5 +1,6 @@
 import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
 import {ActionType} from "scripts/battlegrid/creatures/ActionType";
+import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
 
 export type IRPower = {
     name: string
@@ -37,7 +38,7 @@ type Targeting =
 
 export type IRInstruction =
     {
-        type: "apply_damage"
+        type: typeof INSTRUCTION_TYPE.APPLY_DAMAGE
         value: string
         target: string
         half_damage?: boolean
@@ -45,19 +46,19 @@ export type IRInstruction =
     } |
     IRInstructionSelectTarget |
     {
-        type: "move" | "shift",
+        type: typeof INSTRUCTION_TYPE.MOVE | typeof INSTRUCTION_TYPE.SHIFT,
         target: "owner",
         destination: string
     } | {
-    type: "condition",
+    type: typeof INSTRUCTION_TYPE.CONDITION,
     condition: string,
     instructions_true: Array<IRInstruction>
     instructions_false?: Array<IRInstruction>
 } | {
-    type: "options",
+    type: typeof INSTRUCTION_TYPE.OPTIONS,
     options: Array<{ text: string, instructions: Array<IRInstruction> }>
 } | {
-    type: "save_variable",
+    type: typeof INSTRUCTION_TYPE.SAVE_VARIABLE,
     value: string,
     label: string
 } | {
@@ -65,19 +66,19 @@ export type IRInstruction =
     amount: number,
     target: string
 } | {
-    type: "save_number_as_resolved"
+    type: typeof INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED
     value: string
     label: string
 } | IRInstructionApplyStatus
  | {
-    type: "add_powers_as_options"
+    type: typeof INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS
     creature: string,
     cost: "normal" | "opportunity" | "free_attack",
     filter: "turn" | "melee_basic_attack"
  }
 
 export type IRInstructionApplyStatus = {
-    type: "apply_status",
+    type: typeof INSTRUCTION_TYPE.APPLY_STATUS,
     target: string,
     duration: IRStatusDuration
     status: {
@@ -106,7 +107,7 @@ export type StatusDurationValue = keyof typeof StatusDurationEnum
 type IRStatusDuration = StatusDurationValue | Array<StatusDurationValue>
 
 export type IRInstructionSelectTarget =
-    { type: "select_target", target_label: string } &
+    { type: typeof INSTRUCTION_TYPE.SELECT_TARGET, target_label: string } &
     (IRInstructionSelectTargetMelee |
         IRInstructionSelectTargetMovement |
         IRInstructionSelectTargetRanged |

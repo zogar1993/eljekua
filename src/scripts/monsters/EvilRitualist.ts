@@ -2,6 +2,7 @@ import {Size} from "scripts/battlegrid/creatures/SIZES";
 import {AttributeCode} from "scripts/character_sheet/attributes";
 import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
 import {IRPower} from "scripts/types";
+import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
 
 const sacrificial_dagger: IRPower = {
     name: "Sacrificial Dagger",
@@ -20,7 +21,7 @@ const sacrificial_dagger: IRPower = {
         defense: "ac",
         hit: [
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "4",
                 target: "primary_target"
             }
@@ -44,7 +45,7 @@ const unholy_vigor: IRPower = {
         ],
     },
     effect: [
-        {type: "add_powers_as_options", creature: "owner", cost: "free_attack", filter: "melee_basic_attack"}
+        {type: INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS, creature: "owner", cost: "free_attack", filter: "melee_basic_attack"}
     ]
 }
 

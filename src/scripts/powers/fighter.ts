@@ -2,6 +2,7 @@ import type {IRPower} from "scripts/types";
 import {
     transform_power_ir_into_vm_representation
 } from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
 import {power_resolute_shield} from "scripts/powers/fighter/resolute_shield";
 import {power_shield_faint} from "scripts/powers/fighter/shield_faint";
 
@@ -23,7 +24,7 @@ const sure_strike: IRPower = {
         defense: "ac",
         hit: [
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "{1W}",
                 target: "primary_target"
             },
@@ -49,7 +50,7 @@ const cleave: IRPower = {
         defense: "ac",
         hit: [
             {
-                type: "select_target",
+                type: INSTRUCTION_TYPE.SELECT_TARGET,
                 targeting_type: "adjacent",
                 target_type: "enemy",
                 amount: 1,
@@ -57,16 +58,16 @@ const cleave: IRPower = {
                 target_label: "secondary_target"
             },
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "$add({1W},owner.str_mod)",
                 target: "primary_target"
             },
             {
-                type: "condition",
+                type: INSTRUCTION_TYPE.CONDITION,
                 condition: "$exists(secondary_target)",
                 instructions_true: [
                     {
-                        type: "apply_damage",
+                        type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                         value: "owner.str_mod",
                         target: "secondary_target",
                     },
@@ -94,25 +95,25 @@ const reaping_strike: IRPower = {
         defense: "ac",
         hit: [
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "$add({1W},owner.str_mod)",
                 target: "primary_target"
             },
         ],
         miss: [
             {
-                type: "condition",
+                type: INSTRUCTION_TYPE.CONDITION,
                 condition: `$equipped(owner,"two-handed")`,
                 instructions_true: [
                     {
-                        type: "apply_damage",
+                        type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                         value: `owner.str_mod`,
                         target: "primary_target"
                     },
                 ],
                 instructions_false: [
                     {
-                        type: "apply_damage",
+                        type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                         value: `owner.str_mod`,
                         target: "primary_target",
                         half_damage: true
@@ -144,18 +145,18 @@ const tide_of_iron: IRPower = {
         defense: "ac",
         hit: [
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "$add({1W},owner.str_mod)",
                 target: "primary_target"
             },
             {
-                type: "options",
+                type: INSTRUCTION_TYPE.OPTIONS,
                 options: [
                     {
                         text: "Push",
                         instructions: [
                             {
-                                type: "save_variable",
+                                type: INSTRUCTION_TYPE.SAVE_VARIABLE,
                                 value: "primary_target.position",
                                 label: "primary_target_original_position"
                             },
@@ -165,24 +166,24 @@ const tide_of_iron: IRPower = {
                                 target: "primary_target"
                             },
                             {
-                                type: "condition",
+                                type: INSTRUCTION_TYPE.CONDITION,
                                 condition: "$not_equals(primary_target.position,primary_target_original_position)",
                                 instructions_true: [
                                     {
-                                        type: "options",
+                                        type: INSTRUCTION_TYPE.OPTIONS,
                                         options: [
                                             {
                                                 text: "Follow",
                                                 instructions: [
                                                     {
-                                                        type: "select_target",
+                                                        type: INSTRUCTION_TYPE.SELECT_TARGET,
                                                         targeting_type: "movement",
                                                         distance: 1,
                                                         destination_requirement: "primary_target_original_position",
                                                         target_label: "path_to_follow"
                                                     },
                                                     {
-                                                        type: "shift",
+                                                        type: INSTRUCTION_TYPE.SHIFT,
                                                         target: "owner",
                                                         destination: "path_to_follow"
                                                     }
@@ -226,16 +227,16 @@ const brash_strike: IRPower = {
         defense: "ac",
         hit: [
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "$add({1W},owner.str_mod)",
                 target: "primary_target"
             },
             {
-                type: "condition",
+                type: INSTRUCTION_TYPE.CONDITION,
                 condition: `$or($equipped(owner, "hammer"), $equipped(owner, "axe"), $equipped(owner, "mace"))`,
                 instructions_true: [
                     {
-                        type: "apply_damage",
+                        type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                         value: "owner.con_mod",
                         target: "primary_target"
                     },//TODO P1 revisit that these damages are all dealt as one chunk instead of parts
@@ -245,7 +246,7 @@ const brash_strike: IRPower = {
     },
     effect: [
         {
-            type: "apply_status",
+            type: INSTRUCTION_TYPE.APPLY_STATUS,
             target: "owner",
             duration: "until_start_of_your_next_turn",
             status: {
@@ -275,7 +276,7 @@ const crushing_surge: IRPower = {
         defense: "ac",
         hit: [
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "$add({1W},owner.str_mod)",
                 target: "primary_target"
             },
@@ -304,12 +305,12 @@ const tide_of_iron_true = {
         defense: "ac",
         hit: [
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "$add({1W},owner.str_mod)",
                 target: "primary_target"
             },
             {
-                type: "condition",
+                type: INSTRUCTION_TYPE.CONDITION,
                 condition: "is_greater_or_equal($add(owner.size,1),target.size)",
                 instructions_true: [
                     {
@@ -317,7 +318,7 @@ const tide_of_iron_true = {
                         question: "Push?",
                         instructions_true: [
                             {
-                                type: "save_variable",
+                                type: INSTRUCTION_TYPE.SAVE_VARIABLE,
                                 target: "primary_target.position",
                                 label: "primary_target_original_position"
                             },
@@ -327,7 +328,7 @@ const tide_of_iron_true = {
                                 target: "primary_target"
                             },
                             {
-                                type: "condition",
+                                type: INSTRUCTION_TYPE.CONDITION,
                                 condition: "$and($not_equals(primary_target.position,primary_target_last_position),$equals($movement_distance(owner.position,primary_target_last_position),1))",
                                 instructions_true: [
                                     {
@@ -335,7 +336,7 @@ const tide_of_iron_true = {
                                         question: "Follow?",
                                         instructions_true: [
                                             {
-                                                type: "shift",
+                                                type: INSTRUCTION_TYPE.SHIFT,
                                                 target: "owner",
                                                 destination: "primary_target_last_position"
                                             }

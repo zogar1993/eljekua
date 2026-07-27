@@ -3,7 +3,7 @@ import {
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {Expr} from "scripts/expressions/evaluator/types";
-import {Instruction, InstructionMovement} from "scripts/expressions/parser/instructions";
+import {INSTRUCTION_TYPE, Instruction, InstructionMovement} from "scripts/expressions/parser/instructions";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 
 export const interpret_move = ({
@@ -54,7 +54,7 @@ export const interpret_move = ({
                 description: "movement"
             })
             turn_state.add_instructions([{
-                type: "move",
+                type: INSTRUCTION_TYPE.MOVE,
                 target: instruction.target,
                 destination: instruction.destination
             }])
@@ -63,7 +63,7 @@ export const interpret_move = ({
             for (const {creature: attacker, powers} of potential_attackers) {
                 const instructions: Array<Instruction> = [
                     {
-                        type: "options",
+                        type: INSTRUCTION_TYPE.OPTIONS,
                         options: [
                             ...powers.map(power => ({
                                 text: power.name,

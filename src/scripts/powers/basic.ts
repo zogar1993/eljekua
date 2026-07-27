@@ -2,6 +2,7 @@ import type {IRPower} from "scripts/types.ts";
 import {
     transform_power_ir_into_vm_representation
 } from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
 
 const shift: IRPower = {
     name: "Shift",
@@ -16,7 +17,7 @@ const shift: IRPower = {
     },
     effect: [
         {
-            type: "shift",
+            type: INSTRUCTION_TYPE.SHIFT,
             target: "owner",
             destination: "primary_target"
         }
@@ -36,7 +37,7 @@ const movement: IRPower = {
     },
     effect: [
         {
-            type: "move",
+            type: INSTRUCTION_TYPE.MOVE,
             target: "owner",
             destination: "primary_target"
         }
@@ -61,7 +62,7 @@ const melee_basic_attack: IRPower = {
         defense: "ac",
         hit: [
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "$add({1W},owner.str_mod)",
                 target: "primary_target"
             }
@@ -85,7 +86,7 @@ const opportunity_attack: IRPower = {
         ],
     },
     effect: [
-        {type: "add_powers_as_options", creature: "owner", cost: "opportunity", filter: "melee_basic_attack"}
+        {type: INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS, creature: "owner", cost: "opportunity", filter: "melee_basic_attack"}
     ]
 }
 

@@ -7,6 +7,7 @@ import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import {get_valid_targets} from "scripts/battlegrid/position/get_valid_targets";
+import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
 
 export const evaluate_function_has_valid_targeting = ({node, turn_state, evaluate_ast, battle_grid}:
                                                           {
@@ -20,7 +21,7 @@ export const evaluate_function_has_valid_targeting = ({node, turn_state, evaluat
     const power_name = AST_NODE.as_keyword(node.parameters[0]).value
     const power = EXPR.as_power(turn_state.get_variable(power_name))
 
-    const targeting_instruction = power.instructions.find(instruction => instruction.type === "select_target")
+    const targeting_instruction = power.instructions.find(instruction => instruction.type === INSTRUCTION_TYPE.SELECT_TARGET)
 
     // If there is no select targeting instruction then this check passes
     let is_targeting_valid = true

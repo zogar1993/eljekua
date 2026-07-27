@@ -2,6 +2,7 @@ import {IRPower} from "scripts/types";
 import {
     transform_power_ir_into_vm_representation
 } from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
 
 const sly_flourish = {
     name: "Sly Flourish",
@@ -20,7 +21,7 @@ const sly_flourish = {
         defense: "ac",
         hit: [
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "$add({1W},owner.dex_mod,owner.cha_mod)",
                 target: "primary_target"
             },
@@ -46,7 +47,7 @@ const piercing_strike: IRPower = {
         defense: "reflex",
         hit: [
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "$add({1W},owner.dex_mod)",
                 target: "primary_target"
             },

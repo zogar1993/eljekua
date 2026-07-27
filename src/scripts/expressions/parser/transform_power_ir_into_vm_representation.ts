@@ -2,6 +2,7 @@ import {to_ast} from "scripts/expressions/parser/to_ast";
 import type {IRInstruction, IRInstructionApplyStatus, IRInstructionSelectTarget, IRPower} from "scripts/types";
 import {ATTRIBUTE_CODES} from "scripts/character_sheet/attributes";
 import {
+    INSTRUCTION_TYPE,
     Instruction,
     InstructionApplyStatus,
     InstructionCondition,
@@ -66,14 +67,14 @@ export type Trigger = {
 
 const transform_primary_roll = (roll: Required<IRPower>["roll"]): Array<Instruction> => [
     {
-        type: "attack_dice_roll",
+        type: INSTRUCTION_TYPE.ATTACK_DICE_ROLL,
         attack: to_ast(standardize_attack(roll.attack)),
         defense: roll.defense,
         defender: PRIMARY_TARGET_LABEL,
     },
         ...transform_instructions(roll.before_consequences),
     {
-        type: "attack_roll_consequence",
+        type: INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE,
         defender: PRIMARY_TARGET_LABEL,
         hit: transform_instructions(roll.hit),
         miss: transform_instructions(roll.miss)
@@ -90,59 +91,59 @@ const transform_instructions = (instructions: Array<IRInstruction> | undefined):
 
 const transform_generic_instruction = (instruction: IRInstruction): Array<Instruction> => {
     switch (instruction.type) {
-        case "apply_damage":
+        case INSTRUCTION_TYPE.APPLY_DAMAGE:
             return [{
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: to_ast(instruction.value),
                 target: instruction.target,
                 damage_types: instruction.damage_types ?? [],
                 half_damage: instruction.half_damage ?? false
             }]
-        case "select_target":
+        case INSTRUCTION_TYPE.SELECT_TARGET:
             return [transform_select_target_ir(instruction)]
-        case "move":
+        case INSTRUCTION_TYPE.MOVE:
             return [{
-                type: "move",
+                type: INSTRUCTION_TYPE.MOVE,
                 target: instruction.target,
                 destination: instruction.destination
             }]
-        case "shift":
+        case INSTRUCTION_TYPE.SHIFT:
             return [{
-                type: "shift",
+                type: INSTRUCTION_TYPE.SHIFT,
                 target: instruction.target,
                 destination: instruction.destination
             }]
-        case "condition":
+        case INSTRUCTION_TYPE.CONDITION:
             return [{
-                type: "condition",
+                type: INSTRUCTION_TYPE.CONDITION,
                 condition: to_ast(instruction.condition),
                 instructions_true: transform_instructions(instruction.instructions_true),
                 instructions_false: transform_instructions(instruction.instructions_false)
             }]
-        case "options":
+        case INSTRUCTION_TYPE.OPTIONS:
             return [{
-                type: "options",
+                type: INSTRUCTION_TYPE.OPTIONS,
                 options: instruction.options.map(option => ({
                     text: option.text,
                     instructions: transform_instructions(option.instructions)
                 }))
             }]
-        case "save_variable":
+        case INSTRUCTION_TYPE.SAVE_VARIABLE:
             return [{
-                type: "save_variable",
+                type: INSTRUCTION_TYPE.SAVE_VARIABLE,
                 value: to_ast(instruction.value),
                 label: instruction.label
             }]
-        case "save_number_as_resolved":
+        case INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED:
             return [{
-                type: "save_number_as_resolved",
+                type: INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED,
                 label: instruction.label,
                 value: to_ast(instruction.value)
             }]
         case "push":
             return [
                 {
-                    type: "select_target",
+                    type: INSTRUCTION_TYPE.SELECT_TARGET,
                     targeting_type: "push",
                     distance: to_ast(instruction.amount),
                     anchor: to_ast("owner.position"),
@@ -150,22 +151,22 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                     target_label: "push_position"
                 },
                 {
-                    type: "force_movement",
+                    type: INSTRUCTION_TYPE.FORCE_MOVEMENT,
                     movement_type: "push",
                     target: to_ast(instruction.target),
                     destination: to_ast("push_position")
                 }
             ]
-        case "apply_status":
+        case INSTRUCTION_TYPE.APPLY_STATUS:
             return [{
-                type: "apply_status",
+                type: INSTRUCTION_TYPE.APPLY_STATUS,
                 target: to_ast(instruction.target),
                 duration: typeof instruction.duration === "string" ? [instruction.duration] : instruction.duration,
                 status: transform_apply_status_ir(instruction)
             }]
-        case "add_powers_as_options":
+        case INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS:
             return [{
-                type: "add_powers_as_options",
+                type: INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS,
                 cost: instruction.cost,
                 filter: instruction.filter,
                 creature: to_ast(instruction.creature)
@@ -178,25 +179,25 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
 const transform_primary_damage = (damage: NonNullable<IRPower["damage"]>): Array<Instruction> => {
     return [
         {
-            type: "save_variable",
+            type: INSTRUCTION_TYPE.SAVE_VARIABLE,
             value: to_ast(damage.lvl_1),
             label: "primary_damage"
         },
         ...(damage.lvl_11 ? [{
-            type: "condition",
+            type: INSTRUCTION_TYPE.CONDITION,
             condition: to_ast("$is_greater_or_equal(owner.level,11)"),
             instructions_true: [{
-                type: "save_variable",
+                type: INSTRUCTION_TYPE.SAVE_VARIABLE,
                 value: to_ast(damage.lvl_11),
                 label: "primary_damage"
             }],
             instructions_false: []
         } as InstructionCondition] : []),
         ...(damage.lvl_21 ? [{
-            type: "condition",
+            type: INSTRUCTION_TYPE.CONDITION,
             condition: to_ast("$is_greater_or_equal(owner.level,21)"),
             instructions_true: [{
-                type: "save_variable",
+                type: INSTRUCTION_TYPE.SAVE_VARIABLE,
                 value: to_ast(damage.lvl_21),
                 label: "primary_damage"
             }],
@@ -214,11 +215,11 @@ const transform_trigger = (trigger: NonNullable<IRPower["trigger"]>): Trigger =>
 }
 
 const transform_select_target_ir = (props: Omit<IRInstructionSelectTarget, "type" | "target_label">): InstructionSelectTarget => {
-    const ir = {type: "select_target", target_label: PRIMARY_TARGET_LABEL, ...props} as IRInstructionSelectTarget
+    const ir = {type: INSTRUCTION_TYPE.SELECT_TARGET, target_label: PRIMARY_TARGET_LABEL, ...props} as IRInstructionSelectTarget
 
     if (ir.targeting_type === "area_burst")
         return {
-            type: "select_target",
+            type: INSTRUCTION_TYPE.SELECT_TARGET,
             targeting_type: ir.targeting_type,
             target_type: ir.target_type,
             amount: ir.amount,
@@ -228,7 +229,7 @@ const transform_select_target_ir = (props: Omit<IRInstructionSelectTarget, "type
         }
     if (ir.targeting_type === "movement")
         return {
-            type: "select_target",
+            type: INSTRUCTION_TYPE.SELECT_TARGET,
             targeting_type: ir.targeting_type,
             distance: to_ast(ir.distance),
             target_label: ir.target_label,
@@ -236,7 +237,7 @@ const transform_select_target_ir = (props: Omit<IRInstructionSelectTarget, "type
         }
     if (ir.targeting_type === "ranged")
         return {
-            type: "select_target",
+            type: INSTRUCTION_TYPE.SELECT_TARGET,
             targeting_type: ir.targeting_type,
             target_type: ir.target_type,
             amount: ir.amount,
@@ -246,7 +247,7 @@ const transform_select_target_ir = (props: Omit<IRInstructionSelectTarget, "type
         }
     if (ir.targeting_type === "adjacent" || ir.targeting_type === "melee_weapon")
         return {
-            type: "select_target",
+            type: INSTRUCTION_TYPE.SELECT_TARGET,
             targeting_type: ir.targeting_type,
             target_type: ir.target_type,
             amount: ir.amount,

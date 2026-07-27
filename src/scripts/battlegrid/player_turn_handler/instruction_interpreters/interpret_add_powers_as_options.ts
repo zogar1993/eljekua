@@ -2,7 +2,7 @@ import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
-import {Instruction, InstructionAddPowers, InstructionOptionsItem} from "scripts/expressions/parser/instructions";
+import {INSTRUCTION_TYPE, Instruction, InstructionAddPowers, InstructionOptionsItem} from "scripts/expressions/parser/instructions";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {TURN_ACTION_TYPES} from "scripts/battlegrid/creatures/ActionType";
 import {Power} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
@@ -28,8 +28,8 @@ export const interpret_add_powers_as_options = ({
             to: SYSTEM_KEYWORD.PRIMARY_TARGET
         }] : []
         const instructions: Array<Instruction> = [
-            {type: "expend_action", action_type: action_type_cost},
-            {type: "execute_power", power: power_name, initialization}
+            {type: INSTRUCTION_TYPE.EXPEND_ACTION, action_type: action_type_cost},
+            {type: INSTRUCTION_TYPE.EXECUTE_POWER, power: power_name, initialization}
         ]
         const condition: AstNode = {
             type: "function",
@@ -59,14 +59,14 @@ export const interpret_add_powers_as_options = ({
     }
 
     turn_state.add_instructions([{
-        type: "options",
+        type: INSTRUCTION_TYPE.OPTIONS,
         options: [
             ...options,
             {
                 text: "End turn",
                 instructions: [
                     {
-                        type: "end_turn"
+                        type: INSTRUCTION_TYPE.END_TURN
                     }
                 ],
             }
@@ -87,7 +87,7 @@ const filter_powers = ({powers, filter}: { powers: Array<Power>, filter: Instruc
 
 const remove_default_targeting_instruction = (instructions: Array<Instruction>) => {
     const index = instructions.findIndex(instruction =>
-        instruction.type === "select_target" &&
+        instruction.type === INSTRUCTION_TYPE.SELECT_TARGET &&
         instruction.target_label === SYSTEM_KEYWORD.PRIMARY_TARGET
     )
     if (index === -1) return instructions

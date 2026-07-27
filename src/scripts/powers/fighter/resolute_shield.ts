@@ -1,4 +1,5 @@
 import type {IRPower} from "scripts/types";
+import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
 
 export const power_resolute_shield: IRPower = {
     name: "Resolute Shield",
@@ -26,12 +27,12 @@ export const power_resolute_shield: IRPower = {
         defense: "ac",
         hit: [
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "$add(primary_damage,owner.str_mod)",
                 target: "primary_target"
             },
             {
-                type: "apply_status",
+                type: INSTRUCTION_TYPE.APPLY_STATUS,
                 target: "owner",
                 duration: "until_end_of_your_next_turn",
                 status: {

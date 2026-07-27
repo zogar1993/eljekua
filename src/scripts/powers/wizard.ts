@@ -2,6 +2,7 @@ import {IRPower} from "scripts/types";
 import {
     transform_power_ir_into_vm_representation
 } from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
+import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
 
 const magic_missile: IRPower = {
     name: "Magic Missile",
@@ -18,7 +19,7 @@ const magic_missile: IRPower = {
     },
     effect: [
         {
-            type: "apply_damage",
+            type: INSTRUCTION_TYPE.APPLY_DAMAGE,
             value: "$add(2,owner.int_mod)",
             target: "primary_target",
             damage_types: ["force"] //TODO P1 add vulnerabilities and resistances
@@ -46,14 +47,14 @@ const scorching_burst: IRPower = {
         defense: "reflex",
         before_consequences: [
             {
-                type: "save_number_as_resolved",
+                type: INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED,
                 value: "$add({1d6},owner.int_mod)",
                 label: "primary_damage"
             }
         ],
         hit: [
             {
-                type: "apply_damage",
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
                 target: "primary_target",
                 damage_types: ["fire"]

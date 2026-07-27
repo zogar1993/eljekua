@@ -22,6 +22,7 @@ import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {OptionButton, OptionButtons} from "scripts/battlegrid/option_buttons/OptionButtons";
 import {AST} from "scripts/expressions/parser/AST_NODE";
+import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
 
 type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
@@ -196,7 +197,7 @@ export const create_player_turn_handler = ({
 
     function set_action_selection_for_current_character() {
         const instruction = {
-            type: "add_powers_as_options",
+            type: INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS,
             creature: AST.OWNER,
             cost: "normal",
             filter: "turn"
@@ -244,7 +245,7 @@ const show_attack_success_chance_if_needed = ({turn_state, selection_context, ev
     evaluate_ast: (node: AstNode) => Expr
 }) => {
     const next_instruction = turn_state.peek_instruction()
-    const needs_roll = next_instruction.type === "attack_dice_roll"
+    const needs_roll = next_instruction.type === INSTRUCTION_TYPE.ATTACK_DICE_ROLL
     if (needs_roll && selection_context.target) {
         if (selection_context.target.type !== "creatures")
             throw Error("an attack roll needs to target creatures")

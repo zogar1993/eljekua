@@ -2,6 +2,7 @@ import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {
+    INSTRUCTION_TYPE,
     Instruction,
     InstructionAttackRollConsequence,
     InstructionSaveVariable
@@ -39,4 +40,4 @@ export const interpret_attack_roll_consequence = (props: InterpretInstructionPro
 }
 
 const save_variable_instruction = (origin: string, destination: string): InstructionSaveVariable =>
-    ({type: "save_variable", value: {type: "keyword", value: origin}, label: destination})
+    ({type: INSTRUCTION_TYPE.SAVE_VARIABLE, value: {type: "keyword", value: origin}, label: destination})

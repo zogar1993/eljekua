@@ -3,8 +3,27 @@ import {DefenseCode} from "scripts/character_sheet/get_creature_defense";
 import {StatusDurationValue} from "scripts/types";
 import {ActionType} from "scripts/battlegrid/creatures/ActionType";
 
+export const INSTRUCTION_TYPE = {
+    ATTACK_DICE_ROLL: "attack_dice_roll",
+    ATTACK_ROLL_CONSEQUENCE: "attack_roll_consequence",
+    CONDITION: "condition",
+    APPLY_DAMAGE: "apply_damage",
+    MOVE: "move",
+    SHIFT: "shift",
+    OPTIONS: "options",
+    SAVE_VARIABLE: "save_variable",
+    SAVE_NUMBER_AS_RESOLVED: "save_number_as_resolved",
+    ADD_POWERS_AS_OPTIONS: "add_powers_as_options",
+    EXECUTE_POWER: "execute_power",
+    FORCE_MOVEMENT: "force_movement",
+    APPLY_STATUS: "apply_status",
+    SELECT_TARGET: "select_target",
+    EXPEND_ACTION: "expend_action",
+    END_TURN: "end_turn",
+} as const
+
 export type InstructionAttackDiceRoll = {
-    type: "attack_dice_roll"
+    type: typeof INSTRUCTION_TYPE.ATTACK_DICE_ROLL
     attack: AstNode
     defense: DefenseCode
     defender: string
@@ -13,20 +32,20 @@ export type InstructionAttackDiceRoll = {
 export type InstructionAttackRollConsequence = {
 //TODO this duplication of defender should be not needed
     defender: string
-    type: "attack_roll_consequence"
+    type: typeof INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE
     hit: Array<Instruction>
     miss: Array<Instruction>
 }
 
 export type InstructionCondition = {
-    type: "condition",
+    type: typeof INSTRUCTION_TYPE.CONDITION,
     condition: AstNode,
     instructions_true: Array<Instruction>
     instructions_false: Array<Instruction>
 }
 
 export type InstructionApplyDamage = {
-    type: "apply_damage"
+    type: typeof INSTRUCTION_TYPE.APPLY_DAMAGE
     value: AstNode
     target: string
     half_damage: boolean
@@ -34,52 +53,52 @@ export type InstructionApplyDamage = {
 }
 
 export type InstructionMovement = {
-    type: "move" | "shift"
+    type: typeof INSTRUCTION_TYPE.MOVE | typeof INSTRUCTION_TYPE.SHIFT
     target: string
     destination: string
 }
 
 export type InstructionOptions = {
-    type: "options",
+    type: typeof INSTRUCTION_TYPE.OPTIONS,
     options: Array<InstructionOptionsItem>,
 }
 
 export type InstructionOptionsItem = { text: string, instructions: Array<Instruction>, condition?: AstNode }
 
 export type InstructionSaveVariable = {
-    type: "save_variable",
+    type: typeof INSTRUCTION_TYPE.SAVE_VARIABLE,
     value: AstNode,
     label: string
 }
 
 export type InstructionSaveResolvedNumber = {
-    type: "save_number_as_resolved",
+    type: typeof INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED,
     value: AstNode,
     label: string
 }
 
 export type InstructionAddPowers = {
-    type: "add_powers_as_options",
+    type: typeof INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS,
     creature: AstNode,
     cost: "normal" | "opportunity" | "free_attack",
     filter: "turn" | "melee_basic_attack"
 }
 
 export type InstructionExecutePower = {
-    type: "execute_power",
+    type: typeof INSTRUCTION_TYPE.EXECUTE_POWER,
     power: string,
     initialization?: Array<{from: string, to: string}>,
 }
 
 export type InstructionForceMovement = {
-    type: "force_movement",
+    type: typeof INSTRUCTION_TYPE.FORCE_MOVEMENT,
     movement_type: "push" | "pull" | "slide",
     target: AstNode,
     destination: AstNode
 }
 
 export type InstructionApplyStatus = {
-    type: "apply_status",
+    type: typeof INSTRUCTION_TYPE.APPLY_STATUS,
     target: AstNode,
     duration: Array<StatusDurationValue>
     status: {
@@ -121,7 +140,7 @@ export type InstructionSelectTarget =
     InstructionSelectTargetPush
 
 export type InstructionSelectTargetRanged = {
-    type: "select_target",
+    type: typeof INSTRUCTION_TYPE.SELECT_TARGET,
     targeting_type: "ranged"
     target_type: "terrain" | "enemy" | "creature"
     terrain_prerequisite?: "unoccupied"
@@ -132,7 +151,7 @@ export type InstructionSelectTargetRanged = {
 }
 
 export type InstructionSelectTargetMelee = {
-    type: "select_target"
+    type: typeof INSTRUCTION_TYPE.SELECT_TARGET
     targeting_type: "adjacent" | "melee_weapon"
     target_type: "enemy" | "creature"
     amount: 1,
@@ -141,7 +160,7 @@ export type InstructionSelectTargetMelee = {
 }
 
 export type InstructionSelectTargetAreaBurst = {
-    type: "select_target",
+    type: typeof INSTRUCTION_TYPE.SELECT_TARGET,
     targeting_type: "area_burst"
     target_type: "creature"
     amount: "all"
@@ -151,7 +170,7 @@ export type InstructionSelectTargetAreaBurst = {
 }
 
 export type InstructionSelectTargetMovement = {
-    type: "select_target"
+    type: typeof INSTRUCTION_TYPE.SELECT_TARGET
     targeting_type: "movement"
     distance: AstNode
     target_label: string
@@ -159,7 +178,7 @@ export type InstructionSelectTargetMovement = {
 }
 
 export type InstructionSelectTargetPush = {
-    type: "select_target"
+    type: typeof INSTRUCTION_TYPE.SELECT_TARGET
     targeting_type: "push"
     distance: AstNode
     anchor: AstNode
@@ -168,10 +187,10 @@ export type InstructionSelectTargetPush = {
 }
 
 export type InstructionExpendAction = {
-    type: "expend_action"
+    type: typeof INSTRUCTION_TYPE.EXPEND_ACTION
     action_type: ActionType
 }
 
 export type InstructionEndTurn = {
-    type: "end_turn"
+    type: typeof INSTRUCTION_TYPE.END_TURN
 }
