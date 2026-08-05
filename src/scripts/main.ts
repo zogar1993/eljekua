@@ -12,6 +12,8 @@ import type {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {create_initiative_order} from "scripts/initiative_order/InitiativeOrder";
 import {create_option_buttons} from "scripts/battlegrid/option_buttons/OptionButtons";
 import {create_option_button_visual} from "scripts/battlegrid/option_buttons/OptionButtonVisual";
+import {create_hit_status_buttons} from "scripts/battlegrid/hit_status_buttons/HitStatusButtons";
+import {create_creature_hit_status_visual} from "scripts/battlegrid/hit_status_buttons/CreatureHitStatusVisual";
 import {ATTRIBUTES} from "scripts/character_sheet/attributes";
 import {create_initiative_entry_visual} from "scripts/initiative_order/InitiativeEntryVisual";
 import {create_add_creature_to_game} from "scripts/use_cases/add_creature_to_game";
@@ -37,6 +39,10 @@ const battle_grid = create_battle_grid({
 })
 
 const option_buttons = create_option_buttons({create_option_button_visual})
+const hit_status_buttons = create_hit_status_buttons({
+    create_creature_hit_status_visual,
+    create_option_button_visual,
+})
 
 const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
 
@@ -44,6 +50,7 @@ const player_turn_handler = create_player_turn_handler({
     battle_grid,
     initiative_order,
     option_buttons,
+    hit_status_buttons,
     turn_state,
     evaluate_ast,
 })

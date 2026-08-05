@@ -2,8 +2,8 @@ import {
     interpret_select_target
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_select_target";
 import {
-    interpret_attack_dice_roll,
-} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_attack_dice_roll";
+    interpret_define_attack_roll_result,
+} from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_define_attack_roll_result";
 import {
     interpret_apply_damage
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/interpret_apply_damage";
@@ -47,7 +47,7 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
         case INSTRUCTION_TYPE.SELECT_TARGET:
             return interpret_select_target({...props, instruction})
         case INSTRUCTION_TYPE.ATTACK_DICE_ROLL:
-            return interpret_attack_dice_roll({...props, instruction})
+            return interpret_define_attack_roll_result({...props, instruction})
         case INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE:
             return interpret_attack_roll_consequence({...props, instruction})
         case INSTRUCTION_TYPE.APPLY_DAMAGE:

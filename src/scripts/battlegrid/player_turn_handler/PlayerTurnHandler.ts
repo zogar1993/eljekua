@@ -23,12 +23,20 @@ import {Expr} from "scripts/expressions/evaluator/types";
 import {OptionButton, OptionButtons} from "scripts/battlegrid/option_buttons/OptionButtons";
 import {AST} from "scripts/expressions/parser/AST_NODE";
 import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
+import {HitStatusButtons} from "scripts/battlegrid/hit_status_buttons/HitStatusButtons";
+import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 
 type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
-type PlayerTurnHandlerContextSelect =
+export type PlayerTurnHandlerContextSelect =
     PlayerTurnHandlerContextSelectPosition
     | PlayerTurnHandlerContextSelectOption
+    | PlayerTurnHandlerContextSelectHitStatus
+
+export type PlayerTurnHandlerContextSelectHitStatus = {
+    type: "hit_status_select"
+    hit_statuses: Map<Creature, HitStatus>
+}
 
 export type PlayerTurnHandlerContextSelectPosition = {
     type: "position_select"
@@ -49,12 +57,14 @@ export const create_player_turn_handler = ({
                                                battle_grid,
                                                initiative_order,
                                                option_buttons,
+                                               hit_status_buttons,
                                                turn_state,
                                                evaluate_ast
                                            }: {
     battle_grid: BattleGrid,
     initiative_order: InitiativeOrder,
     option_buttons: OptionButtons
+    hit_status_buttons: HitStatusButtons
     turn_state: TurnState
     evaluate_ast: (expr: AstNode) => Expr
 }): PlayerTurnHandler => {
@@ -88,6 +98,21 @@ export const create_player_turn_handler = ({
         }))
 
         option_buttons.display_options(options)
+    }
+
+    const set_awaiting_hit_status_selection = ({hit_statuses, on_status_change}: {
+        hit_statuses: Map<Creature, HitStatus>
+        on_status_change: (creature: Creature, status: HitStatus) => void
+    }) => {
+        selection_context = {type: "hit_status_select", hit_statuses}
+
+        set_selected_indicator()
+
+        hit_status_buttons.display({
+            hit_statuses,
+            on_status_change,
+            on_confirm: () => deselect(),
+        })
     }
 
     const get_position_selection_context = (): PlayerTurnHandlerContextSelectPosition => {
@@ -186,6 +211,8 @@ export const create_player_turn_handler = ({
             }
         } else if (selection_context.type === "option_select")
             option_buttons.remove_options()
+        else if (selection_context.type === "hit_status_select")
+            hit_status_buttons.remove()
 
         selection_context = null
     }
@@ -213,6 +240,7 @@ export const create_player_turn_handler = ({
     return {
         set_awaiting_position_selection,
         set_awaiting_option_selection,
+        set_awaiting_hit_status_selection,
         get_position_selection_context,
         get_position_selection_context_or_null,
         on_click,
@@ -228,6 +256,10 @@ export const create_player_turn_handler = ({
 export type PlayerTurnHandler = {
     set_awaiting_position_selection: (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => void
     set_awaiting_option_selection: (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => void
+    set_awaiting_hit_status_selection: (context: {
+        hit_statuses: Map<Creature, HitStatus>
+        on_status_change: (creature: Creature, status: HitStatus) => void
+    }) => void
     get_position_selection_context: () => PlayerTurnHandlerContextSelectPosition
     get_position_selection_context_or_null: () => PlayerTurnHandlerContextSelectPosition | null
     on_click: ({coordinate}: { coordinate: ClickableCoordinate }) => void

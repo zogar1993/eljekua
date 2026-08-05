@@ -16,17 +16,21 @@ import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnStat
 import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
 import {create_instruction_loop} from "scripts/instruction_loop";
 import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use_cases";
+import {hit_status_buttons_test_ui} from "tests/utils/hit_status_buttons_test_ui";
+import {create_settings} from "scripts/settings/Settings";
 
 const turn_state = create_turn_state();
 const battle_grid = create_battle_grid({...dependency_mocks, create_battle_grid_visual, size: {x: 10, y: 10}})
 const initiative_order = create_initiative_order({...dependency_mocks})
 const option_buttons = create_option_buttons({create_option_button_visual})
 const evaluate_ast = build_evaluate_ast({turn_state, battle_grid})
+const settings = create_settings()
 const player_turn_handler = create_player_turn_handler({
     ...dependency_mocks,
     battle_grid,
     initiative_order,
     option_buttons,
+    hit_status_buttons: hit_status_buttons_test_ui,
     turn_state,
     evaluate_ast
 })
@@ -44,6 +48,7 @@ const instruction_loop = create_instruction_loop({
     turn_state,
     battle_grid,
     player_turn_handler,
+    settings
 })
 
 battle_grid.visual.addOnMouseMoveHandler(coordinate => {

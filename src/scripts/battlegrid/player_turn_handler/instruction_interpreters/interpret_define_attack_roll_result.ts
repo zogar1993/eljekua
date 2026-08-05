@@ -18,12 +18,39 @@ const COMBAT_ADVANTAGE: ExprNumberResolved = {
     description: "Combat Advantage"
 }
 
-export const interpret_attack_dice_roll = ({
-                                               instruction,
-                                               battle_grid,
-                                               evaluate_ast,
-                                               turn_state
-                                           }: InterpretInstructionProps<InstructionAttackDiceRoll>) => {
+export const interpret_define_attack_roll_result = (props: InterpretInstructionProps<InstructionAttackDiceRoll>) => {
+    const settings = props.settings
+    if (settings.attack_roll_resolution_is_random)
+        handle_hit_status_with_dice_roll(props)
+    else
+        handle_hit_status_manually(props)
+}
+
+
+const handle_hit_status_manually = ({
+                                        turn_state,
+                                        player_turn_handler,
+                                        instruction
+                                    }: InterpretInstructionProps<InstructionAttackDiceRoll>) => {
+    const defenders = EXPR.as_creatures(turn_state.get_variable(instruction.defender))
+    const hit_statuses = new Map<Creature, HitStatus>(defenders.map(defender => [defender, HIT_STATUS.MISS]))
+    turn_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: hit_statuses})
+
+    player_turn_handler.set_awaiting_hit_status_selection({
+        hit_statuses,
+        on_status_change: (creature: Creature, status: HitStatus) => {
+            hit_statuses.set(creature, status)
+            turn_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: hit_statuses})
+        },
+    })
+}
+
+const handle_hit_status_with_dice_roll = ({
+                                              instruction,
+                                              battle_grid,
+                                              evaluate_ast,
+                                              turn_state
+                                          }: InterpretInstructionProps<InstructionAttackDiceRoll>) => {
     const attacker = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
     const defenders = EXPR.as_creatures(turn_state.get_variable(instruction.defender))
 
