@@ -1,0 +1,27 @@
+.hit-status-buttons {
+    position: absolute;
+    top: -28px;
+    left: 0;
+    display: flex;
+    gap: 2px;
+    pointer-events: auto;
+}
+
+.hit-status-button {
+    padding: 2px 4px;
+    font-size: 0.65rem;
+    background-color: white;
+    border: 1px solid gray;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.hit-status-button:hover {
+    background-color: lightpink;
+}
+
+.hit-status-button--selected {
+    background-color: hotpink;
+    border-color: black;
+    font-weight: bold;
+}
