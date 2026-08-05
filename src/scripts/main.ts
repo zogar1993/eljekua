@@ -26,11 +26,14 @@ import {AnimationQueue} from "scripts/AnimationQueue";
 import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use_cases";
 import {HIT_STATUS, HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {create_settings} from "scripts/settings/Settings";
+import {create_game_events} from "scripts/events/GameEvents";
+import {transform_positions_to_f1} from "scripts/battlegrid/Position";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
 const turn_state = create_turn_state()
 const settings = create_settings()
+const game_events = create_game_events()
 
 const battle_grid = create_battle_grid({
     create_visual_square,
@@ -53,6 +56,7 @@ const player_turn_handler = create_player_turn_handler({
     hit_status_buttons,
     turn_state,
     evaluate_ast,
+    game_events
 })
 
 const instruction_visualizer = create_instruction_visualizer()
@@ -71,6 +75,23 @@ const instruction_loop = create_instruction_loop({
     settings
 })
 
+game_events.player_available_interactions_changed.add_handler((interactions) => {
+    const set_selected_indicator = () => {
+        const position = turn_state.get_power_owner().data.position
+        battle_grid.get_squares(position).forEach(({visual}) => visual.set_highlight("selected"))
+    }
+
+    if (interactions.type === "position_select") {
+        set_selected_indicator()
+
+        transform_positions_to_f1(interactions.clickable)
+            .map(battle_grid.get_square)
+            .forEach(({visual}) => visual.set_highlight("available-target"))
+
+        interactions.highlighted
+            .forEach(({position, highlight}) => battle_grid.get_square(position).visual.set_highlight(highlight))
+    }
+})
 
 const on_creature_added_to_game: Array<(creature: Creature) => void> = [
     ({data, events}: Creature) => {

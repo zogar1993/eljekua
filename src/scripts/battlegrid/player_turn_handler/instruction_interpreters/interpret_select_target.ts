@@ -7,7 +7,7 @@ import {
 import {
     InterpretInstructionProps
 } from "scripts/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {PlayerTurnHandlerContextSelectPosition} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
+import {AvailableInteractionsSelectPosition} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {get_reach_area_burst} from "scripts/battlegrid/position/get_reach_area_burst";
 import {get_valid_targets} from "scripts/battlegrid/position/get_valid_targets";
 import {InstructionSelectTarget} from "scripts/expressions/parser/instructions";
@@ -120,7 +120,7 @@ export const interpret_select_target = ({
 
     const footprint = instruction.targeting_type === "movement" ? owner.data.position.footprint : 1
 
-    const selection_base: Omit<PlayerTurnHandlerContextSelectPosition,  "type"> = {
+    const selection_base: Omit<AvailableInteractionsSelectPosition,  "type"> = {
         target_label,
         clickable,
         highlighted: [],

@@ -25,20 +25,21 @@ import {AST} from "scripts/expressions/parser/AST_NODE";
 import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
 import {HitStatusButtons} from "scripts/battlegrid/hit_status_buttons/HitStatusButtons";
 import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
+import {GameEvents} from "scripts/events/GameEvents";
 
 type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
-export type PlayerTurnHandlerContextSelect =
-    PlayerTurnHandlerContextSelectPosition
-    | PlayerTurnHandlerContextSelectOption
-    | PlayerTurnHandlerContextSelectHitStatus
+export type AvailableInteractions =
+    AvailableInteractionsSelectPosition
+    | AvailableInteractionsSelectOption
+    | AvailableInteractionsSelectHitStatus
 
-export type PlayerTurnHandlerContextSelectHitStatus = {
+export type AvailableInteractionsSelectHitStatus = {
     type: "hit_status_select"
     hit_statuses: Map<Creature, HitStatus>
 }
 
-export type PlayerTurnHandlerContextSelectPosition = {
+export type AvailableInteractionsSelectPosition = {
     type: "position_select"
     clickable: Array<Position>
     highlighted: Array<HighlightedPosition>
@@ -48,7 +49,7 @@ export type PlayerTurnHandlerContextSelectPosition = {
     footprint: number
 }
 
-type PlayerTurnHandlerContextSelectOption = {
+type AvailableInteractionsSelectOption = {
     type: "option_select"
     available_options: Array<OptionButton>
 }
@@ -59,7 +60,8 @@ export const create_player_turn_handler = ({
                                                option_buttons,
                                                hit_status_buttons,
                                                turn_state,
-                                               evaluate_ast
+                                               evaluate_ast,
+                                               game_events
                                            }: {
     battle_grid: BattleGrid,
     initiative_order: InitiativeOrder,
@@ -67,24 +69,22 @@ export const create_player_turn_handler = ({
     hit_status_buttons: HitStatusButtons
     turn_state: TurnState
     evaluate_ast: (expr: AstNode) => Expr
+    game_events: GameEvents
 }): PlayerTurnHandler => {
-    let selection_context: PlayerTurnHandlerContextSelect | null = null
+    let selection_context: AvailableInteractions | null = null
 
-    const set_awaiting_position_selection = (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => {
-        //TODO AP3 this should be better on_hover
-        selection_context = {type: "position_select", ...context}
+    const set_available_interactions = (available_interactions: AvailableInteractions) => {
 
-        set_selected_indicator()
-
-        transform_positions_to_f1(context.clickable)
-            .map(battle_grid.get_square)
-            .forEach(({visual}) => visual.set_highlight("available-target"))
-
-        context.highlighted
-            .forEach(({position, highlight}) => battle_grid.get_square(position).visual.set_highlight(highlight))
     }
 
-    const set_awaiting_option_selection = (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => {
+    const set_awaiting_position_selection = (interactions: Omit<AvailableInteractionsSelectPosition, "type">) => {
+        //TODO AP3 this should be better on_hover
+        selection_context = {type: "position_select", ...interactions}
+
+        game_events.player_available_interactions_changed.raise(selection_context)
+    }
+
+    const set_awaiting_option_selection = (context: Omit<AvailableInteractionsSelectOption, "type">) => {
         selection_context = {type: "option_select", ...context}
 
         set_selected_indicator()
@@ -115,13 +115,13 @@ export const create_player_turn_handler = ({
         })
     }
 
-    const get_position_selection_context = (): PlayerTurnHandlerContextSelectPosition => {
+    const get_position_selection_context = (): AvailableInteractionsSelectPosition => {
         if (selection_context?.type !== "position_select")
             throw Error("position_select selection_context not set")
         return selection_context
     }
 
-    const get_position_selection_context_or_null = (): PlayerTurnHandlerContextSelectPosition | null => {
+    const get_position_selection_context_or_null = (): AvailableInteractionsSelectPosition | null => {
         if (selection_context?.type !== "position_select") return null
         return selection_context
     }
@@ -254,26 +254,26 @@ export const create_player_turn_handler = ({
 }
 
 export type PlayerTurnHandler = {
-    set_awaiting_position_selection: (context: Omit<PlayerTurnHandlerContextSelectPosition, "type">) => void
-    set_awaiting_option_selection: (context: Omit<PlayerTurnHandlerContextSelectOption, "type">) => void
+    set_awaiting_position_selection: (context: Omit<AvailableInteractionsSelectPosition, "type">) => void
+    set_awaiting_option_selection: (context: Omit<AvailableInteractionsSelectOption, "type">) => void
     set_awaiting_hit_status_selection: (context: {
         hit_statuses: Map<Creature, HitStatus>
         on_status_change: (creature: Creature, status: HitStatus) => void
     }) => void
-    get_position_selection_context: () => PlayerTurnHandlerContextSelectPosition
-    get_position_selection_context_or_null: () => PlayerTurnHandlerContextSelectPosition | null
+    get_position_selection_context: () => AvailableInteractionsSelectPosition
+    get_position_selection_context_or_null: () => AvailableInteractionsSelectPosition | null
     on_click: ({coordinate}: { coordinate: ClickableCoordinate }) => void
     on_hover: ({coordinate}: { coordinate: ClickableCoordinate | null }) => void
     set_selected_indicator: () => void
     deselect: () => void
     clear_turn_state: () => void
     set_action_selection_for_current_character: () => void
-    get_selection_context: () => PlayerTurnHandlerContextSelect | null
+    get_selection_context: () => AvailableInteractions | null
 }
 
 const show_attack_success_chance_if_needed = ({turn_state, selection_context, evaluate_ast}: {
     turn_state: TurnState,
-    selection_context: PlayerTurnHandlerContextSelectPosition,
+    selection_context: AvailableInteractionsSelectPosition,
     evaluate_ast: (node: AstNode) => Expr
 }) => {
     const next_instruction = turn_state.peek_instruction()
