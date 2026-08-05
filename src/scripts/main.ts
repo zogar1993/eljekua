@@ -93,60 +93,58 @@ game_events.player_available_interactions_changed.add_handler((interactions) => 
     }
 })
 
-const on_creature_added_to_game: Array<(creature: Creature) => void> = [
-    ({data, events}: Creature) => {
-        const visual = create_visual_creature(data)
+game_events.on_creature_added_to_game.add_handler((creature) => {
+    const {data, events} = creature
+    const visual = create_visual_creature(data)
 
-        events.moved.add_handler(({position, movement_type}) => {
-            switch (movement_type) {
-                case "move":
-                    AnimationQueue.add_animation(() => visual.move_one_square(position))
-                    break
-                case "push":
-                    AnimationQueue.add_animation(() => visual.push_to(position))
-                    break
-            }
-        })
+    events.moved.add_handler(({position, movement_type}) => {
+        switch (movement_type) {
+            case "move":
+                AnimationQueue.add_animation(() => visual.move_one_square(position))
+                break
+            case "push":
+                AnimationQueue.add_animation(() => visual.push_to(position))
+                break
+        }
+    })
 
-        events.received_damage.add_handler(({damage}) => {
-            AnimationQueue.add_animation(() => visual.receive_damage({hp: data.hp_current, damage: damage.value}))
-        })
+    events.received_damage.add_handler(({damage}) => {
+        AnimationQueue.add_animation(() => visual.receive_damage({hp: data.hp_current, damage: damage.value}))
+    })
 
-        events.is_untargeted.add_handler(() => {
-            visual.remove_hit_chance()
-        })
+    events.is_untargeted.add_handler(() => {
+        visual.remove_hit_chance()
+    })
 
-        events.is_missed.add_handler(() => {
-            AnimationQueue.add_animation(visual.display_miss)
-        })
+    events.is_missed.add_handler(() => {
+        AnimationQueue.add_animation(visual.display_miss)
+    })
 
-        events.is_targeted.add_handler(({attack, defense, chance}) => {
-            visual.display_hit_chance({attack, defense, chance})
-        })
-    },
-    ({data, events}: Creature) => {
-        events.received_damage.add_handler(({damage}) => {
-            action_log.add_new_action_log(`${data.name} was dealt `, damage, ` damage.`)
-        })
+    events.is_targeted.add_handler(({attack, defense, chance}) => {
+        visual.display_hit_chance({attack, defense, chance})
+    })
 
-        const HIT_STATUS_TEXT = new Map<HitStatus, string>([
-            [HIT_STATUS.MISS, "misses"],
-            [HIT_STATUS.HIT, "hits"],
-            [HIT_STATUS.CRIT, "crits"]
-        ])
+    events.received_damage.add_handler(({damage}) => {
+        action_log.add_new_action_log(`${data.name} was dealt `, damage, ` damage.`)
+    })
 
-        events.has_attacked.add_handler(({attack, defense, hit_status, defender, instruction}) => {
-            action_log.add_new_action_log(
-                `${data.name}'s ${turn_state.get_power_name()} (`,
-                attack,
-                `) ${HIT_STATUS_TEXT.get(hit_status)} against ${defender.data.name}'s ${instruction.defense} (`,
-                defense,
-                `).`)
-        })
-    }
-]
+    const HIT_STATUS_TEXT = new Map<HitStatus, string>([
+        [HIT_STATUS.MISS, "misses"],
+        [HIT_STATUS.HIT, "hits"],
+        [HIT_STATUS.CRIT, "crits"]
+    ])
 
-const add_creature = create_add_creature_to_game({battle_grid, initiative_order, on_creature_added_to_game})
+    events.has_attacked.add_handler(({attack, defense, hit_status, defender, instruction}) => {
+        action_log.add_new_action_log(
+            `${data.name}'s ${turn_state.get_power_name()} (`,
+            attack,
+            `) ${HIT_STATUS_TEXT.get(hit_status)} against ${defender.data.name}'s ${instruction.defense} (`,
+            defense,
+            `).`)
+    })
+})
+
+const add_creature = create_add_creature_to_game({battle_grid, initiative_order, game_events})
 const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop})
 
 ;(window as any).init_demo = () => {
