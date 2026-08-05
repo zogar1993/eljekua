@@ -8,6 +8,7 @@ import type {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import type {Expr} from "scripts/expressions/evaluator/types";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {InstructionVisualizer} from "scripts/instruction_visualizer/instruction_visualizer";
+import {Settings} from "scripts/settings/Settings";
 
 export const create_instruction_loop = ({
                                            player_turn_handler,
@@ -16,6 +17,7 @@ export const create_instruction_loop = ({
                                            evaluate_ast,
                                            initiative_order,
                                            instruction_visualizer,
+                                           settings
                                        }: {
     player_turn_handler: PlayerTurnHandler
     turn_state: TurnState
@@ -23,6 +25,7 @@ export const create_instruction_loop = ({
     evaluate_ast: (node: AstNode) => Expr
     initiative_order: InitiativeOrder
     instruction_visualizer: InstructionVisualizer
+    settings: Settings
 }) => {
     const evaluate_instructions = () => {
         while (player_turn_handler.get_selection_context() === null) {
@@ -39,6 +42,7 @@ export const create_instruction_loop = ({
                     turn_state,
                     evaluate_ast,
                     initiative_order,
+                    settings
                 })
             }
         }

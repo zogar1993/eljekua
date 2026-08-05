@@ -23,10 +23,12 @@ import {create_instruction_visualizer} from "scripts/instruction_visualizer/inst
 import {AnimationQueue} from "scripts/AnimationQueue";
 import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use_cases";
 import {HIT_STATUS, HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
+import {create_settings} from "scripts/settings/Settings";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
 const turn_state = create_turn_state()
+const settings = create_settings()
 
 const battle_grid = create_battle_grid({
     create_visual_square,
@@ -59,6 +61,7 @@ const instruction_loop = create_instruction_loop({
     evaluate_ast,
     initiative_order,
     instruction_visualizer,
+    settings
 })
 
 
