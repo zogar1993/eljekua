@@ -75,7 +75,7 @@ const instruction_loop = create_instruction_loop({
     settings
 })
 
-game_events.player_available_interactions_changed.add_handler((interactions) => {
+game_events.on_available_interactions_changed.add_handler((interactions) => {
     const set_selected_indicator = () => {
         const position = turn_state.get_power_owner().data.position
         battle_grid.get_squares(position).forEach(({visual}) => visual.set_highlight("selected"))
@@ -92,6 +92,7 @@ game_events.player_available_interactions_changed.add_handler((interactions) => 
             .forEach(({position, highlight}) => battle_grid.get_square(position).visual.set_highlight(highlight))
     }
 })
+
 
 game_events.on_creature_added_to_game.add_handler((creature) => {
     const {data, events} = creature

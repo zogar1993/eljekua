@@ -75,7 +75,7 @@ export const create_player_turn_handler = ({
 
     const set_available_interactions = (available_interactions: AvailableInteractions) => {
         selection_context = available_interactions
-        game_events.player_available_interactions_changed.raise(selection_context)
+        game_events.on_available_interactions_changed.raise(selection_context)
     }
 
     const set_awaiting_option_selection = (context: Omit<AvailableInteractionsSelectOption, "type">) => {
