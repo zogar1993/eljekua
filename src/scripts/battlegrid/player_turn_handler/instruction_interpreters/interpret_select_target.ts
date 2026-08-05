@@ -81,7 +81,7 @@ export const interpret_select_target = ({
             const target_positions = area.filter(p => battle_grid.is_terrain_occupied(p))
             const targets = battle_grid.get_creatures_in_positions(target_positions)
 
-            player_turn_handler.set_awaiting_position_selection({
+            player_turn_handler.set_available_interactions({
                 ...selection_base,
                 highlighted: area.map(position => ({position, highlight: "area"})),
                 target: {type: "creatures", value: targets}
@@ -89,26 +89,26 @@ export const interpret_select_target = ({
         } else if (instruction.targeting_type === "movement") {
             const path = get_shortest_path({creature: owner, destination: position, battle_grid})
 
-            player_turn_handler.set_awaiting_position_selection({
+            player_turn_handler.set_available_interactions({
                 ...selection_base,
                 highlighted: transform_positions_to_f1(path).map(position => ({position, highlight: "path"})),
                 target: {type: "positions", value: path},
             })
         } else if (instruction.targeting_type === "push") {
             //TODO AP0 fix push that was changed from position to positions
-            player_turn_handler.set_awaiting_position_selection({
+            player_turn_handler.set_available_interactions({
                 ...selection_base,
                 target: {type: "positions", value: [position]}
             })
         } else {
             if (instruction.target_type === "terrain") {
-                player_turn_handler.set_awaiting_position_selection({
+                player_turn_handler.set_available_interactions({
                     ...selection_base,
                     target: {type: "positions", value: [position]}
                 })
             } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
                 const creature = battle_grid.get_creature_by_position(position)
-                player_turn_handler.set_awaiting_position_selection({
+                player_turn_handler.set_available_interactions({
                     ...selection_base,
                     target: {type: "creatures", value: [creature]}
                 })
@@ -120,7 +120,8 @@ export const interpret_select_target = ({
 
     const footprint = instruction.targeting_type === "movement" ? owner.data.position.footprint : 1
 
-    const selection_base: Omit<AvailableInteractionsSelectPosition,  "type"> = {
+    const selection_base: AvailableInteractionsSelectPosition = {
+        type: "position_select",
         target_label,
         clickable,
         highlighted: [],
@@ -129,5 +130,5 @@ export const interpret_select_target = ({
         footprint
     }
 
-    player_turn_handler.set_awaiting_position_selection(selection_base)
+    player_turn_handler.set_available_interactions(selection_base)
 }

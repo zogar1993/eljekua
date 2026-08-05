@@ -74,13 +74,7 @@ export const create_player_turn_handler = ({
     let selection_context: AvailableInteractions | null = null
 
     const set_available_interactions = (available_interactions: AvailableInteractions) => {
-
-    }
-
-    const set_awaiting_position_selection = (interactions: Omit<AvailableInteractionsSelectPosition, "type">) => {
-        //TODO AP3 this should be better on_hover
-        selection_context = {type: "position_select", ...interactions}
-
+        selection_context = available_interactions
         game_events.player_available_interactions_changed.raise(selection_context)
     }
 
@@ -152,6 +146,7 @@ export const create_player_turn_handler = ({
     }
 
     let latest_position: Position | null = null
+            //TODO AP3 this should be better on_hover
     const on_hover = ({coordinate}: { coordinate: ClickableCoordinate | null }) => {
         if (selection_context?.type !== "position_select") return
 
@@ -238,7 +233,7 @@ export const create_player_turn_handler = ({
     }
 
     return {
-        set_awaiting_position_selection,
+        set_available_interactions,
         set_awaiting_option_selection,
         set_awaiting_hit_status_selection,
         get_position_selection_context,
@@ -254,7 +249,7 @@ export const create_player_turn_handler = ({
 }
 
 export type PlayerTurnHandler = {
-    set_awaiting_position_selection: (context: Omit<AvailableInteractionsSelectPosition, "type">) => void
+    set_available_interactions: (interactions: AvailableInteractions) => void
     set_awaiting_option_selection: (context: Omit<AvailableInteractionsSelectOption, "type">) => void
     set_awaiting_hit_status_selection: (context: {
         hit_statuses: Map<Creature, HitStatus>
