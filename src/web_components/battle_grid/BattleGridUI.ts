@@ -124,7 +124,7 @@ export const initialize_battle_grid_ui = ({battle_grid, player_turn_handler, tur
         const selection_context = player_turn_handler.get_selection_context()
         if (selection_context === null) return
 
-        const position = turn_state.get_power_owner().data.position
+        const position = turn_state.get_acting_creature().data.position
         get_squares(position).forEach((square) => square.set_highlight("none"))
 
         if (selection_context.type === "position_select") {
@@ -149,7 +149,7 @@ export const initialize_battle_grid_ui = ({battle_grid, player_turn_handler, tur
     }
 
     function set_selected_indicator() {
-        const position = turn_state.get_power_owner().data.position
+        const position = turn_state.get_acting_creature().data.position
         set_highlight({positions: [position], highlight: "selected"})
     }
 

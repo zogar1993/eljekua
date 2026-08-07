@@ -9,7 +9,7 @@ export const interpret_execute_power = ({
                                             instruction,
                                             turn_state,
                                         }: InterpretInstructionProps<InstructionExecutePower>) => {
-    const owner = turn_state.get_power_owner()
+    const owner = turn_state.get_acting_creature()
     const {name, instructions} = EXPR.as_power(turn_state.get_variable(instruction.power))
 
     const initialization = instruction.initialization ?? []
@@ -17,5 +17,5 @@ export const interpret_execute_power = ({
     for (const {from, to} of initialization)
         variables[to] = turn_state.get_variable(from)
 
-    turn_state.add_power_frame({name, instructions, owner, variables})
+    turn_state.add_instruction_frame({name, instructions, owner, variables})
 }

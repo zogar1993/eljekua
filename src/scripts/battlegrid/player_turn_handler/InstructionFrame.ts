@@ -4,11 +4,11 @@ import {Expr} from "scripts/expressions/evaluator/types";
 import {Instruction} from "scripts/expressions/parser/instructions";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 
-export const create_power_frame = ({power_name, instructions, owner}: {
+export const create_instruction_frame = ({power_name, instructions, owner}: {
     power_name: string,
     instructions: Array<Instruction>,
     owner: Creature
-}): PowerFrame => {
+}): InstructionFrame => {
     const self = {
         instructions: [...instructions],
         variables: new Map<string, Expr>(),
@@ -69,7 +69,7 @@ export const create_power_frame = ({power_name, instructions, owner}: {
     }
 }
 
-export type PowerFrame = {
+export type InstructionFrame = {
     set_variable: (name: string, variable: Expr) => void
     peek_instruction: () => Instruction
     next_instruction: () => Instruction

@@ -82,7 +82,7 @@ export const interpret_move = ({
                         value: [moving_creature]
                     }
                 }
-                turn_state.add_power_frame({name: "Select Trigger", instructions, owner: attacker, variables})
+                turn_state.add_instruction_frame({name: "Select Trigger", instructions, owner: attacker, variables})
             }
 
             break

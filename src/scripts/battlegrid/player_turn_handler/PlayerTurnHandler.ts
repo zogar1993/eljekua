@@ -66,7 +66,7 @@ export const create_player_turn_handler = ({
     const set_awaiting_option_selection = (context: Omit<AvailableInteractionsSelectOption, "type">) => {
         selection_context = {type: "option_select", ...context}
 
-        game_events.on_acting_creature_changed.raise(turn_state.get_power_owner())
+        game_events.on_acting_creature_changed.raise(turn_state.get_acting_creature())
 
         const options = context.available_options.map(option => ({
             ...option,
@@ -85,7 +85,7 @@ export const create_player_turn_handler = ({
     }) => {
         selection_context = {type: "hit_status_select", hit_statuses}
 
-        game_events.on_acting_creature_changed.raise(turn_state.get_power_owner())
+        game_events.on_acting_creature_changed.raise(turn_state.get_acting_creature())
 
         hit_status_buttons.display({
             hit_statuses,
@@ -118,7 +118,7 @@ export const create_player_turn_handler = ({
             filter: "turn"
         } as const
         const owner = initiative_order.get_current_creature()
-        turn_state.add_power_frame({name: "Action Selection", instructions: [instruction], owner})
+        turn_state.add_instruction_frame({name: "Action Selection", instructions: [instruction], owner})
     }
 
     function get_selection_context() {

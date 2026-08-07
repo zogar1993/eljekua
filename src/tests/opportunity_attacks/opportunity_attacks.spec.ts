@@ -159,7 +159,7 @@ const then_creature = (creature_name: string) => {
             expect(creature.data.position).toEqual({...position, footprint: 1})
         },
         has_action: async (action_name: string) => {
-            await wait_until(() => turn_state.get_power_owner() === creature)
+            await wait_until(() => turn_state.get_acting_creature() === creature)
             expect(option_buttons_test_ui.has_button(action_name)).toEqual(true)
         },
         has_performed_action: async (action_name: string, options: any) => {
