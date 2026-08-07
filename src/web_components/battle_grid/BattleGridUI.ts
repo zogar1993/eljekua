@@ -30,7 +30,7 @@ import {AnimationQueue} from "scripts/AnimationQueue";
 import {OptionButtons} from "scripts/battlegrid/option_buttons/OptionButtons";
 import {HitStatusButtons} from "scripts/battlegrid/hit_status_buttons/HitStatusButtons";
 
-export const create_battle_grid_ui = ({battle_grid, player_turn_handler, turn_state, game_events, option_buttons, hit_status_buttons}: {
+export const initialize_battle_grid_ui = ({battle_grid, player_turn_handler, turn_state, game_events, option_buttons, hit_status_buttons}: {
     battle_grid: BattleGrid,
     player_turn_handler: PlayerTurnHandler,
     turn_state: TurnState,

@@ -25,7 +25,7 @@ import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use
 import {HIT_STATUS, HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {create_settings} from "scripts/settings/Settings";
 import {create_game_events} from "scripts/events/GameEvents";
-import {create_battle_grid_ui} from "web_components/battle_grid/BattleGridUI";
+import {initialize_battle_grid_ui} from "web_components/battle_grid/BattleGridUI";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
@@ -51,7 +51,7 @@ const player_turn_handler = create_player_turn_handler({
     game_events
 })
 
-const battle_grid_ui = create_battle_grid_ui({
+initialize_battle_grid_ui({
     battle_grid,
     player_turn_handler,
     turn_state,
