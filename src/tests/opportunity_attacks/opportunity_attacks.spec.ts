@@ -29,12 +29,10 @@ const settings = create_settings()
 const game_events = create_game_events()
 const player_turn_handler = create_player_turn_handler({
     ...dependency_mocks,
-    battle_grid,
     initiative_order,
     option_buttons,
     hit_status_buttons: hit_status_buttons_test_ui,
     turn_state,
-    evaluate_ast,
     game_events
 })
 

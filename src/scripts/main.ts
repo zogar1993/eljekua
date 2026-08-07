@@ -44,12 +44,10 @@ const hit_status_buttons = create_hit_status_buttons({
 const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
 
 const player_turn_handler = create_player_turn_handler({
-    battle_grid,
     initiative_order,
     option_buttons,
     hit_status_buttons,
     turn_state,
-    evaluate_ast,
     game_events
 })
 

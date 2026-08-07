@@ -44,19 +44,16 @@ type AvailableInteractionsSelectOption = {
 }
 
 export const create_player_turn_handler = ({
-                                               battle_grid,
                                                initiative_order,
                                                option_buttons,
                                                hit_status_buttons,
                                                turn_state,
                                                game_events
                                            }: {
-    battle_grid: BattleGrid,
     initiative_order: InitiativeOrder,
     option_buttons: OptionButtons
     hit_status_buttons: HitStatusButtons
     turn_state: TurnState
-    evaluate_ast: (expr: AstNode) => Expr
     game_events: GameEvents
 }): PlayerTurnHandler => {
     let selection_context: AvailableInteractions | null = null
