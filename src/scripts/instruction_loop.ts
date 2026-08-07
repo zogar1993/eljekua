@@ -10,6 +10,7 @@ import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
 import {InstructionVisualizer} from "scripts/instruction_visualizer/instruction_visualizer";
 import {Settings} from "scripts/settings/Settings";
 
+//TODO see if we can go back to the syncronous loop
 export const create_instruction_loop = ({
                                            player_turn_handler,
                                            turn_state,
