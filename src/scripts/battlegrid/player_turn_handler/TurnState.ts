@@ -1,12 +1,12 @@
-import {create_instruction_frame, InstructionFrame} from "scripts/battlegrid/player_turn_handler/InstructionFrame";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {Instruction} from "scripts/expressions/parser/instructions";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
+import {assert} from "scripts/assert";
 
-export const create_turn_state = (): TurnState => {
-    let power_frames: Array<InstructionFrame> = []
+export const create_turn_state = () => {
+    let frames: Array<InstructionFrame> = []
 
     const add_instruction_frame = ({name, instructions, owner, variables = {}}: {
         name: string
@@ -14,67 +14,78 @@ export const create_turn_state = (): TurnState => {
         owner: Creature
         variables?: Record<string, Expr>
     }) => {
-        const power_frame = create_instruction_frame({instructions, power_name: name, owner})
+        const frame_variables = new Map<string, Expr>()
+        frame_variables.set(SYSTEM_KEYWORD.OWNER, {type: "creatures", value: [owner]})
         for (const [key, value] of Object.entries(variables))
-            power_frame.set_variable(key, value)
-        power_frames.push(power_frame)
-        return power_frame
+            frame_variables.set(key, value)
+
+        frames.push({instructions: [...instructions], variables: frame_variables, name})
     }
 
     const get_current_frame = () => {
-        if (power_frames.length === 0) throw Error("No frames available")
-        return power_frames[power_frames.length - 1]
+        if (frames.length === 0) throw Error("No frames available")
+        return frames[frames.length - 1]
     }
 
     const peek_instruction = (): Instruction => {
-        const current_power_frame = get_current_frame()
-        return current_power_frame.peek_instruction()
+        const frame = get_current_frame()
+        assert(frame.instructions.length > 0, () => "no instructions left when calling peek instruction")
+        return frame.instructions[0]
     }
 
     const next_instruction = () => {
-        while (power_frames.length > 0) {
-            const current_power_frame = get_current_frame()
-            if (current_power_frame.has_instructions())
-                return current_power_frame.next_instruction()
+        while (frames.length > 0) {
+            const frame = get_current_frame()
+            if (frame.instructions.length > 0) {
+                assert(frame.instructions.length > 0, () => "no instructions left when calling next instruction")
+                const [next, ...instructions] = frame.instructions
+                frame.instructions = instructions
+                return next
+            }
 
             // We discard the current frame if it is empty and move on to the next.
             // The reason instruction frames aren't automatically removed alongside their last instruction is that
             // an instruction can be added after that. This is a bit easier to handle.
-            power_frames = power_frames.slice(0, power_frames.length - 1)
+            frames = frames.slice(0, frames.length - 1)
         }
 
         return null
     }
-
-    const get_acting_creature = () => EXPR.as_creature(get_current_frame().get_variable(SYSTEM_KEYWORD.OWNER))
-
-    const get_power_name = () => get_current_frame().power_name
+    const get_power_name = () => get_current_frame().name
 
     const get_variable = (name: string) => {
         const frame = get_current_frame()
-        return frame.get_variable(name)
+        const variable = frame.variables.get(name)
+        //TODO P3 make error handling smoother everywhere
+        if (!variable)
+            throw Error(`variable '${name}' not found in frame. Variables: ${to_formatted_json_string(frame.variables)}.'`)
+        return variable
     }
+
+
+    const get_acting_creature = () => EXPR.as_creature(get_variable(SYSTEM_KEYWORD.OWNER))
 
     const has_variable = (name: string): boolean => {
         const frame = get_current_frame()
-        return frame.has_variable(name)
+        return frame.variables.has(name)
     }
 
     const set_variable = (name: string, value: Expr) => {
         const frame = get_current_frame()
-        frame.set_variable(name, value)
+        frame.variables.set(name, value)
     }
 
     const add_instructions = (instructions: Array<Instruction>) => {
         const frame = get_current_frame()
-        frame.add_instructions(instructions)
+        frame.instructions = [...instructions, ...frame.instructions]
     }
 
     const clear = () => {
-        power_frames = []
+        frames = []
     }
 
-    const get_power_frames = () => power_frames
+    //TODO this is rather ugly, we can separate state from operations
+    const get_power_frames = () => frames
 
     return {
         add_instruction_frame,
@@ -94,23 +105,12 @@ export const create_turn_state = (): TurnState => {
     }
 }
 
-export type TurnState = {
-    add_instruction_frame: (_: {
-        name: string,
-        instructions: Array<Instruction>,
-        owner: Creature,
-        variables?: Record<string, Expr>
-    }) => InstructionFrame
-    peek_instruction: () => Instruction
-    next_instruction: () => Instruction | null
-    get_acting_creature: () => Creature
-    get_power_name: () => string
-    get_variable: (name: string) => Expr
-    has_variable: (name: string) => boolean,
-    set_variable: (name: string, value: Expr) => void
-    add_instructions: (instructions: Array<Instruction>) => void
-    clear: () => void
+export type TurnState = ReturnType<typeof create_turn_state>
 
-    //TODO this is rather ugly, we can separate state from operations
-    get_power_frames: () => Array<InstructionFrame>
+type InstructionFrame = {
+    name: string
+    instructions: Array<Instruction>
+    variables: Map<string, Expr>
 }
+
+const to_formatted_json_string = (obj: object) => JSON.stringify(obj, null, 2)

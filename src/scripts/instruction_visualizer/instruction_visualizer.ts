@@ -12,14 +12,14 @@ export const create_instruction_visualizer = () => {
         for (let i = 0; i < frames.length; i++) {
             const frame = frames[i]
 
-            const variables = frame.get_variables().entries()
+            const variables = frame.variables.entries()
             for (const [key, value] of variables) {
                 const html_variable = create_html_element("div", "instruction__variable")
                 html_variable.textContent = `${key}: ${value.type}`
                 elements.push(html_variable)
             }
 
-            const instructions = frame.get_instructions()
+            const instructions = frame.instructions
             for(const instruction of instructions) {
                 const html_instruction = create_visual_for_instruction(instruction)
                 elements.push(html_instruction)
