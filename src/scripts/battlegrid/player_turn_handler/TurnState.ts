@@ -21,19 +21,19 @@ export const create_turn_state = (): TurnState => {
         return power_frame
     }
 
-    const get_current_power_frame = () => {
-        if (power_frames.length === 0) throw Error("No power frames available")
+    const get_current_frame = () => {
+        if (power_frames.length === 0) throw Error("No frames available")
         return power_frames[power_frames.length - 1]
     }
 
     const peek_instruction = (): Instruction => {
-        const current_power_frame = get_current_power_frame()
+        const current_power_frame = get_current_frame()
         return current_power_frame.peek_instruction()
     }
 
     const next_instruction = () => {
         while (power_frames.length > 0) {
-            const current_power_frame = get_current_power_frame()
+            const current_power_frame = get_current_frame()
             if (current_power_frame.has_instructions())
                 return current_power_frame.next_instruction()
 
@@ -46,27 +46,27 @@ export const create_turn_state = (): TurnState => {
         return null
     }
 
-    const get_acting_creature = () => EXPR.as_creature(get_current_power_frame().get_variable(SYSTEM_KEYWORD.OWNER))
+    const get_acting_creature = () => EXPR.as_creature(get_current_frame().get_variable(SYSTEM_KEYWORD.OWNER))
 
-    const get_power_name = () => get_current_power_frame().power_name
+    const get_power_name = () => get_current_frame().power_name
 
     const get_variable = (name: string) => {
-        const frame = get_current_power_frame()
+        const frame = get_current_frame()
         return frame.get_variable(name)
     }
 
     const has_variable = (name: string): boolean => {
-        const frame = get_current_power_frame()
+        const frame = get_current_frame()
         return frame.has_variable(name)
     }
 
     const set_variable = (name: string, value: Expr) => {
-        const frame = get_current_power_frame()
+        const frame = get_current_frame()
         frame.set_variable(name, value)
     }
 
     const add_instructions = (instructions: Array<Instruction>) => {
-        const frame = get_current_power_frame()
+        const frame = get_current_frame()
         frame.add_instructions(instructions)
     }
 
