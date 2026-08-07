@@ -1,4 +1,3 @@
-import {SquareVisual} from "scripts/battlegrid/squares/SquareVisual";
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {
@@ -9,23 +8,14 @@ import {
     transform_position_to_f1
 } from "scripts/battlegrid/Position";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "scripts/powers/basic";
-import type {BattleGridVisual} from "scripts/battlegrid/BattleGridVisual";
 
-export const create_battle_grid = ({
-                                       create_visual_square,
-                                       create_battle_grid_visual,
-                                       size,
-                                   }: {
-    create_battle_grid_visual: ({width, height}: { width: number, height: number }) => BattleGridVisual
-    create_visual_square: (square: { x: number, y: number }) => SquareVisual,
+export const create_battle_grid = ({size,}: {
     size: { x: number, y: number }
 }): BattleGrid => {
-    const visual: BattleGridVisual = create_battle_grid_visual({width: size.x, height: size.y})
     const creatures: Array<Creature> = []
     const board: Array<Array<Square>> = Array.from({length: size.y}, (_, y) => {
             return Array.from({length: size.x}, (_, x) => {
-                const visual = create_visual_square({x, y})
-                return {visual, position: {x, y, footprint: 1}}
+                return {position: {x, y, footprint: 1}}
             })
         }
     )
@@ -73,7 +63,6 @@ export const create_battle_grid = ({
     }
 
     return {
-        visual,
         size,
         creatures,
         board,
@@ -89,7 +78,6 @@ export const create_battle_grid = ({
 }
 
 export type BattleGrid = {
-    visual: BattleGridVisual
     size: { x: number, y: number }
     creatures: ReadonlyArray<Creature>
     board: Array<Array<Square>>
@@ -106,7 +94,6 @@ export type BattleGrid = {
 }
 
 export type Square = {
-    visual: SquareVisual,
     position: PositionFootprintOne
 }
 

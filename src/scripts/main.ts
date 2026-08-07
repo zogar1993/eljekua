@@ -1,7 +1,5 @@
 import {create_battle_grid} from "scripts/battlegrid/BattleGrid";
-import {create_visual_square} from "scripts/battlegrid/squares/SquareVisual";
 import {create_visual_creature} from "web_components/creature/CreatureVisual";
-import {create_battle_grid_visual} from "scripts/battlegrid/BattleGridVisual";
 import {create_player_turn_handler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {create_action_log} from "scripts/action_log/ActionLog";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
@@ -27,7 +25,7 @@ import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use
 import {HIT_STATUS, HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {create_settings} from "scripts/settings/Settings";
 import {create_game_events} from "scripts/events/GameEvents";
-import {transform_positions_to_f1} from "scripts/battlegrid/Position";
+import {create_battle_grid_ui} from "web_components/battle_grid/BattleGridUI";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
@@ -35,11 +33,7 @@ const turn_state = create_turn_state()
 const settings = create_settings()
 const game_events = create_game_events()
 
-const battle_grid = create_battle_grid({
-    create_visual_square,
-    create_battle_grid_visual,
-    size: {x: 10, y: 10}
-})
+const battle_grid = create_battle_grid({size: {x: 10, y: 10}})
 
 const option_buttons = create_option_buttons({create_option_button_visual})
 const hit_status_buttons = create_hit_status_buttons({
@@ -59,6 +53,15 @@ const player_turn_handler = create_player_turn_handler({
     game_events
 })
 
+const battle_grid_ui = create_battle_grid_ui({
+    battle_grid,
+    player_turn_handler,
+    turn_state,
+    game_events,
+    option_buttons,
+    hit_status_buttons
+})
+
 const instruction_visualizer = create_instruction_visualizer()
 
 const gameplay_use_cases = create_gameplay_use_cases({
@@ -73,24 +76,6 @@ const instruction_loop = create_instruction_loop({
     initiative_order,
     instruction_visualizer,
     settings
-})
-
-game_events.on_available_interactions_changed.add_handler((interactions) => {
-    const set_selected_indicator = () => {
-        const position = turn_state.get_power_owner().data.position
-        battle_grid.get_squares(position).forEach(({visual}) => visual.set_highlight("selected"))
-    }
-
-    if (interactions.type === "position_select") {
-        set_selected_indicator()
-
-        transform_positions_to_f1(interactions.clickable)
-            .map(battle_grid.get_square)
-            .forEach(({visual}) => visual.set_highlight("available-target"))
-
-        interactions.highlighted
-            .forEach(({position, highlight}) => battle_grid.get_square(position).visual.set_highlight(highlight))
-    }
 })
 
 
@@ -235,14 +220,6 @@ const build_character = (
         powers: data.powers ?? []
     }
 }
-
-battle_grid.visual.addOnMouseMoveHandler(coordinate => {
-    player_turn_handler.on_hover({coordinate})
-})
-
-battle_grid.visual.addOnClickHandler(coordinate => {
-    player_turn_handler.on_click({coordinate})
-})
 
 const build_monster = (
     data: Omit<Partial<CreatureData>, "position"> & Pick<CreatureData, "name" | "position">

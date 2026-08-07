@@ -103,6 +103,7 @@ export type TurnState = {
     }) => PowerFrame
     peek_instruction: () => Instruction
     next_instruction: () => Instruction | null
+    //TODO we can lean on acting creature instead of power owner to have a cleaner verbiage
     get_power_owner: () => Creature
     get_power_name: () => string
     get_variable: (name: string) => Expr

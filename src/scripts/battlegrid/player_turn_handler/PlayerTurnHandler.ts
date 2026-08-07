@@ -2,22 +2,11 @@ import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import {
     Position,
     PositionFootprintOne,
-    positions_of_same_footprint_equal,
-    transform_position_to_f1,
-    transform_positions_to_f1
 } from "scripts/battlegrid/Position";
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {TurnState} from "scripts/battlegrid/player_turn_handler/TurnState";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
-import {EXPR} from "scripts/expressions/evaluator/EXPR";
-import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
-import {bound_minmax} from "scripts/ts_utils/bound_minmax";
-import {SquareHighlight} from "scripts/battlegrid/squares/SquareHighlight";
-import {
-    ClickableCoordinate,
-    get_position_by_coordinate,
-    nullable_positions_equal
-} from "scripts/battlegrid/coordinates/ClickableCoordinate";
+import {SquareHighlight} from "web_components/battle_grid/squares/SquareHighlight";
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {Expr} from "scripts/expressions/evaluator/types";
 import {OptionButton, OptionButtons} from "scripts/battlegrid/option_buttons/OptionButtons";
@@ -60,7 +49,6 @@ export const create_player_turn_handler = ({
                                                option_buttons,
                                                hit_status_buttons,
                                                turn_state,
-                                               evaluate_ast,
                                                game_events
                                            }: {
     battle_grid: BattleGrid,
@@ -81,13 +69,13 @@ export const create_player_turn_handler = ({
     const set_awaiting_option_selection = (context: Omit<AvailableInteractionsSelectOption, "type">) => {
         selection_context = {type: "option_select", ...context}
 
-        set_selected_indicator()
+        game_events.on_acting_creature_changed.raise(turn_state.get_power_owner())
 
         const options = context.available_options.map(option => ({
             ...option,
             on_click: () => {
                 option.on_click()
-                deselect()
+                game_events.on_acting_creature_changed.raise(null)
             }
         }))
 
@@ -100,12 +88,12 @@ export const create_player_turn_handler = ({
     }) => {
         selection_context = {type: "hit_status_select", hit_statuses}
 
-        set_selected_indicator()
+        game_events.on_acting_creature_changed.raise(turn_state.get_power_owner())
 
         hit_status_buttons.display({
             hit_statuses,
             on_status_change,
-            on_confirm: () => deselect(),
+            on_confirm: () => game_events.on_acting_creature_changed.raise(null),
         })
     }
 
@@ -120,101 +108,9 @@ export const create_player_turn_handler = ({
         return selection_context
     }
 
-    const on_click = ({coordinate}: { coordinate: ClickableCoordinate }) => {
-        if (selection_context?.type !== "position_select") return
-        if (selection_context.target === null) return
-        const position = get_position_by_coordinate({coordinate, positions: selection_context.clickable})
-        if (position === null) return null;
-
-        if (selection_context.target.type === "positions") {
-            const path = selection_context.target.value
-            if (!positions_of_same_footprint_equal(position, path[path.length - 1]))
-                throw Error("position should be the end of the path")
-        }
-
-        turn_state.set_variable(selection_context.target_label,
-            selection_context.target.type === "creatures" ? {
-                type: selection_context.target.type,
-                value: selection_context.target.value,
-            } : {
-                type: selection_context.target.type,
-                value: selection_context.target.value,
-                description: "target"
-            })
-
-        deselect()
-    }
-
-    let latest_position: Position | null = null
-            //TODO AP3 this should be better on_hover
-    const on_hover = ({coordinate}: { coordinate: ClickableCoordinate | null }) => {
-        if (selection_context?.type !== "position_select") return
-
-        const position = coordinate &&
-            get_position_by_coordinate({positions: selection_context.clickable, coordinate})
-
-        if (nullable_positions_equal(latest_position, position)) return;
-        latest_position = position
-
-        const highlighted_positions = selection_context.highlighted.map(({position}) => position)
-
-        for (const position of highlighted_positions) {
-            battle_grid.get_square(position).visual.set_interaction_status("none")
-            battle_grid.get_square(position).visual.set_highlight("none")
-        }
-
-        for (const creature of battle_grid.creatures)
-            creature.events.is_untargeted.raise()
-
-        selection_context = {...selection_context, highlighted: []}
-
-        if (position) {
-            selection_context.on_hover(position)
-            show_attack_success_chance_if_needed({selection_context, evaluate_ast, turn_state})
-
-            for (const p of transform_position_to_f1(position))
-                battle_grid.get_square(p).visual.set_interaction_status("hover")
-        } else {
-            for (const p of transform_positions_to_f1(selection_context.clickable))
-                battle_grid.get_square(p).visual.set_highlight("available-target")
-        }
-    }
-
-    const set_selected_indicator = () => {
-        const position = turn_state.get_power_owner().data.position
-        battle_grid.get_squares(position).forEach(({visual}) => visual.set_highlight("selected"))
-    }
-
-    const deselect = () => {
-        if (selection_context === null) return
-
-        const position = turn_state.get_power_owner().data.position
-        battle_grid.get_squares(position).forEach(({visual}) => visual.set_highlight("none"))
-
-        if (selection_context.type === "position_select") {
-            for (const position of transform_positions_to_f1(selection_context.clickable))
-                battle_grid.get_square(position).visual.set_highlight("none")
-            for (const position of selection_context.highlighted.map(({position}) => position))
-                battle_grid.get_square(position).visual.set_highlight("none")
-
-            if (selection_context.target) {
-                if (selection_context.target.type === "creatures") {
-                    const creatures = selection_context.target.value
-
-                    creatures.forEach(creature => creature.events.is_untargeted.raise())
-                }
-            }
-        } else if (selection_context.type === "option_select")
-            option_buttons.remove_options()
-        else if (selection_context.type === "hit_status_select")
-            hit_status_buttons.remove()
-
-        selection_context = null
-    }
-
     const clear_turn_state = () => {
-        deselect()
         turn_state.clear()
+        game_events.on_acting_creature_changed.raise(null)
     }
 
     function set_action_selection_for_current_character() {
@@ -232,19 +128,21 @@ export const create_player_turn_handler = ({
         return selection_context
     }
 
+    function set_selection_context(context: AvailableInteractions | null) {
+        selection_context = context
+    }
+
     return {
         set_available_interactions,
         set_awaiting_option_selection,
         set_awaiting_hit_status_selection,
         get_position_selection_context,
         get_position_selection_context_or_null,
-        on_click,
-        on_hover,
-        set_selected_indicator,
-        deselect,
         clear_turn_state,
         set_action_selection_for_current_character,
-        get_selection_context
+        get_selection_context,
+        //TODO remove this since it defeats the purpose
+        set_selection_context
     }
 }
 
@@ -257,37 +155,8 @@ export type PlayerTurnHandler = {
     }) => void
     get_position_selection_context: () => AvailableInteractionsSelectPosition
     get_position_selection_context_or_null: () => AvailableInteractionsSelectPosition | null
-    on_click: ({coordinate}: { coordinate: ClickableCoordinate }) => void
-    on_hover: ({coordinate}: { coordinate: ClickableCoordinate | null }) => void
-    set_selected_indicator: () => void
-    deselect: () => void
     clear_turn_state: () => void
     set_action_selection_for_current_character: () => void
     get_selection_context: () => AvailableInteractions | null
-}
-
-const show_attack_success_chance_if_needed = ({turn_state, selection_context, evaluate_ast}: {
-    turn_state: TurnState,
-    selection_context: AvailableInteractionsSelectPosition,
-    evaluate_ast: (node: AstNode) => Expr
-}) => {
-    const next_instruction = turn_state.peek_instruction()
-    const needs_roll = next_instruction.type === INSTRUCTION_TYPE.ATTACK_DICE_ROLL
-    if (needs_roll && selection_context.target) {
-        if (selection_context.target.type !== "creatures")
-            throw Error("an attack roll needs to target creatures")
-
-        const creatures = selection_context.target.value
-        creatures.forEach(defender => {
-            const attacker = next_instruction.attack
-            const attack = EXPR.as_number(evaluate_ast(attacker))
-
-            const defense_code = next_instruction.defense
-            const defense = get_creature_defense({creature: defender, defense_code}).value
-
-            const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
-
-            defender.events.is_targeted.raise({attack, defense, chance})
-        })
-    }
+    set_selection_context: (context: AvailableInteractions | null) => void
 }

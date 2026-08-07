@@ -18,13 +18,15 @@ import {create_instruction_loop} from "scripts/instruction_loop";
 import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use_cases";
 import {hit_status_buttons_test_ui} from "tests/utils/hit_status_buttons_test_ui";
 import {create_settings} from "scripts/settings/Settings";
+import {create_game_events} from "scripts/events/GameEvents";
 
 const turn_state = create_turn_state();
-const battle_grid = create_battle_grid({...dependency_mocks, create_battle_grid_visual, size: {x: 10, y: 10}})
+const battle_grid = create_battle_grid({size: {x: 10, y: 10}})
 const initiative_order = create_initiative_order({...dependency_mocks})
 const option_buttons = create_option_buttons({create_option_button_visual})
 const evaluate_ast = build_evaluate_ast({turn_state, battle_grid})
 const settings = create_settings()
+const game_events = create_game_events()
 const player_turn_handler = create_player_turn_handler({
     ...dependency_mocks,
     battle_grid,
@@ -32,7 +34,8 @@ const player_turn_handler = create_player_turn_handler({
     option_buttons,
     hit_status_buttons: hit_status_buttons_test_ui,
     turn_state,
-    evaluate_ast
+    evaluate_ast,
+    game_events
 })
 
 const gameplay_use_cases = create_gameplay_use_cases({
@@ -51,15 +54,7 @@ const instruction_loop = create_instruction_loop({
     settings
 })
 
-battle_grid.visual.addOnMouseMoveHandler(coordinate => {
-    player_turn_handler.on_hover({coordinate})
-})
-
-battle_grid.visual.addOnClickHandler(coordinate => {
-    player_turn_handler.on_click({coordinate})
-})
-
-const add_creature_to_game = create_add_creature_to_game({battle_grid, initiative_order, on_creature_added_to_game: []})
+const add_creature_to_game = create_add_creature_to_game({battle_grid, initiative_order, game_events})
 const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop})
 
 describe("when an enemy leaves a space adjacent to a creature", () => {
