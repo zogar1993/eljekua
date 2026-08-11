@@ -6,7 +6,7 @@ import {INSTRUCTION_TYPE, Instruction, InstructionAddPowers, InstructionOptionsI
 import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import {TURN_ACTION_TYPES} from "scripts/battlegrid/creatures/ActionType";
 import {Power} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
-import {remove_from_array_by_index} from "scripts/ts_utils/remove_from_array_by_index";
+import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 
 export const interpret_add_powers_as_options = ({

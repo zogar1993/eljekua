@@ -1,6 +1,6 @@
 import {OptionButtonVisual} from "scripts/battlegrid/option_buttons/OptionButtonVisual";
 import {OptionButton} from "scripts/battlegrid/option_buttons/OptionButtons";
-import {remove_item_from_array} from "scripts/ts_utils/remove_item_from_array";
+import {remove_item_from_array} from "stdlib/remove_item_from_array";
 
 type OptionButtonMockUI = OptionButtonVisual & OptionButton
 

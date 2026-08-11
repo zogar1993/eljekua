@@ -1,6 +1,6 @@
 import {Scanner} from "scripts/expressions/parser/scanner";
 import {is_numeric_character, is_numeric_text} from "scripts/expressions/parser/regexes";
-import {assert} from "scripts/assert";
+import {assert} from "stdlib/assert";
 
 export const parse_number = (scanner: Scanner): AstNodeNumber => {
     const value = scanner.get_text_while(is_numeric_character)

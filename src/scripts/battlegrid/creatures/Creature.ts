@@ -1,9 +1,9 @@
 import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
 import type {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {ACTION_TYPE_EXPENDITURE_ORDER, ActionType} from "scripts/battlegrid/creatures/ActionType";
-import {remove_from_array_by_index} from "scripts/ts_utils/remove_from_array_by_index";
+import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
 import {Position} from "scripts/battlegrid/Position";
-import {create_event_manager} from "scripts/events/event_manager";
+import {create_event_manager} from "stdlib/event_manager";
 import {InstructionAttackDiceRoll} from "scripts/expressions/parser/instructions";
 import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 

@@ -1,4 +1,4 @@
-import {assert} from "scripts/assert";
+import {assert} from "stdlib/assert";
 import {Scanner} from "scripts/expressions/parser/scanner";
 import {AstNode, parse_any} from "scripts/expressions/parser/nodes/AstNode";
 

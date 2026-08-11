@@ -1,6 +1,6 @@
 import {Scanner} from "scripts/expressions/parser/scanner";
 import {is_text_character} from "scripts/expressions/parser/regexes";
-import {assert} from "scripts/assert";
+import {assert} from "stdlib/assert";
 import {AstNode, parse_any} from "scripts/expressions/parser/nodes/AstNode";
 
 export const parse_function = (scanner: Scanner): AstNodeFunction => {

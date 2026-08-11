@@ -1,6 +1,7 @@
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 import {create_html_element} from "web_components/utils/create_html_element";
+import {AssertionError} from "stdlib/AssertionError";
 
 export const create_initiative_entry_visual = ({creature, initiative, index}: {
     creature: Creature,

@@ -3,7 +3,7 @@ import {Expr} from "scripts/expressions/evaluator/types";
 import {Instruction} from "scripts/expressions/parser/instructions";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
-import {assert} from "scripts/assert";
+import {assert} from "stdlib/assert";
 import {GameEvents} from "scripts/events/GameEvents";
 
 export const create_turn_state = ({game_events}: { game_events: GameEvents }) => {

@@ -8,7 +8,7 @@ import {
     transform_positions_to_f1
 } from "scripts/battlegrid/Position";
 import {SquareHighlight} from "web_components/battle_grid/squares/SquareHighlight";
-import {bound_minmax} from "scripts/ts_utils/bound_minmax";
+import {bound_minmax} from "stdlib/bound_minmax";
 import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";

@@ -1,6 +1,6 @@
 import {Creature} from "scripts/battlegrid/creatures/Creature";
 import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
-import {insert_to_array} from "scripts/ts_utils/insert_to_array";
+import {insert_to_array} from "stdlib/insert_to_array";
 import {InitiativeEntryVisual} from "scripts/initiative_order/InitiativeEntryVisual";
 
 export const create_initiative_order = ({create_initiative_entry_visual}: {

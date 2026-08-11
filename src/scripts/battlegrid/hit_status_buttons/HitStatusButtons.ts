@@ -3,6 +3,7 @@ import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
 import {OptionButton} from "scripts/battlegrid/option_buttons/OptionButtons";
 import {OptionButtonVisual} from "scripts/battlegrid/option_buttons/OptionButtonVisual";
 import {CreatureHitStatusVisual} from "scripts/battlegrid/hit_status_buttons/CreatureHitStatusVisual";
+import {AssertionError} from "stdlib/AssertionError";
 
 export const create_hit_status_buttons = ({
                                               create_creature_hit_status_visual,

@@ -1,6 +1,6 @@
 import {Scanner} from "scripts/expressions/parser/scanner";
 import {is_plain_text, is_text_character} from "scripts/expressions/parser/regexes";
-import {assert} from "scripts/assert";
+import {assert} from "stdlib/assert";
 
 export const parse_keyword = (scanner: Scanner): AstNodeKeyword => {
     const value = scanner.get_text_while(is_text_character)

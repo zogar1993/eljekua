@@ -1,4 +1,4 @@
-import {create_event_manager} from "scripts/events/event_manager";
+import {create_event_manager} from "stdlib/event_manager";
 import type {AvailableInteractions} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
 import type {Creature} from "scripts/battlegrid/creatures/Creature";
 import type {Instruction} from "scripts/expressions/parser/instructions";

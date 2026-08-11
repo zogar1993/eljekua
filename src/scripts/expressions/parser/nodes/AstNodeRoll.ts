@@ -1,5 +1,5 @@
 import {Scanner} from "scripts/expressions/parser/scanner";
-import {assert} from "scripts/assert";
+import {assert} from "stdlib/assert";
 import {is_numeric_character} from "scripts/expressions/parser/regexes";
 
 export const parse_roll = (scanner: Scanner): AstNodeDice | AstNodeWeapon => {

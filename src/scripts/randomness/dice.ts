@@ -1,4 +1,4 @@
-import {assert} from "scripts/assert";
+import {assert} from "stdlib/assert";
 
 import {ExprNumberResolved} from "scripts/expressions/evaluator/types";
 
