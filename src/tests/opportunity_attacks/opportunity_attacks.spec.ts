@@ -20,13 +20,13 @@ import {hit_status_buttons_test_ui} from "tests/utils/hit_status_buttons_test_ui
 import {create_settings} from "scripts/settings/Settings";
 import {create_game_events} from "scripts/events/GameEvents";
 
-const turn_state = create_turn_state();
 const battle_grid = create_battle_grid({size: {x: 10, y: 10}})
 const initiative_order = create_initiative_order({...dependency_mocks})
 const option_buttons = create_option_buttons({create_option_button_visual})
-const evaluate_ast = build_evaluate_ast({turn_state, battle_grid})
 const settings = create_settings()
 const game_events = create_game_events()
+const turn_state = create_turn_state({game_events})
+const evaluate_ast = build_evaluate_ast({turn_state, battle_grid})
 const player_turn_handler = create_player_turn_handler({
     ...dependency_mocks,
     initiative_order,

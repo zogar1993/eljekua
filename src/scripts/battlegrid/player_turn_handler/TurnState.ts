@@ -4,8 +4,9 @@ import {Instruction} from "scripts/expressions/parser/instructions";
 import {EXPR} from "scripts/expressions/evaluator/EXPR";
 import {SYSTEM_KEYWORD} from "scripts/expressions/parser/AST_NODE";
 import {assert} from "scripts/assert";
+import {GameEvents} from "scripts/events/GameEvents";
 
-export const create_turn_state = () => {
+export const create_turn_state = ({game_events}: { game_events: GameEvents }) => {
     let frames: Array<InstructionFrame> = []
 
     const add_instruction_frame = ({name, instructions, owner, variables = {}}: {
@@ -19,7 +20,10 @@ export const create_turn_state = () => {
         for (const [key, value] of Object.entries(variables))
             frame_variables.set(key, value)
 
-        frames.push({instructions: [...instructions], variables: frame_variables, name})
+        const frame = {instructions: [...instructions], variables: frame_variables, name}
+        frames.push(frame)
+
+        game_events.on_instruction_frame_added.raise(frame)
     }
 
     const get_current_frame = () => {
@@ -40,6 +44,7 @@ export const create_turn_state = () => {
                 assert(frame.instructions.length > 0, () => "no instructions left when calling next instruction")
                 const [next, ...instructions] = frame.instructions
                 frame.instructions = instructions
+                game_events.on_instruction_consumed.raise(next)
                 return next
             }
 
@@ -47,6 +52,7 @@ export const create_turn_state = () => {
             // The reason instruction frames aren't automatically removed alongside their last instruction is that
             // an instruction can be added after that. This is a bit easier to handle.
             frames = frames.slice(0, frames.length - 1)
+            game_events.on_instruction_frame_popped.raise()
         }
 
         return null
@@ -73,15 +79,18 @@ export const create_turn_state = () => {
     const set_variable = (name: string, value: Expr) => {
         const frame = get_current_frame()
         frame.variables.set(name, value)
+        game_events.on_turn_state_variable_set.raise([name, value])
     }
 
     const add_instructions = (instructions: Array<Instruction>) => {
         const frame = get_current_frame()
         frame.instructions = [...instructions, ...frame.instructions]
+        game_events.on_instructions_prepended.raise(instructions)
     }
 
     const clear = () => {
         frames = []
+        game_events.on_turn_state_cleared.raise()
     }
 
     //TODO this is rather ugly, we can separate state from operations
@@ -107,7 +116,7 @@ export const create_turn_state = () => {
 
 export type TurnState = ReturnType<typeof create_turn_state>
 
-type InstructionFrame = {
+export type InstructionFrame = {
     name: string
     instructions: Array<Instruction>
     variables: Map<string, Expr>

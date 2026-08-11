@@ -7,7 +7,6 @@ import {BattleGrid} from "scripts/battlegrid/BattleGrid";
 import type {AstNode} from "scripts/expressions/parser/nodes/AstNode";
 import type {Expr} from "scripts/expressions/evaluator/types";
 import {InitiativeOrder} from "scripts/initiative_order/InitiativeOrder";
-import {InstructionVisualizer} from "scripts/instruction_visualizer/instruction_visualizer";
 import {Settings} from "scripts/settings/Settings";
 
 //TODO see if we can go back to the syncronous loop
@@ -17,7 +16,6 @@ export const create_instruction_loop = ({
                                            battle_grid,
                                            evaluate_ast,
                                            initiative_order,
-                                           instruction_visualizer,
                                            settings
                                        }: {
     player_turn_handler: PlayerTurnHandler
@@ -25,12 +23,10 @@ export const create_instruction_loop = ({
     battle_grid: BattleGrid
     evaluate_ast: (node: AstNode) => Expr
     initiative_order: InitiativeOrder
-    instruction_visualizer: InstructionVisualizer
     settings: Settings
 }) => {
     const evaluate_instructions = () => {
         while (player_turn_handler.get_selection_context() === null) {
-            instruction_visualizer.show(turn_state)
             const instruction = turn_state.next_instruction()
 
             if (instruction === null) {

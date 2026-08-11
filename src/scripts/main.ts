@@ -19,7 +19,7 @@ import {create_start_battle} from "scripts/use_cases/start_battle";
 import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnState";
 import {create_instruction_loop} from "scripts/instruction_loop";
 import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
-import {create_instruction_visualizer} from "scripts/instruction_visualizer/instruction_visualizer";
+import {create_instruction_visualizer} from "web_components/instruction_visualizer/instruction_visualizer";
 import {AnimationQueue} from "scripts/AnimationQueue";
 import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use_cases";
 import {HIT_STATUS, HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
@@ -29,9 +29,9 @@ import {initialize_battle_grid_ui} from "web_components/battle_grid/BattleGridUI
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
-const turn_state = create_turn_state()
 const settings = create_settings()
 const game_events = create_game_events()
+const turn_state = create_turn_state({game_events})
 
 const battle_grid = create_battle_grid({size: {x: 10, y: 10}})
 
@@ -60,7 +60,7 @@ initialize_battle_grid_ui({
     hit_status_buttons
 })
 
-const instruction_visualizer = create_instruction_visualizer()
+create_instruction_visualizer({game_events})
 
 const gameplay_use_cases = create_gameplay_use_cases({
     battle_grid, player_turn_handler, initiative_order
@@ -72,7 +72,6 @@ const instruction_loop = create_instruction_loop({
     turn_state,
     evaluate_ast,
     initiative_order,
-    instruction_visualizer,
     settings
 })
 
