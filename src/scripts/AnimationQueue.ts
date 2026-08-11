@@ -29,6 +29,7 @@ class AnimationQueueClass {
         }, time)
     }
 
+    //TODO remove this if not needed any longer
     add_on_animation_start_handler = (handler: () => void) => {
         this.on_animation_start_handlers.push(handler)
     }
