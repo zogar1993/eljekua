@@ -3,8 +3,8 @@ import {
     transform_power_ir_into_vm_representation
 } from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
 import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
-import {power_resolute_shield} from "scripts/powers/fighter/resolute_shield";
-import {power_shield_faint} from "scripts/powers/fighter/shield_faint";
+import {power_resolute_shield} from "data/powers/fighter/resolute_shield";
+import {power_shield_faint} from "data/powers/fighter/shield_faint";
 
 const sure_strike: IRPower = {
     name: "Sure Strike",

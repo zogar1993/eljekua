@@ -7,7 +7,7 @@ import {
     positions_share_surface,
     transform_position_to_f1
 } from "scripts/battlegrid/Position";
-import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "scripts/powers/basic";
+import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "data/powers/basic";
 
 export const create_battle_grid = ({size,}: {
     size: { x: number, y: number }
