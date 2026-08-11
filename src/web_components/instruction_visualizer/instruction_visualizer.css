@@ -1,0 +1,39 @@
+.instruction__variables-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.instruction__variables-toggle .expand_icon {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform 0.15s ease;
+}
+
+.instruction__variables-toggle--expanded .expand_icon {
+    transform: rotate(45deg);
+}
+
+.instruction__variables-label {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.instruction__variables--collapsed {
+    display: none;
+}
+
+.instruction__variable {
+    font-size: 0.85rem;
+    padding-left: 1rem;
+}
+
+.instruction__frame-separator {
+    opacity: 0.5;
+    font-size: 0.85rem;
+}

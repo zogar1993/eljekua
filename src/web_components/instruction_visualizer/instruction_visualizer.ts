@@ -4,6 +4,8 @@ import {GameEvents} from "scripts/events/GameEvents";
 import {create_html_element} from "web_components/utils/create_html_element";
 
 type FrameElements = {
+    variablesToggle: HTMLElement
+    variablesContainer: HTMLElement
     variableElements: Array<HTMLElement>
     instructionElements: Array<HTMLElement>
     separator?: HTMLElement
@@ -19,7 +21,15 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
     })
 
     game_events.on_instruction_frame_added.add_handler(({instructions, variables}) => {
-        const frame: FrameElements = {variableElements: [], instructionElements: []}
+        const frame: FrameElements = {
+            variablesToggle: create_html_element("div", "instruction__variables-toggle"),
+            variablesContainer: create_html_element("div", "instruction__variables"),
+            variableElements: [],
+            instructionElements: [],
+        }
+
+        frame.variablesContainer.classList.add("instruction__variables--collapsed")
+        wire_variables_toggle(frame.variablesToggle, frame.variablesContainer)
 
         if (frame_elements.length > 0) {
             frame.separator = create_html_element("div", "instruction__frame-separator")
@@ -27,10 +37,12 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
             html_instructions.append(frame.separator)
         }
 
+        html_instructions.append(frame.variablesToggle, frame.variablesContainer)
+
         for (const [name, value] of variables) {
             const html_variable = create_variable_element(name, value)
             frame.variableElements.push(html_variable)
-            html_instructions.append(html_variable)
+            frame.variablesContainer.append(html_variable)
         }
 
         for (const instruction of instructions) {
@@ -64,7 +76,12 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
 
     game_events.on_instruction_frame_popped.add_handler(() => {
         const frame = frame_elements.pop()!
-        for (const element of [frame.separator, ...frame.variableElements, ...frame.instructionElements])
+        for (const element of [
+            frame.separator,
+            frame.variablesToggle,
+            frame.variablesContainer,
+            ...frame.instructionElements,
+        ])
             if (element) element.remove()
     })
 
@@ -77,12 +94,25 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
         } else {
             const html_variable = create_variable_element(name, value)
             frame.variableElements.push(html_variable)
-            html_instructions.insertBefore(html_variable, frame.instructionElements[0] ?? null)
+            frame.variablesContainer.append(html_variable)
         }
     })
 }
 
 export type InstructionVisualizer = ReturnType<typeof create_instruction_visualizer>
+
+const wire_variables_toggle = (toggle: HTMLElement, variables_container: HTMLElement) => {
+    const expand_icon = create_html_element("div", "expand_icon")
+    const label = create_html_element("span", "instruction__variables-label")
+    label.textContent = "Variables"
+
+    toggle.append(expand_icon, label)
+
+    toggle.addEventListener("click", () => {
+        variables_container.classList.toggle("instruction__variables--collapsed")
+        toggle.classList.toggle("instruction__variables-toggle--expanded")
+    })
+}
 
 const create_variable_element = (name: string, value: Expr) => {
     const html_variable = create_html_element("div", "instruction__variable")
