@@ -1,4 +1,3 @@
-import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {
     Position,
     PositionFootprintOne,
@@ -7,8 +6,6 @@ import {Creature} from "core/battlegrid/creatures/Creature";
 import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import {InitiativeOrder} from "core/initiative_order/InitiativeOrder";
 import {SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
-import {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {Expr} from "core/expressions/evaluator/types";
 import {OptionButton, OptionButtons} from "core/battlegrid/option_buttons/OptionButtons";
 import {AST} from "core/expressions/parser/AST_NODE";
 import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
