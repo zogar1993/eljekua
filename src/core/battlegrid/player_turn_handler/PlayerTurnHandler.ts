@@ -6,7 +6,7 @@ import {
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import {InitiativeOrder} from "core/initiative_order/InitiativeOrder";
-import {SquareHighlight} from "web_components/battle_grid/squares/SquareHighlight";
+import {SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {Expr} from "core/expressions/evaluator/types";
 import {OptionButton, OptionButtons} from "core/battlegrid/option_buttons/OptionButtons";

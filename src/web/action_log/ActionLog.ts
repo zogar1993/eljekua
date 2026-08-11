@@ -1,6 +1,6 @@
 import {Expr} from "core/expressions/evaluator/types";
-import {create_expression_html} from "web_components/expression/create_expression_html";
-import {create_html_element} from "web_components/utils/create_html_element";
+import {create_expression_html} from "web/expression/create_expression_html";
+import {create_html_element} from "web/utils/create_html_element";
 
 export const create_action_log = (): ActionLog => ({
     add_new_action_log: (...text: Array<string | Expr>) => {

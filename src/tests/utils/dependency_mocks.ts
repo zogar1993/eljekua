@@ -1,4 +1,4 @@
-import {SquareVisual} from "web_components/battle_grid/squares/SquareVisual";
+import {SquareVisual} from "web/battle_grid/squares/SquareVisual";
 import {InitiativeEntryVisual} from "core/initiative_order/InitiativeEntryVisual";
 
 const create_visual_square = (): SquareVisual => ({

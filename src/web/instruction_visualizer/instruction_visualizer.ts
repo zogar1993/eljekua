@@ -1,7 +1,7 @@
 import {Instruction} from "core/expressions/parser/instructions";
 import {Expr} from "core/expressions/evaluator/types";
 import {GameEvents} from "core/events/GameEvents";
-import {create_html_element} from "web_components/utils/create_html_element";
+import {create_html_element} from "web/utils/create_html_element";
 
 type FrameElements = {
     variablesToggle: HTMLElement

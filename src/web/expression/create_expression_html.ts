@@ -1,5 +1,5 @@
 import {Expr, ExprNumberResolved} from "core/expressions/evaluator/types";
-import {create_html_element} from "web_components/utils/create_html_element";
+import {create_html_element} from "web/utils/create_html_element";
 
 export const create_expression_html = (expr: Expr): HTMLElement => {
     const html_expression = create_html_element("span", "expression")

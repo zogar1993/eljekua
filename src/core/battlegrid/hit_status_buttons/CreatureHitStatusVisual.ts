@@ -1,6 +1,6 @@
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {HIT_STATUS, HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
-import {create_html_element} from "web_components/utils/create_html_element";
+import {create_html_element} from "web/utils/create_html_element";
 
 const HIT_STATUS_OPTIONS: Array<{ status: HitStatus, label: string }> = [
     {status: HIT_STATUS.MISS, label: "Miss"},

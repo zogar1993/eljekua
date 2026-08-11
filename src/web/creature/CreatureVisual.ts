@@ -1,7 +1,7 @@
 import {Position} from "core/battlegrid/Position";
 import {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {SIZE} from "core/battlegrid/creatures/SIZES";
-import {create_html_element} from "web_components/utils/create_html_element";
+import {create_html_element} from "web/utils/create_html_element";
 
 export type CreatureVisual = {
     place_at: (position: Position) => void

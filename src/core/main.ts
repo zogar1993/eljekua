@@ -1,7 +1,7 @@
 import {create_battle_grid} from "core/battlegrid/BattleGrid";
-import {create_visual_creature} from "web_components/creature/CreatureVisual";
+import {create_visual_creature} from "web/creature/CreatureVisual";
 import {create_player_turn_handler} from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
-import {create_action_log} from "web_components/action_log/ActionLog";
+import {create_action_log} from "web/action_log/ActionLog";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {ROGUE_POWERS} from "data/powers/rogue";
 import {FIGHTER_POWERS} from "data/powers/fighter";
@@ -19,13 +19,13 @@ import {create_start_battle} from "core/use_cases/start_battle";
 import {create_turn_state} from "core/battlegrid/player_turn_handler/TurnState";
 import {create_instruction_loop} from "core/instruction_loop";
 import {build_evaluate_ast} from "core/expressions/evaluator/evaluate_ast";
-import {create_instruction_visualizer} from "web_components/instruction_visualizer/instruction_visualizer";
+import {create_instruction_visualizer} from "web/instruction_visualizer/instruction_visualizer";
 import {AnimationQueue} from "core/AnimationQueue";
 import {create_gameplay_use_cases} from "core/use_cases/gameplay/gameplay_use_cases";
 import {HIT_STATUS, HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 import {create_settings} from "core/settings/Settings";
 import {create_game_events} from "core/events/GameEvents";
-import {initialize_battle_grid_ui} from "web_components/battle_grid/BattleGridUI";
+import {initialize_battle_grid_ui} from "web/battle_grid/BattleGridUI";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()

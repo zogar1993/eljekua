@@ -1,13 +1,13 @@
 import {BattleGrid} from "core/battlegrid/BattleGrid";
-import {create_battle_grid_visual} from "web_components/battle_grid/BattleGridVisual";
-import {create_visual_square} from "web_components/battle_grid/squares/SquareVisual";
+import {create_battle_grid_visual} from "web/battle_grid/BattleGridVisual";
+import {create_visual_square} from "web/battle_grid/squares/SquareVisual";
 import {
     Position,
     PositionFootprintOne, positions_of_same_footprint_equal,
     transform_position_to_f1,
     transform_positions_to_f1
 } from "core/battlegrid/Position";
-import {SquareHighlight} from "web_components/battle_grid/squares/SquareHighlight";
+import {SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
 import {bound_minmax} from "stdlib/bound_minmax";
 import {get_creature_defense} from "core/character_sheet/get_creature_defense";
 import {EXPR} from "core/expressions/evaluator/EXPR";
@@ -23,9 +23,9 @@ import {
     ClickableCoordinate,
     get_position_by_coordinate,
     nullable_positions_equal
-} from "web_components/battle_grid/coordinates/ClickableCoordinate";
+} from "web/battle_grid/coordinates/ClickableCoordinate";
 import {GameEvents} from "core/events/GameEvents";
-import {create_visual_creature} from "web_components/creature/CreatureVisual";
+import {create_visual_creature} from "web/creature/CreatureVisual";
 import {AnimationQueue} from "core/AnimationQueue";
 import {OptionButtons} from "core/battlegrid/option_buttons/OptionButtons";
 import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";

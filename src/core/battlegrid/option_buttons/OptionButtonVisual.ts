@@ -1,5 +1,5 @@
 import {OptionButton} from "core/battlegrid/option_buttons/OptionButtons";
-import {create_html_element} from "web_components/utils/create_html_element";
+import {create_html_element} from "web/utils/create_html_element";
 
 const html_element = document.querySelector("#actions_menu")!
 export const create_option_button_visual = (option: OptionButton): OptionButtonVisual => {

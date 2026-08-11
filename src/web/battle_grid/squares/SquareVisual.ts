@@ -1,5 +1,5 @@
-import {SquareHighlight} from "web_components/battle_grid/squares/SquareHighlight";
-import {create_html_element} from "web_components/utils/create_html_element";
+import {SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
+import {create_html_element} from "web/utils/create_html_element";
 
 export type SquareVisual = {
     set_highlight: (value: SquareHighlight) => void

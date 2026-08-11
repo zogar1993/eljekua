@@ -21,7 +21,7 @@ import {
 import {create_default_power_state, type PowerEditorState} from "power_editor/form_state";
 import {create_instruction_list_editor, mount_targeting_fields} from "power_editor/instruction_editor";
 import {serialize_power, validate_power} from "power_editor/serialize_power";
-import {create_html_element} from "web_components/utils/create_html_element";
+import {create_html_element} from "web/utils/create_html_element";
 
 export const create_power_editor_app = (root: HTMLElement) => {
     let state = create_default_power_state();
