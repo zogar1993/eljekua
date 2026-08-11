@@ -20,7 +20,7 @@ import {
     create_instruction_id,
     type InstructionFormState,
 } from "power_editor/form_state";
-import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
+import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
 import {create_html_element} from "web_components/utils/create_html_element";
 
 export const create_instruction_list_editor = ({

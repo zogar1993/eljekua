@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "packageManager": "pnpm@11.7.0",
   "scripts": {
-    "build": "esbuild src/scripts/main.ts --bundle --outfile=dist/bundle.js --format=esm --sourcemap && pnpm build:power-editor",
+    "build": "esbuild src/core/main.ts --bundle --outfile=dist/bundle.js --format=esm --sourcemap && pnpm build:power-editor",
     "build:power-editor": "esbuild src/power_editor/main.ts --bundle --outfile=dist/power-editor.js --format=esm --sourcemap",
-    "watch": "esbuild src/scripts/main.ts --bundle --outfile=dist/bundle.js --format=esm --sourcemap --watch",
+    "watch": "esbuild src/core/main.ts --bundle --outfile=dist/bundle.js --format=esm --sourcemap --watch",
     "watch:power-editor": "esbuild src/power_editor/main.ts --bundle --outfile=dist/power-editor.js --format=esm --sourcemap --watch",
     "dev": "concurrently -k \"pnpm:watch\" \"pnpm:start\"",
     "dev:power-editor": "concurrently -k \"pnpm:watch:power-editor\" \"live-server --open=./power-editor.html --watch=./\"",

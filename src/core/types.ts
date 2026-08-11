@@ -1,0 +1,150 @@
+import {DefenseCode} from "core/character_sheet/get_creature_defense";
+import {ActionType} from "core/battlegrid/creatures/ActionType";
+import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
+
+export type IRPower = {
+    name: string
+    description?: string
+    keywords?: Array<"Invigorating" | "Martial" | "Weapon">
+    type: {
+        action: ActionType
+        cooldown: "at-will" | "encounter" | "daily"
+        attack: boolean
+        traits?: Array<"melee_basic_attack">
+    }
+    prerequisites?: Array<string>,
+    damage?: {
+        lvl_1: string,
+        lvl_11?: string,
+        lvl_21?: string
+    }
+    targeting?: Targeting,
+    trigger?: IRTrigger,
+    roll?: {
+        attack: string
+        defense: DefenseCode
+        before_consequences?: Array<IRInstruction>
+        hit: Array<IRInstruction>
+        miss?: Array<IRInstruction>
+    }
+    effect?: Array<IRInstruction>
+}
+
+type Targeting =
+    Omit<IRInstructionSelectTargetMelee, "type" | "target_label"> |
+    Omit<IRInstructionSelectTargetMovement, "type" | "target_label"> |
+    Omit<IRInstructionSelectTargetAreaBurst, "type" | "target_label"> |
+    Omit<IRInstructionSelectTargetRanged, "type" | "target_label">
+
+export type IRInstruction =
+    {
+        type: typeof INSTRUCTION_TYPE.APPLY_DAMAGE
+        value: string
+        target: string
+        half_damage?: boolean
+        damage_types?: Array<string>
+    } |
+    IRInstructionSelectTarget |
+    {
+        type: typeof INSTRUCTION_TYPE.MOVE | typeof INSTRUCTION_TYPE.SHIFT,
+        target: "owner",
+        destination: string
+    } | {
+    type: typeof INSTRUCTION_TYPE.CONDITION,
+    condition: string,
+    instructions_true: Array<IRInstruction>
+    instructions_false?: Array<IRInstruction>
+} | {
+    type: typeof INSTRUCTION_TYPE.OPTIONS,
+    options: Array<{ text: string, instructions: Array<IRInstruction> }>
+} | {
+    type: typeof INSTRUCTION_TYPE.SAVE_VARIABLE,
+    value: string,
+    label: string
+} | {
+    type: "push",
+    amount: number,
+    target: string
+} | {
+    type: typeof INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED
+    value: string
+    label: string
+} | IRInstructionApplyStatus
+ | {
+    type: typeof INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS
+    creature: string,
+    cost: "normal" | "opportunity" | "free_attack",
+    filter: "turn" | "melee_basic_attack"
+ }
+
+export type IRInstructionApplyStatus = {
+    type: typeof INSTRUCTION_TYPE.APPLY_STATUS,
+    target: string,
+    duration: IRStatusDuration
+    status: {
+        type: "grant_combat_advantage",
+        against: string,
+    } | {
+        type: "gain_resistance"
+        value: number | string
+        against: string,
+    } | {
+        type: "gain_attack_bonus"
+        value: number | string
+        against: string,
+    }
+}
+
+enum StatusDurationEnum {
+    "until_start_of_your_next_turn",
+    "until_end_of_your_next_turn",
+    "until_start_of_next_turn",
+    "until_your_next_attack_roll_against_target"
+}
+
+export type StatusDurationValue = keyof typeof StatusDurationEnum
+
+type IRStatusDuration = StatusDurationValue | Array<StatusDurationValue>
+
+export type IRInstructionSelectTarget =
+    { type: typeof INSTRUCTION_TYPE.SELECT_TARGET, target_label: string } &
+    (IRInstructionSelectTargetMelee |
+        IRInstructionSelectTargetMovement |
+        IRInstructionSelectTargetRanged |
+        IRInstructionSelectTargetAreaBurst)
+
+type IRInstructionSelectTargetMelee = {
+    targeting_type: "adjacent" | "melee_weapon"
+    target_type: "enemy" | "creature"
+    amount: 1,
+    exclude?: ["primary_target"]
+}
+
+type IRInstructionSelectTargetMovement = {
+    targeting_type: "movement"
+    distance: string | number
+    destination_requirement?: string
+}
+
+type IRInstructionSelectTargetRanged = {
+    targeting_type: "ranged"
+    target_type: "terrain" | "enemy" | "creature"
+    terrain_prerequisite?: "unoccupied"
+    amount: 1
+    distance: string | number
+    exclude?: ["primary_target"]
+}
+
+type IRInstructionSelectTargetAreaBurst = {
+    targeting_type: "area_burst"
+    target_type: "creature"
+    amount: "all"
+    distance: number
+    radius: number
+}
+
+type IRTrigger = {
+    type: "interruption" | "reaction"
+    intercepts: Array<"movement" | "critical_hit">
+    conditions: Array<string>
+}

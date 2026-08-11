@@ -1,0 +1,99 @@
+import {CreatureData} from "core/battlegrid/creatures/CreatureData";
+import {Creature} from "core/battlegrid/creatures/Creature";
+import {
+    Position,
+    PositionFootprintOne,
+    positions_equal_footprint_one,
+    positions_share_surface,
+    transform_position_to_f1
+} from "core/battlegrid/Position";
+import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "data/powers/basic";
+
+export const create_battle_grid = ({size,}: {
+    size: { x: number, y: number }
+}): BattleGrid => {
+    const creatures: Array<Creature> = []
+    const board: Array<Array<Square>> = Array.from({length: size.y}, (_, y) => {
+            return Array.from({length: size.x}, (_, x) => {
+                return {position: {x, y, footprint: 1}}
+            })
+        }
+    )
+
+    const get_square = ({x, y}: PositionFootprintOne) => {
+        if (x < 0 || x >= size.x || y < 0 || y >= size.y)
+            throw (`position {x:${x}, y:${y}} is out of the battle grid dimensions (width:${size.x}, height:${size.y})`)
+        return board[y][x]
+    }
+
+    const get_squares = (position: Position) => {
+        return transform_position_to_f1(position).map(p => get_square(p))
+    }
+
+
+    const is_terrain_occupied = (position: Position, {exclude}: { exclude?: Array<Creature> } = {}): boolean => {
+        for (const p1 of transform_position_to_f1(position))
+            for (const creature of creatures.filter(c => exclude ? !exclude.includes(c) : true))
+                for (const p2 of transform_position_to_f1(creature.data.position))
+                    if (positions_equal_footprint_one(p1, p2)) return true
+        return false
+    }
+
+    const get_creature_by_position = (position: Position): Creature => {
+        const creature = creatures.find(creature => positions_share_surface(creature.data.position, position))
+        if (!creature) throw Error(`creature not found for cell ${position}`)
+        return creature
+    }
+
+    const get_creatures_in_positions = (positions: Array<PositionFootprintOne>): Array<Creature> => {
+        const creatures = positions.filter(position => is_terrain_occupied(position)).map(get_creature_by_position)
+        return [...new Set(creatures)]
+    }
+
+    const create_creature = (data: CreatureData) => {
+        const d = {...data, powers: [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS, ...data.powers]}
+        const creature = new Creature({id: creatures.length, data: d})
+        creatures.push(creature)
+        return creature
+    }
+
+    const push_creature = ({position, creature}: { position: Position, creature: Creature }) => {
+        creature.data.position = position
+        creature.events.moved.raise({position, movement_type: "push"})
+    }
+
+    return {
+        size,
+        creatures,
+        board,
+
+        create_creature,
+        get_square,
+        get_squares,
+        is_terrain_occupied,
+        get_creature_by_position,
+        get_creatures_in_positions,
+        push_creature,
+    }
+}
+
+export type BattleGrid = {
+    size: { x: number, y: number }
+    creatures: ReadonlyArray<Creature>
+    board: Array<Array<Square>>
+
+    get_square: (position: PositionFootprintOne) => Square
+    get_squares: (position: Position) => Array<Square>
+
+    is_terrain_occupied: (position: Position, options?: { exclude?: Array<Creature> }) => boolean
+    get_creature_by_position: (position: Position) => Creature
+    get_creatures_in_positions: (positions: Array<PositionFootprintOne>) => Array<Creature>
+
+    create_creature: (data: CreatureData) => Creature
+    push_creature: (props: { position: Position, creature: Creature }) => void
+}
+
+export type Square = {
+    position: PositionFootprintOne
+}
+

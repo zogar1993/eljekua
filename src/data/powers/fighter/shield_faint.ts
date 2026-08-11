@@ -1,5 +1,5 @@
-import type {IRPower} from "scripts/types";
-import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
+import type {IRPower} from "core/types";
+import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
 
 export const power_shield_faint: IRPower = {
     name: "Shield Feint",

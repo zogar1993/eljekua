@@ -1,5 +1,5 @@
 import {SquareVisual} from "web_components/battle_grid/squares/SquareVisual";
-import {InitiativeEntryVisual} from "scripts/initiative_order/InitiativeEntryVisual";
+import {InitiativeEntryVisual} from "core/initiative_order/InitiativeEntryVisual";
 
 const create_visual_square = (): SquareVisual => ({
     set_highlight: jest.fn(),

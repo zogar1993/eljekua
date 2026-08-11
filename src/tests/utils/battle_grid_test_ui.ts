@@ -1,4 +1,4 @@
-import {BattleGridVisual} from "scripts/battlegrid/BattleGridVisual";
+import {BattleGridVisual} from "core/battlegrid/BattleGridVisual";
 
 
 type OnMouseMoveHandler = Parameters<BattleGridVisual["addOnMouseMoveHandler"]>[0]

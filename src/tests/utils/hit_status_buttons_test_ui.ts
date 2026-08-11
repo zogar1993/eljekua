@@ -1,6 +1,6 @@
-import {Creature} from "scripts/battlegrid/creatures/Creature";
-import {HitStatus} from "scripts/battlegrid/player_turn_handler/HitStatus";
-import {HitStatusButtons} from "scripts/battlegrid/hit_status_buttons/HitStatusButtons";
+import {Creature} from "core/battlegrid/creatures/Creature";
+import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
+import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
 
 const state: {
     on_status_change: ((creature: Creature, status: HitStatus) => void) | null

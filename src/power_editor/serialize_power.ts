@@ -1,5 +1,5 @@
-import type {IRInstruction, IRPower} from "scripts/types";
-import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
+import type {IRInstruction, IRPower} from "core/types";
+import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
 import type {InstructionFormState, PowerEditorState} from "power_editor/form_state";
 
 export type ValidationIssue = {

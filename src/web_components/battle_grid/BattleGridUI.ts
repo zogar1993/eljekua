@@ -1,4 +1,4 @@
-import {BattleGrid} from "scripts/battlegrid/BattleGrid";
+import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {create_battle_grid_visual} from "web_components/battle_grid/BattleGridVisual";
 import {create_visual_square} from "web_components/battle_grid/squares/SquareVisual";
 import {
@@ -6,29 +6,29 @@ import {
     PositionFootprintOne, positions_of_same_footprint_equal,
     transform_position_to_f1,
     transform_positions_to_f1
-} from "scripts/battlegrid/Position";
+} from "core/battlegrid/Position";
 import {SquareHighlight} from "web_components/battle_grid/squares/SquareHighlight";
 import {bound_minmax} from "stdlib/bound_minmax";
-import {get_creature_defense} from "scripts/character_sheet/get_creature_defense";
-import {EXPR} from "scripts/expressions/evaluator/EXPR";
-import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
-import {Expr} from "scripts/expressions/evaluator/types";
-import {AstNode} from "scripts/expressions/parser/nodes/AstNode";
+import {get_creature_defense} from "core/character_sheet/get_creature_defense";
+import {EXPR} from "core/expressions/evaluator/EXPR";
+import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
+import {Expr} from "core/expressions/evaluator/types";
+import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {
     AvailableInteractionsSelectPosition,
     PlayerTurnHandler
-} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
-import {TurnState} from "scripts/battlegrid/player_turn_handler/TurnState";
+} from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
+import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import {
     ClickableCoordinate,
     get_position_by_coordinate,
     nullable_positions_equal
 } from "web_components/battle_grid/coordinates/ClickableCoordinate";
-import {GameEvents} from "scripts/events/GameEvents";
+import {GameEvents} from "core/events/GameEvents";
 import {create_visual_creature} from "web_components/creature/CreatureVisual";
-import {AnimationQueue} from "scripts/AnimationQueue";
-import {OptionButtons} from "scripts/battlegrid/option_buttons/OptionButtons";
-import {HitStatusButtons} from "scripts/battlegrid/hit_status_buttons/HitStatusButtons";
+import {AnimationQueue} from "core/AnimationQueue";
+import {OptionButtons} from "core/battlegrid/option_buttons/OptionButtons";
+import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
 
 export const initialize_battle_grid_ui = ({battle_grid, player_turn_handler, turn_state, game_events, option_buttons, hit_status_buttons}: {
     battle_grid: BattleGrid,

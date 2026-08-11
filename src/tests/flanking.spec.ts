@@ -1,5 +1,5 @@
-import {create_battle_grid} from "scripts/battlegrid/BattleGrid";
-import {get_flanker_positions} from "scripts/battlegrid/position/get_flanker_positions";
+import {create_battle_grid} from "core/battlegrid/BattleGrid";
+import {get_flanker_positions} from "core/battlegrid/position/get_flanker_positions";
 import {dependency_mocks} from "tests/utils/dependency_mocks";
 
 const battle_grid = create_battle_grid({size: {x: 10, y: 10}, ...dependency_mocks});

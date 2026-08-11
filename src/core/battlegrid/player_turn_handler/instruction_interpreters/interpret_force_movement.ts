@@ -1,0 +1,22 @@
+import {
+    InterpretInstructionProps
+} from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
+import {EXPR} from "core/expressions/evaluator/EXPR";
+import {InstructionForceMovement} from "core/expressions/parser/instructions";
+
+export const interpret_force_movement = ({
+                                             instruction,
+                                             battle_grid,
+                                             evaluate_ast
+                                         }: InterpretInstructionProps<InstructionForceMovement>) => {
+    const creature = EXPR.as_creature(evaluate_ast(instruction.target))
+    switch (instruction.movement_type) {
+        case "push": {
+            const destination = EXPR.as_positions(evaluate_ast(instruction.destination))
+            battle_grid.push_creature({creature, position: destination[destination.length - 1]})
+            break
+        }
+        default:
+            throw Error(`forced movement type '${instruction.movement_type}' not supported`)
+    }
+}

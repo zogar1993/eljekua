@@ -1,8 +1,8 @@
-import {IRPower} from "scripts/types";
+import {IRPower} from "core/types";
 import {
     transform_power_ir_into_vm_representation
-} from "scripts/expressions/parser/transform_power_ir_into_vm_representation";
-import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
+} from "core/expressions/parser/transform_power_ir_into_vm_representation";
+import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
 
 const sly_flourish = {
     name: "Sly Flourish",

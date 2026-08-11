@@ -1,0 +1,44 @@
+import {
+    InterpretInstructionProps
+} from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
+import {EXPR} from "core/expressions/evaluator/EXPR";
+import {ExprNumberResolved} from "core/expressions/evaluator/types";
+import {
+    max_number_resolved,
+    resolve_number,
+    subtract_numbers_resolved
+} from "core/expressions/evaluator/number_utils";
+import {StatusEffectGainResistance} from "core/battlegrid/creatures/Creature";
+import {InstructionApplyDamage} from "core/expressions/parser/instructions";
+
+export const interpret_apply_damage = ({
+                                           instruction,
+                                           evaluate_ast,
+                                           turn_state
+                                       }: InterpretInstructionProps<InstructionApplyDamage>) => {
+    const attacker = turn_state.get_acting_creature()
+    //TODO P3 we probably want to apply damage to a bunch of enemies at the same time
+    const target = EXPR.as_creature(turn_state.get_variable(instruction.target))
+
+    let damage = resolve_number(EXPR.as_number_expr(evaluate_ast(instruction.value)))
+
+    const resistances = target.statuses
+        .filter(({effect}) => effect.type === "gain_resistance" && effect.against.includes(attacker))
+        .map(({effect}) => (effect as StatusEffectGainResistance).value)
+    if (resistances.length > 0)
+        damage = subtract_numbers_resolved(damage, max_number_resolved(resistances))
+
+    if (instruction.half_damage)
+        damage = apply_half_damage(damage)
+
+    target.data.hp_current -= damage.value
+
+    target.events.received_damage.raise({damage})
+}
+
+const apply_half_damage = (number: ExprNumberResolved): ExprNumberResolved => ({
+    type: "number_resolved",
+    value: Math.floor(number.value / 2),
+    params: [number],
+    description: "half damage"
+})

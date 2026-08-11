@@ -1,4 +1,4 @@
-import {Expr} from "scripts/expressions/evaluator/types";
+import {Expr} from "core/expressions/evaluator/types";
 import {create_expression_html} from "web_components/expression/create_expression_html";
 import {create_html_element} from "web_components/utils/create_html_element";
 

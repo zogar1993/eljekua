@@ -1,24 +1,24 @@
-import {create_battle_grid} from "scripts/battlegrid/BattleGrid";
-import {get_flanker_positions} from "scripts/battlegrid/position/get_flanker_positions";
+import {create_battle_grid} from "core/battlegrid/BattleGrid";
+import {get_flanker_positions} from "core/battlegrid/position/get_flanker_positions";
 import {dependency_mocks} from "tests/utils/dependency_mocks";
-import {create_player_turn_handler} from "scripts/battlegrid/player_turn_handler/PlayerTurnHandler";
-import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
-import {Creature} from "scripts/battlegrid/creatures/Creature";
-import {ATTRIBUTES} from "scripts/character_sheet/attributes";
-import {create_initiative_order} from "scripts/initiative_order/InitiativeOrder";
-import {create_option_buttons} from "scripts/battlegrid/option_buttons/OptionButtons";
-import {Position} from "scripts/battlegrid/Position";
+import {create_player_turn_handler} from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
+import {CreatureData} from "core/battlegrid/creatures/CreatureData";
+import {Creature} from "core/battlegrid/creatures/Creature";
+import {ATTRIBUTES} from "core/character_sheet/attributes";
+import {create_initiative_order} from "core/initiative_order/InitiativeOrder";
+import {create_option_buttons} from "core/battlegrid/option_buttons/OptionButtons";
+import {Position} from "core/battlegrid/Position";
 import {create_option_button_visual, option_buttons_test_ui} from "tests/utils/option_buttons_test_ui";
 import {battle_grid_test_ui, create_battle_grid_visual} from "tests/utils/battle_grid_test_ui";
-import {create_add_creature_to_game} from "scripts/use_cases/add_creature_to_game";
-import {create_start_battle} from "scripts/use_cases/start_battle";
-import {create_turn_state} from "scripts/battlegrid/player_turn_handler/TurnState";
-import {build_evaluate_ast} from "scripts/expressions/evaluator/evaluate_ast";
-import {create_instruction_loop} from "scripts/instruction_loop";
-import {create_gameplay_use_cases} from "scripts/use_cases/gameplay/gameplay_use_cases";
+import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
+import {create_start_battle} from "core/use_cases/start_battle";
+import {create_turn_state} from "core/battlegrid/player_turn_handler/TurnState";
+import {build_evaluate_ast} from "core/expressions/evaluator/evaluate_ast";
+import {create_instruction_loop} from "core/instruction_loop";
+import {create_gameplay_use_cases} from "core/use_cases/gameplay/gameplay_use_cases";
 import {hit_status_buttons_test_ui} from "tests/utils/hit_status_buttons_test_ui";
-import {create_settings} from "scripts/settings/Settings";
-import {create_game_events} from "scripts/events/GameEvents";
+import {create_settings} from "core/settings/Settings";
+import {create_game_events} from "core/events/GameEvents";
 
 const battle_grid = create_battle_grid({size: {x: 10, y: 10}})
 const initiative_order = create_initiative_order({...dependency_mocks})

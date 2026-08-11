@@ -1,5 +1,5 @@
-import {ACTION_TYPE} from "scripts/battlegrid/creatures/ActionType";
-import {INSTRUCTION_TYPE} from "scripts/expressions/parser/instructions";
+import {ACTION_TYPE} from "core/battlegrid/creatures/ActionType";
+import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
 
 export const ACTION_TYPES = Object.values(ACTION_TYPE);
 export const COOLDOWNS = ["at-will", "encounter", "daily"] as const;

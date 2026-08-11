@@ -1,6 +1,6 @@
-import {Instruction} from "scripts/expressions/parser/instructions";
-import {Expr} from "scripts/expressions/evaluator/types";
-import {GameEvents} from "scripts/events/GameEvents";
+import {Instruction} from "core/expressions/parser/instructions";
+import {Expr} from "core/expressions/evaluator/types";
+import {GameEvents} from "core/events/GameEvents";
 import {create_html_element} from "web_components/utils/create_html_element";
 
 type FrameElements = {

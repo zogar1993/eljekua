@@ -1,6 +1,6 @@
-import {Position} from "scripts/battlegrid/Position";
-import {CreatureData} from "scripts/battlegrid/creatures/CreatureData";
-import {SIZE} from "scripts/battlegrid/creatures/SIZES";
+import {Position} from "core/battlegrid/Position";
+import {CreatureData} from "core/battlegrid/creatures/CreatureData";
+import {SIZE} from "core/battlegrid/creatures/SIZES";
 import {create_html_element} from "web_components/utils/create_html_element";
 
 export type CreatureVisual = {
