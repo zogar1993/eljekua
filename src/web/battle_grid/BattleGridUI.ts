@@ -1,13 +1,13 @@
 import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {create_battle_grid_visual} from "web/battle_grid/BattleGridVisual";
-import {create_visual_square} from "web/battle_grid/squares/SquareVisual";
+import {create_visual_square, SquareVisual} from "web/battle_grid/squares/SquareVisual";
 import {
     Position,
     PositionFootprintOne, positions_of_same_footprint_equal,
     transform_position_to_f1,
     transform_positions_to_f1
 } from "core/battlegrid/Position";
-import {SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
+import {SQUARE_HIGHLIGHT, SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
 import {bound_minmax} from "stdlib/bound_minmax";
 import {get_creature_defense} from "core/character_sheet/get_creature_defense";
 import {EXPR} from "core/expressions/evaluator/EXPR";
@@ -16,7 +16,7 @@ import {Expr} from "core/expressions/evaluator/types";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {
     AvailableInteractionsSelectPosition,
-    PlayerTurnHandler
+    PlayerTurnHandler, Targets
 } from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import {
@@ -30,7 +30,14 @@ import {AnimationQueue} from "core/AnimationQueue";
 import {OptionButtons} from "core/battlegrid/option_buttons/OptionButtons";
 import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
 
-export const initialize_battle_grid_ui = ({battle_grid, player_turn_handler, turn_state, game_events, option_buttons, hit_status_buttons}: {
+export const initialize_battle_grid_ui = ({
+                                              battle_grid,
+                                              player_turn_handler,
+                                              turn_state,
+                                              game_events,
+                                              option_buttons,
+                                              hit_status_buttons
+                                          }: {
     battle_grid: BattleGrid,
     player_turn_handler: PlayerTurnHandler,
     turn_state: TurnState,
@@ -42,6 +49,15 @@ export const initialize_battle_grid_ui = ({battle_grid, player_turn_handler, tur
     const click_overlay = create_battle_grid_visual({width: size.x, height: size.y})
     const board = battle_grid.board.map(row => row.map(({position: {x, y}}) => create_visual_square({x, y})))
 
+    const highlighted: Record<SquareHighlight, Set<SquareVisual>> = {
+        [SQUARE_HIGHLIGHT.NONE]: new Set<SquareVisual>(),
+        [SQUARE_HIGHLIGHT.SELECTED]: new Set<SquareVisual>(),
+        [SQUARE_HIGHLIGHT.AREA]: new Set<SquareVisual>(),
+        [SQUARE_HIGHLIGHT.PATH]: new Set<SquareVisual>(),
+        [SQUARE_HIGHLIGHT.AVAILABLE_TARGET]: new Set<SquareVisual>()
+    }
+    const hovered = new Set<SquareVisual>()
+
     const get_square = ({x, y}: PositionFootprintOne) => {
         if (x < 0 || x >= size.x || y < 0 || y >= size.y)
             throw (`position {x:${x}, y:${y}} is out of the battle grid dimensions (width:${size.x}, height:${size.y})`)
@@ -52,70 +68,37 @@ export const initialize_battle_grid_ui = ({battle_grid, player_turn_handler, tur
         return transform_position_to_f1(position).map(p => get_square(p))
     }
 
-    const set_highlight = ({positions, highlight}: { positions: Array<Position>, highlight: SquareHighlight }) => {
-        positions.forEach(position => get_squares(position).forEach(square => square.set_highlight(highlight)))
+    const set_highlights = ({positions, highlight}: { positions: Array<Position>, highlight: SquareHighlight }) => {
+        const squares = positions.flatMap(position => get_squares(position))
+        squares.forEach(square => square.set_highlight(highlight))
+        squares.forEach(square => highlighted[highlight].add(square))
     }
 
-
-    let latest_position: Position | null = null
-    //TODO AP3 this should be better on_hover
-    const on_hover = ({coordinate}: { coordinate: ClickableCoordinate | null }) => {
-        const selection_context = player_turn_handler.get_selection_context()
-        if (selection_context?.type !== "position_select") return
-
-        const position = coordinate &&
-            get_position_by_coordinate({positions: selection_context.clickable, coordinate})
-
-        if (nullable_positions_equal(latest_position, position)) return;
-        latest_position = position
-
-        const highlighted_positions = selection_context.highlighted.map(({position}) => position)
-
-        for (const position of highlighted_positions) {
-            get_square(position).set_interaction_status("none")
-            get_square(position).set_highlight("none")
-        }
-
-        for (const creature of battle_grid.creatures)
-            creature.events.is_untargeted.raise()
-
-        player_turn_handler.set_selection_context({...selection_context, highlighted: []})
-
-        if (position) {
-            selection_context.on_hover(position)
-            //show_attack_success_chance_if_needed({selection_context, evaluate_ast, turn_state})
-
-            for (const p of transform_position_to_f1(position))
-                get_square(p).set_interaction_status("hover")
-        } else {
-            for (const p of transform_positions_to_f1(selection_context.clickable))
-                get_square(p).set_highlight("available-target")
-        }
+    const clear_highlights = ({highlight}: { highlight: SquareHighlight }) => {
+        const squares = highlighted[highlight]
+        squares.forEach(square => square.set_highlight("none"))
+        squares.clear()
     }
 
+    const set_hovers = ({positions}: { positions: Array<Position> }) => {
+        const squares = positions.flatMap(position => get_squares(position))
+        squares.forEach(square => square.set_interaction_status("hover"))
+        squares.forEach(square => hovered.add(square))
+    }
+
+    const clear_hovers = () => {
+        hovered.forEach(square => square.set_interaction_status("none"))
+        hovered.clear()
+    }
 
     const on_click = ({coordinate}: { coordinate: ClickableCoordinate }) => {
         const selection_context = player_turn_handler.get_selection_context()
         if (selection_context?.type !== "position_select") return
-        if (selection_context.target === null) return
+
         const position = get_position_by_coordinate({coordinate, positions: selection_context.clickable})
-        if (position === null) return null;
+        if (position === null) return
 
-        if (selection_context.target.type === "positions") {
-            const path = selection_context.target.value
-            if (!positions_of_same_footprint_equal(position, path[path.length - 1]))
-                throw Error("position should be the end of the path")
-        }
-
-        turn_state.set_variable(selection_context.target_label,
-            selection_context.target.type === "creatures" ? {
-                type: selection_context.target.type,
-                value: selection_context.target.value,
-            } : {
-                type: selection_context.target.type,
-                value: selection_context.target.value,
-                description: "target"
-            })
+        selection_context.select(position)
 
         deselect()
     }
@@ -124,22 +107,21 @@ export const initialize_battle_grid_ui = ({battle_grid, player_turn_handler, tur
         const selection_context = player_turn_handler.get_selection_context()
         if (selection_context === null) return
 
-        const position = turn_state.get_acting_creature().data.position
-        get_squares(position).forEach((square) => square.set_highlight("none"))
-
         if (selection_context.type === "position_select") {
-            for (const position of transform_positions_to_f1(selection_context.clickable))
-                get_square(position).set_highlight("none")
-            for (const position of selection_context.highlighted.map(({position}) => position))
-                get_square(position).set_highlight("none")
+            clear_highlights({highlight: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
+            clear_highlights({highlight: SQUARE_HIGHLIGHT.PATH})
+            clear_highlights({highlight: SQUARE_HIGHLIGHT.AREA})
+            clear_highlights({highlight: SQUARE_HIGHLIGHT.SELECTED})
+            /*
+                        if (targets) {
+                            if (targets.type === "creatures") {
+                                const creatures = targets.value
 
-            if (selection_context.target) {
-                if (selection_context.target.type === "creatures") {
-                    const creatures = selection_context.target.value
+                                creatures.forEach(creature => creature.events.is_untargeted.raise())
+                            }
+                        }
 
-                    creatures.forEach(creature => creature.events.is_untargeted.raise())
-                }
-            }
+             */
         } else if (selection_context.type === "option_select")
             option_buttons.remove_options()
         else if (selection_context.type === "hit_status_select")
@@ -150,12 +132,48 @@ export const initialize_battle_grid_ui = ({battle_grid, player_turn_handler, tur
 
     function set_selected_indicator() {
         const position = turn_state.get_acting_creature().data.position
-        set_highlight({positions: [position], highlight: "selected"})
+        set_highlights({positions: [position], highlight: "selected"})
     }
 
 
+    let latest_position: Position | null = null
     click_overlay.addOnMouseMoveHandler(coordinate => {
-        on_hover({coordinate})
+        const selection_context = player_turn_handler.get_selection_context()
+        if (selection_context?.type !== "position_select") return
+
+        const position = coordinate &&
+            get_position_by_coordinate({positions: selection_context.clickable, coordinate})
+
+        if (nullable_positions_equal(latest_position, position)) return
+
+        clear_hovers()
+
+        if (position === null) return
+
+
+        latest_position = position
+
+        /*
+                const highlighted_positions = selection_context.highlighted.map(({position}) => position)
+
+                for (const position of highlighted_positions) {
+                    get_square(position).set_interaction_status("none")
+                    get_square(position).set_highlight("none")
+                }
+
+         */
+
+        for (const creature of battle_grid.creatures)
+            creature.events.is_untargeted.raise()
+
+        if (position) {
+            selection_context.get_targets_for_position(position)
+            //show_attack_success_chance_if_needed({selection_context, evaluate_ast, turn_state})
+            set_hovers({positions: transform_position_to_f1(position)})
+        } else {
+            const positions = transform_positions_to_f1(selection_context.clickable)
+            set_highlights({positions, highlight: SQUARE_HIGHLIGHT.NONE})
+        }
     })
 
     click_overlay.addOnClickHandler(coordinate => {
@@ -173,17 +191,19 @@ export const initialize_battle_grid_ui = ({battle_grid, player_turn_handler, tur
         if (interactions.type === "position_select") {
             set_selected_indicator()
 
-            set_highlight({positions: interactions.clickable, highlight: "available-target"})
+            set_highlights({positions: interactions.clickable, highlight: "available-target"})
 
-            for (const {position, highlight} of interactions.highlighted)
-                set_highlight({positions: [position], highlight})
+            /* TODO reactivate path highlighting
+                        for (const {position, highlight} of interactions.highlighted)
+                            set_highlight({positions: [position], highlight})
+
+             */
         }
     })
 
     return {
         click_overlay,
         board,
-        set_highlight,
     }
 }
 

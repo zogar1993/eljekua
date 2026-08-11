@@ -1,19 +1,13 @@
-import {
-    Position,
-    PositionFootprintOne,
-} from "core/battlegrid/Position";
+import {Position} from "core/battlegrid/Position";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import {InitiativeOrder} from "core/initiative_order/InitiativeOrder";
-import {SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
 import {OptionButton, OptionButtons} from "core/battlegrid/option_buttons/OptionButtons";
 import {AST} from "core/expressions/parser/AST_NODE";
 import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
 import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
 import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 import {GameEvents} from "core/events/GameEvents";
-
-type HighlightedPosition = { position: PositionFootprintOne, highlight: SquareHighlight }
 
 export type AvailableInteractions =
     AvailableInteractionsSelectPosition
@@ -28,11 +22,18 @@ export type AvailableInteractionsSelectHitStatus = {
 export type AvailableInteractionsSelectPosition = {
     type: "position_select"
     clickable: Array<Position>
-    highlighted: Array<HighlightedPosition>
-    target: { type: "creatures", value: Array<Creature> } | { type: "positions", value: Array<Position> } | null
     target_label: string
-    on_hover: (position: Position) => void
+    get_targets_for_position: (position: Position) => Targets
     footprint: number
+    select: (position: Position) => void
+}
+
+export type Targets = {
+    type: "positions",
+    value: Array<Position>
+} | {
+    type: "creatures",
+    value: Array<Creature>
 }
 
 type AvailableInteractionsSelectOption = {

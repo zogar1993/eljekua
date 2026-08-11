@@ -7,13 +7,14 @@ import {
 import {
     InterpretInstructionProps
 } from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {AvailableInteractionsSelectPosition} from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
+import {AvailableInteractionsSelectPosition, Targets} from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {get_reach_area_burst} from "core/battlegrid/position/get_reach_area_burst";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
 import {InstructionSelectTarget} from "core/expressions/parser/instructions";
 import {EXPR} from "core/expressions/evaluator/EXPR";
 import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";
+import {assert_is_true} from "stdlib/assert";
 
 export const interpret_select_target = ({
                                             instruction,
@@ -68,11 +69,10 @@ export const interpret_select_target = ({
     }
 
 
-    const on_hover = (position: Position) => {
+    const get_targets_for_position = (position: Position): Targets => {
         const selection = player_turn_handler.get_position_selection_context()
 
-        if (!selection.clickable.some(target => positions_share_surface(target, position)))
-            return
+        assert_is_true(selection.clickable.some(target => positions_share_surface(target, position)))
 
         if (instruction.targeting_type === "area_burst") {
             assert_is_footprint_one(position)
@@ -81,41 +81,41 @@ export const interpret_select_target = ({
             const target_positions = area.filter(p => battle_grid.is_terrain_occupied(p))
             const targets = battle_grid.get_creatures_in_positions(target_positions)
 
-            player_turn_handler.set_available_interactions({
-                ...selection_base,
-                highlighted: area.map(position => ({position, highlight: "area"})),
-                target: {type: "creatures", value: targets}
-            })
+            return {type: "creatures", value: targets}
         } else if (instruction.targeting_type === "movement") {
             const path = get_shortest_path({creature: owner, destination: position, battle_grid})
-
-            player_turn_handler.set_available_interactions({
-                ...selection_base,
-                highlighted: transform_positions_to_f1(path).map(position => ({position, highlight: "path"})),
-                target: {type: "positions", value: path},
-            })
+//TODO add pathfinding below
+            transform_positions_to_f1(path).map(position => ({position, highlight: "path"}))
+            return {type: "positions", value: path}
         } else if (instruction.targeting_type === "push") {
             //TODO AP0 fix push that was changed from position to positions
-            player_turn_handler.set_available_interactions({
-                ...selection_base,
-                target: {type: "positions", value: [position]}
-            })
+            return {type: "positions", value: [position]}
         } else {
             if (instruction.target_type === "terrain") {
-                player_turn_handler.set_available_interactions({
-                    ...selection_base,
-                    target: {type: "positions", value: [position]}
-                })
+                return {type: "positions", value: [position]}
             } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
                 const creature = battle_grid.get_creature_by_position(position)
-                player_turn_handler.set_available_interactions({
-                    ...selection_base,
-                    target: {type: "creatures", value: [creature]}
-                })
+                return {type: "creatures", value: [creature]}
             } else {
                 throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
             }
         }
+    }
+
+    const select = (position: Position) => {
+        const targets = get_targets_for_position(position)
+        if (targets === null) return
+
+
+        turn_state.set_variable(target_label,
+            targets.type === "creatures" ? {
+                type: targets.type,
+                value: targets.value,
+            } : {
+                type: targets.type,
+                value: targets.value,
+                description: "target"
+            })
     }
 
     const footprint = instruction.targeting_type === "movement" ? owner.data.position.footprint : 1
@@ -124,9 +124,8 @@ export const interpret_select_target = ({
         type: "position_select",
         target_label,
         clickable,
-        highlighted: [],
-        target: null,
-        on_hover,
+        get_targets_for_position,
+        select,
         footprint
     }
 
