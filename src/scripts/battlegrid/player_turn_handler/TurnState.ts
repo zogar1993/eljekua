@@ -93,9 +93,6 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
         game_events.on_turn_state_cleared.raise()
     }
 
-    //TODO this is rather ugly, we can separate state from operations
-    const get_power_frames = () => frames
-
     return {
         add_instruction_frame,
         clear,
@@ -110,7 +107,6 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
         get_variable,
         set_variable,
         has_variable,
-        get_power_frames
     }
 }
 
