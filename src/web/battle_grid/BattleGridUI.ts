@@ -15,6 +15,7 @@ import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
 import {Expr} from "core/expressions/evaluator/types";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {
+    AvailableInteractions, AvailableInteractionsSelectPath,
     AvailableInteractionsSelectPosition,
     PlayerTurnHandler, Targets
 } from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
@@ -29,6 +30,7 @@ import {create_visual_creature} from "web/creature/CreatureVisual";
 import {AnimationQueue} from "core/AnimationQueue";
 import {OptionButtons} from "core/battlegrid/option_buttons/OptionButtons";
 import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
+import {assert_is_not_null} from "stdlib/assert";
 
 export const initialize_battle_grid_ui = ({
                                               battle_grid,
@@ -101,7 +103,7 @@ export const initialize_battle_grid_ui = ({
         const selection_context = player_turn_handler.get_selection_context()
         if (selection_context === null) return
 
-        if (["position_select", "select_path"].includes(selection_context.type)) {
+        if (is_click_coordinate_interaction(selection_context)) {
             clear_highlights({highlight: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
             clear_highlights({highlight: SQUARE_HIGHLIGHT.PATH})
             clear_highlights({highlight: SQUARE_HIGHLIGHT.AREA})
@@ -143,12 +145,16 @@ export const initialize_battle_grid_ui = ({
         }
 
         const interactions = player_turn_handler.get_selection_context()
+        if (!is_click_coordinate_interaction(interactions)) return
 
-        if (interactions?.type === "select_path") {
-            const position = get_position_by_coordinate({positions: interactions.clickable, coordinate})
+        const position = get_position_by_coordinate({positions: interactions.clickable, coordinate})
+        assert_is_not_null(position)
+
+        if (nullable_positions_equal(latest_position, position)) return
+
+        if (interactions.type === "select_path") {
             switch_highlights({from: SQUARE_HIGHLIGHT.PATH, to: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
             clear_hovers()
-            if (position === null) return
             const path = interactions.get_path_to_destination(position)
             set_highlights({positions: path, highlight: SQUARE_HIGHLIGHT.PATH})
             set_hovers({positions: transform_position_to_f1(position)})
@@ -156,9 +162,6 @@ export const initialize_battle_grid_ui = ({
 
         if (interactions?.type !== "position_select") return
 
-        const position = get_position_by_coordinate({positions: interactions.clickable, coordinate})
-
-        if (nullable_positions_equal(latest_position, position)) return
 
         clear_hovers()
 
@@ -192,18 +195,15 @@ export const initialize_battle_grid_ui = ({
 
     click_overlay.addOnClickHandler(coordinate => {
         const interactions = player_turn_handler.get_selection_context()
-        if (interactions === null) return
+        if (!is_click_coordinate_interaction(interactions)) return
+
+        const position = get_position_by_coordinate({coordinate, positions: interactions.clickable})
+        if (position === null) return
 
         if (interactions.type === "select_path") {
-            const position = get_position_by_coordinate({coordinate, positions: interactions.clickable})
-            if (position === null) return
-
             const path = interactions.get_path_to_destination(position)
             interactions.select(path)
         } else if (interactions.type === "position_select") {
-            const position = get_position_by_coordinate({coordinate, positions: interactions.clickable})
-            if (position === null) return
-
             interactions.select(position)
         }
 
@@ -218,6 +218,8 @@ export const initialize_battle_grid_ui = ({
     })
 
     game_events.on_available_interactions_changed.add_handler((interactions) => {
+
+
         if (interactions.type === "select_path") {
             set_selected_indicator()
             set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
@@ -267,3 +269,10 @@ const show_attack_success_chance_if_needed = ({turn_state, selection_context, ev
     }
 }
  */
+
+type InteractionClickCoordinate = AvailableInteractionsSelectPosition | AvailableInteractionsSelectPath
+const CLICK_COORDINATE_INTERACTIONS: Array<AvailableInteractions["type"]> = ["position_select", "select_path"]
+
+const is_click_coordinate_interaction = (interaction: AvailableInteractions | null): interaction is InteractionClickCoordinate => {
+    return interaction !== null && CLICK_COORDINATE_INTERACTIONS.includes(interaction.type)
+}
