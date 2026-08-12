@@ -133,55 +133,48 @@ export const initialize_battle_grid_ui = ({
 
 
     let latest_position: Position | null = null
-    click_overlay.addOnMouseMoveHandler(coordinate => {
-        if (coordinate === null) {
-            if (latest_position !== null) {
-                clear_highlights({highlight: SQUARE_HIGHLIGHT.PATH})
-                clear_highlights({highlight: SQUARE_HIGHLIGHT.AREA})
-                latest_position = null
-            }
-            return
-        }
 
+    click_overlay.addOnMouseMoveHandler(coordinate => {
         const interactions = player_turn_handler.get_selection_context()
+
         if (!is_click_coordinate_interaction(interactions)) return
 
-        const position = get_position_by_coordinate({positions: interactions.clickable, coordinate})
-        assert_is_not_null(position)
+        // If outside the clickable positions, then returns null.
+        // There is math involved in checking what the most likely target is,
+        // which makes sense particularly whenever the click position is not footprint 1.
+        const position = coordinate && get_position_by_coordinate({positions: interactions.clickable, coordinate})
 
         if (nullable_positions_equal(latest_position, position)) return
+        latest_position = position
+
+        switch_highlights({from: SQUARE_HIGHLIGHT.PATH, to: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
+        switch_highlights({from: SQUARE_HIGHLIGHT.AREA, to: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
+        clear_hovers()
+
+        if (position === null) return
 
         if (interactions.type === "select_path") {
-            switch_highlights({from: SQUARE_HIGHLIGHT.PATH, to: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
-            clear_hovers()
             const path = interactions.get_path_to_destination(position)
             set_highlights({positions: path, highlight: SQUARE_HIGHLIGHT.PATH})
             set_hovers({positions: transform_position_to_f1(position)})
+        } else if (interactions.type === "position_select") {
+            /*
+                    const highlighted_positions = selection_context.highlighted.map(({position}) => position)
+
+                    for (const position of highlighted_positions) {
+                        get_square(position).set_interaction_status("none")
+                        get_square(position).set_highlight("none")
+                    }
+
+             */
+
+            for (const creature of battle_grid.creatures)
+                creature.events.is_untargeted.raise()
+
+            //interactions.get_targets_for_position(position)
+            //show_attack_success_chance_if_needed({selection_context, evaluate_ast, turn_state})
+            set_hovers({positions: transform_position_to_f1(position)})
         }
-
-        if (interactions?.type !== "position_select") return
-
-
-        clear_hovers()
-
-        latest_position = position
-
-        /*
-                const highlighted_positions = selection_context.highlighted.map(({position}) => position)
-
-                for (const position of highlighted_positions) {
-                    get_square(position).set_interaction_status("none")
-                    get_square(position).set_highlight("none")
-                }
-
-         */
-
-        for (const creature of battle_grid.creatures)
-            creature.events.is_untargeted.raise()
-
-        interactions.get_targets_for_position(position)
-        //show_attack_success_chance_if_needed({selection_context, evaluate_ast, turn_state})
-        set_hovers({positions: transform_position_to_f1(position)})
     })
 
     click_overlay.addOnClickHandler(coordinate => {
