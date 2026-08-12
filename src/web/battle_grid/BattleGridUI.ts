@@ -52,7 +52,6 @@ export const initialize_battle_grid_ui = ({
     const board = battle_grid.board.map(row => row.map(({position: {x, y}}) => create_visual_square({x, y})))
 
     const highlighted: Record<SquareHighlight, Set<SquareVisual>> = {
-        [SQUARE_HIGHLIGHT.NONE]: new Set<SquareVisual>(),
         [SQUARE_HIGHLIGHT.SELECTED]: new Set<SquareVisual>(),
         [SQUARE_HIGHLIGHT.AREA]: new Set<SquareVisual>(),
         [SQUARE_HIGHLIGHT.PATH]: new Set<SquareVisual>(),
@@ -84,7 +83,7 @@ export const initialize_battle_grid_ui = ({
 
     const clear_highlights = ({highlight}: { highlight: SquareHighlight }) => {
         const squares = highlighted[highlight]
-        squares.forEach(square => square.set_highlight("none"))
+        squares.forEach(square => square.set_highlight(null))
         squares.clear()
     }
 
@@ -165,9 +164,6 @@ export const initialize_battle_grid_ui = ({
 
         clear_hovers()
 
-        if (position === null) return
-
-
         latest_position = position
 
         /*
@@ -183,14 +179,9 @@ export const initialize_battle_grid_ui = ({
         for (const creature of battle_grid.creatures)
             creature.events.is_untargeted.raise()
 
-        if (position) {
-            interactions.get_targets_for_position(position)
-            //show_attack_success_chance_if_needed({selection_context, evaluate_ast, turn_state})
-            set_hovers({positions: transform_position_to_f1(position)})
-        } else {
-            const positions = transform_positions_to_f1(interactions.clickable)
-            set_highlights({positions, highlight: SQUARE_HIGHLIGHT.NONE})
-        }
+        interactions.get_targets_for_position(position)
+        //show_attack_success_chance_if_needed({selection_context, evaluate_ast, turn_state})
+        set_hovers({positions: transform_position_to_f1(position)})
     })
 
     click_overlay.addOnClickHandler(coordinate => {

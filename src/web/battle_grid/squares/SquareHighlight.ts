@@ -5,5 +5,4 @@ export const SQUARE_HIGHLIGHT = {
     AVAILABLE_TARGET: "available-target",
     PATH: "path",
     AREA: "area",
-    NONE: "none"
 } as const
