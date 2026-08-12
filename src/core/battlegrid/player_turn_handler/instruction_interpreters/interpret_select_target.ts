@@ -83,10 +83,7 @@ export const interpret_select_target = ({
 
             return {type: "creatures", value: targets}
         } else if (instruction.targeting_type === "movement") {
-            const path = get_shortest_path({creature: owner, destination: position, battle_grid})
-//TODO add pathfinding below
-            transform_positions_to_f1(path).map(position => ({position, highlight: "path"}))
-            return {type: "positions", value: path}
+            throw Error(`This instruction has been moved to its own selection style`)
         } else if (instruction.targeting_type === "push") {
             //TODO AP0 fix push that was changed from position to positions
             return {type: "positions", value: [position]}
@@ -120,14 +117,32 @@ export const interpret_select_target = ({
 
     const footprint = instruction.targeting_type === "movement" ? owner.data.position.footprint : 1
 
-    const selection_base: AvailableInteractionsSelectPosition = {
-        type: "position_select",
-        target_label,
-        clickable,
-        get_targets_for_position,
-        select,
-        footprint
-    }
+    if (instruction.targeting_type === "movement") {
+        const get_path_to_destination = (destination: Position) => {
+            return get_shortest_path({creature: owner, destination, battle_grid})
+        }
+        const select = (path: Array<Position>) => {
+            turn_state.set_variable(target_label, {type: "positions", value: path, description: "target"})
+        }
 
-    player_turn_handler.set_available_interactions(selection_base)
+        player_turn_handler.set_available_interactions({
+            type: "select_path",
+            target_label,
+            clickable,
+            footprint,
+            get_path_to_destination,
+            select,
+        })
+    } else {
+        const selection_base: AvailableInteractionsSelectPosition = {
+            type: "position_select",
+            target_label,
+            clickable,
+            get_targets_for_position,
+            select,
+            footprint
+        }
+
+        player_turn_handler.set_available_interactions(selection_base)
+    }
 }

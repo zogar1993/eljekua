@@ -13,6 +13,7 @@ export type AvailableInteractions =
     AvailableInteractionsSelectPosition
     | AvailableInteractionsSelectOption
     | AvailableInteractionsSelectHitStatus
+    | AvailableInteractionsSelectPath
 
 export type AvailableInteractionsSelectHitStatus = {
     type: "hit_status_select"
@@ -26,6 +27,15 @@ export type AvailableInteractionsSelectPosition = {
     get_targets_for_position: (position: Position) => Targets
     footprint: number
     select: (position: Position) => void
+}
+
+export type AvailableInteractionsSelectPath = {
+    type: "select_path"
+    target_label: string
+    clickable: Array<Position>
+    get_path_to_destination: (position: Position) => Array<Position>
+    select: (position: Array<Position>) => void
+    footprint: number
 }
 
 export type Targets = {

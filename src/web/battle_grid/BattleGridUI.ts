@@ -74,6 +74,12 @@ export const initialize_battle_grid_ui = ({
         squares.forEach(square => highlighted[highlight].add(square))
     }
 
+    const switch_highlights = ({from, to}: { from: SquareHighlight, to: SquareHighlight }) => {
+        highlighted[from].forEach(square => square.set_highlight(to))
+        highlighted[from].forEach(square => highlighted[to].add(square))
+        highlighted[from].clear()
+    }
+
     const clear_highlights = ({highlight}: { highlight: SquareHighlight }) => {
         const squares = highlighted[highlight]
         squares.forEach(square => square.set_highlight("none"))
@@ -91,27 +97,16 @@ export const initialize_battle_grid_ui = ({
         hovered.clear()
     }
 
-    const on_click = ({coordinate}: { coordinate: ClickableCoordinate }) => {
-        const selection_context = player_turn_handler.get_selection_context()
-        if (selection_context?.type !== "position_select") return
-
-        const position = get_position_by_coordinate({coordinate, positions: selection_context.clickable})
-        if (position === null) return
-
-        selection_context.select(position)
-
-        deselect()
-    }
-
-    const deselect = () => {
+    const clear_visual_selection = () => {
         const selection_context = player_turn_handler.get_selection_context()
         if (selection_context === null) return
 
-        if (selection_context.type === "position_select") {
+        if (["position_select", "select_path"].includes(selection_context.type)) {
             clear_highlights({highlight: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
             clear_highlights({highlight: SQUARE_HIGHLIGHT.PATH})
             clear_highlights({highlight: SQUARE_HIGHLIGHT.AREA})
             clear_highlights({highlight: SQUARE_HIGHLIGHT.SELECTED})
+
             /*
                         if (targets) {
                             if (targets.type === "creatures") {
@@ -138,11 +133,30 @@ export const initialize_battle_grid_ui = ({
 
     let latest_position: Position | null = null
     click_overlay.addOnMouseMoveHandler(coordinate => {
-        const selection_context = player_turn_handler.get_selection_context()
-        if (selection_context?.type !== "position_select") return
+        if (coordinate === null) {
+            if (latest_position !== null) {
+                clear_highlights({highlight: SQUARE_HIGHLIGHT.PATH})
+                clear_highlights({highlight: SQUARE_HIGHLIGHT.AREA})
+                latest_position = null
+            }
+            return
+        }
 
-        const position = coordinate &&
-            get_position_by_coordinate({positions: selection_context.clickable, coordinate})
+        const interactions = player_turn_handler.get_selection_context()
+
+        if (interactions?.type === "select_path") {
+            const position = get_position_by_coordinate({positions: interactions.clickable, coordinate})
+            switch_highlights({from: SQUARE_HIGHLIGHT.PATH, to: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
+            clear_hovers()
+            if (position === null) return
+            const path = interactions.get_path_to_destination(position)
+            set_highlights({positions: path, highlight: SQUARE_HIGHLIGHT.PATH})
+            set_hovers({positions: transform_position_to_f1(position)})
+        }
+
+        if (interactions?.type !== "position_select") return
+
+        const position = get_position_by_coordinate({positions: interactions.clickable, coordinate})
 
         if (nullable_positions_equal(latest_position, position)) return
 
@@ -167,31 +181,50 @@ export const initialize_battle_grid_ui = ({
             creature.events.is_untargeted.raise()
 
         if (position) {
-            selection_context.get_targets_for_position(position)
+            interactions.get_targets_for_position(position)
             //show_attack_success_chance_if_needed({selection_context, evaluate_ast, turn_state})
             set_hovers({positions: transform_position_to_f1(position)})
         } else {
-            const positions = transform_positions_to_f1(selection_context.clickable)
+            const positions = transform_positions_to_f1(interactions.clickable)
             set_highlights({positions, highlight: SQUARE_HIGHLIGHT.NONE})
         }
     })
 
     click_overlay.addOnClickHandler(coordinate => {
-        on_click({coordinate})
+        const interactions = player_turn_handler.get_selection_context()
+        if (interactions === null) return
+
+        if (interactions.type === "select_path") {
+            const position = get_position_by_coordinate({coordinate, positions: interactions.clickable})
+            if (position === null) return
+
+            const path = interactions.get_path_to_destination(position)
+            interactions.select(path)
+        } else if (interactions.type === "position_select") {
+            const position = get_position_by_coordinate({coordinate, positions: interactions.clickable})
+            if (position === null) return
+
+            interactions.select(position)
+        }
+
+        clear_visual_selection()
     })
 
     game_events.on_acting_creature_changed.add_handler(creature => {
         if (creature === null)
-            deselect()
+            clear_visual_selection()
         else
             set_selected_indicator()
     })
 
     game_events.on_available_interactions_changed.add_handler((interactions) => {
-        if (interactions.type === "position_select") {
+        if (interactions.type === "select_path") {
+            set_selected_indicator()
+            set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
+        } else if (interactions.type === "position_select") {
             set_selected_indicator()
 
-            set_highlights({positions: interactions.clickable, highlight: "available-target"})
+            set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
 
             /* TODO reactivate path highlighting
                         for (const {position, highlight} of interactions.highlighted)
