@@ -9,18 +9,18 @@ import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButt
 import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 import {GameEvents} from "core/events/GameEvents";
 
-export type AvailableInteractions =
-    AvailableInteractionsSelectPosition
-    | AvailableInteractionsSelectOption
-    | AvailableInteractionsSelectHitStatus
-    | AvailableInteractionsSelectPath
+export type Interaction =
+    InteractionsSelectPosition
+    | InteractionsSelectOption
+    | InteractionsSelectHitStatus
+    | InteractionsSelectPath
 
-export type AvailableInteractionsSelectHitStatus = {
+export type InteractionsSelectHitStatus = {
     type: "hit_status_select"
     hit_statuses: Map<Creature, HitStatus>
 }
 
-export type AvailableInteractionsSelectPosition = {
+export type InteractionsSelectPosition = {
     type: "position_select"
     clickable: Array<Position>
     target_label: string
@@ -29,7 +29,7 @@ export type AvailableInteractionsSelectPosition = {
     select: (position: Position) => void
 }
 
-export type AvailableInteractionsSelectPath = {
+export type InteractionsSelectPath = {
     type: "select_path"
     target_label: string
     clickable: Array<Position>
@@ -46,7 +46,7 @@ export type Targets = {
     value: Array<Creature>
 }
 
-type AvailableInteractionsSelectOption = {
+type InteractionsSelectOption = {
     type: "option_select"
     available_options: Array<OptionButton>
 }
@@ -64,19 +64,19 @@ export const create_player_turn_handler = ({
     turn_state: TurnState
     game_events: GameEvents
 }): PlayerTurnHandler => {
-    let selection_context: AvailableInteractions | null = null
+    let interaction: Interaction | null = null
 
-    const set_available_interactions = (available_interactions: AvailableInteractions) => {
-        selection_context = available_interactions
-        game_events.on_available_interactions_changed.raise(selection_context)
+    const set_available_interactions = (available_interactions: Interaction) => {
+        interaction = available_interactions
+        game_events.on_available_interactions_changed.raise(interaction)
     }
 
-    const set_awaiting_option_selection = (context: Omit<AvailableInteractionsSelectOption, "type">) => {
-        selection_context = {type: "option_select", ...context}
+    const set_awaiting_option_selection = (_interaction: Omit<InteractionsSelectOption, "type">) => {
+        interaction = {type: "option_select", ..._interaction}
 
         game_events.on_acting_creature_changed.raise(turn_state.get_acting_creature())
 
-        const options = context.available_options.map(option => ({
+        const options = interaction.available_options.map(option => ({
             ...option,
             on_click: () => {
                 option.on_click()
@@ -91,7 +91,7 @@ export const create_player_turn_handler = ({
         hit_statuses: Map<Creature, HitStatus>
         on_status_change: (creature: Creature, status: HitStatus) => void
     }) => {
-        selection_context = {type: "hit_status_select", hit_statuses}
+        interaction = {type: "hit_status_select", hit_statuses}
 
         game_events.on_acting_creature_changed.raise(turn_state.get_acting_creature())
 
@@ -100,17 +100,6 @@ export const create_player_turn_handler = ({
             on_status_change,
             on_confirm: () => game_events.on_acting_creature_changed.raise(null),
         })
-    }
-
-    const get_position_selection_context = (): AvailableInteractionsSelectPosition => {
-        if (selection_context?.type !== "position_select")
-            throw Error("position_select selection_context not set")
-        return selection_context
-    }
-
-    const get_position_selection_context_or_null = (): AvailableInteractionsSelectPosition | null => {
-        if (selection_context?.type !== "position_select") return null
-        return selection_context
     }
 
     const clear_turn_state = () => {
@@ -129,39 +118,35 @@ export const create_player_turn_handler = ({
         turn_state.add_instruction_frame({name: "Action Selection", instructions: [instruction], owner})
     }
 
-    function get_selection_context() {
-        return selection_context
+    function get_interaction() {
+        return interaction
     }
 
-    function set_selection_context(context: AvailableInteractions | null) {
-        selection_context = context
+    function set_interaction(_interaction: Interaction | null) {
+        interaction = _interaction
     }
 
     return {
         set_available_interactions,
         set_awaiting_option_selection,
         set_awaiting_hit_status_selection,
-        get_position_selection_context,
-        get_position_selection_context_or_null,
         clear_turn_state,
         set_action_selection_for_current_character,
-        get_selection_context,
+        get_interaction,
         //TODO remove this since it defeats the purpose
-        set_selection_context
+        set_interaction
     }
 }
 
 export type PlayerTurnHandler = {
-    set_available_interactions: (interactions: AvailableInteractions) => void
-    set_awaiting_option_selection: (context: Omit<AvailableInteractionsSelectOption, "type">) => void
-    set_awaiting_hit_status_selection: (context: {
+    set_available_interactions: (interactions: Interaction) => void
+    set_awaiting_option_selection: (interaction: Omit<InteractionsSelectOption, "type">) => void
+    set_awaiting_hit_status_selection: (interaction: {
         hit_statuses: Map<Creature, HitStatus>
         on_status_change: (creature: Creature, status: HitStatus) => void
     }) => void
-    get_position_selection_context: () => AvailableInteractionsSelectPosition
-    get_position_selection_context_or_null: () => AvailableInteractionsSelectPosition | null
     clear_turn_state: () => void
     set_action_selection_for_current_character: () => void
-    get_selection_context: () => AvailableInteractions | null
-    set_selection_context: (context: AvailableInteractions | null) => void
+    get_interaction: () => Interaction | null
+    set_interaction: (interaction: Interaction | null) => void
 }

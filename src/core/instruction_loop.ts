@@ -26,7 +26,7 @@ export const create_instruction_loop = ({
     settings: Settings
 }) => {
     const evaluate_instructions = () => {
-        while (player_turn_handler.get_selection_context() === null) {
+        while (player_turn_handler.get_interaction() === null) {
             const instruction = turn_state.next_instruction()
 
             if (instruction === null) {

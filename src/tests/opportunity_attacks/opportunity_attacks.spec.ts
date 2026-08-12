@@ -137,13 +137,13 @@ const when_creature = (creature_name: string) => {
 
     return {
         moves_to: async (position: Omit<Position, "footprint">) => {
-            await wait_until(() => player_turn_handler.get_selection_context()?.type === "option_select")
+            await wait_until(() => player_turn_handler.get_interaction()?.type === "option_select")
             option_buttons_test_ui.click("Move")
-            await wait_until(() => player_turn_handler.get_selection_context()?.type === "position_select")
+            await wait_until(() => player_turn_handler.get_interaction()?.type === "position_select")
             battle_grid_test_ui.click(position)
         },
         selects_action: async (action_name: string) => {
-            await wait_until(() => player_turn_handler.get_selection_context()?.type === "option_select")
+            await wait_until(() => player_turn_handler.get_interaction()?.type === "option_select")
             option_buttons_test_ui.click(action_name)
         }
     }

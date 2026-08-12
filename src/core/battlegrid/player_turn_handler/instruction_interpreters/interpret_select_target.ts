@@ -2,12 +2,11 @@ import {
     assert_is_footprint_one,
     Position,
     positions_share_surface,
-    transform_positions_to_f1
 } from "core/battlegrid/Position";
 import {
     InterpretInstructionProps
 } from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {AvailableInteractionsSelectPosition, Targets} from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
+import {InteractionsSelectPosition, Targets} from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {get_reach_area_burst} from "core/battlegrid/position/get_reach_area_burst";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
 import {InstructionSelectTarget} from "core/expressions/parser/instructions";
@@ -70,9 +69,11 @@ export const interpret_select_target = ({
 
 
     const get_targets_for_position = (position: Position): Targets => {
-        const selection = player_turn_handler.get_position_selection_context()
+        const interaction = player_turn_handler.get_interaction()
 
-        assert_is_true(selection.clickable.some(target => positions_share_surface(target, position)))
+        if (interaction?.type !== "position_select") throw Error("position select selection_context not set")
+
+        assert_is_true(interaction.clickable.some(target => positions_share_surface(target, position)))
 
         if (instruction.targeting_type === "area_burst") {
             assert_is_footprint_one(position)
@@ -134,7 +135,7 @@ export const interpret_select_target = ({
             select,
         })
     } else {
-        const selection_base: AvailableInteractionsSelectPosition = {
+        const selection_base: InteractionsSelectPosition = {
             type: "position_select",
             target_label,
             clickable,
