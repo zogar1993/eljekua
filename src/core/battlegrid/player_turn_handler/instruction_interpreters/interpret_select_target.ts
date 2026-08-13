@@ -86,8 +86,7 @@ export const interpret_select_target = ({
         } else if (instruction.targeting_type === "movement") {
             throw Error(`This instruction has been moved to its own selection style`)
         } else if (instruction.targeting_type === "push") {
-            //TODO AP0 fix push that was changed from position to positions
-            return {type: "positions", value: [position]}
+            throw Error(`This instruction has been moved to its own selection style`)
         } else {
             if (instruction.target_type === "terrain") {
                 return {type: "positions", value: [position]}
@@ -118,7 +117,7 @@ export const interpret_select_target = ({
 
     const footprint = instruction.targeting_type === "movement" ? owner.data.position.footprint : 1
 
-    if (instruction.targeting_type === "movement") {
+    if (PATH_SELECTION_TYPES.includes(instruction.targeting_type)) {
         const get_path_to_destination = (destination: Position) => {
             return get_shortest_path({creature: owner, destination, battle_grid})
         }
@@ -147,3 +146,5 @@ export const interpret_select_target = ({
         player_turn_handler.set_available_interactions(selection_base)
     }
 }
+
+const PATH_SELECTION_TYPES: Array<InstructionSelectTarget["targeting_type"]> = ["movement", "push"] as const;
