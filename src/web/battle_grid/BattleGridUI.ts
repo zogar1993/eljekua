@@ -55,7 +55,7 @@ export const initialize_battle_grid_ui = ({
         [SQUARE_HIGHLIGHT.SELECTED]: new Set<SquareVisual>(),
         [SQUARE_HIGHLIGHT.AREA]: new Set<SquareVisual>(),
         [SQUARE_HIGHLIGHT.PATH]: new Set<SquareVisual>(),
-        [SQUARE_HIGHLIGHT.AVAILABLE_TARGET]: new Set<SquareVisual>()
+        [SQUARE_HIGHLIGHT.CLICKABLE]: new Set<SquareVisual>()
     }
     const hovered = new Set<SquareVisual>()
 
@@ -103,10 +103,11 @@ export const initialize_battle_grid_ui = ({
         if (selection_context === null) return
 
         if (is_click_coordinate_interaction(selection_context)) {
-            clear_highlights({highlight: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
+            clear_highlights({highlight: SQUARE_HIGHLIGHT.CLICKABLE})
             clear_highlights({highlight: SQUARE_HIGHLIGHT.PATH})
             clear_highlights({highlight: SQUARE_HIGHLIGHT.AREA})
             clear_highlights({highlight: SQUARE_HIGHLIGHT.SELECTED})
+
 
             /*
                         if (targets) {
@@ -147,8 +148,8 @@ export const initialize_battle_grid_ui = ({
         if (nullable_positions_equal(latest_position, position)) return
         latest_position = position
 
-        switch_highlights({from: SQUARE_HIGHLIGHT.PATH, to: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
-        switch_highlights({from: SQUARE_HIGHLIGHT.AREA, to: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
+        switch_highlights({from: SQUARE_HIGHLIGHT.PATH, to: SQUARE_HIGHLIGHT.CLICKABLE})
+        switch_highlights({from: SQUARE_HIGHLIGHT.AREA, to: SQUARE_HIGHLIGHT.CLICKABLE})
         clear_hovers()
 
         if (position === null) return
@@ -204,11 +205,11 @@ export const initialize_battle_grid_ui = ({
     game_events.on_available_interactions_changed.add_handler((interactions) => {
         if (interactions.type === "select_path") {
             set_selected_indicator()
-            set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
+            set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.CLICKABLE})
         } else if (interactions.type === "position_select") {
             set_selected_indicator()
 
-            set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.AVAILABLE_TARGET})
+            set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.CLICKABLE})
 
             /* TODO reactivate path highlighting
                         for (const {position, highlight} of interactions.highlighted)

@@ -2,7 +2,7 @@ export type SquareHighlight = typeof SQUARE_HIGHLIGHT[keyof typeof SQUARE_HIGHLI
 
 export const SQUARE_HIGHLIGHT = {
     SELECTED: "selected",
-    AVAILABLE_TARGET: "available-target",
+    CLICKABLE: "clickable",
     PATH: "path",
     AREA: "area",
 } as const
