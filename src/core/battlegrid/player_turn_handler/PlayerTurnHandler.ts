@@ -102,11 +102,6 @@ export const create_player_turn_handler = ({
         })
     }
 
-    const clear_turn_state = () => {
-        turn_state.clear()
-        game_events.on_acting_creature_changed.raise(null)
-    }
-
     function set_action_selection_for_current_character() {
         const instruction = {
             type: INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS,
@@ -130,7 +125,6 @@ export const create_player_turn_handler = ({
         set_available_interactions,
         set_awaiting_option_selection,
         set_awaiting_hit_status_selection,
-        clear_turn_state,
         set_action_selection_for_current_character,
         get_interaction,
         //TODO remove this since it defeats the purpose
@@ -145,7 +139,6 @@ export type PlayerTurnHandler = {
         hit_statuses: Map<Creature, HitStatus>
         on_status_change: (creature: Creature, status: HitStatus) => void
     }) => void
-    clear_turn_state: () => void
     set_action_selection_for_current_character: () => void
     get_interaction: () => Interaction | null
     set_interaction: (interaction: Interaction | null) => void
