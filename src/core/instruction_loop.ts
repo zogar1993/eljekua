@@ -54,6 +54,7 @@ type InteractionsSelectOption = {
     available_options: Array<OptionButton>
 }
 
+//TODO clean up usages of the player turn handler
 export type PlayerTurnHandler = {
     set_available_interactions: (interactions: Interaction) => void
     set_action_selection_for_current_character: () => void
@@ -124,7 +125,6 @@ export const create_instruction_loop = ({
         }
     }
 
-
     const set_available_interactions = (interaction: Interaction) => {
         current_interaction = add_cleanup_to_interaction_confirmation(interaction)
         game_events.on_available_interactions_changed.raise(current_interaction)
@@ -141,12 +141,8 @@ export const create_instruction_loop = ({
     }
 
     function set_action_selection_for_current_character() {
-        const instruction = {
-            type: INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS,
-            creature: AST.OWNER,
-            cost: "normal",
-            filter: "turn"
-        } as const
+        const type = INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS
+        const instruction = {type, creature: AST.OWNER, cost: "normal", filter: "turn"} as const
         const owner = initiative_order.get_current_creature()
         turn_state.add_instruction_frame({name: "Action Selection", instructions: [instruction], owner})
     }
@@ -166,6 +162,7 @@ export const create_instruction_loop = ({
             const instruction = turn_state.next_instruction()
 
             if (instruction === null) {
+                //TODO convert this into an instruction that runs at the base frame of the turn state
                 player_turn_handler.set_action_selection_for_current_character();
             } else {
                 interpret_instruction({
