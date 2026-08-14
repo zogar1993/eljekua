@@ -37,11 +37,11 @@
     background-color: lawngreen;
 }
 
-.board__square[data-indicator=available-target]::after {
+.board__square[data-indicator=clickable]::after {
     background-color: lightblue;
 }
 
-.board__square[data-indicator=available-target][data-interaction_status=hover]::after {
+.board__square[data-indicator=clickable][data-interaction_status=hover]::after {
     background-color: cadetblue;
 }
 
