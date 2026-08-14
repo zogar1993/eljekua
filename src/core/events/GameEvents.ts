@@ -8,7 +8,7 @@ import type {InstructionFrame} from "core/battlegrid/player_turn_handler/TurnSta
 export const create_game_events = () => ({
     on_available_interactions_changed: create_event_manager<Interaction>(),
     on_creature_added_to_game: create_event_manager<Creature>(),
-    on_acting_creature_changed: create_event_manager<Creature | null>(),
+    on_clear_available_interactions: create_event_manager(),
 
     //Turn State Events
     on_turn_state_cleared: create_event_manager(),

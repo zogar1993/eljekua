@@ -63,7 +63,7 @@ initialize_battle_grid_ui({
 create_instruction_visualizer({game_events})
 
 const gameplay_use_cases = create_gameplay_use_cases({
-    battle_grid, player_turn_handler, initiative_order
+    battle_grid, player_turn_handler, initiative_order, turn_state
 })
 
 const instruction_loop = create_instruction_loop({

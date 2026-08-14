@@ -31,6 +31,7 @@ import {AnimationQueue} from "core/AnimationQueue";
 import {OptionButtons} from "core/battlegrid/option_buttons/OptionButtons";
 import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
 import {assert_is_not_null} from "stdlib/assert";
+import {Creature} from "core/battlegrid/creatures/Creature";
 
 export const initialize_battle_grid_ui = ({
                                               battle_grid,
@@ -99,17 +100,13 @@ export const initialize_battle_grid_ui = ({
     }
 
     const clear_visual_selection = () => {
-        const selection_context = player_turn_handler.get_interaction()
-        if (selection_context === null) return
-
-        if (is_click_coordinate_interaction(selection_context)) {
-            clear_highlights({highlight: SQUARE_HIGHLIGHT.CLICKABLE})
-            clear_highlights({highlight: SQUARE_HIGHLIGHT.PATH})
-            clear_highlights({highlight: SQUARE_HIGHLIGHT.AREA})
-            clear_highlights({highlight: SQUARE_HIGHLIGHT.SELECTED})
-
-
-            /*
+        clear_highlights({highlight: SQUARE_HIGHLIGHT.CLICKABLE})
+        clear_highlights({highlight: SQUARE_HIGHLIGHT.PATH})
+        clear_highlights({highlight: SQUARE_HIGHLIGHT.AREA})
+        clear_highlights({highlight: SQUARE_HIGHLIGHT.SELECTED})
+        option_buttons.remove_options()
+        hit_status_buttons.remove()
+        /*
                         if (targets) {
                             if (targets.type === "creatures") {
                                 const creatures = targets.value
@@ -119,12 +116,6 @@ export const initialize_battle_grid_ui = ({
                         }
 
              */
-        } else if (selection_context.type === "option_select")
-            option_buttons.remove_options()
-        else if (selection_context.type === "hit_status_select")
-            hit_status_buttons.remove()
-
-        player_turn_handler.set_interaction(null)
     }
 
     function set_selected_indicator() {
@@ -195,26 +186,23 @@ export const initialize_battle_grid_ui = ({
         clear_visual_selection()
     })
 
-    game_events.on_acting_creature_changed.add_handler(creature => {
-        if (creature === null)
-            clear_visual_selection()
-        else
-            set_selected_indicator()
+    game_events.on_clear_available_interactions.add_handler(() => {
+        clear_visual_selection()
     })
 
     game_events.on_available_interactions_changed.add_handler((interactions) => {
+        if (interactions === null) return
+
+        set_selected_indicator()
+
         if (interactions.type === "select_path") {
-            set_selected_indicator()
             set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.CLICKABLE})
         } else if (interactions.type === "position_select") {
-            set_selected_indicator()
-
             set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.CLICKABLE})
 
             /* TODO reactivate path highlighting
                         for (const {position, highlight} of interactions.highlighted)
                             set_highlight({positions: [position], highlight})
-
              */
         }
     })

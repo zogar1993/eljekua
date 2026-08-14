@@ -36,7 +36,8 @@ const handle_hit_status_manually = ({
     const hit_statuses = new Map<Creature, HitStatus>(defenders.map(defender => [defender, HIT_STATUS.MISS]))
     turn_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: hit_statuses})
 
-    player_turn_handler.set_awaiting_hit_status_selection({
+    player_turn_handler.set_available_interactions({
+        type: "hit_status_select",
         hit_statuses,
         on_status_change: (creature: Creature, status: HitStatus) => {
             hit_statuses.set(creature, status)

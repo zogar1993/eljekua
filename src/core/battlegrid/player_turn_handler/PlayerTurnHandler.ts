@@ -18,6 +18,7 @@ export type Interaction =
 export type InteractionsSelectHitStatus = {
     type: "hit_status_select"
     hit_statuses: Map<Creature, HitStatus>
+    on_status_change: (creature: Creature, status: HitStatus) => void
 }
 
 export type InteractionsSelectPosition = {
@@ -64,42 +65,63 @@ export const create_player_turn_handler = ({
     turn_state: TurnState
     game_events: GameEvents
 }): PlayerTurnHandler => {
-    let interaction: Interaction | null = null
+    let current_interaction: Interaction | null = null
 
-    const set_available_interactions = (available_interactions: Interaction) => {
-        interaction = available_interactions
-        game_events.on_available_interactions_changed.raise(interaction)
+
+    const clear_current_interaction = () => {
+        current_interaction = null
+        //TODO this should be moved to animation handling so that highlights are cleared
+        game_events.on_clear_available_interactions.raise()
+        option_buttons.remove_options()
     }
 
-    const set_awaiting_option_selection = (_interaction: Omit<InteractionsSelectOption, "type">) => {
-        interaction = {type: "option_select", ..._interaction}
-
-        game_events.on_acting_creature_changed.raise(turn_state.get_acting_creature())
-
-        const options = interaction.available_options.map(option => ({
-            ...option,
-            on_click: () => {
-                option.on_click()
-                game_events.on_acting_creature_changed.raise(null)
-            }
-        }))
-
-        option_buttons.display_options(options)
+    const add_cleanup_to_function = <T>(fn: (value: T) => void) => {
+        return (value: T) => {
+            fn(value)
+            clear_current_interaction()
+        }
+    }
+    const add_cleanup_to_function_zero = (fn: () => void) => {
+        return () => {
+            fn()
+            clear_current_interaction()
+        }
     }
 
-    const set_awaiting_hit_status_selection = ({hit_statuses, on_status_change}: {
-        hit_statuses: Map<Creature, HitStatus>
-        on_status_change: (creature: Creature, status: HitStatus) => void
-    }) => {
-        interaction = {type: "hit_status_select", hit_statuses}
+    // This is needed so that all interactions resume after being resolved
+    const add_cleanup_to_interaction_confirmation = (interaction: Interaction): Interaction => {
+        switch (interaction.type) {
+            case "position_select":
+                return {...interaction, select: add_cleanup_to_function(interaction.select)}
+            case "select_path":
+                return {...interaction, select: add_cleanup_to_function(interaction.select)}
+            case "option_select":
+                return {
+                    ...interaction,
+                    available_options: interaction.available_options.map(option => ({
+                        ...option,
+                        on_click: add_cleanup_to_function_zero(option.on_click)
+                    }))
+                }
+            case "hit_status_select":
+                return interaction
+        }
+    }
 
-        game_events.on_acting_creature_changed.raise(turn_state.get_acting_creature())
 
-        hit_status_buttons.display({
-            hit_statuses,
-            on_status_change,
-            on_confirm: () => game_events.on_acting_creature_changed.raise(null),
-        })
+    const set_available_interactions = (interaction: Interaction) => {
+        current_interaction = add_cleanup_to_interaction_confirmation(interaction)
+        game_events.on_available_interactions_changed.raise(current_interaction)
+
+        if (current_interaction.type === "option_select") {
+            option_buttons.display_options(current_interaction.available_options)
+        } else if (current_interaction.type === "hit_status_select") {
+            hit_status_buttons.display({
+                ...current_interaction,
+                on_status_change: current_interaction.on_status_change,
+                on_confirm: clear_current_interaction,
+            })
+        }
     }
 
     function set_action_selection_for_current_character() {
@@ -114,32 +136,18 @@ export const create_player_turn_handler = ({
     }
 
     function get_interaction() {
-        return interaction
-    }
-
-    function set_interaction(_interaction: Interaction | null) {
-        interaction = _interaction
+        return current_interaction
     }
 
     return {
         set_available_interactions,
-        set_awaiting_option_selection,
-        set_awaiting_hit_status_selection,
         set_action_selection_for_current_character,
         get_interaction,
-        //TODO remove this since it defeats the purpose
-        set_interaction
     }
 }
 
 export type PlayerTurnHandler = {
     set_available_interactions: (interactions: Interaction) => void
-    set_awaiting_option_selection: (interaction: Omit<InteractionsSelectOption, "type">) => void
-    set_awaiting_hit_status_selection: (interaction: {
-        hit_statuses: Map<Creature, HitStatus>
-        on_status_change: (creature: Creature, status: HitStatus) => void
-    }) => void
     set_action_selection_for_current_character: () => void
     get_interaction: () => Interaction | null
-    set_interaction: (interaction: Interaction | null) => void
 }
