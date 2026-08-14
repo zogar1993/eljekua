@@ -16,7 +16,7 @@ import {create_initiative_entry_visual} from "core/initiative_order/InitiativeEn
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {create_start_battle} from "core/use_cases/start_battle";
 import {create_turn_state} from "core/battlegrid/player_turn_handler/TurnState";
-import {create_instruction_loop, create_player_turn_handler} from "core/instruction_loop";
+import {create_instruction_loop} from "core/instruction_loop";
 import {build_evaluate_ast} from "core/expressions/evaluator/evaluate_ast";
 import {create_instruction_visualizer} from "web/instruction_visualizer/instruction_visualizer";
 import {AnimationQueue} from "core/AnimationQueue";
@@ -42,13 +42,19 @@ const hit_status_buttons = create_hit_status_buttons({
 
 const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
 
-const player_turn_handler = create_player_turn_handler({
-    initiative_order,
-    option_buttons,
-    hit_status_buttons,
+const instruction_loop = create_instruction_loop({
+    battle_grid,
     turn_state,
-    game_events
+    evaluate_ast,
+    initiative_order,
+    settings,
+    game_events,
+    hit_status_buttons,
+    option_buttons
 })
+
+//TODO nuke this
+const player_turn_handler = instruction_loop
 
 initialize_battle_grid_ui({
     battle_grid,
@@ -64,16 +70,6 @@ create_instruction_visualizer({game_events})
 const gameplay_use_cases = create_gameplay_use_cases({
     battle_grid, player_turn_handler, initiative_order, turn_state
 })
-
-const instruction_loop = create_instruction_loop({
-    player_turn_handler,
-    battle_grid,
-    turn_state,
-    evaluate_ast,
-    initiative_order,
-    settings
-})
-
 
 game_events.on_creature_added_to_game.add_handler((creature) => {
     const {data, events} = creature

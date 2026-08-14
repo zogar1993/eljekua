@@ -53,19 +53,33 @@ type InteractionsSelectOption = {
     type: "option_select"
     available_options: Array<OptionButton>
 }
-export const create_player_turn_handler = ({
-                                               initiative_order,
-                                               option_buttons,
-                                               hit_status_buttons,
-                                               turn_state,
-                                               game_events
-                                           }: {
-    initiative_order: InitiativeOrder,
+
+export type PlayerTurnHandler = {
+    set_available_interactions: (interactions: Interaction) => void
+    set_action_selection_for_current_character: () => void
+    get_interaction: () => Interaction | null
+}
+
+//TODO see if we can go back to the syncronous loop
+export const create_instruction_loop = ({
+                                            turn_state,
+                                            battle_grid,
+                                            evaluate_ast,
+                                            initiative_order,
+                                            settings,
+                                            option_buttons,
+                                            hit_status_buttons,
+                                            game_events
+                                        }: {
+    turn_state: TurnState
+    battle_grid: BattleGrid
+    evaluate_ast: (node: AstNode) => Expr
+    initiative_order: InitiativeOrder
+    settings: Settings
     option_buttons: OptionButtons
     hit_status_buttons: HitStatusButtons
-    turn_state: TurnState
     game_events: GameEvents
-}): PlayerTurnHandler => {
+}) => {
     let current_interaction: Interaction | null = null
 
 
@@ -140,33 +154,12 @@ export const create_player_turn_handler = ({
         return current_interaction
     }
 
-    return {
+    const player_turn_handler = {
         set_available_interactions,
         set_action_selection_for_current_character,
         get_interaction,
     }
-}
-export type PlayerTurnHandler = {
-    set_available_interactions: (interactions: Interaction) => void
-    set_action_selection_for_current_character: () => void
-    get_interaction: () => Interaction | null
-}
-//TODO see if we can go back to the syncronous loop
-export const create_instruction_loop = ({
-                                           player_turn_handler,
-                                           turn_state,
-                                           battle_grid,
-                                           evaluate_ast,
-                                           initiative_order,
-                                           settings
-                                       }: {
-    player_turn_handler: PlayerTurnHandler
-    turn_state: TurnState
-    battle_grid: BattleGrid
-    evaluate_ast: (node: AstNode) => Expr
-    initiative_order: InitiativeOrder
-    settings: Settings
-}) => {
+
     const evaluate_instructions = () => {
         while (player_turn_handler.get_interaction() === null) {
             const instruction = turn_state.next_instruction()
@@ -193,6 +186,7 @@ export const create_instruction_loop = ({
     }
 
     return {
+        ...player_turn_handler,
         run: run_logical_frame_with_delay_recursion
     }
 }
