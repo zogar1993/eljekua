@@ -9,7 +9,7 @@ export const create_initiative_order = ({create_initiative_entry_visual}: {
         initiative: ExprNumberResolved,
         index: number
     }) => InitiativeEntryVisual
-}): InitiativeOrder => {
+}) => {
     let initiatives: Array<{
         creature: Creature,
         initiative: ExprNumberResolved,
@@ -67,10 +67,4 @@ export const create_initiative_order = ({create_initiative_entry_visual}: {
     }
 }
 
-export type InitiativeOrder = {
-    add_entry: (props: {creature: Creature, initiative: ExprNumberResolved}) => void
-    set_current_turn: (creature: Creature) => void
-    get_current_creature: () => Creature
-    next_turn: () => void
-    start: () => void
-}
+export type InitiativeOrder = ReturnType<typeof create_initiative_order>
