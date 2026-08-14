@@ -1,7 +1,6 @@
 import {create_battle_grid} from "core/battlegrid/BattleGrid";
 import {get_flanker_positions} from "core/battlegrid/position/get_flanker_positions";
 import {dependency_mocks} from "tests/utils/dependency_mocks";
-import {create_player_turn_handler} from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
@@ -14,7 +13,7 @@ import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {create_start_battle} from "core/use_cases/start_battle";
 import {create_turn_state} from "core/battlegrid/player_turn_handler/TurnState";
 import {build_evaluate_ast} from "core/expressions/evaluator/evaluate_ast";
-import {create_instruction_loop} from "core/instruction_loop";
+import {create_instruction_loop, create_player_turn_handler} from "core/instruction_loop";
 import {create_gameplay_use_cases} from "core/use_cases/gameplay/gameplay_use_cases";
 import {hit_status_buttons_test_ui} from "tests/utils/hit_status_buttons_test_ui";
 import {create_settings} from "core/settings/Settings";

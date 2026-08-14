@@ -1,10 +1,10 @@
 import {InitiativeOrder} from "core/initiative_order/InitiativeOrder";
 import {Creature} from "core/battlegrid/creatures/Creature";
-import {PlayerTurnHandler} from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {run_end_of_turn_hooks} from "core/battlegrid/player_turn_handler/run_end_of_turn_hooks";
 import {run_start_of_turn_hooks} from "core/battlegrid/player_turn_handler/run_start_of_turn_hooks";
 import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
+import {PlayerTurnHandler} from "core/instruction_loop";
 
 
 export const create_set_current_turn_to_creature = (

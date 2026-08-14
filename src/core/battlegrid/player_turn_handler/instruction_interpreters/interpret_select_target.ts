@@ -6,7 +6,6 @@ import {
 import {
     InterpretInstructionProps
 } from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {InteractionsSelectPosition, Targets} from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {get_reach_area_burst} from "core/battlegrid/position/get_reach_area_burst";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
 import {InstructionSelectTarget} from "core/expressions/parser/instructions";
@@ -14,6 +13,7 @@ import {EXPR} from "core/expressions/evaluator/EXPR";
 import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";
 import {assert_is_true} from "stdlib/assert";
+import {InteractionsSelectPosition, Targets} from "core/instruction_loop";
 
 export const interpret_select_target = ({
                                             instruction,

@@ -14,11 +14,6 @@ import {EXPR} from "core/expressions/evaluator/EXPR";
 import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
 import {Expr} from "core/expressions/evaluator/types";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {
-    Interaction, InteractionsSelectPath,
-    InteractionsSelectPosition,
-    PlayerTurnHandler, Targets
-} from "core/battlegrid/player_turn_handler/PlayerTurnHandler";
 import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import {
     ClickableCoordinate,
@@ -32,6 +27,13 @@ import {OptionButtons} from "core/battlegrid/option_buttons/OptionButtons";
 import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
 import {assert_is_not_null} from "stdlib/assert";
 import {Creature} from "core/battlegrid/creatures/Creature";
+import {
+    Interaction,
+    InteractionsSelectPath,
+    InteractionsSelectPosition,
+    PlayerTurnHandler,
+    Targets
+} from "core/instruction_loop";
 
 export const initialize_battle_grid_ui = ({
                                               battle_grid,
