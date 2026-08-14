@@ -60,7 +60,6 @@ export type PlayerTurnHandler = {
     get_interaction: () => Interaction | null
 }
 
-//TODO see if we can go back to the syncronous loop
 export const create_instruction_loop = ({
                                             turn_state,
                                             battle_grid,
@@ -82,12 +81,14 @@ export const create_instruction_loop = ({
 }) => {
     let current_interaction: Interaction | null = null
 
-
     const clear_current_interaction = () => {
         current_interaction = null
+
+        game_events.on_available_interactions_changed.raise(null)
         //TODO this should be moved to animation handling so that highlights are cleared
-        game_events.on_clear_available_interactions.raise()
         option_buttons.remove_options()
+
+        evaluate_instructions()
     }
 
     const add_cleanup_to_function = <T>(fn: (value: T) => void) => {
@@ -180,14 +181,9 @@ export const create_instruction_loop = ({
         }
     }
 
-    const run_logical_frame_with_delay_recursion = () => {
-        evaluate_instructions()
-        setTimeout(run_logical_frame_with_delay_recursion, 20)
-    }
-
     return {
         ...player_turn_handler,
-        run: run_logical_frame_with_delay_recursion
+        run: evaluate_instructions
     }
 }
 

@@ -184,16 +184,13 @@ export const initialize_battle_grid_ui = ({
         } else if (interactions.type === "position_select") {
             interactions.select(position)
         }
-
-        clear_visual_selection()
-    })
-
-    game_events.on_clear_available_interactions.add_handler(() => {
-        clear_visual_selection()
     })
 
     game_events.on_available_interactions_changed.add_handler((interactions) => {
-        if (interactions === null) return
+        if (interactions === null) {
+            clear_visual_selection()
+            return
+        }
 
         set_selected_indicator()
 
