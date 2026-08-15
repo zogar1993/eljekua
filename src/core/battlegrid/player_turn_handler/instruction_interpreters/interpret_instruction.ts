@@ -40,6 +40,9 @@ import {interpret_end_turn} from "core/battlegrid/player_turn_handler/instructio
 import {
     interpret_attack_roll_consequence
 } from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_attack_roll_consequence";
+import {
+    interpret_add_current_turn_base_options
+} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_add_current_turn_base_options";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>): void => {
     const {instruction} = props
@@ -76,6 +79,8 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             return interpret_expend_action({...props, instruction})
         case INSTRUCTION_TYPE.END_TURN:
             return interpret_end_turn({...props, instruction})
+        case INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS:
+            return interpret_add_current_turn_base_options({...props, instruction})
         default:
             throw Error("instruction not implemented " + JSON.stringify(instruction))
     }

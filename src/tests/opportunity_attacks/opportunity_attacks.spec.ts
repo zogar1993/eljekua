@@ -52,7 +52,7 @@ const instruction_loop = create_instruction_loop({
 })
 
 const add_creature_to_game = create_add_creature_to_game({battle_grid, initiative_order, game_events})
-const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop})
+const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop, turn_state})
 
 describe("when an enemy leaves a space adjacent to a creature", () => {
     test(`the creature can perform an opportunity attack to it`, async () => {

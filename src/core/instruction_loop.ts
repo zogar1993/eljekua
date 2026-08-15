@@ -11,10 +11,10 @@ import {OptionButton, OptionButtons} from "core/battlegrid/option_buttons/Option
 import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
 import {GameEvents} from "core/events/GameEvents";
 import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
-import {AST} from "core/expressions/parser/AST_NODE";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 import {Position} from "core/battlegrid/Position";
+import {assert_is_not_null} from "stdlib/assert";
 
 export type Interaction =
     InteractionsSelectPosition
@@ -57,7 +57,6 @@ type InteractionsSelectOption = {
 //TODO clean up usages of the player turn handler
 export type PlayerTurnHandler = {
     set_available_interactions: (interactions: Interaction) => void
-    set_action_selection_for_current_character: () => void
     get_interaction: () => Interaction | null
 }
 
@@ -140,41 +139,29 @@ export const create_instruction_loop = ({
         }
     }
 
-    function set_action_selection_for_current_character() {
-        const type = INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS
-        const instruction = {type, creature: AST.OWNER, cost: "normal", filter: "turn"} as const
-        const owner = initiative_order.get_current_creature()
-        turn_state.add_instruction_frame({name: "Action Selection", instructions: [instruction], owner})
-    }
-
     function get_interaction() {
         return current_interaction
     }
 
     const player_turn_handler = {
         set_available_interactions,
-        set_action_selection_for_current_character,
         get_interaction,
     }
 
     const evaluate_instructions = () => {
         while (player_turn_handler.get_interaction() === null) {
             const instruction = turn_state.next_instruction()
+            assert_is_not_null(instruction)
 
-            if (instruction === null) {
-                //TODO convert this into an instruction that runs at the base frame of the turn state
-                player_turn_handler.set_action_selection_for_current_character();
-            } else {
-                interpret_instruction({
-                    instruction,
-                    player_turn_handler,
-                    battle_grid,
-                    turn_state,
-                    evaluate_ast,
-                    initiative_order,
-                    settings
-                })
-            }
+            interpret_instruction({
+                instruction,
+                player_turn_handler,
+                battle_grid,
+                turn_state,
+                evaluate_ast,
+                initiative_order,
+                settings
+            })
         }
     }
 
@@ -185,3 +172,12 @@ export const create_instruction_loop = ({
 }
 
 export type InstructionLoop = ReturnType<typeof create_instruction_loop>
+
+//TODO this seems a bit out of place
+export const setup_turn_base_frame = (turn_state: TurnState, owner: Creature) => {
+    turn_state.add_instruction_frame({
+        name: "Turn",
+        instructions: [{type: INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS}],
+        owner,
+    })
+}

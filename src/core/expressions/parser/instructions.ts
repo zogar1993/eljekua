@@ -20,6 +20,7 @@ export const INSTRUCTION_TYPE = {
     SELECT_TARGET: "select_target",
     EXPEND_ACTION: "expend_action",
     END_TURN: "end_turn",
+    ADD_CURRENT_TURN_BASE_OPTIONS: "add_current_turn_base_options",
 } as const
 
 export type InstructionAttackDiceRoll = {
@@ -130,7 +131,8 @@ export type Instruction =
     InstructionExpendAction |
     InstructionEndTurn |
     InstructionAttackDiceRoll |
-    InstructionAttackRollConsequence
+    InstructionAttackRollConsequence |
+    InstructionAddCurrentTurnBaseOptions
 
 export type InstructionSelectTarget =
     InstructionSelectTargetRanged |
@@ -193,4 +195,8 @@ export type InstructionExpendAction = {
 
 export type InstructionEndTurn = {
     type: typeof INSTRUCTION_TYPE.END_TURN
+}
+
+export type InstructionAddCurrentTurnBaseOptions = {
+    type: typeof INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS
 }

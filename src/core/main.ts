@@ -123,7 +123,7 @@ game_events.on_creature_added_to_game.add_handler((creature) => {
 })
 
 const add_creature = create_add_creature_to_game({battle_grid, initiative_order, game_events})
-const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop})
+const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop, turn_state})
 
 ;(window as any).init_demo = () => {
     const bob = build_character({

@@ -4,15 +4,14 @@ import {run_end_of_turn_hooks} from "core/battlegrid/player_turn_handler/run_end
 import {run_start_of_turn_hooks} from "core/battlegrid/player_turn_handler/run_start_of_turn_hooks";
 import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
-import {PlayerTurnHandler} from "core/instruction_loop";
+import {setup_turn_base_frame} from "core/instruction_loop";
 
 
 export const create_set_current_turn_to_creature = (
-    {turn_state, initiative_order, battle_grid, player_turn_handler}: {
+    {turn_state, initiative_order, battle_grid}: {
         turn_state: TurnState
         initiative_order: InitiativeOrder
         battle_grid: BattleGrid
-        player_turn_handler: PlayerTurnHandler
     }
 ) => (
     {creature}: { creature: Creature }
@@ -24,5 +23,5 @@ export const create_set_current_turn_to_creature = (
 
     run_start_of_turn_hooks({current_turn_creature: initiative_order.get_current_creature(), battle_grid})
 
-    player_turn_handler.set_action_selection_for_current_character()
+    setup_turn_base_frame(turn_state, creature)
 }
