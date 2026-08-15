@@ -10,7 +10,6 @@ import {Settings} from "core/settings/Settings";
 import {OptionButton, OptionButtons} from "core/battlegrid/option_buttons/OptionButtons";
 import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
 import {GameEvents} from "core/events/GameEvents";
-import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 import {Position} from "core/battlegrid/Position";
@@ -172,10 +171,3 @@ export const create_instruction_loop = ({
 }
 
 export type InstructionLoop = ReturnType<typeof create_instruction_loop>
-
-//TODO this seems a bit out of place
-export const setup_turn_base_frame = (turn_state: TurnState, owner: Creature) => {
-    turn_state.add_instruction_frame({
-        instructions: [{type: INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS}]
-    })
-}
