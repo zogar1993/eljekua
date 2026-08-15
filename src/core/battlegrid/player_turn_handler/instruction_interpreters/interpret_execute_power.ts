@@ -4,6 +4,7 @@ import {
 import {EXPR} from "core/expressions/evaluator/EXPR";
 import {InstructionExecutePower} from "core/expressions/parser/instructions";
 import {Expr} from "core/expressions/evaluator/types";
+import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
 
 export const interpret_execute_power = ({
                                             instruction,
@@ -16,6 +17,7 @@ export const interpret_execute_power = ({
     const variables: Record<string, Expr> = {}
     for (const {from, to} of initialization)
         variables[to] = turn_state.get_variable(from)
+    variables[SYSTEM_KEYWORD.POWER_NAME] = {type: "string", value: name}
 
-    turn_state.add_instruction_frame({name, instructions, owner, variables})
+    turn_state.add_instruction_frame({instructions, owner, variables})
 }

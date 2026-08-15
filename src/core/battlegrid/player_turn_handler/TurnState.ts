@@ -9,15 +9,13 @@ import {GameEvents} from "core/events/GameEvents";
 export const create_turn_state = ({game_events}: { game_events: GameEvents }) => {
     let frames: Array<InstructionFrame> = []
 
-    const add_instruction_frame = ({name, instructions, owner, variables = {}}: {
-        name: string
+    const add_instruction_frame = ({instructions, owner, variables = {}}: {
         instructions: Array<Instruction>
         owner: Creature
         variables?: Record<string, Expr>
     }) => {
         const frame_variables = new Map<string, Expr>()
         frame_variables.set(SYSTEM_KEYWORD.OWNER, {type: "creatures", value: [owner]})
-        frame_variables.set(SYSTEM_KEYWORD.POWER_NAME, {type: "string", value: name})
         for (const [key, value] of Object.entries(variables))
             frame_variables.set(key, value)
 
