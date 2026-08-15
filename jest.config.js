@@ -6,7 +6,8 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testMatch: ['**/src/**/?(*.)+(spec|test).ts'],
   moduleNameMapper: {
-    "^scripts/(.+)$": "<rootDir>/src/scripts/$1",
+    "^core/(.+)$": "<rootDir>/src/core/$1",
+    "^data/(.+)$": "<rootDir>/src/data/$1",
     "^stdlib/(.+)$": "<rootDir>/src/stdlib/$1",
     "^tests/(.+)$": "<rootDir>/src/tests/$1",
   },
