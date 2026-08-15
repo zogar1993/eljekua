@@ -7,9 +7,7 @@ import {FIGHTER_POWERS} from "data/powers/fighter";
 import {WIZARD_POWERS} from "data/powers/wizard";
 import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {create_initiative_order} from "core/initiative_order/InitiativeOrder";
-import {create_option_button_visual} from "web/creature_option_buttons/CreatureOptionButton";
-import {create_hit_status_buttons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
-import {create_creature_hit_status_visual} from "core/battlegrid/hit_status_buttons/CreatureHitStatusVisual";
+import {create_hit_status_buttons_ui} from "web/hit_status_buttons/HitStatusButtonsUI";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
 import {create_initiative_entry_visual} from "core/initiative_order/InitiativeEntryVisual";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
@@ -34,11 +32,6 @@ const turn_state = create_turn_state({game_events})
 
 const battle_grid = create_battle_grid({size: {x: 10, y: 10}})
 
-const hit_status_buttons = create_hit_status_buttons({
-    create_creature_hit_status_visual,
-    create_option_button_visual,
-})
-
 const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
 
 const instruction_loop = create_instruction_loop({
@@ -48,7 +41,6 @@ const instruction_loop = create_instruction_loop({
     initiative_order,
     settings,
     game_events,
-    hit_status_buttons,
 })
 
 //TODO nuke this
@@ -59,10 +51,10 @@ initialize_battle_grid_ui({
     player_turn_handler,
     turn_state,
     game_events,
-    hit_status_buttons
 })
 
 create_option_buttons_ui({game_events})
+create_hit_status_buttons_ui({game_events})
 create_instruction_visualizer({game_events})
 
 const gameplay_use_cases = create_gameplay_use_cases({

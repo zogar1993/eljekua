@@ -43,6 +43,8 @@ const handle_hit_status_manually = ({
             hit_statuses.set(creature, status)
             turn_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: hit_statuses})
         },
+        on_confirm: () => {
+        }
     })
 }
 

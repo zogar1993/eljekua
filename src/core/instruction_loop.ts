@@ -8,7 +8,6 @@ import type {Expr} from "core/expressions/evaluator/types";
 import {InitiativeOrder} from "core/initiative_order/InitiativeOrder";
 import {Settings} from "core/settings/Settings";
 import {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
-import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
 import {GameEvents} from "core/events/GameEvents";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
@@ -20,11 +19,14 @@ export type Interaction =
     | InteractionsSelectOption
     | InteractionsSelectHitStatus
     | InteractionsSelectPath
+
 export type InteractionsSelectHitStatus = {
     type: "hit_status_select"
     hit_statuses: Map<Creature, HitStatus>
     on_status_change: (creature: Creature, status: HitStatus) => void
+    on_confirm: () => void
 }
+
 export type InteractionsSelectPosition = {
     type: "position_select"
     clickable: Array<Position>
@@ -33,6 +35,7 @@ export type InteractionsSelectPosition = {
     footprint: number
     select: (position: Position) => void
 }
+
 export type InteractionsSelectPath = {
     type: "select_path"
     target_label: string
@@ -41,6 +44,7 @@ export type InteractionsSelectPath = {
     select: (position: Array<Position>) => void
     footprint: number
 }
+
 export type Targets = {
     type: "positions",
     value: Array<Position>
@@ -48,6 +52,7 @@ export type Targets = {
     type: "creatures",
     value: Array<Creature>
 }
+
 type InteractionsSelectOption = {
     type: "option_select"
     available_options: Array<OptionButton>
@@ -65,7 +70,6 @@ export const create_instruction_loop = ({
                                             evaluate_ast,
                                             initiative_order,
                                             settings,
-                                            hit_status_buttons,
                                             game_events
                                         }: {
     turn_state: TurnState
@@ -73,7 +77,6 @@ export const create_instruction_loop = ({
     evaluate_ast: (node: AstNode) => Expr
     initiative_order: InitiativeOrder
     settings: Settings
-    hit_status_buttons: HitStatusButtons
     game_events: GameEvents
 }) => {
     let current_interaction: Interaction | null = null
@@ -115,21 +118,16 @@ export const create_instruction_loop = ({
                     }))
                 }
             case "hit_status_select":
-                return interaction
+                return {
+                    ...interaction,
+                    on_confirm: add_cleanup_to_function_zero(interaction.on_confirm)
+                }
         }
     }
 
     const set_available_interactions = (interaction: Interaction) => {
         current_interaction = add_cleanup_to_interaction_confirmation(interaction)
         game_events.on_available_interactions_changed.raise(current_interaction)
-
-        if (current_interaction.type === "hit_status_select") {
-            hit_status_buttons.display({
-                ...current_interaction,
-                on_status_change: current_interaction.on_status_change,
-                on_confirm: clear_current_interaction,
-            })
-        }
     }
 
     function get_interaction() {
