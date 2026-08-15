@@ -9,7 +9,7 @@ import {
 } from "core/battlegrid/Position";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "data/powers/basic";
 
-export const create_battle_grid = ({size,}: {
+export const create_battle_grid = ({size}: {
     size: { x: number, y: number }
 }): BattleGrid => {
     const creatures: Array<Creature> = []
