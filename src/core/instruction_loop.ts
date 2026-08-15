@@ -7,7 +7,7 @@ import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {Expr} from "core/expressions/evaluator/types";
 import {InitiativeOrder} from "core/initiative_order/InitiativeOrder";
 import {Settings} from "core/settings/Settings";
-import {OptionButton, OptionButtons} from "core/battlegrid/option_buttons/OptionButtons";
+import {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
 import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
 import {GameEvents} from "core/events/GameEvents";
 import {Creature} from "core/battlegrid/creatures/Creature";
@@ -65,7 +65,6 @@ export const create_instruction_loop = ({
                                             evaluate_ast,
                                             initiative_order,
                                             settings,
-                                            option_buttons,
                                             hit_status_buttons,
                                             game_events
                                         }: {
@@ -74,7 +73,6 @@ export const create_instruction_loop = ({
     evaluate_ast: (node: AstNode) => Expr
     initiative_order: InitiativeOrder
     settings: Settings
-    option_buttons: OptionButtons
     hit_status_buttons: HitStatusButtons
     game_events: GameEvents
 }) => {
@@ -84,8 +82,6 @@ export const create_instruction_loop = ({
         current_interaction = null
 
         game_events.on_available_interactions_changed.raise(null)
-        //TODO this should be moved to animation handling so that highlights are cleared
-        option_buttons.remove_options()
 
         evaluate_instructions()
     }
@@ -127,9 +123,7 @@ export const create_instruction_loop = ({
         current_interaction = add_cleanup_to_interaction_confirmation(interaction)
         game_events.on_available_interactions_changed.raise(current_interaction)
 
-        if (current_interaction.type === "option_select") {
-            option_buttons.display_options(current_interaction.available_options)
-        } else if (current_interaction.type === "hit_status_select") {
+        if (current_interaction.type === "hit_status_select") {
             hit_status_buttons.display({
                 ...current_interaction,
                 on_status_change: current_interaction.on_status_change,

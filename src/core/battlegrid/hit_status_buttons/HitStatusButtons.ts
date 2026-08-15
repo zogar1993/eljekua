@@ -1,7 +1,7 @@
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
-import {OptionButton} from "core/battlegrid/option_buttons/OptionButtons";
-import {OptionButtonVisual} from "core/battlegrid/option_buttons/OptionButtonVisual";
+import {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
+import {CreatureOptionButton} from "web/creature_option_buttons/CreatureOptionButton";
 import {CreatureHitStatusVisual} from "core/battlegrid/hit_status_buttons/CreatureHitStatusVisual";
 import {AssertionError} from "stdlib/AssertionError";
 
@@ -14,10 +14,10 @@ export const create_hit_status_buttons = ({
         current_status: HitStatus
         on_status_change: (status: HitStatus) => void
     }) => CreatureHitStatusVisual
-    create_option_button_visual: (option: OptionButton) => OptionButtonVisual
+    create_option_button_visual: (option: OptionButton) => CreatureOptionButton
 }): HitStatusButtons => {
     let creature_visuals: Array<CreatureHitStatusVisual> = []
-    let end_button_visual: OptionButtonVisual | null = null
+    let end_button_visual: CreatureOptionButton | null = null
 
     return {
         display: ({hit_statuses, on_status_change, on_confirm}) => {

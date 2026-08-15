@@ -23,7 +23,6 @@ import {
 import {GameEvents} from "core/events/GameEvents";
 import {create_visual_creature} from "web/creature/CreatureVisual";
 import {AnimationQueue} from "core/AnimationQueue";
-import {OptionButtons} from "core/battlegrid/option_buttons/OptionButtons";
 import {HitStatusButtons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
 import {assert_is_not_null} from "stdlib/assert";
 import {Creature} from "core/battlegrid/creatures/Creature";
@@ -40,14 +39,12 @@ export const initialize_battle_grid_ui = ({
                                               player_turn_handler,
                                               turn_state,
                                               game_events,
-                                              option_buttons,
                                               hit_status_buttons
                                           }: {
     battle_grid: BattleGrid,
     player_turn_handler: PlayerTurnHandler,
     turn_state: TurnState,
     game_events: GameEvents,
-    option_buttons: OptionButtons,
     hit_status_buttons: HitStatusButtons
 }) => {
     const {size} = battle_grid
@@ -106,7 +103,6 @@ export const initialize_battle_grid_ui = ({
         clear_highlights({highlight: SQUARE_HIGHLIGHT.PATH})
         clear_highlights({highlight: SQUARE_HIGHLIGHT.AREA})
         clear_highlights({highlight: SQUARE_HIGHLIGHT.SELECTED})
-        option_buttons.remove_options()
         hit_status_buttons.remove()
         /*
                         if (targets) {

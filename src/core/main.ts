@@ -7,8 +7,7 @@ import {FIGHTER_POWERS} from "data/powers/fighter";
 import {WIZARD_POWERS} from "data/powers/wizard";
 import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {create_initiative_order} from "core/initiative_order/InitiativeOrder";
-import {create_option_buttons} from "core/battlegrid/option_buttons/OptionButtons";
-import {create_option_button_visual} from "core/battlegrid/option_buttons/OptionButtonVisual";
+import {create_option_button_visual} from "web/creature_option_buttons/CreatureOptionButton";
 import {create_hit_status_buttons} from "core/battlegrid/hit_status_buttons/HitStatusButtons";
 import {create_creature_hit_status_visual} from "core/battlegrid/hit_status_buttons/CreatureHitStatusVisual";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
@@ -25,6 +24,7 @@ import {HIT_STATUS, HitStatus} from "core/battlegrid/player_turn_handler/HitStat
 import {create_settings} from "core/settings/Settings";
 import {create_game_events} from "core/events/GameEvents";
 import {initialize_battle_grid_ui} from "web/battle_grid/BattleGridUI";
+import {create_option_buttons_ui} from "web/creature_option_buttons/CreatureOptionButtons";
 
 const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
@@ -34,7 +34,6 @@ const turn_state = create_turn_state({game_events})
 
 const battle_grid = create_battle_grid({size: {x: 10, y: 10}})
 
-const option_buttons = create_option_buttons({create_option_button_visual})
 const hit_status_buttons = create_hit_status_buttons({
     create_creature_hit_status_visual,
     create_option_button_visual,
@@ -50,7 +49,6 @@ const instruction_loop = create_instruction_loop({
     settings,
     game_events,
     hit_status_buttons,
-    option_buttons
 })
 
 //TODO nuke this
@@ -61,10 +59,10 @@ initialize_battle_grid_ui({
     player_turn_handler,
     turn_state,
     game_events,
-    option_buttons,
     hit_status_buttons
 })
 
+create_option_buttons_ui({game_events})
 create_instruction_visualizer({game_events})
 
 const gameplay_use_cases = create_gameplay_use_cases({

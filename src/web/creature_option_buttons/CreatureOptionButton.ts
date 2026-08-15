@@ -1,8 +1,9 @@
-import {OptionButton} from "core/battlegrid/option_buttons/OptionButtons";
+import {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
 import {create_html_element} from "web/utils/create_html_element";
 
 const html_element = document.querySelector("#actions_menu")!
-export const create_option_button_visual = (option: OptionButton): OptionButtonVisual => {
+
+export const create_option_button_visual = (option: OptionButton): CreatureOptionButton => {
     const button = create_html_element("button", "option-button");
     button.innerText = option.text
 
@@ -18,6 +19,6 @@ export const create_option_button_visual = (option: OptionButton): OptionButtonV
     }
 }
 
-export type OptionButtonVisual = {
+export type CreatureOptionButton = {
     remove: () => void
 }
