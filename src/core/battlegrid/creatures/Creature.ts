@@ -15,7 +15,8 @@ type EventHandlerHasAttacked = {
     hit_status: HitStatus,
     defender: Creature,
     defense: ExprNumberResolved,
-    instruction: InstructionAttackDiceRoll
+    instruction: InstructionAttackDiceRoll,
+    power_name: string,
 }
 
 export class Creature {

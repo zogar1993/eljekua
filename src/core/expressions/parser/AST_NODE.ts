@@ -21,6 +21,7 @@ export const AST_NODE = {
 
 export const SYSTEM_KEYWORD = {
     OWNER: "owner",
+    POWER_NAME: "power_name",
     PRIMARY_TARGET: "primary_target",
     TRIGGERER: "triggerer",
     HIT_STATUS: "hit_status",

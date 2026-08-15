@@ -112,9 +112,9 @@ game_events.on_creature_added_to_game.add_handler((creature) => {
         [HIT_STATUS.CRIT, "crits"]
     ])
 
-    events.has_attacked.add_handler(({attack, defense, hit_status, defender, instruction}) => {
+    events.has_attacked.add_handler(({attack, defense, hit_status, defender, instruction, power_name}) => {
         action_log.add_new_action_log(
-            `${data.name}'s ${turn_state.get_power_name()} (`,
+            `${data.name}'s ${power_name} (`,
             attack,
             `) ${HIT_STATUS_TEXT.get(hit_status)} against ${defender.data.name}'s ${instruction.defense} (`,
             defense,

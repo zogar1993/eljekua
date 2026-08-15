@@ -32,7 +32,6 @@ export type ExprNumberResolved = {
 export type ExprString = {
     type: "string",
     value: string
-    description: string
 }
 
 export type ExprCreatures = {

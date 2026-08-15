@@ -17,10 +17,11 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
     }) => {
         const frame_variables = new Map<string, Expr>()
         frame_variables.set(SYSTEM_KEYWORD.OWNER, {type: "creatures", value: [owner]})
+        frame_variables.set(SYSTEM_KEYWORD.POWER_NAME, {type: "string", value: name})
         for (const [key, value] of Object.entries(variables))
             frame_variables.set(key, value)
 
-        const frame = {instructions: [...instructions], variables: frame_variables, name}
+        const frame = {instructions: [...instructions], variables: frame_variables}
         frames.push(frame)
 
         game_events.on_instruction_frame_added.raise(frame)
@@ -57,7 +58,6 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
 
         return null
     }
-    const get_power_name = () => get_current_frame().name
 
     const get_variable = (name: string) => {
         const frame = get_current_frame()
@@ -102,7 +102,6 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
         add_instructions,
 
         get_acting_creature,
-        get_power_name,
 
         get_variable,
         set_variable,
@@ -113,7 +112,6 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
 export type TurnState = ReturnType<typeof create_turn_state>
 
 export type InstructionFrame = {
-    name: string
     instructions: Array<Instruction>
     variables: Map<string, Expr>
 }

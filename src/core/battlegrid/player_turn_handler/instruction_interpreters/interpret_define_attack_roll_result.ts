@@ -54,6 +54,7 @@ const handle_hit_status_with_dice_roll = ({
                                           }: InterpretInstructionProps<InstructionAttackDiceRoll>) => {
     const attacker = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
     const defenders = EXPR.as_creatures(turn_state.get_variable(instruction.defender))
+    const power_name = EXPR.as_string(turn_state.get_variable(SYSTEM_KEYWORD.POWER_NAME))
 
     const roll_results = new Map<Creature, HitStatus>()
 
@@ -87,6 +88,6 @@ const handle_hit_status_with_dice_roll = ({
 
         turn_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: roll_results})
 
-        attacker.events.has_attacked.raise({attack, hit_status, defender, defense, instruction})
+        attacker.events.has_attacked.raise({attack, hit_status, defender, defense, instruction, power_name})
     })
 }
