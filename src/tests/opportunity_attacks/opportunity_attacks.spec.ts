@@ -5,41 +5,24 @@ import {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
 import {create_initiative_order} from "core/initiative_order/InitiativeOrder";
-import {create_option_buttons} from "core/battlegrid/option_buttons/OptionButtons";
 import {Position} from "core/battlegrid/Position";
-import {create_option_button_visual, option_buttons_test_ui} from "tests/utils/option_buttons_test_ui";
-import {battle_grid_test_ui, create_battle_grid_visual} from "tests/utils/battle_grid_test_ui";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
-import {create_start_battle} from "core/use_cases/start_battle";
 import {create_turn_state} from "core/battlegrid/player_turn_handler/TurnState";
 import {build_evaluate_ast} from "core/expressions/evaluator/evaluate_ast";
-import {create_instruction_loop, create_player_turn_handler} from "core/instruction_loop";
+import {create_instruction_loop} from "core/instruction_loop";
 import {create_gameplay_use_cases} from "core/use_cases/gameplay/gameplay_use_cases";
-import {hit_status_buttons_test_ui} from "tests/utils/hit_status_buttons_test_ui";
 import {create_settings} from "core/settings/Settings";
 import {create_game_events} from "core/events/GameEvents";
+import {create_interaction_test_helpers} from "tests/utils/interaction_test_helpers";
+import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
+import {EXPR} from "core/expressions/evaluator/EXPR";
 
 const battle_grid = create_battle_grid({size: {x: 10, y: 10}})
 const initiative_order = create_initiative_order({...dependency_mocks})
-const option_buttons = create_option_buttons({create_option_button_visual})
 const settings = create_settings()
 const game_events = create_game_events()
 const turn_state = create_turn_state({game_events})
 const evaluate_ast = build_evaluate_ast({turn_state, battle_grid})
-const player_turn_handler = create_player_turn_handler({
-    ...dependency_mocks,
-    initiative_order,
-    option_buttons,
-    hit_status_buttons: hit_status_buttons_test_ui,
-    turn_state,
-    game_events
-})
-
-const gameplay_use_cases = create_gameplay_use_cases({
-    battle_grid,
-    initiative_order,
-    player_turn_handler
-})
 
 const instruction_loop = create_instruction_loop({
     ...dependency_mocks,
@@ -47,15 +30,42 @@ const instruction_loop = create_instruction_loop({
     evaluate_ast,
     turn_state,
     battle_grid,
+    settings,
+    game_events,
+})
+
+const player_turn_handler = instruction_loop
+const interactions = create_interaction_test_helpers({player_turn_handler})
+
+const gameplay_use_cases = create_gameplay_use_cases({
+    battle_grid,
+    initiative_order,
     player_turn_handler,
-    settings
+    turn_state
 })
 
 const add_creature_to_game = create_add_creature_to_game({battle_grid, initiative_order, game_events})
-const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop, turn_state})
+
+const start_battle = () => {
+    initiative_order.start()
+}
+
+const attack_log: Array<{ attacker: string, target: string, power_name: string }> = []
+
+game_events.on_creature_added_to_game.add_handler(creature => {
+    creature.events.is_missed.add_handler(() => {
+        const attacker = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
+        const power_name = EXPR.as_string(turn_state.get_variable(SYSTEM_KEYWORD.POWER_NAME))
+        attack_log.push({
+            attacker: attacker.data.name,
+            target: creature.data.name,
+            power_name,
+        })
+    })
+})
 
 describe("when an enemy leaves a space adjacent to a creature", () => {
-    test(`the creature can perform an opportunity attack to it`, async () => {
+    test(`the creature can perform an opportunity attack to it`, () => {
         // Both ragoz and calendula are next to linuar.
         // When ragoz moves, the opportunity attack should target him automatically.
         // The reason for calendula being here is so we have multiple basic attack valid targets
@@ -65,17 +75,17 @@ describe("when an enemy leaves a space adjacent to a creature", () => {
         start_battle()
         given_creature("ragoz").is_in_its_turn()
 
-        await when_creature("ragoz").moves_to({x: 2, y: 0})
+        when_creature("ragoz").moves_to({x: 2, y: 0})
 
-        await then_creature("ragoz").is_at_position({x: 1, y: 0}) //hasn't moved yet
-        await then_creature("linuar").has_action("Opportunity Attack")
+        then_creature("ragoz").is_at_position({x: 1, y: 0}) //hasn't moved yet
+        then_creature("linuar").has_action("Opportunity Attack")
 
-        await when_creature("linuar").selects_action("Opportunity Attack")
-        await when_creature("linuar").selects_action("Melee Basic Attack")
+        when_creature("linuar").selects_action("Opportunity Attack")
+        when_creature("linuar").selects_action("Melee Basic Attack")
 
-        await then_creature("linuar").has_performed_action("Melee Basic Attack", {target: "ragoz"})
+        then_creature("linuar").has_performed_action("Melee Basic Attack", {target: "ragoz"})
 
-        await then_creature("ragoz").is_at_position({x: 2, y: 0})
+        then_creature("ragoz").is_at_position({x: 2, y: 0})
     })
 })
 
@@ -117,14 +127,17 @@ const given_a_creature_is_created = (c: Partial<CreatureData> & Pick<CreatureDat
     add_creature_to_game({data})
 }
 
-
 const given_creature = (creature_name: string) => {
     const creature = battle_grid.creatures.find(creature => creature.data.name === creature_name)
     if (!creature) throw Error(`creature name "${creature_name}" not found`)
 
     return {
         is_in_its_turn: () => {
+            if (player_turn_handler.get_interaction() !== null)
+                throw Error("instruction loop still has a pending interaction — call start_battle() without running the loop first")
+
             gameplay_use_cases.set_current_turn_to_creature({creature})
+            instruction_loop.run()
         }
     }
 }
@@ -135,57 +148,34 @@ const when_creature = (creature_name: string) => {
     if (!creature) throw Error(`creature name "${creature_name}" not found`)
 
     return {
-        moves_to: async (position: Omit<Position, "footprint">) => {
-            await wait_until(() => player_turn_handler.get_interaction()?.type === "option_select")
-            option_buttons_test_ui.click("Move")
-            await wait_until(() => player_turn_handler.get_interaction()?.type === "position_select")
-            battle_grid_test_ui.click(position)
+        moves_to: (position: Omit<Position, "footprint">) => {
+            interactions.select_option("Move")
+            interactions.select_position(position)
         },
-        selects_action: async (action_name: string) => {
-            await wait_until(() => player_turn_handler.get_interaction()?.type === "option_select")
-            option_buttons_test_ui.click(action_name)
+        selects_action: (action_name: string) => {
+            interactions.select_option(action_name)
+            interactions.confirm_pending_interaction()
         }
     }
 }
-
 
 const then_creature = (creature_name: string) => {
     const creature = battle_grid.creatures.find(creature => creature.data.name === creature_name)
     if (!creature) throw Error(`creature name "${creature_name}" not found`)
 
     return {
-        is_at_position: async (position: Omit<Position, "footprint">) => {
+        is_at_position: (position: Omit<Position, "footprint">) => {
             expect(creature.data.position).toEqual({...position, footprint: 1})
         },
-        has_action: async (action_name: string) => {
-            await wait_until(() => turn_state.get_acting_creature() === creature)
-            expect(option_buttons_test_ui.has_button(action_name)).toEqual(true)
+        has_action: (action_name: string) => {
+            expect(interactions.has_option(action_name)).toEqual(true)
         },
-        has_performed_action: async (action_name: string, options: any) => {
-            throw Error("'has_performed_action' has not been implemented yet")
+        has_performed_action: (action_name: string, options: { target: string }) => {
+            expect(attack_log).toContainEqual({
+                attacker: creature_name,
+                target: options.target,
+                power_name: action_name,
+            })
         }
     }
-}
-
-const wait_until = (
-    condition: () => boolean | Promise<boolean>,
-): Promise<void> => {
-    const interval = 20
-    const timeout = 1000
-
-    const start = Date.now();
-    return new Promise((resolve, reject) => {
-        const check = async () => {
-            try {
-                if (await condition()) return resolve();
-            } catch (err) {
-                return reject(err);
-            }
-            if (timeout != null && Date.now() - start >= timeout) {
-                return reject(new Error("wait_for: timed out"));
-            }
-            setTimeout(check, interval);
-        };
-        check();
-    });
 }
