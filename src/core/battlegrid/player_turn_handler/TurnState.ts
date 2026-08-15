@@ -1,4 +1,3 @@
-import {Creature} from "core/battlegrid/creatures/Creature";
 import {Expr} from "core/expressions/evaluator/types";
 import {Instruction} from "core/expressions/parser/instructions";
 import {EXPR} from "core/expressions/evaluator/EXPR";
@@ -9,13 +8,11 @@ import {GameEvents} from "core/events/GameEvents";
 export const create_turn_state = ({game_events}: { game_events: GameEvents }) => {
     let frames: Array<InstructionFrame> = []
 
-    const add_instruction_frame = ({instructions, owner, variables = {}}: {
+    const add_instruction_frame = ({instructions, variables = {}}: {
         instructions: Array<Instruction>
-        owner: Creature
         variables?: Record<string, Expr>
     }) => {
         const frame_variables = new Map<string, Expr>()
-        frame_variables.set(SYSTEM_KEYWORD.OWNER, {type: "creatures", value: [owner]})
         for (const [key, value] of Object.entries(variables))
             frame_variables.set(key, value)
 

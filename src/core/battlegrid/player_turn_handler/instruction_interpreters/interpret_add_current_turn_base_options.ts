@@ -2,7 +2,7 @@ import {
     InterpretInstructionProps
 } from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
 import {INSTRUCTION_TYPE, InstructionAddCurrentTurnBaseOptions} from "core/expressions/parser/instructions";
-import {AST} from "core/expressions/parser/AST_NODE";
+import {AST, SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
 
 export const interpret_add_current_turn_base_options = ({
                                                             initiative_order,
@@ -12,7 +12,10 @@ export const interpret_add_current_turn_base_options = ({
     turn_state.add_instructions([{type: INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS}])
 
     const owner = initiative_order.get_current_creature()
-    turn_state.add_instruction_frame({instructions: [CURRENT_TURN_BASE_OPTIONS], owner})
+    turn_state.add_instruction_frame({
+        instructions: [CURRENT_TURN_BASE_OPTIONS],
+        variables: {[SYSTEM_KEYWORD.OWNER]: {type: "creatures", value: [owner]}}
+    })
 }
 
 const CURRENT_TURN_BASE_OPTIONS = {

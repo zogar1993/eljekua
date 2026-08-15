@@ -77,12 +77,11 @@ export const interpret_move = ({
                     },
                 ]
                 const variables: Record<string, Expr> = {
-                    [SYSTEM_KEYWORD.TRIGGERER]: {
-                        type: "creatures",
-                        value: [moving_creature]
-                    }
+                    [SYSTEM_KEYWORD.OWNER]: {type: "creatures", value: [attacker]},
+                    [SYSTEM_KEYWORD.TRIGGERER]: {type: "creatures", value: [moving_creature]}
                 }
-                turn_state.add_instruction_frame({instructions, owner: attacker, variables})
+
+                turn_state.add_instruction_frame({instructions, variables})
             }
 
             break
