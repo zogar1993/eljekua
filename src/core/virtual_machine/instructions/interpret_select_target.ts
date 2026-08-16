@@ -8,7 +8,10 @@ import {
 } from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {get_reach_area_burst} from "core/battlegrid/position/get_reach_area_burst";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
+import {get_attack_success_chance} from "core/battlegrid/queries/get_attack_success_chance";
+import {Creature} from "core/battlegrid/creatures/Creature";
 import {
+    INSTRUCTION_TYPE,
     InstructionSelectTarget,
     InstructionSelectTargetMovement,
     InstructionSelectTargetPush
@@ -72,6 +75,17 @@ export const interpret_select_target = ({
     }
 
     const footprint = instruction.targeting_type === "movement" ? owner.data.position.footprint : 1
+    const get_attack_hit_chance_against = (creature: Creature) => {
+        const next_instruction = turn_state.peek_instruction()
+        if (next_instruction.type !== INSTRUCTION_TYPE.ATTACK_DICE_ROLL) return null
+
+        return get_attack_success_chance({
+            attack_ast: next_instruction.attack,
+            defense_code: next_instruction.defense,
+            defender: creature,
+            evaluate_ast,
+        })
+    }
 
     if (is_path_selection_targeting_type(instruction)) {
         const get_path_to_destination = (destination: Position) => {
@@ -122,6 +136,7 @@ export const interpret_select_target = ({
             clickable,
             get_area_for_position,
             get_targets_for_position,
+            get_attack_hit_chance_against,
             select,
             footprint,
         })
@@ -163,6 +178,7 @@ export const interpret_select_target = ({
             target_label,
             clickable,
             get_targets_for_position,
+            get_attack_hit_chance_against,
             select,
             footprint
         })

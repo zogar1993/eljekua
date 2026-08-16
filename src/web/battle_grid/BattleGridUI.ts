@@ -3,28 +3,16 @@ import {create_battle_grid_visual} from "web/battle_grid/BattleGridVisual";
 import {create_visual_square, SquareVisual} from "web/battle_grid/squares/SquareVisual";
 import {
     Position,
-    PositionFootprintOne, positions_of_same_footprint_equal,
+    PositionFootprintOne,
     transform_position_to_f1,
-    transform_positions_to_f1
 } from "core/battlegrid/Position";
 import {SQUARE_HIGHLIGHT, SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
-import {bound_minmax} from "stdlib/bound_minmax";
-import {get_creature_defense} from "core/character_sheet/get_creature_defense";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
-import {Expr} from "core/virtual_machine/expressions/types";
-import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import {
-    ClickableCoordinate,
     get_position_by_coordinate,
     nullable_positions_equal
 } from "web/battle_grid/coordinates/ClickableCoordinate";
 import {GameEvents} from "core/events/GameEvents";
-import {create_visual_creature} from "web/creature/CreatureVisual";
-import {AnimationQueue} from "core/AnimationQueue";
-import {assert_is_not_null} from "stdlib/assert";
-import {Creature} from "core/battlegrid/creatures/Creature";
 import {
     Interaction,
     InteractionsSelectArea,
@@ -95,21 +83,34 @@ export const initialize_battle_grid_ui = ({
         hovered.clear()
     }
 
+    const clear_attack_success_chances = () => {
+        for (const creature of battle_grid.creatures)
+            creature.events.is_untargeted.raise()
+    }
+
+    const show_attack_success_chances_for_position = (
+        interactions: InteractionsSelectPosition | InteractionsSelectArea,
+        position: Position,
+    ) => {
+        clear_attack_success_chances()
+
+        const targets = interactions.get_targets_for_position(position)
+        if (targets.type !== "creatures") return
+
+        for (const creature of targets.value) {
+            const hit_chance = interactions.get_attack_hit_chance_against(creature)
+            if (hit_chance === null) return;
+            creature.events.is_targeted.raise(hit_chance)
+        }
+
+    }
+
     const clear_visual_selection = () => {
         clear_highlights({highlight: SQUARE_HIGHLIGHT.CLICKABLE})
         clear_highlights({highlight: SQUARE_HIGHLIGHT.PATH})
         clear_highlights({highlight: SQUARE_HIGHLIGHT.AREA})
         clear_highlights({highlight: SQUARE_HIGHLIGHT.SELECTED})
-        /*
-                        if (targets) {
-                            if (targets.type === "creatures") {
-                                const creatures = targets.value
-
-                                creatures.forEach(creature => creature.events.is_untargeted.raise())
-                            }
-                        }
-
-             */
+        clear_attack_success_chances()
     }
 
     function set_selected_indicator() {
@@ -137,20 +138,20 @@ export const initialize_battle_grid_ui = ({
         switch_highlights({from: SQUARE_HIGHLIGHT.AREA, to: SQUARE_HIGHLIGHT.CLICKABLE})
         clear_hovers()
 
-        if (position === null) return
+        if (position === null) {
+            clear_attack_success_chances()
+            return
+        }
 
         if (interactions.type === "select_path") {
             const path = interactions.get_path_to_destination(position)
             set_highlights({positions: path, highlight: SQUARE_HIGHLIGHT.PATH})
         } else if (interactions.type === "select_area") {
-            for (const creature of battle_grid.creatures)
-                creature.events.is_untargeted.raise()
-
             const area = interactions.get_area_for_position(position)
             set_highlights({positions: area, highlight: SQUARE_HIGHLIGHT.AREA})
+            show_attack_success_chances_for_position(interactions, position)
         } else if (interactions.type === "position_select") {
-            for (const creature of battle_grid.creatures)
-                creature.events.is_untargeted.raise()
+            show_attack_success_chances_for_position(interactions, position)
         }
         set_hovers({positions: transform_position_to_f1(position)})
     })
@@ -176,6 +177,7 @@ export const initialize_battle_grid_ui = ({
             return
         }
 
+        clear_attack_success_chances()
         set_selected_indicator()
 
         if (interactions.type === "select_path"
@@ -190,34 +192,6 @@ export const initialize_battle_grid_ui = ({
         board,
     }
 }
-
-/* TODO activate success chance again
-const show_attack_success_chance_if_needed = ({turn_state, selection_context, evaluate_ast}: {
-    turn_state: TurnState,
-    selection_context: AvailableInteractionsSelectPosition,
-    evaluate_ast: (node: AstNode) => Expr
-}) => {
-    const next_instruction = turn_state.peek_instruction()
-    const needs_roll = next_instruction.type === INSTRUCTION_TYPE.ATTACK_DICE_ROLL
-    if (needs_roll && selection_context.target) {
-        if (selection_context.target.type !== "creatures")
-            throw Error("an attack roll needs to target creatures")
-
-        const creatures = selection_context.target.value
-        creatures.forEach(defender => {
-            const attacker = next_instruction.attack
-            const attack = EXPR.as_number(evaluate_ast(attacker))
-
-            const defense_code = next_instruction.defense
-            const defense = get_creature_defense({creature: defender, defense_code}).value
-
-            const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
-
-            defender.events.is_targeted.raise({attack, defense, chance})
-        })
-    }
-}
- */
 
 type InteractionClickCoordinate = InteractionsSelectPosition | InteractionsSelectPath | InteractionsSelectArea
 const CLICK_COORDINATE_INTERACTIONS: Array<Interaction["type"]> = ["position_select", "select_path", "select_area"]

@@ -10,6 +10,7 @@ import {Settings} from "core/settings/Settings";
 import {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
 import {GameEvents} from "core/events/GameEvents";
 import {Creature} from "core/battlegrid/creatures/Creature";
+import {AttackSuccessChance} from "core/battlegrid/queries/get_attack_success_chance";
 import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 import {Position} from "core/battlegrid/Position";
 import {assert_is_not_null} from "stdlib/assert";
@@ -33,6 +34,7 @@ export type InteractionsSelectPosition = {
     clickable: Array<Position>
     target_label: string
     get_targets_for_position: (position: Position) => Targets
+    get_attack_hit_chance_against: (creature: Creature) => AttackSuccessChance | null
     footprint: number
     select: (position: Position) => void
 }
@@ -43,6 +45,7 @@ export type InteractionsSelectArea = {
     clickable: Array<Position>
     get_area_for_position: (position: Position) => Array<Position>
     get_targets_for_position: (position: Position) => Targets
+    get_attack_hit_chance_against: (creature: Creature) => AttackSuccessChance | null
     select: (position: Position) => void
     footprint: number
 }
