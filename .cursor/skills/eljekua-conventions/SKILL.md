@@ -70,7 +70,7 @@ export const INSTRUCTION_TYPE = {
 
 - `core/` is headless-playable; `web/` renders and forwards input.
 - Core never imports `web/`. Web reads core state; mutations only via core APIs (use cases, interaction callbacks).
-- Core → web only via `GameEvents` (`core/events/GameEvents.ts`). All outward-facing signals — creature lifecycle, movement, damage, targeting, turn state, interactions — are raised on `game_events`, never on domain objects.
+- Core → web only via `GameEvents` (`core/events/GameEvents.ts`). Core raises `game_events` when game state changes; web subscribes. Never raise `game_events` from `web/` — presentation-only state (e.g. hover previews) stays inside the UI module.
 - Thread `game_events` into factories that emit events (`create_battle_grid`, `create_instruction_loop`, `create_turn_state`). Interpreters receive it via `InterpretInstructionProps`.
 - Web modules subscribe to `game_events` in `main.ts` or their own `create_*_ui` factory. Per-creature payloads include a `creature` field so handlers can filter or map to visuals.
 
