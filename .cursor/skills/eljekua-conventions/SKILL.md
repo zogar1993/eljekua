@@ -2,12 +2,21 @@
 name: eljekua-conventions
 description: >-
   Eljekua project conventions. Apply when writing, editing, or reviewing code in
-  this repo — naming, formatting, file layout, imports, architecture, and git workflow.
+  this repo — naming, formatting, file layout, imports, architecture, git workflow,
+  and before marking any task complete.
 ---
 
 # Eljekua Conventions
 
 Match surrounding files when adding to an existing module.
+
+## @workflow
+
+**A task is not complete until `@checklist` passes.** Do not mark todos done or tell the user you are finished until every checklist item is verified.
+
+1. Implement the change.
+2. Run tests / `tsc --noEmit` when you touched runtime code.
+3. Run `@checklist` — run shell commands where the checklist says to (especially `git status` / `git add`).
 
 ## @naming-constants
 
@@ -90,14 +99,16 @@ New interaction: (1) type + union in `instruction_loop.ts`, (2) cleanup in `add_
 
 ## @git
 
-- Never commit or push unless the user explicitly asks.
+- **`git add` is required** when you create new files. Staging is not committing — always stage before finishing.
+- Before your final response, run `git status`. No file you created should appear under "Untracked files".
+- Never `git commit` or `git push` unless the user explicitly asks.
 - No destructive git commands unless explicitly requested.
 
 ## @checklist
 
-Run this checklist **before** marking the task complete:
+**Run every item. Skipping a step means the task is not done.**
 
 - [ ] Naming: SCREAMING_SNAKE constants, PascalCase types, snake_case values
 - [ ] Imports: `core/` / `stdlib/` paths, `import type` where appropriate
 - [ ] `Array<T>`, `as const`, layout matches neighbors
-- [ ] **`git add` every new file** — `git status` shows none you created as untracked; no commit/push unless the user asked
+- [ ] Git: run `git status`. `git add` every new file you created. Confirm no untracked files remain from your work. Do not commit unless the user asked

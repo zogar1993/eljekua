@@ -18,6 +18,7 @@ Follow `eljekua-conventions` for naming and `@core-web` / `@player-interactions`
 3. Forward input via interaction callbacks (`select`, `on_click`, `on_confirm`) or use cases — never mutate core state directly.
 4. Wire in `src/main.ts`.
 5. Confirm headless playability: no DOM required to advance the game; update `tests/utils/interaction_test_helpers.ts` if interactions change.
+6. Run `eljekua-conventions` `@checklist` — required; includes `git add` for any new files.
 
 ## @events
 

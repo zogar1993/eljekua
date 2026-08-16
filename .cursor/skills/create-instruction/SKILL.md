@@ -24,6 +24,8 @@ Instructions are turn-state VM opcodes: definition, interpreter, switch case.
 
 **Outward signals:** raise `game_events.on_*` (available on `InterpretInstructionProps`) — never attach events to domain objects. See `eljekua-conventions` `@core-web`.
 
+5. Run `eljekua-conventions` `@checklist` — required; includes `git add` for any new files.
+
 ## @reference
 
 - Minimal runtime-only: `interpret_add_current_turn_base_options.ts`
