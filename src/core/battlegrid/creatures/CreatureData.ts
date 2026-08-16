@@ -5,6 +5,7 @@ import type {Size} from "core/battlegrid/creatures/SIZES";
 
 export type CreatureData = {
     name: string
+    template: string | null
     level: number
     size: Size
     attributes: Record<AttributeCode, number>

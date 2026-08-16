@@ -16,6 +16,12 @@ export const build_evaluate_keyword = ({turn_state}: { turn_state: TurnState }) 
                 const description = `${creature.data.name}'s position`
                 return {type: "positions", value: [creature.data.position], description}
             }
+            if (node.property === "template") {
+                return {
+                    type: "string",
+                    value: creature.data.template ?? "",
+                }
+            }
             return {
                 type: "number_resolved",
                 ...get_creature_property({creature, property: node.property}),

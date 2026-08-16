@@ -41,6 +41,7 @@ const FUNCTION_NAMES = [
     "distance",
     "are_enemies",
     "is_ally",
+    "is_monster_template",
     "has_action_type_available",
     "is_lower_or_equal",
     "is_greater_or_equal",

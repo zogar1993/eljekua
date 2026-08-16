@@ -34,6 +34,9 @@ import {
     evaluate_function_is_ally
 } from "core/virtual_machine/expressions/internals/function/evaluate_function_is_ally";
 import {
+    evaluate_function_is_monster_template
+} from "core/virtual_machine/expressions/internals/function/evaluate_function_is_monster_template";
+import {
     evaluate_function_has_action_type_available
 } from "core/virtual_machine/expressions/internals/function/evaluate_function_has_action_type_available";
 import {
@@ -65,6 +68,8 @@ export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                 return evaluate_function_are_enemies({node, evaluate_ast})
             case "is_ally":
                 return evaluate_function_is_ally({node, evaluate_ast})
+            case "is_monster_template":
+                return evaluate_function_is_monster_template({node, evaluate_ast})
             case "can_expend_action_type":
                 return evaluate_function_can_expend_action_type({node, evaluate_ast})
             case "distance":

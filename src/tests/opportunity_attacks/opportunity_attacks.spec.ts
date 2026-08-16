@@ -110,6 +110,7 @@ describe("when a 1x1 attacker attacks a 2x2 defender", () => {
 const given_a_creature_is_created = (c: Partial<CreatureData> & Pick<CreatureData, "position" | "name">) => {
     const data: CreatureData = {
         name: c.name || "",
+        template: c.template ?? null,
         position: c.position,
         size: c.size ?? "medium",
         image: c.image ?? `url("/public/saber-and-pistol.svg")`,

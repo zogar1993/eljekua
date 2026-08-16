@@ -1,0 +1,25 @@
+import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
+import type {Expr, ExprBoolean} from "core/virtual_machine/expressions/types";
+import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
+
+export const evaluate_function_is_monster_template = ({node, evaluate_ast}:
+                                                          {
+                                                              node: AstNodeFunction
+                                                              evaluate_ast: (node: AstNode) => Expr
+                                                          }): ExprBoolean => {
+    assert_parameters_amount_equals(node, 2)
+
+    const parameters = node.parameters.map(evaluate_ast)
+
+    const creature = EXPR.as_creature(parameters[0])
+    const template = EXPR.as_string(parameters[1])
+
+    return {
+        type: "boolean",
+        value: creature.data.template === template,
+        description: "is monster template",
+        params: parameters
+    }
+}
