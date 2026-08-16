@@ -22,15 +22,12 @@ Follow `eljekua-conventions` for naming and `@core-web` / `@player-interactions`
 
 ## @events
 
-| Source | Use for |
-|--------|---------|
-| `on_available_interactions_changed` | Option buttons, hit-status UI, grid highlights |
-| `on_creature_added_to_game` | Register creature visuals (`creature_visual_registry`) |
-| `on_creature_moved` | Movement animations |
-| `on_creature_received_damage` | Damage animations, action log |
-| `on_creature_missed` | Miss animation |
-| `on_creature_attacked` | Attack action log |
-| `on_turn_state_*` | Instruction visualizer, debug panels |
+The event catalog is `core/events/GameEvents.ts` (`create_game_events`). Read that file for the current `on_*` managers and payload types — do not duplicate the list here.
+
+- Architecture: `eljekua-conventions` `@core-web`
+- Subscribe with `game_events.on_<name>.add_handler(...)` in `create_*_ui` or `main.ts`
+- Find existing subscribers: grep `src/web/` for `game_events.on_`
+- Reference: `BattleGridUI.ts` (creatures, combat, interactions), `instruction_visualizer/instruction_visualizer.ts` (turn state)
 
 ## @file-layout
 
