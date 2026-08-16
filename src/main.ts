@@ -4,7 +4,11 @@ import {Creature} from "core/battlegrid/creatures/Creature";
 import {ROGUE_POWERS} from "data/powers/rogue";
 import {FIGHTER_POWERS} from "data/powers/fighter";
 import {WIZARD_POWERS} from "data/powers/wizard";
+import {evil_ritualist, Monster} from "data/monsters/EvilRitualist";
 import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
+import {
+    transform_power_ir_into_vm_representation
+} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {create_initiative_order} from "core/initiative_order/InitiativeOrder";
 import {create_hit_status_buttons_ui} from "web/hit_status_buttons/HitStatusButtonsUI";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
@@ -126,10 +130,17 @@ const start_battle = create_start_battle({battle_grid, initiative_order, instruc
         image: `url("/public/saber-and-pistol.svg")`,
     })
 
+    const ritualist = build_monster(evil_ritualist, {
+        position: {x: 3, y: 3, footprint: 1},
+        image: `url("/public/wizard-staff.svg")`,
+        team: null,
+    })
+
     add_creature({data: bob})
     add_creature({data: maik})
     add_creature({data: yeims})
     add_creature({data: jenri})
+    add_creature({data: ritualist})
 
     start_battle()
 }
@@ -156,6 +167,7 @@ const build_character = (
 ): CreatureData => {
     return {
         name: data.name,
+        template: data.template ?? null,
         position: data.position,
         size: data.size ?? "medium",
         image: data.image ?? `url("/public/saber-and-pistol.svg")`,
@@ -170,20 +182,22 @@ const build_character = (
 }
 
 const build_monster = (
-    data: Omit<Partial<CreatureData>, "position"> & Pick<CreatureData, "name" | "position">
+    monster: Monster,
+    overrides: Pick<CreatureData, "position"> & Partial<Omit<CreatureData, "position">>,
 ): CreatureData => {
     return {
-        name: data.name,
-        position: data.position,
-        size: data.size ?? "medium",
-        image: data.image ?? `url("/public/saber-and-pistol.svg")`,
-        movement: data.movement ?? 5,
-        hp_current: data.hp_current ?? 10,
-        hp_max: data.hp_max ?? 10,
-        level: data.level ?? 1,
-        team: data.team ?? null,
-        attributes: data.attributes ?? Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
-        powers: data.powers ?? []
+        name: overrides.name ?? monster.template,
+        template: overrides.template ?? monster.template,
+        position: overrides.position,
+        size: overrides.size ?? monster.size,
+        image: overrides.image ?? `url("/public/saber-and-pistol.svg")`,
+        movement: overrides.movement ?? monster.speed,
+        hp_current: overrides.hp_current ?? monster.hp,
+        hp_max: overrides.hp_max ?? monster.hp,
+        level: overrides.level ?? monster.level,
+        team: overrides.team ?? null,
+        attributes: overrides.attributes ?? monster.attributes,
+        powers: overrides.powers ?? monster.powers.map(transform_power_ir_into_vm_representation),
     }
 }
 

@@ -4,6 +4,25 @@ import {DefenseCode} from "core/character_sheet/get_creature_defense";
 import {IRPower} from "core/types";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
+export type Monster = {
+    template: string
+    size: Size
+    race: string
+    keywords: Array<string>
+    level: number
+    xp: number
+    archetypes: Array<string>
+    initiative: number
+    senses: Record<string, number>
+    alignment: string
+    languages: Array<string>
+    hp: number
+    defenses: Record<DefenseCode, number>
+    speed: number
+    powers: Array<IRPower>
+    attributes: Record<AttributeCode, number>
+}
+
 const sacrificial_dagger: IRPower = {
     name: "Sacrificial Dagger",
     type: {
@@ -40,12 +59,17 @@ const unholy_vigor: IRPower = {
         type: "reaction",
         intercepts: ["critical_hit"],
         conditions: [
-            `$is_lower_or_equal($distance($triggerer(),owner),5)`,
-            `$or($is_ally($triggerer()),$is_monster_template(owner.template))`,
+            `$is_lower_or_equal($distance(trigger_activator,trigger_owner),5)`,
+            `$or($is_ally(trigger_activator),$is_monster_template(trigger_owner, "Evil Ritualist"))`,
         ],
     },
     effect: [
-        {type: INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS, creature: "owner", cost: "free_attack", filter: "melee_basic_attack"}
+        {
+            type: INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS,
+            creature: "owner",
+            cost: "free_attack",
+            filter: "melee_basic_attack"
+        }
     ]
 }
 
@@ -73,8 +97,7 @@ const evil_ritualist: Monster = {
     speed: 6,
     powers: [
         sacrificial_dagger,
-unholy_vigor
-
+        unholy_vigor
     ],
     attributes: {
         str: 10,
@@ -86,21 +109,4 @@ unholy_vigor
     }
 }
 
-type Monster = {
-    template: string
-    size: Size
-    race: string
-    keywords: Array<string>
-    level: number
-    xp: number
-    archetypes: Array<string>
-    initiative: number
-    senses: Record<string, number>
-    alignment: string
-    languages: Array<string>
-    hp: number
-    defenses: Record<DefenseCode, number>
-    speed: number
-    powers: Array<IRPower>
-    attributes: Record<AttributeCode, number>
-}
+export {evil_ritualist}
