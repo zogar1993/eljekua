@@ -21,7 +21,13 @@ export const create_interaction_test_helpers = ({player_turn_handler}: {
         const interaction = player_turn_handler.get_interaction()
 
         if (interaction?.type === "position_select" || interaction?.type === "select_area") {
-            interaction.select({...position, footprint: interaction.footprint})
+            const full_position = interaction.clickable.find(
+                clickable => clickable.x === position.x && clickable.y === position.y,
+            )
+            if (!full_position)
+                throw Error(`Position (${position.x}, ${position.y}) not in clickable`)
+
+            interaction.select(full_position)
             return
         }
 

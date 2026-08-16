@@ -140,7 +140,6 @@ export const interpret_select_target = ({
             get_targets_for_position,
             get_attack_hit_chance_against,
             select,
-            footprint: 1,
         })
     } else {
         const get_targets_for_position = (position: Position): Targets => {
@@ -182,7 +181,6 @@ export const interpret_select_target = ({
             get_targets_for_position,
             get_attack_hit_chance_against,
             select,
-            footprint: 1
         })
     }
 }

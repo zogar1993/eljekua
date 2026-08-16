@@ -35,7 +35,6 @@ export type InteractionsSelectPosition = {
     target_label: string
     get_targets_for_position: (position: Position) => Targets
     get_attack_hit_chance_against: (creature: Creature) => AttackSuccessChance | null
-    footprint: number
     select: (position: Position) => void
 }
 
@@ -47,7 +46,6 @@ export type InteractionsSelectArea = {
     get_targets_for_position: (position: Position) => Targets
     get_attack_hit_chance_against: (creature: Creature) => AttackSuccessChance | null
     select: (position: Position) => void
-    footprint: number
 }
 
 export type InteractionsSelectPath = {
