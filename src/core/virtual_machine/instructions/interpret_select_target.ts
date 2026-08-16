@@ -74,7 +74,6 @@ export const interpret_select_target = ({
         }
     }
 
-    const footprint = instruction.targeting_type === "movement" ? owner.data.position.footprint : 1
     const get_attack_hit_chance_against = (creature: Creature) => {
         const next_instruction = turn_state.peek_instruction()
         if (next_instruction.type !== INSTRUCTION_TYPE.ATTACK_DICE_ROLL) return null
@@ -88,12 +87,19 @@ export const interpret_select_target = ({
     }
 
     if (is_path_selection_targeting_type(instruction)) {
+        const moving_creature = instruction.targeting_type === "push"
+            ? EXPR.as_creature(evaluate_ast(instruction.defender))
+            : owner
+
         const get_path_to_destination = (destination: Position) => {
-            return get_shortest_path({creature: owner, destination, battle_grid})
+            return get_shortest_path({creature: moving_creature, destination, battle_grid})
         }
+
         const select = (path: Array<Position>) => {
             turn_state.set_variable(target_label, {type: "positions", value: path, description: "target"})
         }
+
+        const footprint = moving_creature.data.position.footprint
 
         player_turn_handler.set_available_interactions({
             type: "select_path",
@@ -110,11 +116,7 @@ export const interpret_select_target = ({
         }
 
         const get_targets_for_position = (position: Position): Targets => {
-            const interaction = player_turn_handler.get_interaction()
-
-            if (interaction?.type !== "select_area") throw Error("select area selection_context not set")
-
-            assert_position_is_clickable({position, clickable: interaction.clickable})
+            assert_position_is_clickable({position, clickable})
 
             const area = get_area_for_position(position)
             const target_positions = area.filter(p => battle_grid.is_terrain_occupied(p))
@@ -138,7 +140,7 @@ export const interpret_select_target = ({
             get_targets_for_position,
             get_attack_hit_chance_against,
             select,
-            footprint,
+            footprint: 1,
         })
     } else {
         const get_targets_for_position = (position: Position): Targets => {
@@ -180,7 +182,7 @@ export const interpret_select_target = ({
             get_targets_for_position,
             get_attack_hit_chance_against,
             select,
-            footprint
+            footprint: 1
         })
     }
 }
