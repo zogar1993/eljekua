@@ -13,6 +13,9 @@ import {
     nullable_positions_equal
 } from "web/battle_grid/coordinates/ClickableCoordinate";
 import {GameEvents} from "core/events/GameEvents";
+import {Creature} from "core/battlegrid/creatures/Creature";
+import {create_visual_creature, CreatureVisual} from "web/creature/CreatureVisual";
+import {AnimationQueue} from "core/AnimationQueue";
 import {
     Interaction,
     InteractionsSelectArea,
@@ -20,6 +23,7 @@ import {
     InteractionsSelectPosition,
     PlayerTurnHandler,
 } from "core/instruction_loop";
+import {assert_is_not_undefined} from "stdlib/assert";
 
 export const initialize_battle_grid_ui = ({
                                               battle_grid,
@@ -33,6 +37,7 @@ export const initialize_battle_grid_ui = ({
     game_events: GameEvents,
 }) => {
     const {size} = battle_grid
+    const creature_visuals = new Map<Creature, CreatureVisual>()
     const click_overlay = create_battle_grid_visual({width: size.x, height: size.y})
     const board = battle_grid.board.map(row => row.map(({position: {x, y}}) => create_visual_square({x, y})))
 
@@ -43,6 +48,12 @@ export const initialize_battle_grid_ui = ({
         [SQUARE_HIGHLIGHT.CLICKABLE]: new Set<SquareVisual>()
     }
     const hovered = new Set<SquareVisual>()
+
+    const get_creature_visual = (creature: Creature) => {
+        const visual = creature_visuals.get(creature)
+        assert_is_not_undefined(visual)
+        return visual
+    }
 
     const get_square = ({x, y}: PositionFootprintOne) => {
         if (x < 0 || x >= size.x || y < 0 || y >= size.y)
@@ -85,7 +96,7 @@ export const initialize_battle_grid_ui = ({
 
     const clear_attack_success_chances = () => {
         for (const creature of battle_grid.creatures)
-            game_events.on_creature_untargeted.raise(creature)
+            get_creature_visual(creature).remove_hit_chance()
     }
 
     const show_attack_success_chances_for_position = (
@@ -100,7 +111,7 @@ export const initialize_battle_grid_ui = ({
         for (const creature of targets.value) {
             const hit_chance = interactions.get_attack_hit_chance_against(creature)
             if (hit_chance === null) return;
-            game_events.on_creature_targeted.raise({creature, ...hit_chance})
+            get_creature_visual(creature).display_hit_chance(hit_chance)
         }
 
     }
@@ -169,6 +180,35 @@ export const initialize_battle_grid_ui = ({
         } else if (interactions.type === "select_area" || interactions.type === "position_select") {
             interactions.select(position)
         }
+    })
+
+    game_events.on_creature_added_to_game.add_handler((creature) => {
+        creature_visuals.set(creature, create_visual_creature(creature.data))
+    })
+
+    game_events.on_creature_moved.add_handler(({creature, position, movement_type}) => {
+        const visual = get_creature_visual(creature)
+
+        switch (movement_type) {
+            case "move":
+                AnimationQueue.add_animation(() => visual.move_one_square(position))
+                break
+            case "push":
+                AnimationQueue.add_animation(() => visual.push_to(position))
+                break
+        }
+    })
+
+    game_events.on_creature_received_damage.add_handler(({creature, damage}) => {
+        const visual = get_creature_visual(creature)
+
+        AnimationQueue.add_animation(() => visual.receive_damage({hp: creature.data.hp_current, damage: damage.value}))
+    })
+
+    game_events.on_creature_missed.add_handler((creature) => {
+        const visual = get_creature_visual(creature)
+
+        AnimationQueue.add_animation(visual.display_miss)
     })
 
     game_events.on_available_interactions_changed.add_handler((interactions) => {

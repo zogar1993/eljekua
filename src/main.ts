@@ -1,5 +1,4 @@
 import {create_battle_grid} from "core/battlegrid/BattleGrid";
-import {create_visual_creature, CreatureVisual} from "web/creature/CreatureVisual";
 import {create_action_log} from "web/action_log/ActionLog";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {ROGUE_POWERS} from "data/powers/rogue";
@@ -16,7 +15,6 @@ import {create_turn_state} from "core/battlegrid/player_turn_handler/TurnState";
 import {create_instruction_loop} from "core/instruction_loop";
 import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
 import {create_instruction_visualizer} from "web/instruction_visualizer/instruction_visualizer";
-import {AnimationQueue} from "core/AnimationQueue";
 import {create_gameplay_use_cases} from "core/use_cases/gameplay/gameplay_use_cases";
 import {HIT_STATUS, HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 import {create_settings} from "core/settings/Settings";
@@ -61,47 +59,8 @@ const gameplay_use_cases = create_gameplay_use_cases({
     battle_grid, player_turn_handler, initiative_order, turn_state
 })
 
-const creature_visuals = new Map<Creature, CreatureVisual>()
-
-game_events.on_creature_added_to_game.add_handler((creature) => {
-    creature_visuals.set(creature, create_visual_creature(creature.data))
-})
-
-game_events.on_creature_moved.add_handler(({creature, position, movement_type}) => {
-    const visual = creature_visuals.get(creature)
-    if (!visual) return
-
-    switch (movement_type) {
-        case "move":
-            AnimationQueue.add_animation(() => visual.move_one_square(position))
-            break
-        case "push":
-            AnimationQueue.add_animation(() => visual.push_to(position))
-            break
-    }
-})
-
 game_events.on_creature_received_damage.add_handler(({creature, damage}) => {
-    const visual = creature_visuals.get(creature)
-    if (!visual) return
-
-    AnimationQueue.add_animation(() => visual.receive_damage({hp: creature.data.hp_current, damage: damage.value}))
     action_log.add_new_action_log(`${creature.data.name} was dealt `, damage, ` damage.`)
-})
-
-game_events.on_creature_untargeted.add_handler((creature) => {
-    creature_visuals.get(creature)?.remove_hit_chance()
-})
-
-game_events.on_creature_missed.add_handler((creature) => {
-    const visual = creature_visuals.get(creature)
-    if (!visual) return
-
-    AnimationQueue.add_animation(visual.display_miss)
-})
-
-game_events.on_creature_targeted.add_handler(({creature, attack, defense, chance}) => {
-    creature_visuals.get(creature)?.display_hit_chance({attack, defense, chance})
 })
 
 const HIT_STATUS_TEXT = new Map<HitStatus, string>([
