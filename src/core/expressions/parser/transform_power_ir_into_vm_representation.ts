@@ -61,9 +61,16 @@ export type Power = {
 
 export type Trigger = {
     type: "interruption" | "reaction"
-    intercepts: Array<"movement" | "critical_hit">
+    intercepts: Array<TriggerInterception>
     conditions: Array<AstNode>
 }
+
+export const TRIGGER_INTERCEPTION = {
+    MOVEMENT: "movement",
+    CRITICAL_HIT: "critical_hit",
+} as const
+
+export type TriggerInterception = typeof TRIGGER_INTERCEPTION[keyof typeof TRIGGER_INTERCEPTION]
 
 const transform_primary_roll = (roll: Required<IRPower>["roll"]): Array<Instruction> => [
     {
@@ -72,7 +79,7 @@ const transform_primary_roll = (roll: Required<IRPower>["roll"]): Array<Instruct
         defense: roll.defense,
         defender: PRIMARY_TARGET_LABEL,
     },
-        ...transform_instructions(roll.before_consequences),
+    ...transform_instructions(roll.before_consequences),
     {
         type: INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE,
         defender: PRIMARY_TARGET_LABEL,
@@ -215,7 +222,11 @@ const transform_trigger = (trigger: NonNullable<IRPower["trigger"]>): Trigger =>
 }
 
 const transform_select_target_ir = (props: Omit<IRInstructionSelectTarget, "type" | "target_label">): InstructionSelectTarget => {
-    const ir = {type: INSTRUCTION_TYPE.SELECT_TARGET, target_label: PRIMARY_TARGET_LABEL, ...props} as IRInstructionSelectTarget
+    const ir = {
+        type: INSTRUCTION_TYPE.SELECT_TARGET,
+        target_label: PRIMARY_TARGET_LABEL,
+        ...props
+    } as IRInstructionSelectTarget
 
     if (ir.targeting_type === "area_burst")
         return {
