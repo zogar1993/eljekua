@@ -92,7 +92,7 @@
 
 .instruction__variable {
     display: flex;
-    align-items: baseline;
+    align-items: flex-start;
     gap: 6px;
     padding: 2px 4px;
     font-size: 0.72rem;
@@ -112,6 +112,80 @@
     color: #333;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.instruction__variable-value--expandable {
+    flex: 1;
+    min-width: 0;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+.instruction__variable-summary {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.instruction__variable-summary:hover {
+    color: #000;
+}
+
+.instruction__variable-summary .expand_icon {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-right: 2px solid #888;
+    border-bottom: 2px solid #888;
+    transform: rotate(-45deg);
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+}
+
+.instruction__variable-value--expanded .instruction__variable-summary .expand_icon {
+    transform: rotate(45deg);
+}
+
+.instruction__variable-details {
+    padding: 4px 0 2px 12px;
+}
+
+.instruction__variable-details--collapsed {
+    display: none;
+}
+
+.instruction__variable-details-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.instruction__creature-block {
+    padding: 4px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.instruction__creature-block:last-child {
+    border-bottom: none;
+}
+
+.instruction__creature-name {
+    font-weight: bold;
+    font-size: 0.7rem;
+    margin-bottom: 2px;
+}
+
+.instruction__variable-param {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    padding: 2px 0;
+}
+
+.instruction__variable-param-label {
+    color: #888;
+    flex-shrink: 0;
 }
 
 .instruction {

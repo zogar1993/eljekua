@@ -4,6 +4,10 @@ import {GameEvents} from "core/events/GameEvents";
 import {create_html_element} from "web/utils/create_html_element";
 import {create_expression_html} from "web/expression/create_expression_html";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
+import {Creature} from "core/battlegrid/creatures/Creature";
+import {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
+import {Position} from "core/battlegrid/Position";
+import {HIT_STATUS, HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 
 type FrameElements = {
     variablesToggle?: HTMLElement
@@ -149,45 +153,214 @@ const create_variable_element = (name: string, value: Expr) => {
     const name_span = create_html_element("span", "instruction__variable-name")
     name_span.textContent = name
 
-    const value_span = create_html_element("span", "instruction__variable-value")
-    append_expr_value(value_span, value)
-
-    html_variable.append(name_span, value_span)
+    html_variable.append(name_span, create_variable_value_element(value))
     return html_variable
 }
 
 const update_variable_value = (html_variable: HTMLElement, value: Expr) => {
-    const value_span = html_variable.querySelector(".instruction__variable-value") as HTMLElement
-    value_span.replaceChildren()
-    append_expr_value(value_span, value)
+    const old_value = html_variable.querySelector(".instruction__variable-value")
+    old_value?.replaceWith(create_variable_value_element(value))
 }
 
-const append_expr_value = (container: HTMLElement, expr: Expr) => {
-    if (expr.type === "number_resolved") {
-        container.append(create_expression_html(expr))
-    } else {
-        container.textContent = format_expr_summary(expr)
+const create_variable_value_element = (expr: Expr): HTMLElement => {
+    switch (expr.type) {
+        case "creatures":
+            return create_expandable_variable_value(
+                format_creature_names(expr.value),
+                () => create_creature_details(expr.value),
+            )
+        case "attack_rolls":
+            return create_expandable_variable_value(
+                `${expr.value.size} roll(s)`,
+                () => create_attack_rolls_details(expr.value),
+            )
+        case "power":
+            return create_expandable_variable_value(
+                expr.value.name,
+                () => create_power_details(expr.value),
+            )
+        case "positions":
+            return create_expandable_variable_value(
+                format_positions_summary(expr.value),
+                () => create_positions_details(expr),
+            )
+        case "number_unresolved":
+            if (expr.params?.length)
+                return create_expandable_variable_value(
+                    expr.description,
+                    () => create_expr_params_details(expr.params!),
+                )
+            return create_flat_variable_value(expr.description)
+        case "boolean":
+            if (expr.params?.length)
+                return create_expandable_variable_value(
+                    String(expr.value),
+                    () => create_expr_params_details(expr.params!),
+                )
+            return create_flat_variable_value(String(expr.value))
+        case "number_resolved":
+            return create_flat_variable_value(create_expression_html(expr))
+        case "string":
+            return create_flat_variable_value(expr.value)
     }
 }
 
-const format_expr_summary = (expr: Expr): string => {
-    switch (expr.type) {
-        case "number_unresolved":
-            return expr.description
-        case "number_resolved":
-            return String(expr.value)
-        case "string":
-            return expr.value
-        case "boolean":
-            return String(expr.value)
-        case "creatures":
-            return expr.value.map(creature => creature.data.name).join(", ")
-        case "positions":
-            return expr.value.map(position => `(${position.x}, ${position.y})`).join(", ")
-        case "power":
-            return expr.value.name
-        case "attack_rolls":
-            return `${expr.value.size} roll(s)`
+const create_flat_variable_value = (content: string | HTMLElement): HTMLElement => {
+    const value_el = create_html_element("span", "instruction__variable-value")
+    if (typeof content === "string")
+        value_el.textContent = content
+    else
+        value_el.append(content)
+    return value_el
+}
+
+const create_expandable_variable_value = (
+    summary: string,
+    build_details: () => HTMLElement,
+): HTMLElement => {
+    const container = create_html_element("div", "instruction__variable-value instruction__variable-value--expandable")
+
+    const summary_line = create_html_element("div", "instruction__variable-summary")
+    const expand_icon = create_html_element("div", "expand_icon")
+    const summary_text = create_html_element("span", "instruction__variable-summary-text")
+    summary_text.textContent = summary
+
+    const details_wrapper = create_html_element("div", "instruction__variable-details")
+    details_wrapper.classList.add("instruction__variable-details--collapsed")
+    details_wrapper.append(build_details())
+
+    summary_line.addEventListener("click", () => {
+        details_wrapper.classList.toggle("instruction__variable-details--collapsed")
+        container.classList.toggle("instruction__variable-value--expanded")
+    })
+
+    summary_line.append(expand_icon, summary_text)
+    container.append(summary_line, details_wrapper)
+    return container
+}
+
+const create_creature_details = (creatures: Array<Creature>): HTMLElement => {
+    const container = create_html_element("div", "instruction__variable-details-inner")
+
+    for (const creature of creatures) {
+        const block = create_html_element("div", "instruction__creature-block")
+        const title = create_html_element("div", "instruction__creature-name")
+        title.textContent = creature.data.name
+        block.append(title)
+
+        append_detail_row(block, "hp", `${creature.data.hp_current}/${creature.data.hp_max}`)
+        append_detail_row(
+            block,
+            "position",
+            `(${creature.data.position.x}, ${creature.data.position.y}) fp${creature.data.position.footprint}`,
+        )
+        append_detail_row(block, "level", String(creature.data.level))
+        append_detail_row(block, "size", creature.data.size)
+        append_detail_row(block, "team", creature.data.team === null ? "none" : String(creature.data.team))
+        append_detail_row(block, "movement", String(creature.data.movement))
+
+        if (creature.available_actions.length)
+            append_detail_row(block, "actions", creature.available_actions.join(", "))
+
+        if (creature.statuses.length)
+            append_detail_row(block, "statuses", String(creature.statuses.length))
+
+        append_detail_row(
+            block,
+            "attributes",
+            Object.entries(creature.data.attributes).map(([key, value]) => `${key}: ${value}`).join(", "),
+        )
+
+        container.append(block)
+    }
+
+    return container
+}
+
+const create_attack_rolls_details = (rolls: Map<Creature, HitStatus>): HTMLElement => {
+    const container = create_html_element("div", "instruction__variable-details-inner")
+
+    for (const [creature, hit_status] of rolls) {
+        const block = create_html_element("div", "instruction__creature-block")
+        append_detail_row(block, creature.data.name, format_hit_status(hit_status))
+        container.append(block)
+    }
+
+    return container
+}
+
+const create_power_details = (power: Power): HTMLElement => {
+    const container = create_html_element("div", "instruction__variable-details-inner")
+    append_detail_row(container, "action", power.type.action)
+    append_detail_row(container, "cooldown", power.type.cooldown)
+    append_detail_row(container, "attack", String(power.type.attack))
+
+    if (power.type.traits.length)
+        append_detail_row(container, "traits", power.type.traits.join(", "))
+
+    if (power.description)
+        append_detail_row(container, "description", power.description)
+
+    return container
+}
+
+const create_positions_details = (expr: Expr & { type: "positions" }): HTMLElement => {
+    const container = create_html_element("div", "instruction__variable-details-inner")
+
+    for (const position of expr.value)
+        append_detail_row(
+            container,
+            `(${position.x}, ${position.y})`,
+            `footprint ${position.footprint}`,
+        )
+
+    if (expr.description)
+        append_detail_row(container, "description", expr.description)
+
+    if (expr.params?.length)
+        container.append(create_expr_params_details(expr.params))
+
+    return container
+}
+
+const create_expr_params_details = (params: Array<Expr>): HTMLElement => {
+    const container = create_html_element("div", "instruction__variable-details-inner")
+
+    for (let i = 0; i < params.length; i++) {
+        const row = create_html_element("div", "instruction__variable-param")
+        const label = create_html_element("span", "instruction__variable-param-label")
+        label.textContent = `[${i}]`
+        row.append(label, create_variable_value_element(params[i]))
+        container.append(row)
+    }
+
+    return container
+}
+
+const append_detail_row = (parent: HTMLElement, key: string, value: string) => {
+    const row = create_html_element("div", "instruction__detail-row")
+    const key_span = create_html_element("span", "instruction__detail-key")
+    key_span.textContent = key
+    const value_span = create_html_element("span", "instruction__detail-value")
+    value_span.textContent = value
+    row.append(key_span, value_span)
+    parent.append(row)
+}
+
+const format_creature_names = (creatures: Array<Creature>): string =>
+    creatures.map(creature => creature.data.name).join(", ")
+
+const format_positions_summary = (positions: Array<Position>): string =>
+    positions.map(position => `(${position.x}, ${position.y})`).join(", ")
+
+const format_hit_status = (hit_status: HitStatus): string => {
+    switch (hit_status) {
+        case HIT_STATUS.MISS:
+            return "miss"
+        case HIT_STATUS.HIT:
+            return "hit"
+        case HIT_STATUS.CRIT:
+            return "crit"
     }
 }
 
@@ -213,14 +386,7 @@ const create_visual_for_instruction = (instruction: Instruction) => {
     instruction_details.classList.add("instruction__details--collapsed")
 
     for (const [key, value] of detail_entries) {
-        const row = create_html_element("div", "instruction__detail-row")
-        const key_span = create_html_element("span", "instruction__detail-key")
-        key_span.textContent = key
-        const value_span = create_html_element("span", "instruction__detail-value")
-        value_span.textContent = format_instruction_value(value)
-
-        row.append(key_span, value_span)
-        instruction_details.append(row)
+        append_detail_row(instruction_details, key, format_instruction_value(value))
     }
 
     name_line.addEventListener("click", () => {
