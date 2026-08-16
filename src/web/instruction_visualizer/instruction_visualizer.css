@@ -1,18 +1,67 @@
+.instruction-panel {
+    width: 300px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    background: #fafafa;
+    border: 3px solid gray;
+    border-radius: 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.75rem;
+    overflow: hidden;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.instruction-panel__header {
+    padding: 8px 12px;
+    background: lightpink;
+    border-bottom: 2px solid gray;
+    font-weight: bold;
+    font-size: 0.8rem;
+    letter-spacing: 0.03em;
+}
+
+.instruction-panel__content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.instruction__frame-separator {
+    height: 1px;
+    margin: 4px 0;
+    background: linear-gradient(to right, transparent, gray, transparent);
+    border: none;
+}
+
 .instruction__variables-toggle {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
+    padding: 4px 6px;
     cursor: pointer;
     user-select: none;
+    border-radius: 6px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    transition: background 0.15s ease;
+}
+
+.instruction__variables-toggle:hover {
+    background: #e8e8e8;
 }
 
 .instruction__variables-toggle .expand_icon {
-    width: 0.6rem;
-    height: 0.6rem;
-    border-right: 2px solid currentColor;
-    border-bottom: 2px solid currentColor;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid #666;
+    border-bottom: 2px solid #666;
     transform: rotate(-45deg);
     transition: transform 0.15s ease;
+    flex-shrink: 0;
 }
 
 .instruction__variables-toggle--expanded .expand_icon {
@@ -20,8 +69,22 @@
 }
 
 .instruction__variables-label {
-    font-size: 0.85rem;
-    opacity: 0.8;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.instruction__variables {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 6px;
+    margin-bottom: 4px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 6px;
 }
 
 .instruction__variables--collapsed {
@@ -29,11 +92,155 @@
 }
 
 .instruction__variable {
-    font-size: 0.85rem;
-    padding-left: 1rem;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 2px 4px;
+    font-size: 0.72rem;
+    border-radius: 4px;
 }
 
-.instruction__frame-separator {
-    opacity: 0.5;
-    font-size: 0.85rem;
+.instruction__variable-name {
+    color: #888;
+    flex-shrink: 0;
+}
+
+.instruction__variable-name::after {
+    content: ":";
+}
+
+.instruction__variable-value {
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.instruction {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+    overflow: hidden;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.instruction--current {
+    border-color: hotpink;
+    border-width: 2px;
+    box-shadow: 0 0 0 1px hotpink;
+}
+
+.instruction__name-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease;
+}
+
+.instruction__name-line:hover {
+    background: #fff0f5;
+}
+
+.instruction--current .instruction__name-line {
+    background: #ffe4ec;
+}
+
+.instruction__name-line .expand_icon {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-right: 2px solid #888;
+    border-bottom: 2px solid #888;
+    transform: rotate(-45deg);
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+}
+
+.instruction--expanded .instruction__name-line .expand_icon {
+    transform: rotate(45deg);
+}
+
+.instruction__type-badge {
+    font-size: 0.72rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #e8e8e8;
+    color: #444;
+    letter-spacing: 0.02em;
+}
+
+.instruction--type-attack_dice_roll .instruction__type-badge,
+.instruction--type-attack_roll_consequence .instruction__type-badge,
+.instruction--type-apply_damage .instruction__type-badge,
+.instruction--type-apply_status .instruction__type-badge {
+    background: #ffcdd2;
+    color: #b71c1c;
+}
+
+.instruction--type-move .instruction__type-badge,
+.instruction--type-shift .instruction__type-badge,
+.instruction--type-force_movement .instruction__type-badge {
+    background: #bbdefb;
+    color: #1565c0;
+}
+
+.instruction--type-select_target .instruction__type-badge,
+.instruction--type-options .instruction__type-badge {
+    background: #e1bee7;
+    color: #6a1b9a;
+}
+
+.instruction--type-condition .instruction__type-badge {
+    background: #fff9c4;
+    color: #f57f17;
+}
+
+.instruction--type-execute_power .instruction__type-badge,
+.instruction--type-add_powers_as_options .instruction__type-badge {
+    background: #c8e6c9;
+    color: #2e7d32;
+}
+
+.instruction--type-end_turn .instruction__type-badge,
+.instruction--type-expend_action .instruction__type-badge {
+    background: #e0e0e0;
+    color: #616161;
+}
+
+.instruction__details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 8px 8px;
+    border-top: 1px solid #eee;
+    background: #fafafa;
+}
+
+.instruction__details--collapsed {
+    display: none;
+}
+
+.instruction__detail-row {
+    display: flex;
+    gap: 8px;
+    padding: 2px 0;
+    font-size: 0.7rem;
+    line-height: 1.4;
+}
+
+.instruction__detail-key {
+    color: #888;
+    flex-shrink: 0;
+    min-width: 5rem;
+}
+
+.instruction__detail-key::after {
+    content: ":";
+}
+
+.instruction__detail-value {
+    color: #333;
+    word-break: break-word;
 }
