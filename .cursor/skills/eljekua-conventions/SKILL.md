@@ -88,13 +88,14 @@ New interaction: (1) type + union in `instruction_loop.ts`, (2) cleanup in `add_
 
 ## @git
 
-- Stage new files with `git add`.
 - Never commit or push unless the user explicitly asks.
 - No destructive git commands unless explicitly requested.
 
 ## @checklist
 
+Run this checklist **before** marking the task complete:
+
 - [ ] Naming: SCREAMING_SNAKE constants, PascalCase types, snake_case values
 - [ ] Imports: `core/` / `stdlib/` paths, `import type` where appropriate
 - [ ] `Array<T>`, `as const`, layout matches neighbors
-- [ ] New files staged; no commits or pushes
+- [ ] **`git add` every new file** — `git status` shows none you created as untracked; no commit/push unless the user asked
