@@ -19,6 +19,7 @@ export type Interaction =
     | InteractionsSelectOption
     | InteractionsSelectHitStatus
     | InteractionsSelectPath
+    | InteractionsSelectArea
 
 export type InteractionsSelectHitStatus = {
     type: "hit_status_select"
@@ -34,6 +35,16 @@ export type InteractionsSelectPosition = {
     get_targets_for_position: (position: Position) => Targets
     footprint: number
     select: (position: Position) => void
+}
+
+export type InteractionsSelectArea = {
+    type: "select_area"
+    target_label: string
+    clickable: Array<Position>
+    get_area_for_position: (position: Position) => Array<Position>
+    get_targets_for_position: (position: Position) => Targets
+    select: (position: Position) => void
+    footprint: number
 }
 
 export type InteractionsSelectPath = {
@@ -100,6 +111,8 @@ export const create_instruction_loop = ({
     const add_cleanup_to_interaction_confirmation = (interaction: Interaction): Interaction => {
         switch (interaction.type) {
             case "position_select":
+                return {...interaction, select: add_cleanup_to_function(interaction.select)}
+            case "select_area":
                 return {...interaction, select: add_cleanup_to_function(interaction.select)}
             case "select_path":
                 return {...interaction, select: add_cleanup_to_function(interaction.select)}

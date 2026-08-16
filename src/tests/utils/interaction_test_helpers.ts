@@ -20,7 +20,7 @@ export const create_interaction_test_helpers = ({player_turn_handler}: {
     select_position: (position: Omit<Position, "footprint">) => {
         const interaction = player_turn_handler.get_interaction()
 
-        if (interaction?.type === "position_select") {
+        if (interaction?.type === "position_select" || interaction?.type === "select_area") {
             interaction.select({...position, footprint: interaction.footprint})
             return
         }
@@ -31,7 +31,7 @@ export const create_interaction_test_helpers = ({player_turn_handler}: {
             return
         }
 
-        throw Error(`Expected position_select or select_path interaction, got ${interaction?.type ?? "null"}`)
+        throw Error(`Expected position_select, select_area, or select_path interaction, got ${interaction?.type ?? "null"}`)
     },
 
     has_option: (text: string) => {
