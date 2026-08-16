@@ -14,7 +14,7 @@ Follow `eljekua-conventions` for naming and `@core-web` / `@player-interactions`
 ## @checklist
 
 1. Create `src/web/<feature>/` with a `create_*_ui` or `initialize_*_ui` factory.
-2. Subscribe to `GameEvents` (global) or `creature.events` (per-creature) to drive rendering.
+2. Subscribe to `GameEvents` to drive rendering.
 3. Forward input via interaction callbacks (`select`, `on_click`, `on_confirm`) or use cases — never mutate core state directly.
 4. Wire in `src/main.ts`.
 5. Confirm headless playability: no DOM required to advance the game; update `tests/utils/interaction_test_helpers.ts` if interactions change.
@@ -24,9 +24,13 @@ Follow `eljekua-conventions` for naming and `@core-web` / `@player-interactions`
 | Source | Use for |
 |--------|---------|
 | `on_available_interactions_changed` | Option buttons, hit-status UI, grid highlights |
-| `on_creature_added_to_game` | Creature visuals, per-creature handlers |
+| `on_creature_added_to_game` | Register creature visuals |
+| `on_creature_moved` | Movement animations |
+| `on_creature_received_damage` | Damage animations, action log |
+| `on_creature_targeted` / `on_creature_untargeted` | Hit-chance overlay |
+| `on_creature_missed` | Miss animation |
+| `on_creature_attacked` | Attack action log |
 | `on_turn_state_*` | Instruction visualizer, debug panels |
-| `creature.events` | Movement, damage, targeting, attacks |
 
 ## @file-layout
 

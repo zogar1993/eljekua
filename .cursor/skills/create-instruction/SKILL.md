@@ -22,6 +22,8 @@ Instructions are turn-state VM opcodes: definition, interpreter, switch case.
 
 **Player input:** call `player_turn_handler.set_available_interactions(...)` and return. See `eljekua-conventions` `@player-interactions`.
 
+**Outward signals:** raise `game_events.on_*` (available on `InterpretInstructionProps`) — never attach events to domain objects. See `eljekua-conventions` `@core-web`.
+
 ## @reference
 
 - Minimal runtime-only: `interpret_add_current_turn_base_options.ts`
