@@ -14,7 +14,7 @@ import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {create_start_battle} from "core/use_cases/start_battle";
 import {create_turn_state} from "core/battlegrid/player_turn_handler/TurnState";
 import {create_instruction_loop} from "core/instruction_loop";
-import {build_evaluate_ast} from "core/expressions/evaluator/evaluate_ast";
+import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
 import {create_instruction_visualizer} from "web/instruction_visualizer/instruction_visualizer";
 import {AnimationQueue} from "core/AnimationQueue";
 import {create_gameplay_use_cases} from "core/use_cases/gameplay/gameplay_use_cases";

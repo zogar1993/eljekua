@@ -4,7 +4,7 @@ import {
 import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import {BattleGrid} from "core/battlegrid/BattleGrid";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import type {Expr} from "core/expressions/evaluator/types";
+import type {Expr} from "core/virtual_machine/expressions/types";
 import {InitiativeOrder} from "core/initiative_order/InitiativeOrder";
 import {Settings} from "core/settings/Settings";
 import {OptionButton} from "core/battlegrid/creature_option/CreatureOption";

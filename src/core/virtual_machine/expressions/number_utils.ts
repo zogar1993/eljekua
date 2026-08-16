@@ -1,4 +1,4 @@
-import {Expr, ExprNumber, ExprNumberResolved, ExprNumberUnresolved} from "core/expressions/evaluator/types";
+import {Expr, ExprNumber, ExprNumberResolved, ExprNumberUnresolved} from "core/virtual_machine/expressions/types";
 import {roll_d} from "core/randomness/dice";
 
 export const add_numbers_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved => ({

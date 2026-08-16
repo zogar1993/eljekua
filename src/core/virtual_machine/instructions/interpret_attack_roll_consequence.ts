@@ -7,8 +7,8 @@ import {
     InstructionAttackRollConsequence,
     InstructionSaveVariable
 } from "core/virtual_machine/instructions/instructions";
-import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
-import {EXPR} from "core/expressions/evaluator/EXPR";
+import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {HIT_STATUS} from "core/battlegrid/player_turn_handler/HitStatus";
 
 export const interpret_attack_roll_consequence = (props: InterpretInstructionProps<InstructionAttackRollConsequence>) => {

@@ -1,8 +1,8 @@
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
-import type {Expr, ExprNumberResolved} from "core/expressions/evaluator/types";
-import {assert_parameters_amount_equals} from "core/expressions/evaluator/asserts";
+import type {Expr, ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {EXPR} from "core/expressions/evaluator/EXPR";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {distance_between_positions} from "core/battlegrid/Position";
 
 export const evaluate_function_distance = ({node, evaluate_ast}:

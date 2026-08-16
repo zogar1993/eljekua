@@ -1,10 +1,10 @@
 import {
     InterpretInstructionProps
 } from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {EXPR} from "core/expressions/evaluator/EXPR";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {InstructionExecutePower} from "core/virtual_machine/instructions/instructions";
-import {Expr} from "core/expressions/evaluator/types";
-import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
+import {Expr} from "core/virtual_machine/expressions/types";
+import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 
 export const interpret_execute_power = ({
                                             instruction,

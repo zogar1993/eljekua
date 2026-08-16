@@ -1,11 +1,11 @@
-import type {Expr, ExprNumber} from "core/expressions/evaluator/types";
+import type {Expr, ExprNumber} from "core/virtual_machine/expressions/types";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {
     add_numbers,
     add_numbers_resolved,
     is_number,
     is_number_resolved
-} from "core/expressions/evaluator/number_utils";
+} from "core/virtual_machine/expressions/number_utils";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 
 export const evaluate_function_add = ({node, evaluate_ast}:

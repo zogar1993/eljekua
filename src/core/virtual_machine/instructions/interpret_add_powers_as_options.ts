@@ -1,13 +1,13 @@
 import {
     InterpretInstructionProps
 } from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {EXPR} from "core/expressions/evaluator/EXPR";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {INSTRUCTION_TYPE, Instruction, InstructionAddPowers, InstructionOptionsItem} from "core/virtual_machine/instructions/instructions";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
 import {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
-import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
+import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 
 export const interpret_add_powers_as_options = ({
                                                     instruction,

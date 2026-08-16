@@ -10,9 +10,9 @@ import {
 import {SQUARE_HIGHLIGHT, SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
 import {bound_minmax} from "stdlib/bound_minmax";
 import {get_creature_defense} from "core/character_sheet/get_creature_defense";
-import {EXPR} from "core/expressions/evaluator/EXPR";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
-import {Expr} from "core/expressions/evaluator/types";
+import {Expr} from "core/virtual_machine/expressions/types";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import {

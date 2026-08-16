@@ -1,8 +1,8 @@
-import type {Expr} from "core/expressions/evaluator/types";
+import type {Expr} from "core/virtual_machine/expressions/types";
 import type {AstNodeKeyword} from "core/expressions/parser/nodes/AstNodeKeyword";
 import type {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import {get_creature_property} from "core/character_sheet/get_creature_property";
-import {EXPR} from "core/expressions/evaluator/EXPR";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
 
 export const build_evaluate_keyword = ({turn_state}: { turn_state: TurnState }) => {
     return (node: AstNodeKeyword): Expr => {

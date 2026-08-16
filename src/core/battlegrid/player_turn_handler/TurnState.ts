@@ -1,7 +1,7 @@
-import {Expr} from "core/expressions/evaluator/types";
+import {Expr} from "core/virtual_machine/expressions/types";
 import {Instruction} from "core/virtual_machine/instructions/instructions";
-import {EXPR} from "core/expressions/evaluator/EXPR";
-import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
+import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {assert} from "stdlib/assert";
 import {GameEvents} from "core/events/GameEvents";
 

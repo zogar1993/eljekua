@@ -1,5 +1,5 @@
 import {assert_is_footprint_one} from "core/battlegrid/Position";
-import {EXPR} from "core/expressions/evaluator/EXPR";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {get_reach_movement} from "core/battlegrid/position/get_reach_movement";
 import {get_reach_melee} from "core/battlegrid/position/get_reach_melee";
 import {get_reach_adjacent} from "core/battlegrid/position/get_reach_adjacent";
@@ -8,8 +8,8 @@ import {get_reach_area_burst} from "core/battlegrid/position/get_reach_area_burs
 import {get_reach_push} from "core/battlegrid/position/get_reach_push";
 import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {Expr} from "core/expressions/evaluator/types";
-import {AST} from "core/expressions/parser/AST_NODE";
+import {Expr} from "core/virtual_machine/expressions/types";
+import {AST} from "core/virtual_machine/expressions/AST_NODE";
 import {InstructionSelectTarget} from "core/virtual_machine/instructions/instructions";
 
 

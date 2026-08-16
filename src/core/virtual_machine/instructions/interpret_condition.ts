@@ -1,7 +1,7 @@
 import {
     InterpretInstructionProps
 } from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {EXPR} from "core/expressions/evaluator/EXPR";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {InstructionCondition} from "core/virtual_machine/instructions/instructions";
 
 export const interpret_condition = ({

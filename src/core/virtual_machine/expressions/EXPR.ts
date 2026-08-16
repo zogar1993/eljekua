@@ -1,4 +1,4 @@
-import {Expr, ExprNumber, ExprNumberResolved} from "core/expressions/evaluator/types";
+import {Expr, ExprNumber, ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {Position} from "core/battlegrid/Position";
 import {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";

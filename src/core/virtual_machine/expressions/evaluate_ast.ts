@@ -1,11 +1,11 @@
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import type {Expr} from "core/expressions/evaluator/types";
-import {build_evaluate_keyword} from "core/expressions/evaluator/internals/evaluate_keyword";
-import {evaluate_string} from "core/expressions/evaluator/internals/evaluate_string";
-import {evaluate_number} from "core/expressions/evaluator/internals/evaluate_number";
-import {evaluate_weapon} from "core/expressions/evaluator/internals/evaluate_weapon";
-import {evaluate_dice} from "core/expressions/evaluator/internals/evaluate_dice";
-import {build_evaluate_function} from "core/expressions/evaluator/internals/function/evaluate_function";
+import type {Expr} from "core/virtual_machine/expressions/types";
+import {build_evaluate_keyword} from "core/virtual_machine/expressions/internals/evaluate_keyword";
+import {evaluate_string} from "core/virtual_machine/expressions/internals/evaluate_string";
+import {evaluate_number} from "core/virtual_machine/expressions/internals/evaluate_number";
+import {evaluate_weapon} from "core/virtual_machine/expressions/internals/evaluate_weapon";
+import {evaluate_dice} from "core/virtual_machine/expressions/internals/evaluate_dice";
+import {build_evaluate_function} from "core/virtual_machine/expressions/internals/function/evaluate_function";
 import type {AstNodeNumber} from "core/expressions/parser/nodes/AstNodeNumber";
 import type {AstNodeString} from "core/expressions/parser/nodes/AstNodeString";
 import type {AstNodeDice, AstNodeWeapon} from "core/expressions/parser/nodes/AstNodeRoll";

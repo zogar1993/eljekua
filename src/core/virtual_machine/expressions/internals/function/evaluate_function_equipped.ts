@@ -1,8 +1,8 @@
-import type {Expr, ExprBoolean} from "core/expressions/evaluator/types";
+import type {Expr, ExprBoolean} from "core/virtual_machine/expressions/types";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
-import {assert_parameters_amount_equals} from "core/expressions/evaluator/asserts";
-import {EXPR} from "core/expressions/evaluator/EXPR";
-import {AST_NODE} from "core/expressions/parser/AST_NODE";
+import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
+import {AST_NODE} from "core/virtual_machine/expressions/AST_NODE";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 
 export const evaluate_function_equipped = ({node, evaluate_ast}:

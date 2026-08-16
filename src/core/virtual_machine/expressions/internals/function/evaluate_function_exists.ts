@@ -1,7 +1,7 @@
-import type {ExprBoolean} from "core/expressions/evaluator/types";
+import type {ExprBoolean} from "core/virtual_machine/expressions/types";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
-import {assert_parameters_amount_equals} from "core/expressions/evaluator/asserts";
-import {AST_NODE} from "core/expressions/parser/AST_NODE";
+import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
+import {AST_NODE} from "core/virtual_machine/expressions/AST_NODE";
 import type {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 
 export const evaluate_function_exists = ({node, turn_state}:

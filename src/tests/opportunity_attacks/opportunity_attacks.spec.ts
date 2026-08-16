@@ -8,14 +8,14 @@ import {create_initiative_order} from "core/initiative_order/InitiativeOrder";
 import {Position} from "core/battlegrid/Position";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {create_turn_state} from "core/battlegrid/player_turn_handler/TurnState";
-import {build_evaluate_ast} from "core/expressions/evaluator/evaluate_ast";
+import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
 import {create_instruction_loop} from "core/instruction_loop";
 import {create_gameplay_use_cases} from "core/use_cases/gameplay/gameplay_use_cases";
 import {create_settings} from "core/settings/Settings";
 import {create_game_events} from "core/events/GameEvents";
 import {create_interaction_test_helpers} from "tests/utils/interaction_test_helpers";
-import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
-import {EXPR} from "core/expressions/evaluator/EXPR";
+import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
 
 const battle_grid = create_battle_grid({size: {x: 10, y: 10}})
 const initiative_order = create_initiative_order({...dependency_mocks})

@@ -9,8 +9,8 @@ import {
 import {get_reach_area_burst} from "core/battlegrid/position/get_reach_area_burst";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
 import {InstructionSelectTarget} from "core/virtual_machine/instructions/instructions";
-import {EXPR} from "core/expressions/evaluator/EXPR";
-import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
+import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";
 import {assert_is_true} from "stdlib/assert";
 import {InteractionsSelectPosition, Targets} from "core/instruction_loop";

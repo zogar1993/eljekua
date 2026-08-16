@@ -1,13 +1,13 @@
 import {
     InterpretInstructionProps
 } from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {EXPR} from "core/expressions/evaluator/EXPR";
-import {ExprNumberResolved} from "core/expressions/evaluator/types";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
+import {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {
     max_number_resolved,
     resolve_number,
     subtract_numbers_resolved
-} from "core/expressions/evaluator/number_utils";
+} from "core/virtual_machine/expressions/number_utils";
 import {StatusEffectGainResistance} from "core/battlegrid/creatures/Creature";
 import {InstructionApplyDamage} from "core/virtual_machine/instructions/instructions";
 

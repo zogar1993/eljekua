@@ -1,6 +1,6 @@
-import type {ExprNumberUnresolved} from "core/expressions/evaluator/types";
+import type {ExprNumberUnresolved} from "core/virtual_machine/expressions/types";
 import type {AstNodeDice} from "core/expressions/parser/nodes/AstNodeRoll";
-import {add_numbers} from "core/expressions/evaluator/number_utils";
+import {add_numbers} from "core/virtual_machine/expressions/number_utils";
 
 export const evaluate_dice = (node: AstNodeDice): ExprNumberUnresolved => {
     const description = `d${node.faces}`

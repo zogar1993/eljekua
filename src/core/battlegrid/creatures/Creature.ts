@@ -1,5 +1,5 @@
 import {CreatureData} from "core/battlegrid/creatures/CreatureData";
-import type {ExprNumberResolved} from "core/expressions/evaluator/types";
+import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {ACTION_TYPE_EXPENDITURE_ORDER, ActionType} from "core/battlegrid/creatures/ActionType";
 import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
 import {Position} from "core/battlegrid/Position";

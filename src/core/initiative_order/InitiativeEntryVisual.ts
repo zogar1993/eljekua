@@ -1,5 +1,5 @@
 import {Creature} from "core/battlegrid/creatures/Creature";
-import {ExprNumberResolved} from "core/expressions/evaluator/types";
+import {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {create_html_element} from "web/utils/create_html_element";
 import {AssertionError} from "stdlib/AssertionError";
 

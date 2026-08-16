@@ -1,10 +1,10 @@
 import {
     InterpretInstructionProps
 } from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {EXPR} from "core/expressions/evaluator/EXPR";
-import {Expr} from "core/expressions/evaluator/types";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
+import {Expr} from "core/virtual_machine/expressions/types";
 import {INSTRUCTION_TYPE, Instruction, InstructionMovement} from "core/virtual_machine/instructions/instructions";
-import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
+import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 
 export const interpret_move = ({
                                    instruction,

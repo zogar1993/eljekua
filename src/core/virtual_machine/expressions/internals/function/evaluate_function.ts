@@ -1,41 +1,41 @@
-import {Expr} from "core/expressions/evaluator/types";
+import {Expr} from "core/virtual_machine/expressions/types";
 import {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
-import {evaluate_function_add} from "core/expressions/evaluator/internals/function/evaluate_function_add";
-import {evaluate_function_equipped} from "core/expressions/evaluator/internals/function/evaluate_function_equipped";
+import {evaluate_function_add} from "core/virtual_machine/expressions/internals/function/evaluate_function_add";
+import {evaluate_function_equipped} from "core/virtual_machine/expressions/internals/function/evaluate_function_equipped";
 import {
     evaluate_function_not_equals
-} from "core/expressions/evaluator/internals/function/evaluate_function_not_equals";
+} from "core/virtual_machine/expressions/internals/function/evaluate_function_not_equals";
 import {
     evaluate_function_has_valid_targeting
-} from "core/expressions/evaluator/internals/function/evaluate_function_has_valid_targeting";
-import {evaluate_function_or} from "core/expressions/evaluator/internals/function/evaluate_function_or";
+} from "core/virtual_machine/expressions/internals/function/evaluate_function_has_valid_targeting";
+import {evaluate_function_or} from "core/virtual_machine/expressions/internals/function/evaluate_function_or";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
-import {evaluate_function_exists} from "core/expressions/evaluator/internals/function/evaluate_function_exists";
+import {evaluate_function_exists} from "core/virtual_machine/expressions/internals/function/evaluate_function_exists";
 import {
     evaluate_function_is_greater_or_equal
-} from "core/expressions/evaluator/internals/function/evaluate_function_is_greater_or_equal";
+} from "core/virtual_machine/expressions/internals/function/evaluate_function_is_greater_or_equal";
 import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {
     evaluate_function_can_expend_action_type
-} from "core/expressions/evaluator/internals/function/evaluate_function_can_expend_action_type";
-import {evaluate_function_and} from "core/expressions/evaluator/internals/function/evaluate_function_and";
+} from "core/virtual_machine/expressions/internals/function/evaluate_function_can_expend_action_type";
+import {evaluate_function_and} from "core/virtual_machine/expressions/internals/function/evaluate_function_and";
 import {
     evaluate_function_is_lower_or_equal
-} from "core/expressions/evaluator/internals/function/evaluate_function_is_lower_or_equal";
-import {evaluate_function_distance} from "core/expressions/evaluator/internals/function/evaluate_function_distance";
+} from "core/virtual_machine/expressions/internals/function/evaluate_function_is_lower_or_equal";
+import {evaluate_function_distance} from "core/virtual_machine/expressions/internals/function/evaluate_function_distance";
 import {
     evaluate_function_opportunity_attack_range,
-} from "core/expressions/evaluator/internals/function/evaluate_function_opportunity_attack_range";
+} from "core/virtual_machine/expressions/internals/function/evaluate_function_opportunity_attack_range";
 import {
     evaluate_function_are_enemies
-} from "core/expressions/evaluator/internals/function/evaluate_function_are_enemies";
+} from "core/virtual_machine/expressions/internals/function/evaluate_function_are_enemies";
 import {
     evaluate_function_has_action_type_available
-} from "core/expressions/evaluator/internals/function/evaluate_function_has_action_type_available";
+} from "core/virtual_machine/expressions/internals/function/evaluate_function_has_action_type_available";
 import {
     evaluate_function_creature_by_id
-} from "core/expressions/evaluator/internals/function/evaluate_function_creature_by_id";
+} from "core/virtual_machine/expressions/internals/function/evaluate_function_creature_by_id";
 
 export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                                             {

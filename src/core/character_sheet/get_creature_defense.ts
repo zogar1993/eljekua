@@ -1,5 +1,5 @@
 import type {Creature} from "core/battlegrid/creatures/Creature";
-import type {ExprNumberResolved} from "core/expressions/evaluator/types";
+import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {get_creature_half_level} from "core/character_sheet/get_creature_half_level";
 import {get_creature_attribute_mod} from "core/character_sheet/get_creature_attribute_mod";
 

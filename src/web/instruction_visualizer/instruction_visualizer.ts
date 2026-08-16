@@ -1,5 +1,5 @@
 import {Instruction} from "core/virtual_machine/instructions/instructions";
-import {Expr} from "core/expressions/evaluator/types";
+import {Expr} from "core/virtual_machine/expressions/types";
 import {GameEvents} from "core/events/GameEvents";
 import {create_html_element} from "web/utils/create_html_element";
 

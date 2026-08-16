@@ -1,5 +1,5 @@
 import {Creature} from "core/battlegrid/creatures/Creature";
-import {ExprNumberResolved} from "core/expressions/evaluator/types";
+import {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {insert_to_array} from "stdlib/insert_to_array";
 import {InitiativeEntryVisual} from "core/initiative_order/InitiativeEntryVisual";
 
