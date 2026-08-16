@@ -60,7 +60,7 @@ const unholy_vigor: IRPower = {
         intercepts: ["critical_hit"],
         conditions: [
             `$is_lower_or_equal($distance(trigger_activator,trigger_owner),5)`,
-            `$or($is_ally(trigger_activator),$is_monster_template(trigger_owner, "Evil Ritualist"))`,
+            `$or($is_ally(trigger_activator, trigger_owner),$is_monster_template(trigger_owner, "Evil Ritualist"))`,
         ],
     },
     effect: [
