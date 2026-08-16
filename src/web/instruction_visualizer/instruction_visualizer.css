@@ -31,10 +31,9 @@
 }
 
 .instruction__frame-separator {
-    height: 1px;
-    margin: 4px 0;
-    background: linear-gradient(to right, transparent, gray, transparent);
-    border: none;
+    height: 0;
+    margin: 6px 0;
+    border-top: 1px solid #ccc;
 }
 
 .instruction__variables-toggle {
