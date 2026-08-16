@@ -40,6 +40,7 @@ const FUNCTION_NAMES = [
     "add",
     "distance",
     "are_enemies",
+    "is_ally",
     "has_action_type_available",
     "is_lower_or_equal",
     "is_greater_or_equal",
