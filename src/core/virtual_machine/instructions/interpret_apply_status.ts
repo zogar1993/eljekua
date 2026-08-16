@@ -1,12 +1,12 @@
 import type {
     InterpretInstructionProps
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
+} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/expressions/evaluator/EXPR";
 import type {StatusDuration, StatusEffect} from "core/battlegrid/creatures/Creature";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {Expr} from "core/expressions/evaluator/types";
-import {InstructionApplyStatus} from "core/expressions/parser/instructions";
+import {InstructionApplyStatus} from "core/virtual_machine/instructions/instructions";
 
 export const interpret_apply_status = ({
                                            instruction,

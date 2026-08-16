@@ -1,6 +1,6 @@
 import {
     InterpretInstructionProps
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
+} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/expressions/evaluator/EXPR";
 import {ExprNumberResolved} from "core/expressions/evaluator/types";
 import {
@@ -9,7 +9,7 @@ import {
     subtract_numbers_resolved
 } from "core/expressions/evaluator/number_utils";
 import {StatusEffectGainResistance} from "core/battlegrid/creatures/Creature";
-import {InstructionApplyDamage} from "core/expressions/parser/instructions";
+import {InstructionApplyDamage} from "core/virtual_machine/instructions/instructions";
 
 export const interpret_apply_damage = ({
                                            instruction,

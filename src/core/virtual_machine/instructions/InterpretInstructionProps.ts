@@ -2,7 +2,7 @@ import type {BattleGrid} from "core/battlegrid/BattleGrid";
 import type {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import type {Expr} from "core/expressions/evaluator/types";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {Instruction} from "core/expressions/parser/instructions";
+import {Instruction} from "core/virtual_machine/instructions/instructions";
 import {InitiativeOrder} from "core/initiative_order/InitiativeOrder";
 import {Settings} from "core/settings/Settings";
 import {PlayerTurnHandler} from "core/instruction_loop";

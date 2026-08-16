@@ -2,7 +2,7 @@ import type {IRPower} from "core/types.ts";
 import {
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
-import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
 const shift: IRPower = {
     name: "Shift",

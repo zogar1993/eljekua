@@ -7,7 +7,7 @@ import {EXPR} from "core/expressions/evaluator/EXPR";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
-import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
 export const evaluate_function_has_valid_targeting = ({node, turn_state, evaluate_ast, battle_grid}:
                                                           {

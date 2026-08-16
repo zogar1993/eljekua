@@ -1,7 +1,7 @@
 import {
     InterpretInstructionProps
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {INSTRUCTION_TYPE, InstructionAddCurrentTurnBaseOptions} from "core/expressions/parser/instructions";
+} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import {INSTRUCTION_TYPE, InstructionAddCurrentTurnBaseOptions} from "core/virtual_machine/instructions/instructions";
 import {AST, SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
 
 export const interpret_add_current_turn_base_options = ({

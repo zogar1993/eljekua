@@ -1,6 +1,6 @@
 import {DefenseCode} from "core/character_sheet/get_creature_defense";
 import {ActionType} from "core/battlegrid/creatures/ActionType";
-import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
 export type IRPower = {
     name: string

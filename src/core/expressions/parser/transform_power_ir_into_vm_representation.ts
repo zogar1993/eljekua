@@ -7,7 +7,7 @@ import {
     InstructionApplyStatus,
     InstructionCondition,
     InstructionSelectTarget
-} from "core/expressions/parser/instructions";
+} from "core/virtual_machine/instructions/instructions";
 import {ActionType, TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 

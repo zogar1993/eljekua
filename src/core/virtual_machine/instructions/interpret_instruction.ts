@@ -1,48 +1,48 @@
 import {
     interpret_select_target
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_select_target";
+} from "core/virtual_machine/instructions/interpret_select_target";
 import {
     interpret_define_attack_roll_result,
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_define_attack_roll_result";
+} from "core/virtual_machine/instructions/interpret_define_attack_roll_result";
 import {
     interpret_apply_damage
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_apply_damage";
-import {interpret_move} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_move";
-import {interpret_shift} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_shift";
+} from "core/virtual_machine/instructions/interpret_apply_damage";
+import {interpret_move} from "core/virtual_machine/instructions/interpret_move";
+import {interpret_shift} from "core/virtual_machine/instructions/interpret_shift";
 import {
     interpret_force_movement
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_force_movement";
+} from "core/virtual_machine/instructions/interpret_force_movement";
 import {
     interpret_save_variable
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_save_variable";
-import {interpret_options} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_options";
-import {interpret_condition} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_condition";
+} from "core/virtual_machine/instructions/interpret_save_variable";
+import {interpret_options} from "core/virtual_machine/instructions/interpret_options";
+import {interpret_condition} from "core/virtual_machine/instructions/interpret_condition";
 import type {
     InterpretInstructionProps
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
+} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {
     interpret_save_number_as_resolved
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_save_number_as_resolved";
+} from "core/virtual_machine/instructions/interpret_save_number_as_resolved";
 import {
     interpret_execute_power
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_execute_power";
+} from "core/virtual_machine/instructions/interpret_execute_power";
 import {
     interpret_add_powers_as_options
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_add_powers_as_options";
+} from "core/virtual_machine/instructions/interpret_add_powers_as_options";
 import {
     interpret_apply_status
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_apply_status";
+} from "core/virtual_machine/instructions/interpret_apply_status";
 import {
     interpret_expend_action
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_expend_action";
-import {INSTRUCTION_TYPE, Instruction} from "core/expressions/parser/instructions";
-import {interpret_end_turn} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_end_turn";
+} from "core/virtual_machine/instructions/interpret_expend_action";
+import {INSTRUCTION_TYPE, Instruction} from "core/virtual_machine/instructions/instructions";
+import {interpret_end_turn} from "core/virtual_machine/instructions/interpret_end_turn";
 import {
     interpret_attack_roll_consequence
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_attack_roll_consequence";
+} from "core/virtual_machine/instructions/interpret_attack_roll_consequence";
 import {
     interpret_add_current_turn_base_options
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_add_current_turn_base_options";
+} from "core/virtual_machine/instructions/interpret_add_current_turn_base_options";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>): void => {
     const {instruction} = props

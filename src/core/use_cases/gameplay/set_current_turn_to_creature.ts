@@ -4,7 +4,7 @@ import {run_end_of_turn_hooks} from "core/battlegrid/player_turn_handler/run_end
 import {run_start_of_turn_hooks} from "core/battlegrid/player_turn_handler/run_start_of_turn_hooks";
 import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
-import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
 
 export const create_set_current_turn_to_creature = (

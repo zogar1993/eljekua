@@ -1,7 +1,7 @@
 import {
     InterpretInstructionProps
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
-import {InstructionEndTurn} from "core/expressions/parser/instructions";
+} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import {InstructionEndTurn} from "core/virtual_machine/instructions/instructions";
 import {run_start_of_turn_hooks} from "core/battlegrid/player_turn_handler/run_start_of_turn_hooks";
 import {run_end_of_turn_hooks} from "core/battlegrid/player_turn_handler/run_end_of_turn_hooks";
 

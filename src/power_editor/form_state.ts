@@ -15,7 +15,7 @@ import type {
     TRIGGER_TYPES,
 } from "power_editor/constants";
 import {ACTION_TYPE} from "core/battlegrid/creatures/ActionType";
-import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
 export type PowerEditorState = {
     name: string

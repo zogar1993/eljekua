@@ -1,5 +1,5 @@
 import type {IRPower} from "core/types";
-import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
 export const power_resolute_shield: IRPower = {
     name: "Resolute Shield",

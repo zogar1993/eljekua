@@ -1,9 +1,9 @@
 import {
     InterpretInstructionProps
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
+} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/expressions/evaluator/EXPR";
 import {Expr} from "core/expressions/evaluator/types";
-import {INSTRUCTION_TYPE, Instruction, InstructionMovement} from "core/expressions/parser/instructions";
+import {INSTRUCTION_TYPE, Instruction, InstructionMovement} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
 
 export const interpret_move = ({

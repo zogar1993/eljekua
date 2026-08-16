@@ -1,5 +1,5 @@
 import {Expr} from "core/expressions/evaluator/types";
-import {Instruction} from "core/expressions/parser/instructions";
+import {Instruction} from "core/virtual_machine/instructions/instructions";
 import {EXPR} from "core/expressions/evaluator/EXPR";
 import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
 import {assert} from "stdlib/assert";

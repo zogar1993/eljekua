@@ -1,8 +1,8 @@
 import {
     InterpretInstructionProps
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
+} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/expressions/evaluator/EXPR";
-import {InstructionExecutePower} from "core/expressions/parser/instructions";
+import {InstructionExecutePower} from "core/virtual_machine/instructions/instructions";
 import {Expr} from "core/expressions/evaluator/types";
 import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
 

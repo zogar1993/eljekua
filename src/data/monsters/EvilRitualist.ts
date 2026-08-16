@@ -2,7 +2,7 @@ import {Size} from "core/battlegrid/creatures/SIZES";
 import {AttributeCode} from "core/character_sheet/attributes";
 import {DefenseCode} from "core/character_sheet/get_creature_defense";
 import {IRPower} from "core/types";
-import {INSTRUCTION_TYPE} from "core/expressions/parser/instructions";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
 const sacrificial_dagger: IRPower = {
     name: "Sacrificial Dagger",

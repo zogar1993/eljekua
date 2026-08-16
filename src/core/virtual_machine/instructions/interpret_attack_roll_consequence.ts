@@ -1,12 +1,12 @@
 import {
     InterpretInstructionProps
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/InterpretInstructionProps";
+} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {
     INSTRUCTION_TYPE,
     Instruction,
     InstructionAttackRollConsequence,
     InstructionSaveVariable
-} from "core/expressions/parser/instructions";
+} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/expressions/parser/AST_NODE";
 import {EXPR} from "core/expressions/evaluator/EXPR";
 import {HIT_STATUS} from "core/battlegrid/player_turn_handler/HitStatus";

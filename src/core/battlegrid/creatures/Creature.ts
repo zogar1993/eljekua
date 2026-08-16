@@ -4,7 +4,7 @@ import {ACTION_TYPE_EXPENDITURE_ORDER, ActionType} from "core/battlegrid/creatur
 import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
 import {Position} from "core/battlegrid/Position";
 import {create_event_manager} from "stdlib/event_manager";
-import {InstructionAttackDiceRoll} from "core/expressions/parser/instructions";
+import {InstructionAttackDiceRoll} from "core/virtual_machine/instructions/instructions";
 import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 
 type EventHandlerMoved = { position: Position, movement_type: "move" | "push" };

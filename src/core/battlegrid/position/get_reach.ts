@@ -10,7 +10,7 @@ import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {Expr} from "core/expressions/evaluator/types";
 import {AST} from "core/expressions/parser/AST_NODE";
-import {InstructionSelectTarget} from "core/expressions/parser/instructions";
+import {InstructionSelectTarget} from "core/virtual_machine/instructions/instructions";
 
 
 export const get_reach = ({instruction, battle_grid, evaluate_ast}: {

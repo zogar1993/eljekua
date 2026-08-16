@@ -10,7 +10,7 @@ import {
     positions_share_surface,
 } from "core/battlegrid/Position";
 import {AST} from "core/expressions/parser/AST_NODE";
-import {InstructionSelectTarget} from "core/expressions/parser/instructions";
+import {InstructionSelectTarget} from "core/virtual_machine/instructions/instructions";
 
 export const get_valid_targets = ({instruction, battle_grid, evaluate_ast}: {
     instruction: InstructionSelectTarget,

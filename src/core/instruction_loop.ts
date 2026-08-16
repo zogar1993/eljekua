@@ -1,6 +1,6 @@
 import {
     interpret_instruction
-} from "core/battlegrid/player_turn_handler/instruction_interpreters/interpret_instruction";
+} from "core/virtual_machine/instructions/interpret_instruction";
 import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import {BattleGrid} from "core/battlegrid/BattleGrid";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
