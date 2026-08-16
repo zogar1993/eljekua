@@ -6,8 +6,8 @@ import {create_expression_html} from "web/expression/create_expression_html";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 
 type FrameElements = {
-    variablesToggle: HTMLElement
-    variablesContainer: HTMLElement
+    variablesToggle?: HTMLElement
+    variablesContainer?: HTMLElement
     variableElements: Array<HTMLElement>
     instructionElements: Array<HTMLElement>
     separator?: HTMLElement
@@ -32,26 +32,23 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
 
     game_events.on_instruction_frame_added.add_handler(({instructions, variables}) => {
         const frame: FrameElements = {
-            variablesToggle: create_html_element("div", "instruction__variables-toggle"),
-            variablesContainer: create_html_element("div", "instruction__variables"),
             variableElements: [],
             instructionElements: [],
         }
-
-        frame.variablesContainer.classList.add("instruction__variables--collapsed")
-        wire_variables_toggle(frame.variablesToggle, frame.variablesContainer)
 
         if (frame_elements.length > 0) {
             frame.separator = create_html_element("div", "instruction__frame-separator")
             html_content.append(frame.separator)
         }
 
-        html_content.append(frame.variablesToggle, frame.variablesContainer)
+        if (variables.size > 0) {
+            ensure_variables_section(frame, html_content)
 
-        for (const [name, value] of variables) {
-            const html_variable = create_variable_element(name, value)
-            frame.variableElements.push(html_variable)
-            frame.variablesContainer.append(html_variable)
+            for (const [name, value] of variables) {
+                const html_variable = create_variable_element(name, value)
+                frame.variableElements.push(html_variable)
+                frame.variablesContainer!.append(html_variable)
+            }
         }
 
         for (const instruction of instructions) {
@@ -104,9 +101,10 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
         if (existing) {
             update_variable_value(existing, value)
         } else {
+            ensure_variables_section(frame, html_content)
             const html_variable = create_variable_element(name, value)
             frame.variableElements.push(html_variable)
-            frame.variablesContainer.append(html_variable)
+            frame.variablesContainer!.append(html_variable)
         }
     })
 }
@@ -116,6 +114,19 @@ export type InstructionVisualizer = ReturnType<typeof create_instruction_visuali
 const update_current_instruction_highlight = (frame: FrameElements) => {
     for (let i = 0; i < frame.instructionElements.length; i++)
         frame.instructionElements[i].classList.toggle("instruction--current", i === 0)
+}
+
+const ensure_variables_section = (frame: FrameElements, html_content: HTMLElement) => {
+    if (frame.variablesContainer) return
+
+    frame.variablesToggle = create_html_element("div", "instruction__variables-toggle")
+    frame.variablesContainer = create_html_element("div", "instruction__variables")
+    frame.variablesContainer.classList.add("instruction__variables--collapsed")
+    wire_variables_toggle(frame.variablesToggle, frame.variablesContainer)
+
+    const insert_before = frame.instructionElements[0] ?? null
+    html_content.insertBefore(frame.variablesContainer, insert_before)
+    html_content.insertBefore(frame.variablesToggle, frame.variablesContainer)
 }
 
 const wire_variables_toggle = (toggle: HTMLElement, variables_container: HTMLElement) => {
@@ -185,17 +196,23 @@ const create_visual_for_instruction = (instruction: Instruction) => {
     html_instruction.classList.add(`instruction--type-${instruction.type}`)
 
     const name_line = create_html_element("div", "instruction__name-line")
-
-    const expand_icon = create_html_element("div", "expand_icon")
     const type_badge = create_html_element("span", "instruction__type-badge")
     type_badge.textContent = instruction.type
 
+    const detail_entries = Object.entries(instruction).filter(([key]) => key !== "type")
+
+    if (detail_entries.length === 0) {
+        name_line.classList.add("instruction__name-line--static")
+        name_line.append(type_badge)
+        html_instruction.append(name_line)
+        return html_instruction
+    }
+
+    const expand_icon = create_html_element("div", "expand_icon")
     const instruction_details = create_html_element("div", "instruction__details")
     instruction_details.classList.add("instruction__details--collapsed")
 
-    for (const [key, value] of Object.entries(instruction)) {
-        if (key === "type") continue
-
+    for (const [key, value] of detail_entries) {
         const row = create_html_element("div", "instruction__detail-row")
         const key_span = create_html_element("span", "instruction__detail-key")
         key_span.textContent = key
