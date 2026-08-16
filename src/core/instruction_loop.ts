@@ -89,15 +89,9 @@ export const create_instruction_loop = ({
         evaluate_instructions()
     }
 
-    const add_cleanup_to_function = <T>(fn: (value: T) => void) => {
-        return (value: T) => {
-            fn(value)
-            clear_current_interaction()
-        }
-    }
-    const add_cleanup_to_function_zero = (fn: () => void) => {
-        return () => {
-            fn()
+    const add_cleanup_to_function = <T extends unknown[]>(fn: (...args: T) => void) => {
+        return (...args: T) => {
+            fn(...args)
             clear_current_interaction()
         }
     }
@@ -114,13 +108,13 @@ export const create_instruction_loop = ({
                     ...interaction,
                     available_options: interaction.available_options.map(option => ({
                         ...option,
-                        on_click: add_cleanup_to_function_zero(option.on_click)
+                        on_click: add_cleanup_to_function(option.on_click)
                     }))
                 }
             case "hit_status_select":
                 return {
                     ...interaction,
-                    on_confirm: add_cleanup_to_function_zero(interaction.on_confirm)
+                    on_confirm: add_cleanup_to_function(interaction.on_confirm)
                 }
         }
     }
