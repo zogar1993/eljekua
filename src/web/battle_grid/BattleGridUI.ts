@@ -190,11 +190,6 @@ export const initialize_battle_grid_ui = ({
             set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.CLICKABLE})
         } else if (interactions.type === "position_select") {
             set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.CLICKABLE})
-
-            /* TODO reactivate path highlighting
-                        for (const {position, highlight} of interactions.highlighted)
-                            set_highlight({positions: [position], highlight})
-             */
         }
     })
 
