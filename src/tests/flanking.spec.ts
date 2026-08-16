@@ -1,8 +1,10 @@
 import {create_battle_grid} from "core/battlegrid/BattleGrid";
 import {get_flanker_positions} from "core/battlegrid/position/get_flanker_positions";
 import {dependency_mocks} from "tests/utils/dependency_mocks";
+import {create_game_events} from "core/events/GameEvents";
 
-const battle_grid = create_battle_grid({size: {x: 10, y: 10}, ...dependency_mocks});
+const game_events = create_game_events()
+const battle_grid = create_battle_grid({size: {x: 10, y: 10}, game_events, ...dependency_mocks});
 
 describe("when a 1x1 attacker attacks a 1x1 defender, there is one flanking position", () => {
     [

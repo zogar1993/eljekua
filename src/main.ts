@@ -1,5 +1,5 @@
 import {create_battle_grid} from "core/battlegrid/BattleGrid";
-import {create_visual_creature} from "web/creature/CreatureVisual";
+import {create_visual_creature, CreatureVisual} from "web/creature/CreatureVisual";
 import {create_action_log} from "web/action_log/ActionLog";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {ROGUE_POWERS} from "data/powers/rogue";
@@ -30,7 +30,7 @@ const settings = create_settings()
 const game_events = create_game_events()
 const turn_state = create_turn_state({game_events})
 
-const battle_grid = create_battle_grid({size: {x: 10, y: 10}})
+const battle_grid = create_battle_grid({size: {x: 10, y: 10}, game_events})
 
 const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
 
@@ -61,55 +61,62 @@ const gameplay_use_cases = create_gameplay_use_cases({
     battle_grid, player_turn_handler, initiative_order, turn_state
 })
 
+const creature_visuals = new Map<Creature, CreatureVisual>()
+
 game_events.on_creature_added_to_game.add_handler((creature) => {
-    const {data, events} = creature
-    const visual = create_visual_creature(data)
+    creature_visuals.set(creature, create_visual_creature(creature.data))
+})
 
-    events.moved.add_handler(({position, movement_type}) => {
-        switch (movement_type) {
-            case "move":
-                AnimationQueue.add_animation(() => visual.move_one_square(position))
-                break
-            case "push":
-                AnimationQueue.add_animation(() => visual.push_to(position))
-                break
-        }
-    })
+game_events.on_creature_moved.add_handler(({creature, position, movement_type}) => {
+    const visual = creature_visuals.get(creature)
+    if (!visual) return
 
-    events.received_damage.add_handler(({damage}) => {
-        AnimationQueue.add_animation(() => visual.receive_damage({hp: data.hp_current, damage: damage.value}))
-    })
+    switch (movement_type) {
+        case "move":
+            AnimationQueue.add_animation(() => visual.move_one_square(position))
+            break
+        case "push":
+            AnimationQueue.add_animation(() => visual.push_to(position))
+            break
+    }
+})
 
-    events.is_untargeted.add_handler(() => {
-        visual.remove_hit_chance()
-    })
+game_events.on_creature_received_damage.add_handler(({creature, damage}) => {
+    const visual = creature_visuals.get(creature)
+    if (!visual) return
 
-    events.is_missed.add_handler(() => {
-        AnimationQueue.add_animation(visual.display_miss)
-    })
+    AnimationQueue.add_animation(() => visual.receive_damage({hp: creature.data.hp_current, damage: damage.value}))
+    action_log.add_new_action_log(`${creature.data.name} was dealt `, damage, ` damage.`)
+})
 
-    events.is_targeted.add_handler(({attack, defense, chance}) => {
-        visual.display_hit_chance({attack, defense, chance})
-    })
+game_events.on_creature_untargeted.add_handler((creature) => {
+    creature_visuals.get(creature)?.remove_hit_chance()
+})
 
-    events.received_damage.add_handler(({damage}) => {
-        action_log.add_new_action_log(`${data.name} was dealt `, damage, ` damage.`)
-    })
+game_events.on_creature_missed.add_handler((creature) => {
+    const visual = creature_visuals.get(creature)
+    if (!visual) return
 
-    const HIT_STATUS_TEXT = new Map<HitStatus, string>([
-        [HIT_STATUS.MISS, "misses"],
-        [HIT_STATUS.HIT, "hits"],
-        [HIT_STATUS.CRIT, "crits"]
-    ])
+    AnimationQueue.add_animation(visual.display_miss)
+})
 
-    events.has_attacked.add_handler(({attack, defense, hit_status, defender, instruction, power_name}) => {
-        action_log.add_new_action_log(
-            `${data.name}'s ${power_name} (`,
-            attack,
-            `) ${HIT_STATUS_TEXT.get(hit_status)} against ${defender.data.name}'s ${instruction.defense} (`,
-            defense,
-            `).`)
-    })
+game_events.on_creature_targeted.add_handler(({creature, attack, defense, chance}) => {
+    creature_visuals.get(creature)?.display_hit_chance({attack, defense, chance})
+})
+
+const HIT_STATUS_TEXT = new Map<HitStatus, string>([
+    [HIT_STATUS.MISS, "misses"],
+    [HIT_STATUS.HIT, "hits"],
+    [HIT_STATUS.CRIT, "crits"]
+])
+
+game_events.on_creature_attacked.add_handler(({creature, attack, defense, hit_status, defender, instruction, power_name}) => {
+    action_log.add_new_action_log(
+        `${creature.data.name}'s ${power_name} (`,
+        attack,
+        `) ${HIT_STATUS_TEXT.get(hit_status)} against ${defender.data.name}'s ${instruction.defense} (`,
+        defense,
+        `).`)
 })
 
 const add_creature = create_add_creature_to_game({battle_grid, initiative_order, game_events})

@@ -6,6 +6,7 @@ import {Instruction} from "core/virtual_machine/instructions/instructions";
 import {InitiativeOrder} from "core/initiative_order/InitiativeOrder";
 import {Settings} from "core/settings/Settings";
 import {PlayerTurnHandler} from "core/instruction_loop";
+import {GameEvents} from "core/events/GameEvents";
 
 export type InterpretInstructionProps<T extends Instruction> = {
     instruction: T
@@ -15,4 +16,5 @@ export type InterpretInstructionProps<T extends Instruction> = {
     evaluate_ast: (node: AstNode) => Expr
     initiative_order: InitiativeOrder
     settings: Settings
+    game_events: GameEvents
 }

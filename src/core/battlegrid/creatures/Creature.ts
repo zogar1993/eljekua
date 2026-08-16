@@ -2,37 +2,11 @@ import {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {ACTION_TYPE_EXPENDITURE_ORDER, ActionType} from "core/battlegrid/creatures/ActionType";
 import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
-import {Position} from "core/battlegrid/Position";
-import {create_event_manager} from "stdlib/event_manager";
-import {InstructionAttackDiceRoll} from "core/virtual_machine/instructions/instructions";
-import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
-
-type EventHandlerMoved = { position: Position, movement_type: "move" | "push" };
-type EventHandlerReceivedDamage = { damage: ExprNumberResolved };
-type EventHandlerIsTargeted = { attack: number, defense: number, chance: number };
-type EventHandlerHasAttacked = {
-    attack: ExprNumberResolved,
-    hit_status: HitStatus,
-    defender: Creature,
-    defense: ExprNumberResolved,
-    instruction: InstructionAttackDiceRoll,
-    power_name: string,
-}
-
 export class Creature {
     id: number
     data: CreatureData
     statuses: Array<Status> = []
     available_actions: Array<ActionType> = []
-
-    events = {
-        moved: create_event_manager<EventHandlerMoved>(),
-        received_damage: create_event_manager<EventHandlerReceivedDamage>(),
-        is_targeted: create_event_manager<EventHandlerIsTargeted>(),
-        is_untargeted: create_event_manager(),
-        is_missed: create_event_manager(),
-        has_attacked: create_event_manager<EventHandlerHasAttacked>(),
-    }
 
     constructor({id, data}: { id: number, data: CreatureData }) {
         this.data = data

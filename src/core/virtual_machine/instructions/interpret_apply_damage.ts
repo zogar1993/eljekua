@@ -14,7 +14,8 @@ import {InstructionApplyDamage} from "core/virtual_machine/instructions/instruct
 export const interpret_apply_damage = ({
                                            instruction,
                                            evaluate_ast,
-                                           turn_state
+                                           turn_state,
+                                           game_events,
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
     const attacker = turn_state.get_acting_creature()
     //TODO P3 we probably want to apply damage to a bunch of enemies at the same time
@@ -33,7 +34,7 @@ export const interpret_apply_damage = ({
 
     target.data.hp_current -= damage.value
 
-    target.events.received_damage.raise({damage})
+    game_events.on_creature_received_damage.raise({creature: target, damage})
 }
 
 const apply_half_damage = (number: ExprNumberResolved): ExprNumberResolved => ({

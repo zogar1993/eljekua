@@ -8,9 +8,11 @@ import {
     transform_position_to_f1
 } from "core/battlegrid/Position";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "data/powers/basic";
+import {GameEvents} from "core/events/GameEvents";
 
-export const create_battle_grid = ({size}: {
+export const create_battle_grid = ({size, game_events}: {
     size: { x: number, y: number }
+    game_events: GameEvents
 }): BattleGrid => {
     const creatures: Array<Creature> = []
     const board: Array<Array<Square>> = Array.from({length: size.y}, (_, y) => {
@@ -59,7 +61,7 @@ export const create_battle_grid = ({size}: {
 
     const push_creature = ({position, creature}: { position: Position, creature: Creature }) => {
         creature.data.position = position
-        creature.events.moved.raise({position, movement_type: "push"})
+        game_events.on_creature_moved.raise({creature, position, movement_type: "push"})
     }
 
     return {

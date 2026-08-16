@@ -52,7 +52,8 @@ const handle_hit_status_with_dice_roll = ({
                                               instruction,
                                               battle_grid,
                                               evaluate_ast,
-                                              turn_state
+                                              turn_state,
+                                              game_events,
                                           }: InterpretInstructionProps<InstructionAttackDiceRoll>) => {
     const attacker = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
     const defenders = EXPR.as_creatures(turn_state.get_variable(instruction.defender))
@@ -90,6 +91,6 @@ const handle_hit_status_with_dice_roll = ({
 
         turn_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: roll_results})
 
-        attacker.events.has_attacked.raise({attack, hit_status, defender, defense, instruction, power_name})
+        game_events.on_creature_attacked.raise({creature: attacker, attack, hit_status, defender, defense, instruction, power_name})
     })
 }

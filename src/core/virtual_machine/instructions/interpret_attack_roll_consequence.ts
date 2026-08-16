@@ -12,7 +12,7 @@ import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {HIT_STATUS} from "core/battlegrid/player_turn_handler/HitStatus";
 
 export const interpret_attack_roll_consequence = (props: InterpretInstructionProps<InstructionAttackRollConsequence>) => {
-    const {instruction, turn_state} = props
+    const {instruction, turn_state, game_events} = props
     const attack_rolls = EXPR.as_attack_rolls(turn_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
     const entries = [...attack_rolls.entries()]
 
@@ -25,7 +25,7 @@ export const interpret_attack_roll_consequence = (props: InterpretInstructionPro
         if (is_hit) {
             new_instructions.push(...instruction.hit)
         } else {
-            defender.events.is_missed.raise()
+            game_events.on_creature_missed.raise(defender)
             new_instructions.push(...instruction.miss)
         }
     })

@@ -161,7 +161,8 @@ export const create_instruction_loop = ({
                 turn_state,
                 evaluate_ast,
                 initiative_order,
-                settings
+                settings,
+                game_events,
             })
         }
     }

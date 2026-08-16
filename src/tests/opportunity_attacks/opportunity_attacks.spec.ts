@@ -17,10 +17,10 @@ import {create_interaction_test_helpers} from "tests/utils/interaction_test_help
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 
-const battle_grid = create_battle_grid({size: {x: 10, y: 10}})
+const game_events = create_game_events()
+const battle_grid = create_battle_grid({size: {x: 10, y: 10}, game_events})
 const initiative_order = create_initiative_order({...dependency_mocks})
 const settings = create_settings()
-const game_events = create_game_events()
 const turn_state = create_turn_state({game_events})
 const evaluate_ast = build_evaluate_ast({turn_state, battle_grid})
 
@@ -52,15 +52,13 @@ const start_battle = () => {
 
 const attack_log: Array<{ attacker: string, target: string, power_name: string }> = []
 
-game_events.on_creature_added_to_game.add_handler(creature => {
-    creature.events.is_missed.add_handler(() => {
-        const attacker = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
-        const power_name = EXPR.as_string(turn_state.get_variable(SYSTEM_KEYWORD.POWER_NAME))
-        attack_log.push({
-            attacker: attacker.data.name,
-            target: creature.data.name,
-            power_name,
-        })
+game_events.on_creature_missed.add_handler((creature) => {
+    const attacker = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
+    const power_name = EXPR.as_string(turn_state.get_variable(SYSTEM_KEYWORD.POWER_NAME))
+    attack_log.push({
+        attacker: attacker.data.name,
+        target: creature.data.name,
+        power_name,
     })
 })
 

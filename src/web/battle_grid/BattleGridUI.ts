@@ -85,7 +85,7 @@ export const initialize_battle_grid_ui = ({
 
     const clear_attack_success_chances = () => {
         for (const creature of battle_grid.creatures)
-            creature.events.is_untargeted.raise()
+            game_events.on_creature_untargeted.raise(creature)
     }
 
     const show_attack_success_chances_for_position = (
@@ -100,7 +100,7 @@ export const initialize_battle_grid_ui = ({
         for (const creature of targets.value) {
             const hit_chance = interactions.get_attack_hit_chance_against(creature)
             if (hit_chance === null) return;
-            creature.events.is_targeted.raise(hit_chance)
+            game_events.on_creature_targeted.raise({creature, ...hit_chance})
         }
 
     }

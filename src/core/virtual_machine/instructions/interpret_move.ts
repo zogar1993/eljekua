@@ -11,6 +11,7 @@ export const interpret_move = ({
                                    battle_grid,
                                    turn_state,
                                    evaluate_ast,
+                                   game_events,
                                }: InterpretInstructionProps<InstructionMovement>) => {
     const moving_creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
     const destination_label = instruction.destination
@@ -46,7 +47,7 @@ export const interpret_move = ({
         if (potential_attackers.length === 0) {
             const new_position = path[i + 1]
             moving_creature.data.position = new_position
-            moving_creature.events.moved.raise({position: new_position, movement_type: "move"})
+            game_events.on_creature_moved.raise({creature: moving_creature, position: new_position, movement_type: "move"})
         } else {
             turn_state.set_variable(destination_label, {
                 type: "positions",
