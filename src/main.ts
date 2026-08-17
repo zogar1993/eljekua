@@ -133,7 +133,13 @@ const start_battle = create_start_battle({battle_grid, initiative_order, instruc
     const ritualist = build_monster(evil_ritualist, {
         position: {x: 3, y: 3, footprint: 1},
         image: `url("/public/wizard-staff.svg")`,
-        team: null,
+        team: 2,
+    })
+
+    const ritualist2 = build_monster(evil_ritualist, {
+        position: {x: 3, y: 4, footprint: 1},
+        image: `url("/public/wizard-staff.svg")`,
+        team: 2,
     })
 
     add_creature({data: bob})
@@ -141,6 +147,7 @@ const start_battle = create_start_battle({battle_grid, initiative_order, instruc
     add_creature({data: yeims})
     add_creature({data: jenri})
     add_creature({data: ritualist})
+    add_creature({data: ritualist2})
 
     start_battle()
 }
