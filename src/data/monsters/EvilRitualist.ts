@@ -29,6 +29,7 @@ const sacrificial_dagger: IRPower = {
         action: "standard",
         cooldown: "at-will",
         attack: true,
+        traits: ["melee_basic_attack"],
     },
     targeting: {
         targeting_type: "melee_weapon",

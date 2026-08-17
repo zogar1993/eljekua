@@ -81,6 +81,7 @@ export type InstructionSaveResolvedNumber = {
 export type InstructionAddPowers = {
     type: typeof INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS,
     creature: AstNode,
+    //TODO costs should only be normal and triger
     cost: "normal" | "opportunity" | "free_attack",
     filter: "turn" | "melee_basic_attack"
 }

@@ -22,7 +22,7 @@ export const interpret_add_powers_as_options = ({
     for (const power of filtered_powers) {
         const power_name = `power_${power.name.replaceAll(" ", "_").toLowerCase()}`
         const is_opportunity_attack = instruction.cost === "opportunity"
-        const action_type_cost = is_opportunity_attack ? "opportunity" : power.type.action
+        const action_type_cost = instruction.cost === "normal" ? power.type.action : instruction.cost
         const initialization = is_opportunity_attack ? [{
             from: SYSTEM_KEYWORD.TRIGGERER,
             to: SYSTEM_KEYWORD.PRIMARY_TARGET
