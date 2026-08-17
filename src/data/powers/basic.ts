@@ -78,7 +78,7 @@ const opportunity_attack: IRPower = {
         attack: true,
     },
     trigger: {
-        type: "interruption",
+        type: "reaction",
         intercepts: ["movement"],
         conditions: [
             `$is_lower_or_equal($distance(trigger_activator,trigger_owner),$opportunity_attack_range(trigger_owner))`,
