@@ -2,9 +2,8 @@ import {
     InterpretInstructionProps
 } from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {Expr} from "core/virtual_machine/expressions/types";
-import {INSTRUCTION_TYPE, Instruction, InstructionMovement} from "core/virtual_machine/instructions/instructions";
-import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
+import {INSTRUCTION_TYPE, InstructionMovement} from "core/virtual_machine/instructions/instructions";
+import {get_potential_triggers, create_trigger_frame} from "core/virtual_machine/instructions/trigger_reactions";
 
 export const interpret_move = ({
                                    instruction,
@@ -16,73 +15,41 @@ export const interpret_move = ({
     const moving_creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
     const destination_label = instruction.destination
     const path = EXPR.as_positions(turn_state.get_variable(destination_label))
-    turn_state.set_variable("trigger_activator", {type: "creatures", value: [moving_creature]})
 
     for (let i = 0; i < path.length - 1; i++) {
-        // We exclude the ones who already were potential attackers for this power.
-        // This is a little redundant in most cases, but without it, we wouldn't
-        // disregard those who ignored the chance to make an opportunity attack.
-        const excluded = turn_state.has_variable(SYSTEM_KEYWORD.EXCLUDED_FROM_REACTING) ?
-            EXPR.as_creatures(turn_state.get_variable(SYSTEM_KEYWORD.EXCLUDED_FROM_REACTING)) : []
+        const potential_reactors = get_potential_triggers({
+            battle_grid,
+            turn_state,
+            evaluate_ast,
+            activator: moving_creature,
+            intercept: "movement"
+        })
 
-        const potential_attackers =
-            battle_grid.creatures
-                .filter(creature => creature !== moving_creature)
-                .filter(creature => !excluded.includes(creature))
-                .map(creature => {
-                    turn_state.set_variable("trigger_owner", {type: "creatures", value: [creature]})
-                    const powers = creature.data.powers.filter(power => {
-                        if (!power.trigger) return false
-                        if (!power.trigger.intercepts.includes("movement")) return false
-                        if (!creature.has_action_available(power.type.action)) return false
-                        return power.trigger.conditions.every(condition => EXPR.as_boolean(evaluate_ast(condition)))
-                    })
-                    return {creature, powers}
-                })
-                .filter(({powers}) => powers.length > 0)
 
-        const new_excluded = [...excluded, ...potential_attackers.map(({creature}) => creature)]
-        turn_state.set_variable(SYSTEM_KEYWORD.EXCLUDED_FROM_REACTING, {type: "creatures", value: new_excluded})
-
-        if (potential_attackers.length === 0) {
+        if (potential_reactors.length === 0) {
             const new_position = path[i + 1]
             moving_creature.data.position = new_position
-            game_events.on_creature_moved.raise({creature: moving_creature, position: new_position, movement_type: "move"})
+            game_events.on_creature_moved.raise({
+                creature: moving_creature,
+                position: new_position,
+                movement_type: "move"
+            })
         } else {
             turn_state.set_variable(destination_label, {
                 type: "positions",
                 value: path.slice(i),
                 description: "movement"
             })
+
             turn_state.add_instructions([{
                 type: INSTRUCTION_TYPE.MOVE,
                 target: instruction.target,
                 destination: instruction.destination
             }])
 
-
-            for (const {creature: attacker, powers} of potential_attackers) {
-                const instructions: Array<Instruction> = [
-                    {
-                        type: INSTRUCTION_TYPE.OPTIONS,
-                        options: [
-                            ...powers.map(power => ({
-                                text: power.name,
-                                instructions: power.instructions
-                            })),
-                            {
-                                text: "Ignore",
-                                instructions: []
-                            }
-                        ]
-                    },
-                ]
-                const variables: Record<string, Expr> = {
-                    [SYSTEM_KEYWORD.OWNER]: {type: "creatures", value: [attacker]},
-                    [SYSTEM_KEYWORD.TRIGGERER]: {type: "creatures", value: [moving_creature]}
-                }
-
-                turn_state.add_instruction_frame({instructions, variables})
+            for (const {creature: trigger_owner, powers} of potential_reactors) {
+                const frame = create_trigger_frame({activator: moving_creature, trigger_owner, powers})
+                turn_state.add_instruction_frame(frame)
             }
 
             break

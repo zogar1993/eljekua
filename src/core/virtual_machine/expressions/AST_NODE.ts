@@ -25,7 +25,6 @@ export const SYSTEM_KEYWORD = {
     PRIMARY_TARGET: "primary_target",
     TRIGGERER: "triggerer",
     HIT_STATUS: "hit_status",
-    EXCLUDED_FROM_REACTING: "excluded_from_reacting"
 } as const
 
 export const AST = {

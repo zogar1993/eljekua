@@ -7,10 +7,11 @@ export const run_start_of_turn_hooks = ({current_turn_creature, battle_grid}: {
     battle_grid: BattleGrid
 }) => {
     for (const creature of battle_grid.creatures) {
+    //TODO this should work by replenishing instead of setting, since immediate actions are one per round
         if (creature === current_turn_creature)
-            creature.set_available_actions([ACTION_TYPE.STANDARD, ACTION_TYPE.MOVEMENT, ACTION_TYPE.MINOR])
+            creature.set_available_actions([ACTION_TYPE.STANDARD, ACTION_TYPE.MOVEMENT, ACTION_TYPE.MINOR, ACTION_TYPE.FREE_ATTACK])
         else
-            creature.set_available_actions([ACTION_TYPE.OPPORTUNITY])
+            creature.set_available_actions([ACTION_TYPE.OPPORTUNITY, ACTION_TYPE.FREE_ATTACK])
 
         creature.remove_statuses({type: "turn_start", creature: current_turn_creature})
 

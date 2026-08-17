@@ -8,7 +8,7 @@ import {
     InstructionCondition,
     InstructionSelectTarget
 } from "core/virtual_machine/instructions/instructions";
-import {ActionType, TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
+import {ACTION_TYPE, ActionType, TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
@@ -28,8 +28,8 @@ export const transform_power_ir_into_vm_representation = (power: IRPower): Power
         throw Error(`Power '${power.name}' does not have a trigger defined despite being an opportunity action`)
 
     if (power.trigger) {
-        if (power.type.action !== "opportunity")
-            throw Error(`Power '${power.name}' with trigger needs to be of type 'opportunity'.`)
+        if (!TRIGGER_ACTION_TYPES.includes(power.type.action))
+            throw Error(`Power '${power.name}' with trigger needs to be one of ${JSON.stringify(TRIGGER_ACTION_TYPES)} but is '${power.type.action}'.`)
         //TODO P4 check that no owner can be set on conditions so that we avoid confusing the trigger owner with the triggering power owner
     }
 
@@ -293,3 +293,5 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
             throw Error(`"${ir.status.type}" is not a valid "apply_status" type`)
     }
 }
+
+const TRIGGER_ACTION_TYPES = [ACTION_TYPE.IMMEDIATE, ACTION_TYPE.OPPORTUNITY, ACTION_TYPE.FREE_ATTACK] as Array<ActionType>
