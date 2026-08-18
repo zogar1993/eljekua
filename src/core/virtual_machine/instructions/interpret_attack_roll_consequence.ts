@@ -21,7 +21,8 @@ export const interpret_attack_roll_consequence = ({
                                                       evaluate_ast,
                                                       battle_grid,
                                                       instruction,
-                                                      game_events
+                                                      game_events,
+                                                      initiative_order,
                                                   }: InterpretInstructionProps<InstructionAttackRollConsequence>) => {
 
     const attack_rolls = EXPR.as_attack_rolls(turn_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
@@ -35,6 +36,7 @@ export const interpret_attack_roll_consequence = ({
         const potential_triggers = get_potential_triggers({
             battle_grid,
             turn_state,
+            initiative_order,
             evaluate_ast,
             activator,
             intercept: TRIGGER_INTERCEPTION.CRITICAL_HIT,

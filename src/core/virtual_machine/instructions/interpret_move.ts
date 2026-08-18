@@ -11,6 +11,7 @@ export const interpret_move = ({
                                    turn_state,
                                    evaluate_ast,
                                    game_events,
+                                   initiative_order,
                                }: InterpretInstructionProps<InstructionMovement>) => {
     const moving_creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
     const destination_label = instruction.destination
@@ -21,6 +22,7 @@ export const interpret_move = ({
             battle_grid,
             turn_state,
             evaluate_ast,
+            initiative_order,
             activator: moving_creature,
             intercept: "movement"
         })

@@ -35,8 +35,10 @@ export class Creature {
         this.statuses = new_statuses
     }
 
-    set_available_actions = (actions: Array<ActionType>) => {
-        this.available_actions = [...actions]
+    restore_actions = (actions: Array<ActionType>) => {
+        for (const action of actions)
+            if (!this.available_actions.includes(action))
+                this.available_actions.push(action)
     }
 
     has_action_available = (action: ActionType) => {

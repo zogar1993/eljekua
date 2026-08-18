@@ -50,7 +50,6 @@ const sacrificial_dagger: IRPower = {
 }
 
 //TODO add free attack expenditure
-//TODO add immediate action lifecycle
 //TODO add reaction placement in the instruction queue
 //TODO ignored dont work properly as the immediate and oportunity defer
 const unholy_vigor: IRPower = {

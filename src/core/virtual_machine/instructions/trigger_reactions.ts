@@ -11,6 +11,8 @@ import type {Expr} from "core/virtual_machine/expressions/types";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
+import {ACTION_TYPE, ActionType} from "core/battlegrid/creatures/ActionType";
+import {InitiativeOrder} from "core/initiative_order/InitiativeOrder";
 
 export const TRIGGER_VARIABLE = {
     ACTIVATOR: "trigger_activator",
@@ -20,12 +22,14 @@ export const TRIGGER_VARIABLE = {
 export const get_potential_triggers = ({
                                            battle_grid,
                                            turn_state,
+                                           initiative_order,
                                            evaluate_ast,
                                            activator,
                                            intercept,
                                        }: {
     battle_grid: BattleGrid
     turn_state: TurnState
+    initiative_order: InitiativeOrder
     evaluate_ast: (node: AstNode) => Expr
     activator: Creature
     intercept: TriggerInterception
@@ -39,6 +43,7 @@ export const get_potential_triggers = ({
 
     turn_state.set_variable(TRIGGER_VARIABLE.ACTIVATOR, {type: "creatures", value: [activator]})
 
+    const current_turn_creature = initiative_order.get_current_creature()
     const trigger_owners = battle_grid.creatures
         .filter(creature => !already_triggered.includes(creature))
         .map(creature => {
@@ -46,6 +51,7 @@ export const get_potential_triggers = ({
             const powers = creature.data.powers.filter(power => {
                 if (!power.trigger) return false
                 if (!power.trigger.intercepts.includes(intercept)) return false
+                if (!can_use_power_on_own_turn(power) && creature === current_turn_creature) return false
                 if (!creature.has_action_available(power.type.action)) return false
                 return power.trigger.conditions.every(condition => EXPR.as_boolean(evaluate_ast(condition)))
             })
@@ -82,3 +88,6 @@ export const create_trigger_frame = ({activator, trigger_owner: creature, powers
         [SYSTEM_KEYWORD.TRIGGERER]: {type: "creatures", value: [activator]}
     }
 })
+
+const OTHER_TURN_ACTIONS: Array<ActionType> = [ACTION_TYPE.OPPORTUNITY, ACTION_TYPE.IMMEDIATE] as const
+const can_use_power_on_own_turn = (power: Power) => OTHER_TURN_ACTIONS.includes(power.type.action)

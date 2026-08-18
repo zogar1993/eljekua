@@ -2,9 +2,9 @@ export const ACTION_TYPE = {
     STANDARD: "standard",
     MOVEMENT: "movement",
     MINOR: "minor",
-    IMMEDIATE: "immediate",
-    OPPORTUNITY: "opportunity",
-    FREE_ATTACK: "free_attack",
+    IMMEDIATE: "immediate", // Once per round, someone else's turn, interrupt/reaction
+    OPPORTUNITY: "opportunity", // Once per turn, someone else's turn, interrupt
+    FREE_ATTACK: "free_attack", // Once per turn
     FREE: "free"
 } as const
 
@@ -26,4 +26,8 @@ export function assert_is_action_type(value: string): asserts value is ActionTyp
     throw Error(`"${value}" is not an action type`)
 }
 
-export const TURN_ACTION_TYPES: Array<ActionType> = [ACTION_TYPE.MINOR, ACTION_TYPE.MOVEMENT, ACTION_TYPE.STANDARD]
+export const TURN_ACTION_TYPES: Array<ActionType> = [
+    ACTION_TYPE.MINOR,
+    ACTION_TYPE.MOVEMENT,
+    ACTION_TYPE.STANDARD
+]
