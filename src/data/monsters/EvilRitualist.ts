@@ -91,7 +91,7 @@ const evil_ritualist: Monster = {
     },
     alignment: "unaligned",
     languages: [],
-    hp: 1, //TODO P1 a missed attack never damages a minion.
+    hp: 1,
     defenses: {
         ac: 15,
         fortitude: 13,

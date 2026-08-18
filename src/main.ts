@@ -177,7 +177,8 @@ const build_character = (
         level: data.level ?? 1,
         team: data.team ?? null,
         attributes: data.attributes ?? Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
-        powers: data.powers ?? []
+        powers: data.powers ?? [],
+        archetypes: []
     }
 }
 
@@ -197,6 +198,7 @@ const build_monster = (
         level: overrides.level ?? monster.level,
         team: overrides.team ?? null,
         attributes: overrides.attributes ?? monster.attributes,
+        archetypes: overrides.archetypes ?? monster.archetypes,
         powers: overrides.powers ?? monster.powers.map(transform_power_ir_into_vm_representation),
     }
 }

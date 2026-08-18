@@ -10,6 +10,9 @@ import {
 } from "core/virtual_machine/expressions/number_utils";
 import {StatusEffectGainResistance} from "core/battlegrid/creatures/Creature";
 import {InstructionApplyDamage} from "core/virtual_machine/instructions/instructions";
+import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
+import {assert_is_not_undefined} from "stdlib/assert";
+import {HIT_STATUS, HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 
 export const interpret_apply_damage = ({
                                            instruction,
@@ -19,8 +22,21 @@ export const interpret_apply_damage = ({
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
     const {turn_state} = game_state
     const attacker = turn_state.get_acting_creature()
+
     //TODO P3 we probably want to apply damage to a bunch of enemies at the same time
+
     const target = EXPR.as_creature(turn_state.get_variable(instruction.target))
+
+    // TODO this is a hack so that powers that do not have a roll still hit
+    let hit_status_value: HitStatus = HIT_STATUS.HIT
+    if (turn_state.has_variable(SYSTEM_KEYWORD.HIT_STATUS)) {
+        const hit_status = EXPR.as_attack_rolls(turn_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
+        const value = hit_status.get(target)
+        if (value !== undefined)
+            hit_status_value = value
+    }
+
+    if (hit_status_value === HIT_STATUS.MISS && target.data.archetypes.includes("minion")) return
 
     let damage = resolve_number(EXPR.as_number_expr(evaluate_ast(instruction.value)))
 
