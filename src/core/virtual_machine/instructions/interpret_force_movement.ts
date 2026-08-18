@@ -6,9 +6,10 @@ import {InstructionForceMovement} from "core/virtual_machine/instructions/instru
 
 export const interpret_force_movement = ({
                                              instruction,
-                                             battle_grid,
+                                             game_state,
                                              evaluate_ast
                                          }: InterpretInstructionProps<InstructionForceMovement>) => {
+    const {battle_grid} = game_state
     const creature = EXPR.as_creature(evaluate_ast(instruction.target))
     switch (instruction.movement_type) {
         case "push": {

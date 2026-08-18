@@ -10,9 +10,10 @@ import {InstructionApplyStatus} from "core/virtual_machine/instructions/instruct
 
 export const interpret_apply_status = ({
                                            instruction,
-                                           turn_state,
+                                           game_state,
                                            evaluate_ast,
                                        }: InterpretInstructionProps<InstructionApplyStatus>) => {
+    const {turn_state} = game_state
     const targets = EXPR.as_creatures(evaluate_ast(instruction.target))
     const power_owner = turn_state.get_acting_creature()
     

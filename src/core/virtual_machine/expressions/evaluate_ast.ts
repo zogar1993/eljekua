@@ -11,17 +11,16 @@ import type {AstNodeString} from "core/expressions/parser/nodes/AstNodeString";
 import type {AstNodeDice, AstNodeWeapon} from "core/expressions/parser/nodes/AstNodeRoll";
 import type {AstNodeKeyword} from "core/expressions/parser/nodes/AstNodeKeyword";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
-import {BattleGrid} from "core/battlegrid/BattleGrid";
-import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
+import type {GameState} from "core/game_state/GameState";
 
 /*
     This is called "evaluate" instead on "interpret" to distinguish the expressions that evaluate to a value from the
     interpreting of instructions that affect the game context.
  */
-export const build_evaluate_ast = ({turn_state, battle_grid}: {
-    turn_state: TurnState
-    battle_grid: BattleGrid
+export const build_evaluate_ast = ({game_state}: {
+    game_state: GameState
 }): (node: AstNode) => Expr => {
+    const {turn_state, battle_grid} = game_state
     const evaluate_ast = (node: AstNode) => {
         const func = evaluator_internals[node.type]
         if (!func) throw Error(`evaluator for type '${node.type}' does not exist`)

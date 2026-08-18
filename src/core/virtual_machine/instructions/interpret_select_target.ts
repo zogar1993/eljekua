@@ -24,11 +24,11 @@ import {Targets} from "core/instruction_loop";
 
 export const interpret_select_target = ({
                                             instruction,
-                                            turn_state,
+                                            game_state,
                                             player_turn_handler,
-                                            battle_grid,
                                             evaluate_ast
                                         }: InterpretInstructionProps<InstructionSelectTarget>) => {
+    const {battle_grid, turn_state} = game_state
     const clickable = get_valid_targets({instruction, battle_grid, evaluate_ast})
 
     if (clickable.length === 0) return

@@ -6,9 +6,10 @@ import {InstructionMovement} from "core/virtual_machine/instructions/instruction
 
 export const interpret_shift = ({
                                     instruction,
-                                    turn_state,
+                                    game_state,
                                     game_events,
                                 }: InterpretInstructionProps<InstructionMovement>) => {
+    const {turn_state} = game_state
     const creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
     const path = EXPR.as_positions(turn_state.get_variable(instruction.destination))
     for (const position of path) {

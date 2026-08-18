@@ -11,9 +11,10 @@ import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 
 export const interpret_add_powers_as_options = ({
                                                     instruction,
-                                                    turn_state,
+                                                    game_state,
                                                     evaluate_ast
                                                 }: InterpretInstructionProps<InstructionAddPowers>) => {
+    const {turn_state} = game_state
     const creature = EXPR.as_creature(evaluate_ast(instruction.creature))
     const filtered_powers = filter_powers({powers: creature.data.powers, filter: instruction.filter})
 

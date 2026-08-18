@@ -17,13 +17,12 @@ import {
 import {TRIGGER_INTERCEPTION} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 
 export const interpret_attack_roll_consequence = ({
-                                                      turn_state,
+                                                      game_state,
                                                       evaluate_ast,
-                                                      battle_grid,
                                                       instruction,
                                                       game_events,
-                                                      initiative_order,
                                                   }: InterpretInstructionProps<InstructionAttackRollConsequence>) => {
+    const {turn_state} = game_state
 
     const attack_rolls = EXPR.as_attack_rolls(turn_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
     const entries = [...attack_rolls.entries()]
@@ -34,9 +33,7 @@ export const interpret_attack_roll_consequence = ({
         const activator = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
 
         const potential_triggers = get_potential_triggers({
-            battle_grid,
-            turn_state,
-            initiative_order,
+            game_state,
             evaluate_ast,
             activator,
             intercept: TRIGGER_INTERCEPTION.CRITICAL_HIT,

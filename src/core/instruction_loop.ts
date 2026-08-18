@@ -1,12 +1,9 @@
 import {
     interpret_instruction
 } from "core/virtual_machine/instructions/interpret_instruction";
-import {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
-import {BattleGrid} from "core/battlegrid/BattleGrid";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {Expr} from "core/virtual_machine/expressions/types";
-import {InitiativeOrder} from "core/initiative_order/InitiativeOrder";
-import {Settings} from "core/settings/Settings";
+import type {GameState} from "core/game_state/GameState";
 import {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
 import {GameEvents} from "core/events/GameEvents";
 import {Creature} from "core/battlegrid/creatures/Creature";
@@ -77,20 +74,15 @@ export type PlayerTurnHandler = {
 }
 
 export const create_instruction_loop = ({
-                                            turn_state,
-                                            battle_grid,
+                                            game_state,
                                             evaluate_ast,
-                                            initiative_order,
-                                            settings,
                                             game_events
                                         }: {
-    turn_state: TurnState
-    battle_grid: BattleGrid
+    game_state: GameState
     evaluate_ast: (node: AstNode) => Expr
-    initiative_order: InitiativeOrder
-    settings: Settings
     game_events: GameEvents
 }) => {
+    const {turn_state} = game_state
     let current_interaction: Interaction | null = null
 
     const clear_current_interaction = () => {
@@ -155,11 +147,8 @@ export const create_instruction_loop = ({
             interpret_instruction({
                 instruction,
                 player_turn_handler,
-                battle_grid,
-                turn_state,
+                game_state,
                 evaluate_ast,
-                initiative_order,
-                settings,
                 game_events,
             })
         }

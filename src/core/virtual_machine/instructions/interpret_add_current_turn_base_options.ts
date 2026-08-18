@@ -5,9 +5,9 @@ import {INSTRUCTION_TYPE, InstructionAddCurrentTurnBaseOptions} from "core/virtu
 import {AST, SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 
 export const interpret_add_current_turn_base_options = ({
-                                                            initiative_order,
-                                                            turn_state,
+                                                            game_state,
                                                         }: InterpretInstructionProps<InstructionAddCurrentTurnBaseOptions>) => {
+    const {initiative_order, turn_state} = game_state
     // This instruction adds itself so that it is always present at the base frame
     turn_state.add_instructions([{type: INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS}])
 

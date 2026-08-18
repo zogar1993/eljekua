@@ -5,9 +5,10 @@ import {InstructionSaveVariable} from "core/virtual_machine/instructions/instruc
 
 export const interpret_save_variable = ({
                                             instruction,
-                                            turn_state,
+                                            game_state,
                                             evaluate_ast
                                         }: InterpretInstructionProps<InstructionSaveVariable>) => {
+    const {turn_state} = game_state
     const expression = evaluate_ast(instruction.value)
     turn_state.set_variable(instruction.label, expression)
 }

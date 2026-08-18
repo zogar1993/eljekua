@@ -8,8 +8,9 @@ export const interpret_options = ({
                                       instruction,
                                       player_turn_handler,
                                       evaluate_ast,
-                                      turn_state
+                                      game_state
                                   }: InterpretInstructionProps<InstructionOptions>) => {
+    const {turn_state} = game_state
     player_turn_handler.set_available_interactions({
         type: "option_select",
         available_options: instruction.options.map(({text, condition, instructions}) => ({

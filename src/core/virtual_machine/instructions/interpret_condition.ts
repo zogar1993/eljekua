@@ -6,9 +6,10 @@ import {InstructionCondition} from "core/virtual_machine/instructions/instructio
 
 export const interpret_condition = ({
                                         instruction,
-                                        turn_state,
+                                        game_state,
                                         evaluate_ast
                                     }: InterpretInstructionProps<InstructionCondition>) => {
+    const {turn_state} = game_state
     const result = EXPR.as_boolean(evaluate_ast(instruction.condition))
     turn_state.add_instructions(result ? instruction.instructions_true : instruction.instructions_false)
 }

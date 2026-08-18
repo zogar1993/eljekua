@@ -1,4 +1,4 @@
-import type {BattleGrid} from "core/battlegrid/BattleGrid";
+import type {GameState} from "core/game_state/GameState";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
@@ -12,7 +12,6 @@ import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {ACTION_TYPE, ActionType} from "core/battlegrid/creatures/ActionType";
-import {InitiativeOrder} from "core/initiative_order/InitiativeOrder";
 
 export const TRIGGER_VARIABLE = {
     ACTIVATOR: "trigger_activator",
@@ -20,20 +19,17 @@ export const TRIGGER_VARIABLE = {
 } as const
 
 export const get_potential_triggers = ({
-                                           battle_grid,
-                                           turn_state,
-                                           initiative_order,
+                                           game_state,
                                            evaluate_ast,
                                            activator,
                                            intercept,
                                        }: {
-    battle_grid: BattleGrid
-    turn_state: TurnState
-    initiative_order: InitiativeOrder
+    game_state: GameState
     evaluate_ast: (node: AstNode) => Expr
     activator: Creature
     intercept: TriggerInterception
 }): Array<{ creature: Creature, powers: Array<Power> }> => {
+    const {battle_grid, turn_state, initiative_order} = game_state
     // We exclude the ones who already were triggered for this power.
     // This is a little redundant in most cases, but without it, we wouldn't
     // disregard those who ignored the chance to use the trigger.

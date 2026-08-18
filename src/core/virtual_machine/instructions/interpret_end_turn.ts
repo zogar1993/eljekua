@@ -6,10 +6,10 @@ import {run_start_of_turn_hooks} from "core/battlegrid/player_turn_handler/run_s
 import {run_end_of_turn_hooks} from "core/battlegrid/player_turn_handler/run_end_of_turn_hooks";
 
 export const interpret_end_turn = ({
-                                       battle_grid,
-                                       initiative_order,
+                                       game_state,
                                        game_events,
                                    }: InterpretInstructionProps<InstructionEndTurn>) => {
+    const {battle_grid, initiative_order} = game_state
     run_end_of_turn_hooks({current_turn_creature: initiative_order.get_current_creature(), battle_grid})
 
     initiative_order.next_turn()

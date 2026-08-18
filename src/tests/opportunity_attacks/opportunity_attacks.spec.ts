@@ -1,36 +1,31 @@
-import {create_battle_grid} from "core/battlegrid/BattleGrid";
 import {get_flanker_positions} from "core/battlegrid/position/get_flanker_positions";
 import {dependency_mocks} from "tests/utils/dependency_mocks";
 import {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
-import {create_initiative_order} from "core/initiative_order/InitiativeOrder";
 import {Position} from "core/battlegrid/Position";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
-import {create_turn_state} from "core/battlegrid/player_turn_handler/TurnState";
 import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
 import {create_instruction_loop} from "core/instruction_loop";
 import {create_gameplay_use_cases} from "core/use_cases/gameplay/gameplay_use_cases";
-import {create_settings} from "core/settings/Settings";
 import {create_game_events} from "core/events/GameEvents";
+import {create_game_state} from "core/game_state/GameState";
 import {create_interaction_test_helpers} from "tests/utils/interaction_test_helpers";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 
 const game_events = create_game_events()
-const battle_grid = create_battle_grid({size: {x: 10, y: 10}, game_events})
-const initiative_order = create_initiative_order({...dependency_mocks})
-const settings = create_settings()
-const turn_state = create_turn_state({game_events})
-const evaluate_ast = build_evaluate_ast({turn_state, battle_grid})
+const game_state = create_game_state({
+    game_events,
+    ...dependency_mocks,
+    battle_grid_size: {x: 10, y: 10},
+})
+const {battle_grid, initiative_order, turn_state} = game_state
+const evaluate_ast = build_evaluate_ast({game_state})
 
 const instruction_loop = create_instruction_loop({
-    ...dependency_mocks,
-    initiative_order,
+    game_state,
     evaluate_ast,
-    turn_state,
-    battle_grid,
-    settings,
     game_events,
 })
 
@@ -38,14 +33,12 @@ const player_turn_handler = instruction_loop
 const interactions = create_interaction_test_helpers({player_turn_handler})
 
 const gameplay_use_cases = create_gameplay_use_cases({
-    battle_grid,
-    initiative_order,
+    game_state,
     player_turn_handler,
-    turn_state,
     game_events,
 })
 
-const add_creature_to_game = create_add_creature_to_game({battle_grid, initiative_order, game_events})
+const add_creature_to_game = create_add_creature_to_game({game_state, game_events})
 
 const start_battle = () => {
     initiative_order.start()

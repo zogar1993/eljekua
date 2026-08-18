@@ -8,8 +8,9 @@ import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 
 export const interpret_execute_power = ({
                                             instruction,
-                                            turn_state,
+                                            game_state,
                                         }: InterpretInstructionProps<InstructionExecutePower>) => {
+    const {turn_state} = game_state
     const owner = turn_state.get_acting_creature()
     const {name, instructions} = EXPR.as_power(turn_state.get_variable(instruction.power))
 

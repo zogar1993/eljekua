@@ -7,22 +7,19 @@ import {get_potential_triggers, create_trigger_frame} from "core/virtual_machine
 
 export const interpret_move = ({
                                    instruction,
-                                   battle_grid,
-                                   turn_state,
+                                   game_state,
                                    evaluate_ast,
                                    game_events,
-                                   initiative_order,
                                }: InterpretInstructionProps<InstructionMovement>) => {
+    const {turn_state} = game_state
     const moving_creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
     const destination_label = instruction.destination
     const path = EXPR.as_positions(turn_state.get_variable(destination_label))
 
     for (let i = 0; i < path.length - 1; i++) {
         const potential_reactors = get_potential_triggers({
-            battle_grid,
-            turn_state,
+            game_state,
             evaluate_ast,
-            initiative_order,
             activator: moving_creature,
             intercept: "movement"
         })

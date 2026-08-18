@@ -19,7 +19,7 @@ const COMBAT_ADVANTAGE: ExprNumberResolved = {
 }
 
 export const interpret_define_attack_roll_result = (props: InterpretInstructionProps<InstructionAttackDiceRoll>) => {
-    const settings = props.settings
+    const {settings} = props.game_state
     if (settings.attack_roll_resolution_is_random)
         handle_hit_status_with_dice_roll(props)
     else
@@ -28,10 +28,11 @@ export const interpret_define_attack_roll_result = (props: InterpretInstructionP
 
 
 const handle_hit_status_manually = ({
-                                        turn_state,
+                                        game_state,
                                         player_turn_handler,
                                         instruction
                                     }: InterpretInstructionProps<InstructionAttackDiceRoll>) => {
+    const {turn_state} = game_state
     const defenders = EXPR.as_creatures(turn_state.get_variable(instruction.defender))
     const hit_statuses = new Map<Creature, HitStatus>(defenders.map(defender => [defender, HIT_STATUS.MISS]))
     turn_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: hit_statuses})
@@ -50,11 +51,11 @@ const handle_hit_status_manually = ({
 
 const handle_hit_status_with_dice_roll = ({
                                               instruction,
-                                              battle_grid,
+                                              game_state,
                                               evaluate_ast,
-                                              turn_state,
                                               game_events,
                                           }: InterpretInstructionProps<InstructionAttackDiceRoll>) => {
+    const {battle_grid, turn_state} = game_state
     const attacker = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
     const defenders = EXPR.as_creatures(turn_state.get_variable(instruction.defender))
     const power_name = EXPR.as_string(turn_state.get_variable(SYSTEM_KEYWORD.POWER_NAME))

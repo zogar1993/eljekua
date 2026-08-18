@@ -1,4 +1,3 @@
-import {create_battle_grid} from "core/battlegrid/BattleGrid";
 import {create_action_log} from "web/action_log/ActionLog";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {ROGUE_POWERS} from "data/powers/rogue";
@@ -9,39 +8,35 @@ import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
-import {create_initiative_order} from "core/initiative_order/InitiativeOrder";
 import {create_hit_status_buttons_ui} from "web/hit_status_buttons/HitStatusButtonsUI";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
 import {create_initiative_entry_visual} from "core/initiative_order/InitiativeEntryVisual";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {create_start_battle} from "core/use_cases/start_battle";
-import {create_turn_state} from "core/battlegrid/player_turn_handler/TurnState";
 import {create_instruction_loop} from "core/instruction_loop";
 import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
 import {create_instruction_visualizer} from "web/instruction_visualizer/instruction_visualizer";
 import {create_gameplay_use_cases} from "core/use_cases/gameplay/gameplay_use_cases";
 import {HIT_STATUS, HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
-import {create_settings} from "core/settings/Settings";
 import {create_game_events} from "core/events/GameEvents";
+import {create_game_state} from "core/game_state/GameState";
 import {initialize_battle_grid_ui} from "web/battle_grid/BattleGridUI";
 import {create_option_buttons_ui} from "web/creature_option_buttons/CreatureOptionButtons";
 
-const initiative_order = create_initiative_order({create_initiative_entry_visual})
 const action_log = create_action_log()
-const settings = create_settings()
 const game_events = create_game_events()
-const turn_state = create_turn_state({game_events})
+const game_state = create_game_state({
+    game_events,
+    create_initiative_entry_visual,
+    battle_grid_size: {x: 10, y: 10},
+})
+const {battle_grid, turn_state} = game_state
 
-const battle_grid = create_battle_grid({size: {x: 10, y: 10}, game_events})
-
-const evaluate_ast = build_evaluate_ast({battle_grid, turn_state})
+const evaluate_ast = build_evaluate_ast({game_state})
 
 const instruction_loop = create_instruction_loop({
-    battle_grid,
-    turn_state,
+    game_state,
     evaluate_ast,
-    initiative_order,
-    settings,
     game_events,
 })
 
@@ -60,7 +55,7 @@ create_hit_status_buttons_ui({game_events})
 create_instruction_visualizer({game_events})
 
 const gameplay_use_cases = create_gameplay_use_cases({
-    battle_grid, player_turn_handler, initiative_order, turn_state, game_events
+    game_state, player_turn_handler, game_events
 })
 
 game_events.on_creature_received_damage.add_handler(({creature, damage}) => {
@@ -82,8 +77,8 @@ game_events.on_creature_attacked.add_handler(({creature, attack, defense, hit_st
         `).`)
 })
 
-const add_creature = create_add_creature_to_game({battle_grid, initiative_order, game_events})
-const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop, turn_state, game_events})
+const add_creature = create_add_creature_to_game({game_state, game_events})
+const start_battle = create_start_battle({game_state, instruction_loop, game_events})
 
 ;(window as any).init_demo = () => {
     const bob = build_character({

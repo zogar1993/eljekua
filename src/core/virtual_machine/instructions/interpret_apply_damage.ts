@@ -14,9 +14,10 @@ import {InstructionApplyDamage} from "core/virtual_machine/instructions/instruct
 export const interpret_apply_damage = ({
                                            instruction,
                                            evaluate_ast,
-                                           turn_state,
+                                           game_state,
                                            game_events,
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
+    const {turn_state} = game_state
     const attacker = turn_state.get_acting_creature()
     //TODO P3 we probably want to apply damage to a bunch of enemies at the same time
     const target = EXPR.as_creature(turn_state.get_variable(instruction.target))
