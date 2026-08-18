@@ -16,7 +16,7 @@ import {create_start_battle} from "core/use_cases/start_battle";
 import {create_instruction_loop} from "core/instruction_loop";
 import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
 import {create_instruction_visualizer} from "web/instruction_visualizer/instruction_visualizer";
-import {create_gameplay_use_cases} from "core/use_cases/gameplay/gameplay_use_cases";
+import {create_set_current_turn_to_creature} from "core/use_cases/gameplay/set_current_turn_to_creature";
 import {HIT_STATUS, HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 import {create_game_events} from "core/events/GameEvents";
 import {create_game_state} from "core/game_state/GameState";
@@ -54,9 +54,7 @@ create_option_buttons_ui({game_events})
 create_hit_status_buttons_ui({game_events})
 create_instruction_visualizer({game_events})
 
-const gameplay_use_cases = create_gameplay_use_cases({
-    game_state, player_turn_handler, game_events
-})
+const set_current_turn_to_creature = create_set_current_turn_to_creature({game_state, game_events})
 
 game_events.on_creature_received_damage.add_handler(({creature, damage}) => {
     action_log.add_new_action_log(`${creature.data.name} was dealt `, damage, ` damage.`)
@@ -161,7 +159,7 @@ const start_battle = create_start_battle({game_state, instruction_loop, game_eve
         console.log(`Creature with name '${name}' not found`)
         return
     }
-    gameplay_use_cases.set_current_turn_to_creature({creature})
+    set_current_turn_to_creature({creature})
 }
 
 const build_character = (

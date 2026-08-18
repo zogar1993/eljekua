@@ -7,7 +7,7 @@ import {Position} from "core/battlegrid/Position";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
 import {create_instruction_loop} from "core/instruction_loop";
-import {create_gameplay_use_cases} from "core/use_cases/gameplay/gameplay_use_cases";
+import {create_set_current_turn_to_creature} from "core/use_cases/gameplay/set_current_turn_to_creature";
 import {create_game_events} from "core/events/GameEvents";
 import {create_game_state} from "core/game_state/GameState";
 import {create_interaction_test_helpers} from "tests/utils/interaction_test_helpers";
@@ -32,11 +32,7 @@ const instruction_loop = create_instruction_loop({
 const player_turn_handler = instruction_loop
 const interactions = create_interaction_test_helpers({player_turn_handler})
 
-const gameplay_use_cases = create_gameplay_use_cases({
-    game_state,
-    player_turn_handler,
-    game_events,
-})
+const set_current_turn_to_creature = create_set_current_turn_to_creature({game_state, game_events})
 
 const add_creature_to_game = create_add_creature_to_game({game_state, game_events})
 
@@ -129,7 +125,7 @@ const given_creature = (creature_name: string) => {
             if (player_turn_handler.get_interaction() !== null)
                 throw Error("instruction loop still has a pending interaction — call start_battle() without running the loop first")
 
-            gameplay_use_cases.set_current_turn_to_creature({creature})
+            set_current_turn_to_creature({creature})
             instruction_loop.run()
         }
     }
