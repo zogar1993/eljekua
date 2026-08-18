@@ -37,6 +37,7 @@ export const create_game_events = () => ({
     on_creature_received_damage: create_event_manager<CreatureReceivedDamageEvent>(),
     on_creature_missed: create_event_manager<Creature>(),
     on_creature_attacked: create_event_manager<CreatureAttackedEvent>(),
+    on_creature_available_actions_changed: create_event_manager<Creature>(),
 
     //Turn State Events
     on_turn_state_cleared: create_event_manager(),

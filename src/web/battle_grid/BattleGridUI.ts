@@ -182,9 +182,16 @@ export const initialize_battle_grid_ui = ({
         }
     })
 
+    const update_creature_action_dots = (creature: Creature) => {
+        get_creature_visual(creature).set_available_actions(creature.available_actions)
+    }
+
     game_events.on_creature_added_to_game.add_handler((creature) => {
         creature_visuals.set(creature, create_visual_creature(creature.data))
+        update_creature_action_dots(creature)
     })
+
+    game_events.on_creature_available_actions_changed.add_handler(update_creature_action_dots)
 
     game_events.on_creature_moved.add_handler(({creature, position, movement_type}) => {
         const visual = get_creature_visual(creature)

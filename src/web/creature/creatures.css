@@ -1,9 +1,13 @@
 .creature {
     position: absolute;
     width: 60px;
-    aspect-ratio: 1;
+    height: 60px;
+    box-sizing: border-box;
     z-index: 2;
     pointer-events: none;
+
+    --creature__inset: 4px;
+    --creature__gap: 4px;
 
     --creature__offset-x: calc(var(--creature_position-x) * 60px + 1px);
     --creature__offset-y: calc(var(--creature_position-y) * 60px + 1px);
@@ -12,9 +16,9 @@
     left: var(--creature__offset-x);
 
     display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    padding-bottom: 4px;
+    flex-direction: column;
+    padding: var(--creature__inset);
+    gap: var(--creature__gap);
 
     transition:
         var(--creature__position-animation-duration, 0ms) top,
@@ -24,21 +28,12 @@
     transform-origin: top left;
 }
 
-.creature__image {
-    width: 40px;
-    aspect-ratio: 1;
-    background-image: var(--creature__image);
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-}
-
 .creature__lifebar {
-    position: absolute;
-    width: 50px ;
-    height: 8px;
+    width: 100%;
+    height: 6px;
     border: 1px solid black;
-    top: 6px;
-    left: 4px;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .creature__lifebar::before {
@@ -48,6 +43,66 @@
     height: 100%;
     transition: width 0.5s ease-in-out;
     background-color: red;
+}
+
+.creature__main {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 1;
+    min-height: 0;
+    gap: var(--creature__gap);
+}
+
+.creature__image {
+    flex: 1;
+    min-width: 0;
+    aspect-ratio: 1;
+    background-image: var(--creature__image);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.creature__action-dots {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: stretch;
+    gap: 3px;
+    flex-shrink: 0;
+    padding-right: 1px;
+}
+
+.creature__action-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+    flex-shrink: 0;
+}
+
+.creature__action-dot--standard {
+    background-color: #e53935;
+}
+
+.creature__action-dot--movement {
+    background-color: #1e88e5;
+}
+
+.creature__action-dot--minor {
+    background-color: #fdd835;
+}
+
+.creature__action-dot--opportunity {
+    background-color: #43a047;
+}
+
+.creature__action-dot--immediate {
+    background-color: #fb8c00;
+}
+
+.creature__action-dot--free_attack {
+    background-color: #8e24aa;
 }
 
 .fading-number {

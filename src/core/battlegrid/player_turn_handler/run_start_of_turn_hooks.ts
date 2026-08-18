@@ -1,10 +1,12 @@
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {ACTION_TYPE} from "core/battlegrid/creatures/ActionType";
+import type {GameEvents} from "core/events/GameEvents";
 
-export const run_start_of_turn_hooks = ({current_turn_creature, battle_grid}: {
+export const run_start_of_turn_hooks = ({current_turn_creature, battle_grid, game_events}: {
     current_turn_creature: Creature,
     battle_grid: BattleGrid
+    game_events: GameEvents
 }) => {
     for (const creature of battle_grid.creatures) {
     //TODO this should work by replenishing instead of setting, since immediate actions are one per round
@@ -12,6 +14,8 @@ export const run_start_of_turn_hooks = ({current_turn_creature, battle_grid}: {
             creature.set_available_actions([ACTION_TYPE.STANDARD, ACTION_TYPE.MOVEMENT, ACTION_TYPE.MINOR, ACTION_TYPE.FREE_ATTACK])
         else
             creature.set_available_actions([ACTION_TYPE.OPPORTUNITY, ACTION_TYPE.FREE_ATTACK])
+
+        game_events.on_creature_available_actions_changed.raise(creature)
 
         creature.remove_statuses({type: "turn_start", creature: current_turn_creature})
 

@@ -60,7 +60,7 @@ create_hit_status_buttons_ui({game_events})
 create_instruction_visualizer({game_events})
 
 const gameplay_use_cases = create_gameplay_use_cases({
-    battle_grid, player_turn_handler, initiative_order, turn_state
+    battle_grid, player_turn_handler, initiative_order, turn_state, game_events
 })
 
 game_events.on_creature_received_damage.add_handler(({creature, damage}) => {
@@ -83,7 +83,7 @@ game_events.on_creature_attacked.add_handler(({creature, attack, defense, hit_st
 })
 
 const add_creature = create_add_creature_to_game({battle_grid, initiative_order, game_events})
-const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop, turn_state})
+const start_battle = create_start_battle({battle_grid, initiative_order, instruction_loop, turn_state, game_events})
 
 ;(window as any).init_demo = () => {
     const bob = build_character({

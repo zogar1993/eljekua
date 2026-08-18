@@ -1,7 +1,9 @@
 import {Position} from "core/battlegrid/Position";
 import {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {SIZE} from "core/battlegrid/creatures/SIZES";
+import {ActionType} from "core/battlegrid/creatures/ActionType";
 import {create_html_element} from "web/utils/create_html_element";
+import {create_action_dots_visual} from "web/creature/ActionDotsVisual";
 
 export type CreatureVisual = {
     place_at: (position: Position) => void
@@ -15,6 +17,7 @@ export type CreatureVisual = {
         chance: number
     }) => void
     remove_hit_chance: () => void
+    set_available_actions: (actions: Array<ActionType>) => void
 }
 
 export const create_visual_creature = (data: CreatureData): CreatureVisual => {
@@ -33,11 +36,14 @@ export const create_visual_creature = (data: CreatureData): CreatureVisual => {
 
     html_creature.style.setProperty("--fading-text_animation-duration", `${FADING_TEXT_ANIMATION_DURATION}ms`)
 
+    const html_main = create_html_element("div", "creature__main")
     const html_sprite = create_html_element("div", "creature__image")
-    html_creature.appendChild(html_sprite)
+    const action_dots = create_action_dots_visual(html_main)
+    html_main.appendChild(html_sprite)
 
     const html_lifebar = create_html_element("div", "creature__lifebar")
     html_creature.appendChild(html_lifebar)
+    html_creature.appendChild(html_main)
 
     const html_creatures = document.getElementById("creatures")!
     html_creatures.appendChild(html_creature)
@@ -94,6 +100,7 @@ export const create_visual_creature = (data: CreatureData): CreatureVisual => {
             const hit_chance = html_creature.querySelector(".hit-chance")
             hit_chance?.remove()
         },
+        set_available_actions: action_dots.set_available_actions,
     }
 }
 

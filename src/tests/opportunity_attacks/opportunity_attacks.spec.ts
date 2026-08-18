@@ -41,7 +41,8 @@ const gameplay_use_cases = create_gameplay_use_cases({
     battle_grid,
     initiative_order,
     player_turn_handler,
-    turn_state
+    turn_state,
+    game_events,
 })
 
 const add_creature_to_game = create_add_creature_to_game({battle_grid, initiative_order, game_events})
