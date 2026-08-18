@@ -49,6 +49,7 @@ const sacrificial_dagger: IRPower = {
     },
 }
 
+//TODO Evil cultist is not triggering on its own
 //TODO add free attack expenditure
 //TODO add reaction placement in the instruction queue
 //TODO ignored dont work properly as the immediate and oportunity defer
