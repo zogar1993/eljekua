@@ -86,4 +86,4 @@ export const create_trigger_frame = ({activator, trigger_owner: creature, powers
 })
 
 const OTHER_TURN_ACTIONS: Array<ActionType> = [ACTION_TYPE.OPPORTUNITY, ACTION_TYPE.IMMEDIATE] as const
-const can_use_power_on_own_turn = (power: Power) => OTHER_TURN_ACTIONS.includes(power.type.action)
+const can_use_power_on_own_turn = (power: Power) => !OTHER_TURN_ACTIONS.includes(power.type.action)
