@@ -7,7 +7,7 @@ description: >-
 
 # Create / Modify Skill
 
-Read this before writing or editing any `SKILL.md`. Follow `eljekua-conventions` `@git` when adding skill files to the repo.
+Read this before writing or editing any `SKILL.md`. Follow `@git` when adding skill files to the repo.
 
 ## @principles
 

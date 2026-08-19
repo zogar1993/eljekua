@@ -7,8 +7,6 @@ description: >-
 
 # Create Instruction
 
-Read `eljekua-conventions` before starting.
-
 Instructions are turn-state VM opcodes: definition, interpreter, switch case.
 
 ## @checklist
@@ -20,11 +18,11 @@ Instructions are turn-state VM opcodes: definition, interpreter, switch case.
 
 **Runtime-only** (e.g. `ADD_CURRENT_TURN_BASE_OPTIONS`): steps 1–3 only.
 
-**Player input:** call `player_turn_handler.set_available_interactions(...)` and return. See `eljekua-conventions` `@player-interactions`.
+**Player input:** call `player_turn_handler.set_available_interactions(...)` and return. See `@player-interactions`.
 
-**Outward signals:** raise `game_events.on_*` (available on `InterpretInstructionProps`) — never attach events to domain objects. See `eljekua-conventions` `@core-web`.
+**Outward signals:** raise `game_events.on_*` (available on `InterpretInstructionProps`) — never attach events to domain objects. See `@core-web`.
 
-5. Run `eljekua-conventions` `@checklist` — required; includes `git add` for any new files.
+5. Run `@checklist` — required; includes `git add` for any new files.
 
 ## @reference
 

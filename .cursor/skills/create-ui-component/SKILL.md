@@ -7,9 +7,7 @@ description: >-
 
 # Create UI Component
 
-Read `eljekua-conventions` before starting.
-
-Follow `eljekua-conventions` for naming and `@core-web` / `@player-interactions` boundaries.
+Follow project conventions for naming and `@core-web` / `@player-interactions` boundaries.
 
 ## @checklist
 
@@ -18,13 +16,13 @@ Follow `eljekua-conventions` for naming and `@core-web` / `@player-interactions`
 3. Forward input via interaction callbacks (`select`, `on_click`, `on_confirm`) or use cases — never mutate core state directly.
 4. Wire in `src/main.ts`.
 5. Confirm headless playability: no DOM required to advance the game; update `tests/utils/interaction_test_helpers.ts` if interactions change.
-6. Run `eljekua-conventions` `@checklist` — required; includes `git add` for any new files.
+6. Run `@checklist` — required; includes `git add` for any new files.
 
 ## @events
 
 The event catalog is `core/events/GameEvents.ts` (`create_game_events`). Read that file for the current `on_*` managers and payload types — do not duplicate the list here.
 
-- Architecture: `eljekua-conventions` `@core-web`
+- Architecture: `@core-web`
 - Subscribe with `game_events.on_<name>.add_handler(...)` in `create_*_ui` or `main.ts`
 - Find existing subscribers: grep `src/web/` for `game_events.on_`
 - Reference: `BattleGridUI.ts` (creatures, combat, interactions), `instruction_visualizer/instruction_visualizer.ts` (turn state)
