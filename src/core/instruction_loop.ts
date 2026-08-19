@@ -13,7 +13,8 @@ import {Position} from "core/battlegrid/Position";
 import {assert_is_not_null} from "stdlib/assert";
 
 export type Interaction =
-    InteractionsSelectPosition
+    InteractionsSelectTerrain
+    | InteractionsSelectCreature
     | InteractionsSelectOption
     | InteractionsSelectHitStatus
     | InteractionsSelectPath
@@ -26,13 +27,20 @@ export type InteractionsSelectHitStatus = {
     on_confirm: () => void
 }
 
-export type InteractionsSelectPosition = {
-    type: "position_select"
-    clickable: Array<Position>
+export type InteractionsSelectTerrain = {
+    type: "select_terrain"
     target_label: string
-    get_targets_for_position: (position: Position) => Targets
-    get_attack_hit_chance_against: (creature: Creature) => AttackSuccessChance | null
+    clickable: Array<Position>
     select: (position: Position) => void
+}
+
+export type InteractionsSelectCreature = {
+    type: "select_creature"
+    target_label: string
+    clickable: Array<Position>
+    get_target_for_position: (position: Position) => Creature
+    get_attack_hit_chance_against: (creature: Creature) => AttackSuccessChance | null
+    select: (position: Creature) => void
 }
 
 export type InteractionsSelectArea = {
@@ -40,7 +48,7 @@ export type InteractionsSelectArea = {
     target_label: string
     clickable: Array<Position>
     get_area_for_position: (position: Position) => Array<Position>
-    get_targets_for_position: (position: Position) => Targets
+    get_targets_for_position: (position: Position) => Array<Creature>
     get_attack_hit_chance_against: (creature: Creature) => AttackSuccessChance | null
     select: (position: Position) => void
 }
@@ -52,14 +60,6 @@ export type InteractionsSelectPath = {
     get_path_to_destination: (position: Position) => Array<Position>
     select: (position: Array<Position>) => void
     footprint: number
-}
-
-export type Targets = {
-    type: "positions",
-    value: Array<Position>
-} | {
-    type: "creatures",
-    value: Array<Creature>
 }
 
 type InteractionsSelectOption = {
@@ -103,7 +103,9 @@ export const create_instruction_loop = ({
     // This is needed so that all interactions resume after being resolved
     const add_cleanup_to_interaction_confirmation = (interaction: Interaction): Interaction => {
         switch (interaction.type) {
-            case "position_select":
+            case "select_terrain":
+                return {...interaction, select: add_cleanup_to_function(interaction.select)}
+            case "select_creature":
                 return {...interaction, select: add_cleanup_to_function(interaction.select)}
             case "select_area":
                 return {...interaction, select: add_cleanup_to_function(interaction.select)}

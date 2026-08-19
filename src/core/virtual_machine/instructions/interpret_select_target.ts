@@ -20,7 +20,6 @@ import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";
 import {assert_is_true} from "stdlib/assert";
-import {Targets} from "core/instruction_loop";
 
 export const interpret_select_target = ({
                                             instruction,
@@ -115,21 +114,17 @@ export const interpret_select_target = ({
             return get_reach_area_burst({origin: position, distance: instruction.radius, battle_grid})
         }
 
-        const get_targets_for_position = (position: Position): Targets => {
+        const get_targets_for_position = (position: Position): Array<Creature> => {
             assert_position_is_clickable({position, clickable})
 
             const area = get_area_for_position(position)
             const target_positions = area.filter(p => battle_grid.is_terrain_occupied(p))
-            const targets = battle_grid.get_creatures_in_positions(target_positions)
-
-            return {type: "creatures", value: targets}
+            return battle_grid.get_creatures_in_positions(target_positions)
         }
 
         const select = (position: Position) => {
             const targets = get_targets_for_position(position)
-            if (targets.type !== "creatures") throw Error("area burst must target creatures")
-
-            turn_state.set_variable(target_label, {type: "creatures", value: targets.value})
+            turn_state.set_variable(target_label, {type: "creatures", value: targets})
         }
 
         player_turn_handler.set_available_interactions({
@@ -141,47 +136,44 @@ export const interpret_select_target = ({
             get_attack_hit_chance_against,
             select,
         })
-    } else {
-        const get_targets_for_position = (position: Position): Targets => {
-            const interaction = player_turn_handler.get_interaction()
-
-            if (interaction?.type !== "position_select") throw Error("position select selection_context not set")
-
-            assert_position_is_clickable({position, clickable: interaction.clickable})
-
-            if (instruction.target_type === "terrain") {
-                return {type: "positions", value: [position]}
-            } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
-                const creature = battle_grid.get_creature_by_position(position)
-                return {type: "creatures", value: [creature]}
-            } else {
-                throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
-            }
-        }
-
+    } else if (instruction.target_type === "terrain") {
         const select = (position: Position) => {
-            const targets = get_targets_for_position(position)
-            if (targets === null) return
+            assert_position_is_clickable({position, clickable})
 
-            turn_state.set_variable(target_label,
-                targets.type === "creatures" ? {
-                    type: targets.type,
-                    value: targets.value,
-                } : {
-                    type: targets.type,
-                    value: targets.value,
-                    description: "target"
-                })
+            turn_state.set_variable(target_label, {
+                type: "positions",
+                value: [position],
+                description: "target",
+            })
         }
 
         player_turn_handler.set_available_interactions({
-            type: "position_select",
+            type: "select_terrain",
             target_label,
             clickable,
-            get_targets_for_position,
+            select,
+        })
+    } else if (instruction.target_type === "creature" || instruction.target_type === "enemy") {
+        const get_target_for_position = (position: Position): Creature => {
+            assert_position_is_clickable({position, clickable})
+
+            return battle_grid.get_creature_by_position(position)
+        }
+
+        const select = (creature: Creature) => {
+            turn_state.set_variable(target_label, {type: "creatures", value: [creature]})
+        }
+
+        player_turn_handler.set_available_interactions({
+            type: "select_creature",
+            target_label,
+            clickable,
+            get_target_for_position,
             get_attack_hit_chance_against,
             select,
         })
+    } else {
+        throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
     }
 }
 

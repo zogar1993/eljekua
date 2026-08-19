@@ -19,8 +19,9 @@ import {AnimationQueue} from "core/AnimationQueue";
 import {
     Interaction,
     InteractionsSelectArea,
+    InteractionsSelectCreature,
     InteractionsSelectPath,
-    InteractionsSelectPosition,
+    InteractionsSelectTerrain,
     PlayerTurnHandler,
 } from "core/instruction_loop";
 import {assert_is_not_undefined} from "stdlib/assert";
@@ -100,20 +101,20 @@ export const initialize_battle_grid_ui = ({
     }
 
     const show_attack_success_chances_for_position = (
-        interactions: InteractionsSelectPosition | InteractionsSelectArea,
+        interactions: InteractionsSelectCreature | InteractionsSelectArea,
         position: Position,
     ) => {
         clear_attack_success_chances()
 
-        const targets = interactions.get_targets_for_position(position)
-        if (targets.type !== "creatures") return
+        const targets = interactions.type === "select_creature"
+            ? [interactions.get_target_for_position(position)]
+            : interactions.get_targets_for_position(position)
 
-        for (const creature of targets.value) {
+        for (const creature of targets) {
             const hit_chance = interactions.get_attack_hit_chance_against(creature)
             if (hit_chance === null) return;
             get_creature_visual(creature).display_hit_chance(hit_chance)
         }
-
     }
 
     const clear_visual_selection = () => {
@@ -161,7 +162,7 @@ export const initialize_battle_grid_ui = ({
             const area = interactions.get_area_for_position(position)
             set_highlights({positions: area, highlight: SQUARE_HIGHLIGHT.AREA})
             show_attack_success_chances_for_position(interactions, position)
-        } else if (interactions.type === "position_select") {
+        } else if (interactions.type === "select_creature") {
             show_attack_success_chances_for_position(interactions, position)
         }
         set_hovers({positions: transform_position_to_f1(position)})
@@ -173,11 +174,15 @@ export const initialize_battle_grid_ui = ({
 
         const position = get_position_by_coordinate({coordinate, positions: interactions.clickable})
         if (position === null) return
+        if (!is_click_coordinate_interaction(interactions)) return
 
         if (interactions.type === "select_path") {
             const path = interactions.get_path_to_destination(position)
             interactions.select(path)
-        } else if (interactions.type === "select_area" || interactions.type === "position_select") {
+        } else if (interactions.type === "select_creature") {
+            const creature = interactions.get_target_for_position(position)
+            interactions.select(creature)
+        } else {
             interactions.select(position)
         }
     })
@@ -227,9 +232,7 @@ export const initialize_battle_grid_ui = ({
         clear_attack_success_chances()
         set_selected_indicator()
 
-        if (interactions.type === "select_path"
-            || interactions.type === "select_area"
-            || interactions.type === "position_select") {
+        if (is_click_coordinate_interaction(interactions)) {
             set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.CLICKABLE})
         }
     })
@@ -240,8 +243,12 @@ export const initialize_battle_grid_ui = ({
     }
 }
 
-type InteractionClickCoordinate = InteractionsSelectPosition | InteractionsSelectPath | InteractionsSelectArea
-const CLICK_COORDINATE_INTERACTIONS: Array<Interaction["type"]> = ["position_select", "select_path", "select_area"]
+type InteractionClickCoordinate =
+    InteractionsSelectTerrain
+    | InteractionsSelectCreature
+    | InteractionsSelectPath
+    | InteractionsSelectArea
+const CLICK_COORDINATE_INTERACTIONS: Array<Interaction["type"]> = ["select_terrain", "select_creature", "select_path", "select_area"]
 
 const is_click_coordinate_interaction = (interaction: Interaction | null): interaction is InteractionClickCoordinate => {
     return interaction !== null && CLICK_COORDINATE_INTERACTIONS.includes(interaction.type)

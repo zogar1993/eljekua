@@ -20,7 +20,8 @@ export const create_interaction_test_helpers = ({player_turn_handler}: {
     select_position: (position: Omit<Position, "footprint">) => {
         const interaction = player_turn_handler.get_interaction()
 
-        if (interaction?.type === "position_select" || interaction?.type === "select_area") {
+        if (interaction?.type === "select_terrain"
+            || interaction?.type === "select_area") {
             const full_position = interaction.clickable.find(
                 clickable => clickable.x === position.x && clickable.y === position.y,
             )
@@ -31,13 +32,25 @@ export const create_interaction_test_helpers = ({player_turn_handler}: {
             return
         }
 
+        if (interaction?.type === "select_creature") {
+            const full_position = interaction.clickable.find(
+                clickable => clickable.x === position.x && clickable.y === position.y,
+            )
+            if (!full_position)
+                throw Error(`Position (${position.x}, ${position.y}) not in clickable`)
+
+            const creature = interaction.get_target_for_position(full_position)
+            interaction.select(creature[0])
+            return
+        }
+
         if (interaction?.type === "select_path") {
             const destination = {...position, footprint: interaction.footprint}
             interaction.select(interaction.get_path_to_destination(destination))
             return
         }
 
-        throw Error(`Expected position_select, select_area, or select_path interaction, got ${interaction?.type ?? "null"}`)
+        throw Error(`Expected select_creature, select_terrain, select_area, or select_path interaction, got ${interaction?.type ?? "null"}`)
     },
 
     has_option: (text: string) => {
