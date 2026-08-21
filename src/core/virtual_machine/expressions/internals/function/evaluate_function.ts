@@ -42,6 +42,12 @@ import {
 import {
     evaluate_function_creature_by_id
 } from "core/virtual_machine/expressions/internals/function/evaluate_function_creature_by_id";
+import {
+    evaluate_function_is_greater
+} from "core/virtual_machine/expressions/internals/function/evaluate_function_is_greater";
+import {
+    evaluate_function_is_lower
+} from "core/virtual_machine/expressions/internals/function/evaluate_function_is_lower";
 
 export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                                             {
@@ -84,6 +90,10 @@ export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
                 return evaluate_function_is_greater_or_equal({node, evaluate_ast})
             case "is_lower_or_equal":
                 return evaluate_function_is_lower_or_equal({node, evaluate_ast})
+            case "is_greater":
+                return evaluate_function_is_greater({node, evaluate_ast})
+            case "is_lower":
+                return evaluate_function_is_lower({node, evaluate_ast})
             case "creature_by_id":
                 return evaluate_function_creature_by_id({node, battle_grid})
             default:

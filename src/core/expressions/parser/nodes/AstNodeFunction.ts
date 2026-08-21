@@ -45,6 +45,8 @@ const FUNCTION_NAMES = [
     "has_action_type_available",
     "is_lower_or_equal",
     "is_greater_or_equal",
+    "is_lower",
+    "is_greater",
     "not_equals",
     "equipped",
     "has_valid_targeting",
