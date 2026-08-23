@@ -2,14 +2,17 @@ import {
     InterpretInstructionProps
 } from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {InstructionCondition} from "core/virtual_machine/instructions/instructions";
+import {InstructionJumpIf} from "core/virtual_machine/instructions/instructions";
 
-export const interpret_condition = ({
+export const interpret_jump_if = ({
                                         instruction,
                                         game_state,
                                         evaluate_ast
-                                    }: InterpretInstructionProps<InstructionCondition>) => {
+                                    }: InterpretInstructionProps<InstructionJumpIf>) => {
     const {turn_state} = game_state
     const result = EXPR.as_boolean(evaluate_ast(instruction.condition))
-    turn_state.add_instructions(result ? instruction.instructions_true : instruction.instructions_false)
+    if (result)
+        turn_state.jump(instruction.offset)
+    else
+        turn_state.jump(1)
 }

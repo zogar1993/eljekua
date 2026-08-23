@@ -15,7 +15,8 @@ export const interpret_options = ({
         type: "option_select",
         available_options: instruction.options.map(({text, condition, instructions}) => ({
                 text,
-                on_click: () => turn_state.add_instructions(instructions),
+                //TODO this should reference the same power frame
+                on_click: () => turn_state.add_instruction_frame({instructions}),
                 disabled: condition ? !EXPR.as_boolean(evaluate_ast(condition)) : false
             })
         )

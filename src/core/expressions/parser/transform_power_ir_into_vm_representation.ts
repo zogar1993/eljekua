@@ -5,7 +5,6 @@ import {
     INSTRUCTION_TYPE,
     Instruction,
     InstructionApplyStatus,
-    InstructionCondition,
     InstructionSelectTarget
 } from "core/virtual_machine/instructions/instructions";
 import {ACTION_TYPE, ActionType, TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
@@ -121,12 +120,11 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 destination: instruction.destination
             }]
         case INSTRUCTION_TYPE.CONDITION:
-            return [{
-                type: INSTRUCTION_TYPE.CONDITION,
+            return create_if_block({
                 condition: to_ast(instruction.condition),
-                instructions_true: transform_instructions(instruction.instructions_true),
-                instructions_false: transform_instructions(instruction.instructions_false)
-            }]
+                instructions_if_true: transform_instructions(instruction.instructions_true),
+                instructions_if_false: transform_instructions(instruction.instructions_false)
+            })
         case INSTRUCTION_TYPE.OPTIONS:
             return [{
                 type: INSTRUCTION_TYPE.OPTIONS,
@@ -184,33 +182,35 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
 }
 
 const transform_primary_damage = (damage: NonNullable<IRPower["damage"]>): Array<Instruction> => {
-    return [
-        {
-            type: INSTRUCTION_TYPE.SAVE_VARIABLE,
-            value: to_ast(damage.lvl_1),
-            label: "primary_damage"
-        },
-        ...(damage.lvl_11 ? [{
-            type: INSTRUCTION_TYPE.CONDITION,
-            condition: to_ast("$is_greater_or_equal(owner.level,11)"),
-            instructions_true: [{
+    const lvl_1_block: Array<Instruction> = [{
+        type: INSTRUCTION_TYPE.SAVE_VARIABLE,
+        value: to_ast(damage.lvl_1),
+        label: "primary_damage"
+    }];
+
+    const up_to_lvl_11_block = damage.lvl_11 ? create_if_block({
+        condition: to_ast("$is_lower(owner.level,11)"),
+        instructions_if_true: [
+            {
                 type: INSTRUCTION_TYPE.SAVE_VARIABLE,
                 value: to_ast(damage.lvl_11),
                 label: "primary_damage"
-            }],
-            instructions_false: []
-        } as InstructionCondition] : []),
-        ...(damage.lvl_21 ? [{
-            type: INSTRUCTION_TYPE.CONDITION,
-            condition: to_ast("$is_greater_or_equal(owner.level,21)"),
-            instructions_true: [{
+            }
+        ],
+        instructions_if_false: lvl_1_block
+    }) : lvl_1_block;
+
+    return damage.lvl_21 ? create_if_block({
+        condition: to_ast("$is_lower(owner.level,21)"),
+        instructions_if_true: [
+            {
                 type: INSTRUCTION_TYPE.SAVE_VARIABLE,
                 value: to_ast(damage.lvl_21),
                 label: "primary_damage"
-            }],
-            instructions_false: []
-        } as InstructionCondition] : [])
-    ]
+            }
+        ],
+        instructions_if_false: up_to_lvl_11_block
+    }) : up_to_lvl_11_block
 }
 
 const transform_trigger = (trigger: NonNullable<IRPower["trigger"]>): Trigger => {
@@ -295,3 +295,27 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
 }
 
 const TRIGGER_ACTION_TYPES = [ACTION_TYPE.IMMEDIATE, ACTION_TYPE.OPPORTUNITY, ACTION_TYPE.FREE_ATTACK] as Array<ActionType>
+
+const create_if_block = ({
+                             condition,
+                             instructions_if_true,
+                             instructions_if_false
+                         }: {
+    condition: AstNode,
+    instructions_if_true: Array<Instruction>,
+    instructions_if_false: Array<Instruction>
+}): Array<Instruction> => {
+    return [
+        {
+            type: INSTRUCTION_TYPE.JUMP_IF,
+            condition: condition,
+            offset: instructions_if_true.length + 2
+        },
+        ...instructions_if_false,
+        {
+            type: INSTRUCTION_TYPE.JUMP,
+            offset: instructions_if_false.length + 1
+        },
+        ...instructions_if_true,
+    ];
+}

@@ -40,11 +40,14 @@ export const interpret_move = ({
                 description: "movement"
             })
 
-            turn_state.add_instructions([{
-                type: INSTRUCTION_TYPE.MOVE,
-                target: instruction.target,
-                destination: instruction.destination
-            }])
+            //TODO this should reference the same power frame
+            turn_state.add_instruction_frame({
+                instructions: [{
+                    type: INSTRUCTION_TYPE.MOVE,
+                    target: instruction.target,
+                    destination: instruction.destination
+                }]
+            })
 
             for (const {creature: trigger_owner, powers} of potential_reactors) {
                 const frame = create_trigger_frame({activator: moving_creature, trigger_owner, powers})

@@ -16,6 +16,15 @@ export const create_start_battle = (
     initiative_order.start()
     const creature = initiative_order.get_current_creature()
     run_start_of_turn_hooks({current_turn_creature: creature, battle_grid, game_events})
-    turn_state.add_instruction_frame({instructions: [{type: INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS}]})
+    turn_state.add_instruction_frame({instructions: [ADD_CURRENT_TURN_BASE_OPTIONS, JUMP_TO_START]})
     instruction_loop.run()
 }
+
+const ADD_CURRENT_TURN_BASE_OPTIONS = {
+    type: INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS
+} as const
+
+const JUMP_TO_START = {
+    type: INSTRUCTION_TYPE.JUMP,
+    offset: -1
+} as const

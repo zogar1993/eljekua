@@ -16,7 +16,7 @@ import {
     interpret_save_variable
 } from "core/virtual_machine/instructions/interpret_save_variable";
 import {interpret_options} from "core/virtual_machine/instructions/interpret_options";
-import {interpret_condition} from "core/virtual_machine/instructions/interpret_condition";
+import {interpret_jump_if} from "core/virtual_machine/instructions/interpret_jump_if";
 import type {
     InterpretInstructionProps
 } from "core/virtual_machine/instructions/InterpretInstructionProps";
@@ -43,6 +43,7 @@ import {
 import {
     interpret_add_current_turn_base_options
 } from "core/virtual_machine/instructions/interpret_add_current_turn_base_options";
+import {interpret_jump} from "core/virtual_machine/instructions/interpret_jump";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>): void => {
     const {instruction} = props
@@ -67,8 +68,10 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             return interpret_save_number_as_resolved({...props, instruction})
         case INSTRUCTION_TYPE.OPTIONS:
             return interpret_options({...props, instruction})
-        case INSTRUCTION_TYPE.CONDITION:
-            return interpret_condition({...props, instruction})
+        case INSTRUCTION_TYPE.JUMP:
+            return interpret_jump({...props, instruction})
+        case INSTRUCTION_TYPE.JUMP_IF:
+            return interpret_jump_if({...props, instruction})
         case INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS:
             return interpret_add_powers_as_options({...props, instruction})
         case INSTRUCTION_TYPE.EXECUTE_POWER:

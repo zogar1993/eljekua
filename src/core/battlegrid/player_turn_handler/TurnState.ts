@@ -2,21 +2,20 @@ import {Expr} from "core/virtual_machine/expressions/types";
 import {Instruction} from "core/virtual_machine/instructions/instructions";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
-import {assert} from "stdlib/assert";
 import {GameEvents} from "core/events/GameEvents";
 
 export const create_turn_state = ({game_events}: { game_events: GameEvents }) => {
     let frames: Array<InstructionFrame> = []
 
     const add_instruction_frame = ({instructions, variables = {}}: {
-        instructions: Array<Instruction>
+        instructions: ReadonlyArray<Instruction>
         variables?: Record<string, Expr>
     }) => {
         const frame_variables = new Map<string, Expr>()
         for (const [key, value] of Object.entries(variables))
             frame_variables.set(key, value)
 
-        const frame = {instructions: [...instructions], variables: frame_variables}
+        const frame = {instructions: [...instructions], variables: frame_variables, current_instruction: 0}
         frames.push(frame)
 
         game_events.on_instruction_frame_added.raise(frame)
@@ -27,40 +26,26 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
         return frames[frames.length - 1]
     }
 
-    const peek_instruction = (): Instruction => {
-        const frame = get_current_frame()
-        assert(frame.instructions.length > 0, () => "no instructions left when calling peek instruction")
-        return frame.instructions[0]
-    }
-
-    const next_instruction = () => {
+    const peek = (): Instruction => {
         while (frames.length > 0) {
             const frame = get_current_frame()
-            if (frame.instructions.length > 0) {
-                assert(frame.instructions.length > 0, () => "no instructions left when calling next instruction")
-                const [next, ...instructions] = frame.instructions
-                frame.instructions = instructions
-                game_events.on_instruction_consumed.raise(next)
-                return next
-            }
 
-            // We discard the current frame if it is empty and move on to the next.
-            // The reason instruction frames aren't automatically removed alongside their last instruction is that
-            // an instruction can be added after that. This is a bit easier to handle.
-            frames = frames.slice(0, frames.length - 1)
-            game_events.on_instruction_frame_popped.raise()
+            if (frame.instructions.length > frame.current_instruction)
+                return frame.instructions[frame.current_instruction]
+
+            frames.pop()
         }
-
-        return null
+        throw Error("no instructions left")
     }
 
     const get_variable = (name: string) => {
-        const frame = get_current_frame()
-        const variable = frame.variables.get(name)
+        for (let i = frames.length - 1; i >= 0; i--) {
+            const frame = frames[i]
+            const variable = frame.variables.get(name)
+            if (variable) return variable
+        }
+        throw Error(`variable '${name}' not found in frame.'`)
         //TODO P3 make error handling smoother everywhere
-        if (!variable)
-            throw Error(`variable '${name}' not found in frame. Variables: ${to_formatted_json_string(frame.variables)}.'`)
-        return variable
     }
 
 
@@ -77,10 +62,9 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
         game_events.on_turn_state_variable_set.raise([name, value])
     }
 
-    const add_instructions = (instructions: Array<Instruction>) => {
+    const jump = (offset: number) => {
         const frame = get_current_frame()
-        frame.instructions = [...instructions, ...frame.instructions]
-        game_events.on_instructions_prepended.raise(instructions)
+        frame.current_instruction += offset
     }
 
     const clear = () => {
@@ -92,9 +76,8 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
         add_instruction_frame,
         clear,
 
-        peek_instruction,
-        next_instruction,
-        add_instructions,
+        peek,
+        jump,
 
         get_acting_creature,
 
@@ -107,8 +90,7 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
 export type TurnState = ReturnType<typeof create_turn_state>
 
 export type InstructionFrame = {
-    instructions: Array<Instruction>
+    current_instruction: number
+    instructions: ReadonlyArray<Instruction>
     variables: Map<string, Expr>
 }
-
-const to_formatted_json_string = (obj: object) => JSON.stringify(obj, null, 2)

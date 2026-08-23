@@ -8,9 +8,6 @@ export const interpret_add_current_turn_base_options = ({
                                                             game_state,
                                                         }: InterpretInstructionProps<InstructionAddCurrentTurnBaseOptions>) => {
     const {initiative_order, turn_state} = game_state
-    // This instruction adds itself so that it is always present at the base frame
-    turn_state.add_instructions([{type: INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS}])
-
     const owner = initiative_order.get_current_creature()
     turn_state.add_instruction_frame({
         instructions: [CURRENT_TURN_BASE_OPTIONS],

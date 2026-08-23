@@ -11,6 +11,7 @@ import {AttackSuccessChance} from "core/battlegrid/queries/get_attack_success_ch
 import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 import {Position} from "core/battlegrid/Position";
 import {assert_is_not_null} from "stdlib/assert";
+import {is_branching_instruction} from "core/virtual_machine/instructions/instructions";
 
 export type Interaction =
     InteractionsSelectTerrain
@@ -143,8 +144,12 @@ export const create_instruction_loop = ({
 
     const evaluate_instructions = () => {
         while (player_turn_handler.get_interaction() === null) {
-            const instruction = turn_state.next_instruction()
+            const instruction = turn_state.peek()
+
             assert_is_not_null(instruction)
+
+            if (!is_branching_instruction(instruction))
+                turn_state.jump(1)
 
             interpret_instruction({
                 instruction,

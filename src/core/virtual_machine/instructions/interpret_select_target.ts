@@ -36,7 +36,7 @@ export const interpret_select_target = ({
     const target_label = instruction.target_label
 
     if (clickable.length === 1) {
-        if (turn_state.peek_instruction().type !== "attack_dice_roll") {
+        if (turn_state.peek().type !== "attack_dice_roll") {
             const position = clickable[0]
 
             if (instruction.targeting_type === "area_burst") {
@@ -74,7 +74,7 @@ export const interpret_select_target = ({
     }
 
     const get_attack_hit_chance_against = (creature: Creature) => {
-        const next_instruction = turn_state.peek_instruction()
+        const next_instruction = turn_state.peek()
         if (next_instruction.type !== INSTRUCTION_TYPE.ATTACK_DICE_ROLL) return null
 
         return get_attack_success_chance({

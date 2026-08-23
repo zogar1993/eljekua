@@ -57,7 +57,8 @@ export const interpret_attack_roll_consequence = ({
         }
     })
 
-    turn_state.add_instructions(new_instructions)
+    //TODO this should reference the same power frame
+    turn_state.add_instruction_frame({instructions: new_instructions})
 }
 
 const save_variable_instruction = (origin: number, destination: string): InstructionSaveVariable => ({

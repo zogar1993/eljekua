@@ -2,7 +2,12 @@ import {
     InterpretInstructionProps
 } from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {INSTRUCTION_TYPE, Instruction, InstructionAddPowers, InstructionOptionsItem} from "core/virtual_machine/instructions/instructions";
+import {
+    INSTRUCTION_TYPE,
+    Instruction,
+    InstructionAddPowers,
+    InstructionOptionsItem
+} from "core/virtual_machine/instructions/instructions";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
 import {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
@@ -59,20 +64,24 @@ export const interpret_add_powers_as_options = ({
         options.push({text: power.name, instructions, condition})
     }
 
-    turn_state.add_instructions([{
-        type: INSTRUCTION_TYPE.OPTIONS,
-        options: [
-            ...options,
-            {
-                text: "End turn",
-                instructions: [
-                    {
-                        type: INSTRUCTION_TYPE.END_TURN
-                    }
-                ],
-            }
-        ]
-    }])
+
+    //TODO this should reference the same power frame
+    turn_state.add_instruction_frame({
+        instructions: [{
+            type: INSTRUCTION_TYPE.OPTIONS,
+            options: [
+                ...options,
+                {
+                    text: "End turn",
+                    instructions: [
+                        {
+                            type: INSTRUCTION_TYPE.END_TURN
+                        }
+                    ],
+                }
+            ]
+        }]
+    })
 }
 
 const filter_powers = ({powers, filter}: { powers: Array<Power>, filter: InstructionAddPowers["filter"] }) => {

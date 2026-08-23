@@ -6,7 +6,6 @@ import {ActionType} from "core/battlegrid/creatures/ActionType";
 export const INSTRUCTION_TYPE = {
     ATTACK_DICE_ROLL: "attack_dice_roll",
     ATTACK_ROLL_CONSEQUENCE: "attack_roll_consequence",
-    CONDITION: "condition",
     APPLY_DAMAGE: "apply_damage",
     MOVE: "move",
     SHIFT: "shift",
@@ -21,7 +20,15 @@ export const INSTRUCTION_TYPE = {
     EXPEND_ACTION: "expend_action",
     END_TURN: "end_turn",
     ADD_CURRENT_TURN_BASE_OPTIONS: "add_current_turn_base_options",
+    JUMP: "jump",
+    JUMP_IF: "jump_if",
+    CONDITION: "condition",
 } as const
+
+export type InstructionType = typeof INSTRUCTION_TYPE[keyof typeof INSTRUCTION_TYPE];
+
+export const is_branching_instruction = (instruction: Instruction) =>
+    ([INSTRUCTION_TYPE.JUMP, INSTRUCTION_TYPE.JUMP_IF] as Array<InstructionType>).includes(instruction.type)
 
 export type InstructionAttackDiceRoll = {
     type: typeof INSTRUCTION_TYPE.ATTACK_DICE_ROLL
@@ -38,11 +45,15 @@ export type InstructionAttackRollConsequence = {
     miss: Array<Instruction>
 }
 
-export type InstructionCondition = {
-    type: typeof INSTRUCTION_TYPE.CONDITION,
+export type InstructionJump = {
+    type: typeof INSTRUCTION_TYPE.JUMP,
+    offset: number,
+}
+
+export type InstructionJumpIf = {
+    type: typeof INSTRUCTION_TYPE.JUMP_IF,
     condition: AstNode,
-    instructions_true: Array<Instruction>
-    instructions_false: Array<Instruction>
+    offset: number,
 }
 
 export type InstructionApplyDamage = {
@@ -89,7 +100,7 @@ export type InstructionAddPowers = {
 export type InstructionExecutePower = {
     type: typeof INSTRUCTION_TYPE.EXECUTE_POWER,
     power: string,
-    initialization?: Array<{from: string, to: string}>,
+    initialization?: Array<{ from: string, to: string }>,
 }
 
 export type InstructionForceMovement = {
@@ -118,22 +129,30 @@ export type InstructionApplyStatus = {
 }
 
 export type Instruction =
+    // Turns
+    InstructionEndTurn |
+    // Character
     InstructionApplyDamage |
-    InstructionSelectTarget |
-    InstructionCondition |
     InstructionMovement |
-    InstructionOptions |
-    InstructionSaveVariable |
-    InstructionSaveResolvedNumber |
-    InstructionAddPowers |
-    InstructionExecutePower |
     InstructionApplyStatus |
     InstructionForceMovement |
     InstructionExpendAction |
-    InstructionEndTurn |
+    // Input
+    InstructionSelectTarget |
+    InstructionAddCurrentTurnBaseOptions |
+    InstructionOptions |
+    // Inner
+    InstructionAddPowers |
+    InstructionExecutePower |
+    InstructionSaveVariable |
+    InstructionSaveResolvedNumber |
+    // Branching
+    InstructionJumpIf |
+    InstructionJump |
+    // Misc
     InstructionAttackDiceRoll |
-    InstructionAttackRollConsequence |
-    InstructionAddCurrentTurnBaseOptions
+    InstructionAttackRollConsequence
+
 
 export type InstructionSelectTarget =
     InstructionSelectTargetRanged |
