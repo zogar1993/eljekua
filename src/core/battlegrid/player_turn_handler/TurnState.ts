@@ -30,10 +30,13 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
         while (frames.length > 0) {
             const frame = get_current_frame()
 
-            if (frame.instructions.length > frame.current_instruction)
+            if (frame.instructions.length > frame.current_instruction) {
+                game_events.on_instruction_pointer_changed.raise(frame)
                 return frame.instructions[frame.current_instruction]
+            }
 
             frames.pop()
+            game_events.on_instruction_frame_popped.raise()
         }
         throw Error("no instructions left")
     }

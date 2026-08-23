@@ -1,6 +1,7 @@
 import {Instruction} from "core/virtual_machine/instructions/instructions";
 import {Expr} from "core/virtual_machine/expressions/types";
 import {GameEvents} from "core/events/GameEvents";
+import {InstructionFrame} from "core/battlegrid/player_turn_handler/TurnState";
 import {create_html_element} from "web/utils/create_html_element";
 import {create_expression_html} from "web/expression/create_expression_html";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
@@ -10,6 +11,7 @@ import {Position} from "core/battlegrid/Position";
 import {HIT_STATUS, HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
 
 type FrameElements = {
+    core_frame: InstructionFrame
     variablesToggle?: HTMLElement
     variablesContainer?: HTMLElement
     variableElements: Array<HTMLElement>
@@ -29,13 +31,28 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
 
     const frame_elements: Array<FrameElements> = []
 
+    const refresh_active_instruction_highlight = () => {
+        for (const frame of frame_elements)
+            for (const element of frame.instructionElements)
+                element.classList.remove("instruction--current")
+
+        const top_frame = frame_elements[frame_elements.length - 1]
+        if (!top_frame) return
+
+        const current_index = top_frame.core_frame.current_instruction
+        if (current_index >= top_frame.instructionElements.length) return
+
+        top_frame.instructionElements[current_index].classList.add("instruction--current")
+    }
+
     game_events.on_turn_state_cleared.add_handler(() => {
         frame_elements.length = 0
         html_content.replaceChildren()
     })
 
-    game_events.on_instruction_frame_added.add_handler(({instructions, variables}) => {
+    game_events.on_instruction_frame_added.add_handler((core_frame) => {
         const frame: FrameElements = {
+            core_frame,
             variableElements: [],
             instructionElements: [],
         }
@@ -45,46 +62,28 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
             html_content.append(frame.separator)
         }
 
-        if (variables.size > 0) {
+        if (core_frame.variables.size > 0) {
             ensure_variables_section(frame, html_content)
 
-            for (const [name, value] of variables) {
+            for (const [name, value] of core_frame.variables) {
                 const html_variable = create_variable_element(name, value)
                 frame.variableElements.push(html_variable)
                 frame.variablesContainer!.append(html_variable)
             }
         }
 
-        for (const instruction of instructions) {
+        for (const instruction of core_frame.instructions) {
             const html_instruction = create_visual_for_instruction(instruction)
             frame.instructionElements.push(html_instruction)
             html_content.append(html_instruction)
         }
 
-        update_current_instruction_highlight(frame)
         frame_elements.push(frame)
+        refresh_active_instruction_highlight()
     })
 
-    game_events.on_instructions_prepended.add_handler((instructions) => {
-        const frame = frame_elements[frame_elements.length - 1]
-        const new_elements = instructions.map(create_visual_for_instruction)
-        const insert_before = frame.instructionElements[0] ?? null
-
-        for (let i = new_elements.length - 1; i >= 0; i--)
-            html_content.insertBefore(new_elements[i], insert_before)
-
-        frame.instructionElements = [...new_elements, ...frame.instructionElements]
-        update_current_instruction_highlight(frame)
-    })
-
-    game_events.on_instruction_consumed.add_handler(() => {
-        const frame = frame_elements[frame_elements.length - 1]
-        const [removed, ...rest] = frame.instructionElements
-        if (removed) {
-            removed.remove()
-            frame.instructionElements = rest
-            update_current_instruction_highlight(frame)
-        }
+    game_events.on_instruction_pointer_changed.add_handler(() => {
+        refresh_active_instruction_highlight()
     })
 
     game_events.on_instruction_frame_popped.add_handler(() => {
@@ -96,6 +95,8 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
             ...frame.instructionElements,
         ])
             if (element) element.remove()
+
+        refresh_active_instruction_highlight()
     })
 
     game_events.on_turn_state_variable_set.add_handler(([name, value]) => {
@@ -114,11 +115,6 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
 }
 
 export type InstructionVisualizer = ReturnType<typeof create_instruction_visualizer>
-
-const update_current_instruction_highlight = (frame: FrameElements) => {
-    for (let i = 0; i < frame.instructionElements.length; i++)
-        frame.instructionElements[i].classList.toggle("instruction--current", i === 0)
-}
 
 const ensure_variables_section = (frame: FrameElements, html_content: HTMLElement) => {
     if (frame.variablesContainer) return

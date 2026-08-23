@@ -42,8 +42,7 @@ export const create_game_events = () => ({
     //Turn State Events
     on_turn_state_cleared: create_event_manager(),
     on_instruction_frame_added: create_event_manager<InstructionFrame>(),
-    on_instructions_prepended: create_event_manager<Array<Instruction>>(),
-    on_instruction_consumed: create_event_manager<Instruction>(),
+    on_instruction_pointer_changed: create_event_manager<InstructionFrame>(),
     on_instruction_frame_popped: create_event_manager(),
     on_turn_state_variable_set: create_event_manager<[string, Expr]>()
 })

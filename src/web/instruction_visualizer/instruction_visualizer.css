@@ -277,7 +277,8 @@
     color: #6a1b9a;
 }
 
-.instruction--type-condition .instruction__type-badge {
+.instruction--type-jump_if .instruction__type-badge,
+.instruction--type-jump .instruction__type-badge {
     background: #fff9c4;
     color: #f57f17;
 }
