@@ -64,8 +64,6 @@ export const interpret_add_powers_as_options = ({
         options.push({text: power.name, instructions, condition})
     }
 
-
-    //TODO this should reference the same power frame
     turn_state.add_instruction_frame({
         instructions: [{
             type: INSTRUCTION_TYPE.OPTIONS,

@@ -40,7 +40,6 @@ export const interpret_move = ({
                 description: "movement"
             })
 
-            //TODO this should reference the same power frame
             turn_state.add_instruction_frame({
                 instructions: [{
                     type: INSTRUCTION_TYPE.MOVE,

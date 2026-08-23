@@ -57,7 +57,6 @@ export const interpret_attack_roll_consequence = ({
         }
     })
 
-    //TODO this should reference the same power frame
     turn_state.add_instruction_frame({instructions: new_instructions})
 }
 
