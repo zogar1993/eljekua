@@ -29,6 +29,12 @@ export type CreatureAttackedEvent = {
     power_name: string
 }
 
+export type InitiativeEntryAddedEvent = {
+    creature: Creature
+    initiative: ExprNumberResolved
+    index: number
+}
+
 export const create_game_events = () => ({
     on_available_interactions_changed: create_event_manager<Interaction | null>(),
     on_creature_added_to_game: create_event_manager<Creature>(),
@@ -38,6 +44,9 @@ export const create_game_events = () => ({
     on_creature_missed: create_event_manager<Creature>(),
     on_creature_attacked: create_event_manager<CreatureAttackedEvent>(),
     on_creature_available_actions_changed: create_event_manager<Creature>(),
+
+    on_initiative_entry_added: create_event_manager<InitiativeEntryAddedEvent>(),
+    on_initiative_current_creature_changed: create_event_manager<Creature>(),
 
     //Turn State Events
     on_turn_state_cleared: create_event_manager(),

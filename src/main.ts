@@ -10,7 +10,7 @@ import {
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {create_hit_status_buttons_ui} from "web/hit_status_buttons/HitStatusButtonsUI";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
-import {create_initiative_entry_visual} from "core/initiative_order/InitiativeEntryVisual";
+import {create_initiative_order_ui} from "web/initiative_order/InitiativeOrderUI";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {create_start_battle} from "core/use_cases/start_battle";
 import {create_instruction_loop} from "core/instruction_loop";
@@ -27,7 +27,6 @@ const action_log = create_action_log()
 const game_events = create_game_events()
 const game_state = create_game_state({
     game_events,
-    create_initiative_entry_visual,
     battle_grid_size: {x: 10, y: 10},
 })
 const {battle_grid, turn_state} = game_state
@@ -52,6 +51,7 @@ initialize_battle_grid_ui({
 
 create_option_buttons_ui({game_events})
 create_hit_status_buttons_ui({game_events})
+create_initiative_order_ui({game_events})
 create_instruction_visualizer({game_events})
 
 const set_current_turn_to_creature = create_set_current_turn_to_creature({game_state, game_events})

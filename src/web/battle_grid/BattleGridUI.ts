@@ -15,7 +15,7 @@ import {
 import {GameEvents} from "core/events/GameEvents";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {create_visual_creature, CreatureVisual} from "web/creature/CreatureVisual";
-import {AnimationQueue} from "core/AnimationQueue";
+import {AnimationQueue} from "web/animation_queue/AnimationQueue";
 import {
     Interaction,
     InteractionsSelectArea,

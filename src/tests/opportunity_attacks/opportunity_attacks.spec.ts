@@ -1,5 +1,4 @@
 import {get_flanker_positions} from "core/battlegrid/position/get_flanker_positions";
-import {dependency_mocks} from "tests/utils/dependency_mocks";
 import {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
@@ -17,7 +16,6 @@ import {EXPR} from "core/virtual_machine/expressions/EXPR";
 const game_events = create_game_events()
 const game_state = create_game_state({
     game_events,
-    ...dependency_mocks,
     battle_grid_size: {x: 10, y: 10},
 })
 const {battle_grid, initiative_order, turn_state} = game_state
@@ -110,7 +108,8 @@ const given_a_creature_is_created = (c: Partial<CreatureData> & Pick<CreatureDat
         level: c.level ?? 1,
         team: c.team ?? null,
         attributes: c.attributes ?? Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
-        powers: c.powers ?? []
+        powers: c.powers ?? [],
+        archetypes: c.archetypes ?? []
     }
 
     add_creature_to_game({data})

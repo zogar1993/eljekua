@@ -1,13 +1,13 @@
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {create_html_element} from "web/utils/create_html_element";
 import {AssertionError} from "stdlib/AssertionError";
 
 export const create_initiative_entry_visual = ({creature, initiative, index}: {
-    creature: Creature,
-    initiative: ExprNumberResolved,
+    creature: Creature
+    initiative: ExprNumberResolved
     index: number
-}): InitiativeEntryVisual => {
+}) => {
     const html_initiative_order = document.getElementById("initiative_order")!
     if (html_initiative_order.children.length > index)
         throw new AssertionError("create_visual_initiative_order must never be called with an index higher than its length")
@@ -39,6 +39,4 @@ export const create_initiative_entry_visual = ({creature, initiative, index}: {
     }
 }
 
-export type InitiativeEntryVisual = {
-    set_current_turn: (value: boolean) => void
-}
+export type InitiativeEntryVisual = ReturnType<typeof create_initiative_entry_visual>

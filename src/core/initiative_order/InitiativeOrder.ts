@@ -1,23 +1,16 @@
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import type {GameEvents} from "core/events/GameEvents";
 import {insert_to_array} from "stdlib/insert_to_array";
-import {InitiativeEntryVisual} from "core/initiative_order/InitiativeEntryVisual";
 
-export const create_initiative_order = ({create_initiative_entry_visual}: {
-    create_initiative_entry_visual: (props: {
-        creature: Creature,
-        initiative: ExprNumberResolved,
-        index: number
-    }) => InitiativeEntryVisual
-}) => {
+export const create_initiative_order = ({game_events}: { game_events: GameEvents }) => {
     let initiatives: Array<{
-        creature: Creature,
-        initiative: ExprNumberResolved,
-        visual: InitiativeEntryVisual
+        creature: Creature
+        initiative: ExprNumberResolved
     }> = []
     let current_index = 0
 
-    const add_entry = ({creature, initiative}: {creature: Creature, initiative: ExprNumberResolved}) => {
+    const add_entry = ({creature, initiative}: { creature: Creature, initiative: ExprNumberResolved }) => {
         //TODO contemplate same initiative
 
         let index = 0
@@ -27,9 +20,8 @@ export const create_initiative_order = ({create_initiative_entry_visual}: {
                 break
             index++
         }
-        const visual_initiative_entry = create_initiative_entry_visual({creature, initiative, index})
-        const new_entry = {creature, initiative, visual: visual_initiative_entry}
-        initiatives = insert_to_array(initiatives, new_entry, index)
+        initiatives = insert_to_array(initiatives, {creature, initiative}, index)
+        game_events.on_initiative_entry_added.raise({creature, initiative, index})
     }
 
     const get_current_creature = (): Creature => {
@@ -39,23 +31,20 @@ export const create_initiative_order = ({create_initiative_entry_visual}: {
     }
 
     const next_turn = () => {
-        initiatives[current_index].visual.set_current_turn(false)
         if (current_index + 1 === initiatives.length)
             current_index = 0
         else
             current_index++
-        initiatives[current_index].visual.set_current_turn(true)
+        game_events.on_initiative_current_creature_changed.raise(initiatives[current_index].creature)
     }
 
     const start = () => {
-        initiatives[current_index].visual.set_current_turn(true)
+        game_events.on_initiative_current_creature_changed.raise(initiatives[current_index].creature)
     }
 
     const set_current_turn = (creature: Creature) => {
-        const index = initiatives.findIndex(entry => creature === entry.creature)
-        initiatives[current_index].visual.set_current_turn(false)
-        current_index = index
-        initiatives[current_index].visual.set_current_turn(false)
+        current_index = initiatives.findIndex(entry => creature === entry.creature)
+        game_events.on_initiative_current_creature_changed.raise(initiatives[current_index].creature)
     }
 
     return {
