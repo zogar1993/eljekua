@@ -29,12 +29,10 @@ import {assert_is_not_undefined} from "stdlib/assert";
 export const initialize_battle_grid_ui = ({
                                               battle_grid,
                                               player_turn_handler,
-                                              turn_state,
                                               game_events,
                                           }: {
     battle_grid: BattleGrid,
     player_turn_handler: PlayerTurnHandler,
-    turn_state: TurnState,
     game_events: GameEvents,
 }) => {
     const {size} = battle_grid
@@ -124,12 +122,6 @@ export const initialize_battle_grid_ui = ({
         clear_highlights({highlight: SQUARE_HIGHLIGHT.SELECTED})
         clear_attack_success_chances()
     }
-
-    function set_selected_indicator() {
-        const position = turn_state.get_acting_creature().data.position
-        set_highlights({positions: [position], highlight: "selected"})
-    }
-
 
     let latest_position: Position | null = null
 
@@ -223,18 +215,17 @@ export const initialize_battle_grid_ui = ({
         AnimationQueue.add_animation(visual.display_miss)
     })
 
-    game_events.on_available_interactions_changed.add_handler((interactions) => {
-        if (interactions === null) {
+    game_events.on_available_interactions_changed.add_handler(interaction => {
+        if (interaction === null) {
             clear_visual_selection()
             return
         }
 
         clear_attack_success_chances()
-        set_selected_indicator()
+        set_highlights({positions: [interaction.creature.data.position], highlight: SQUARE_HIGHLIGHT.SELECTED})
 
-        if (is_click_coordinate_interaction(interactions)) {
-            set_highlights({positions: interactions.clickable, highlight: SQUARE_HIGHLIGHT.CLICKABLE})
-        }
+        if (is_click_coordinate_interaction(interaction))
+            set_highlights({positions: interaction.clickable, highlight: SQUARE_HIGHLIGHT.CLICKABLE})
     })
 
     return {

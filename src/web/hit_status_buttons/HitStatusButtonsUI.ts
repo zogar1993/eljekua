@@ -49,12 +49,12 @@ export const create_hit_status_buttons_ui = ({game_events}: { game_events: GameE
         })
     }
 
-    game_events.on_available_interactions_changed.add_handler((interactions) => {
-        if (interactions?.type === "hit_status_select")
+    game_events.on_available_interactions_changed.add_handler((interaction) => {
+        if (interaction?.type === "hit_status_select")
             display({
-                hit_statuses: interactions.hit_statuses,
-                on_status_change: interactions.on_status_change,
-                on_confirm: interactions.on_confirm!,
+                hit_statuses: interaction.hit_statuses,
+                on_status_change: interaction.on_status_change,
+                on_confirm: interaction.on_confirm!,
             })
         else
             remove()

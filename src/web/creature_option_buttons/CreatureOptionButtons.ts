@@ -17,9 +17,9 @@ export const create_option_buttons_ui = ({game_events}: { game_events: GameEvent
         visual_options = options.map(option => create_option_button_visual(option))
     }
 
-    game_events.on_available_interactions_changed.add_handler((interactions) => {
-        if (interactions?.type === "option_select")
-            display_options(interactions.available_options)
+    game_events.on_available_interactions_changed.add_handler(interaction => {
+        if (interaction?.type === "option_select")
+            display_options(interaction.available_options)
         else
             remove_options()
     })

@@ -1,6 +1,5 @@
 import {create_event_manager} from "stdlib/event_manager";
 import type {Creature} from "core/battlegrid/creatures/Creature";
-import type {Instruction} from "core/virtual_machine/instructions/instructions";
 import type {Expr, ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import type {InstructionFrame} from "core/battlegrid/player_turn_handler/TurnState";
 import {Interaction} from "core/instruction_loop";
@@ -35,8 +34,11 @@ export type InitiativeEntryAddedEvent = {
     index: number
 }
 
+//TODO a null event feels wrong
+export type AvailableActionsChangedEvent = (Interaction & { creature: Creature }) | null
+
 export const create_game_events = () => ({
-    on_available_interactions_changed: create_event_manager<Interaction | null>(),
+    on_available_interactions_changed: create_event_manager<AvailableActionsChangedEvent>(),
     on_creature_added_to_game: create_event_manager<Creature>(),
 
     on_creature_moved: create_event_manager<CreatureMovedEvent>(),

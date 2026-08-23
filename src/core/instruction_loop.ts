@@ -130,7 +130,8 @@ export const create_instruction_loop = ({
 
     const set_available_interactions = (interaction: Interaction) => {
         current_interaction = add_cleanup_to_interaction_confirmation(interaction)
-        game_events.on_available_interactions_changed.raise(current_interaction)
+        const creature = turn_state.get_acting_creature()
+        game_events.on_available_interactions_changed.raise({...current_interaction, creature})
     }
 
     function get_interaction() {
