@@ -27,8 +27,7 @@ const instruction_loop = create_instruction_loop({
     game_events,
 })
 
-const player_turn_handler = instruction_loop
-const interactions = create_interaction_test_helpers({player_turn_handler})
+const interactions = create_interaction_test_helpers({game_events})
 
 const set_current_turn_to_creature = create_set_current_turn_to_creature({game_state, game_events})
 
@@ -121,7 +120,7 @@ const given_creature = (creature_name: string) => {
 
     return {
         is_in_its_turn: () => {
-            if (player_turn_handler.get_interaction() !== null)
+            if (interactions.has_pending_interaction())
                 throw Error("instruction loop still has a pending interaction — call start_battle() without running the loop first")
 
             set_current_turn_to_creature({creature})

@@ -21,17 +21,14 @@ import {
     InteractionsSelectCreature,
     InteractionsSelectPath,
     InteractionsSelectTerrain,
-    PlayerTurnHandler,
 } from "core/instruction_loop";
 import {assert_is_not_undefined} from "stdlib/assert";
 
 export const initialize_battle_grid_ui = ({
                                               battle_grid,
-                                              player_turn_handler,
                                               game_events,
                                           }: {
     battle_grid: BattleGrid,
-    player_turn_handler: PlayerTurnHandler,
     game_events: GameEvents,
 }) => {
     const {size} = battle_grid
@@ -123,9 +120,10 @@ export const initialize_battle_grid_ui = ({
     }
 
     let latest_position: Position | null = null
+    let current_interaction: Interaction | null = null
 
     click_overlay.addOnMouseMoveHandler(coordinate => {
-        const interactions = player_turn_handler.get_interaction()
+        const interactions = current_interaction
 
         if (!is_click_coordinate_interaction(interactions)) return
 
@@ -160,7 +158,7 @@ export const initialize_battle_grid_ui = ({
     })
 
     click_overlay.addOnClickHandler(coordinate => {
-        const interactions = player_turn_handler.get_interaction()
+        const interactions = current_interaction
         if (!is_click_coordinate_interaction(interactions)) return
 
         const position = get_position_by_coordinate({coordinate, positions: interactions.clickable})
@@ -215,6 +213,8 @@ export const initialize_battle_grid_ui = ({
     })
 
     game_events.on_available_interactions_changed.add_handler(interaction => {
+        current_interaction = interaction
+
         if (interaction === null) {
             clear_visual_selection()
             return

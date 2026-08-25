@@ -39,12 +39,8 @@ const instruction_loop = create_instruction_loop({
     game_events,
 })
 
-//TODO nuke this
-const player_turn_handler = instruction_loop
-
 initialize_battle_grid_ui({
     battle_grid,
-    player_turn_handler,
     game_events,
 })
 

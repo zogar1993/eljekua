@@ -71,7 +71,6 @@ type InteractionsSelectOption = {
 //TODO clean up usages of the player turn handler
 export type PlayerTurnHandler = {
     set_available_interactions: (interactions: Interaction) => void
-    get_interaction: () => Interaction | null
 }
 
 export const create_instruction_loop = ({
@@ -134,17 +133,12 @@ export const create_instruction_loop = ({
         game_events.on_available_interactions_changed.raise({...current_interaction, creature})
     }
 
-    function get_interaction() {
-        return current_interaction
-    }
-
     const player_turn_handler = {
         set_available_interactions,
-        get_interaction,
     }
 
     const evaluate_instructions = () => {
-        while (player_turn_handler.get_interaction() === null) {
+        while (current_interaction === null) {
             const instruction = vm_state.peek()
 
             assert_is_not_null(instruction)
@@ -163,8 +157,8 @@ export const create_instruction_loop = ({
     }
 
     return {
-        ...player_turn_handler,
-        run: evaluate_instructions
+        set_available_interactions,
+        run: evaluate_instructions,
     }
 }
 
