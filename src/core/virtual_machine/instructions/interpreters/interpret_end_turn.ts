@@ -2,8 +2,8 @@ import {
     InterpretInstructionProps
 } from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {InstructionEndTurn} from "core/virtual_machine/instructions/instructions";
-import {run_start_of_turn_hooks} from "core/battlegrid/turns/run_start_of_turn_hooks";
-import {run_end_of_turn_hooks} from "core/battlegrid/turns/run_end_of_turn_hooks";
+import {run_start_of_turn_hooks} from "core/turns/run_start_of_turn_hooks";
+import {run_end_of_turn_hooks} from "core/turns/run_end_of_turn_hooks";
 
 export const interpret_end_turn = ({
                                        game_state,
