@@ -1,49 +1,49 @@
 import {
     interpret_select_target
-} from "core/virtual_machine/instructions/interpret_select_target";
+} from "core/virtual_machine/instructions/interpreters/interpret_select_target";
 import {
     interpret_define_attack_roll_result,
-} from "core/virtual_machine/instructions/interpret_define_attack_roll_result";
+} from "core/virtual_machine/instructions/interpreters/interpret_define_attack_roll_result";
 import {
     interpret_apply_damage
-} from "core/virtual_machine/instructions/interpret_apply_damage";
-import {interpret_move} from "core/virtual_machine/instructions/interpret_move";
-import {interpret_shift} from "core/virtual_machine/instructions/interpret_shift";
+} from "core/virtual_machine/instructions/interpreters/interpret_apply_damage";
+import {interpret_move} from "core/virtual_machine/instructions/interpreters/interpret_move";
+import {interpret_shift} from "core/virtual_machine/instructions/interpreters/interpret_shift";
 import {
     interpret_force_movement
-} from "core/virtual_machine/instructions/interpret_force_movement";
+} from "core/virtual_machine/instructions/interpreters/interpret_force_movement";
 import {
     interpret_save_variable
-} from "core/virtual_machine/instructions/interpret_save_variable";
-import {interpret_options} from "core/virtual_machine/instructions/interpret_options";
-import {interpret_jump_if} from "core/virtual_machine/instructions/interpret_jump_if";
+} from "core/virtual_machine/instructions/interpreters/interpret_save_variable";
+import {interpret_options} from "core/virtual_machine/instructions/interpreters/interpret_options";
+import {interpret_jump_if} from "core/virtual_machine/instructions/interpreters/interpret_jump_if";
 import type {
     InterpretInstructionProps
 } from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {
     interpret_save_number_as_resolved
-} from "core/virtual_machine/instructions/interpret_save_number_as_resolved";
+} from "core/virtual_machine/instructions/interpreters/interpret_save_number_as_resolved";
 import {
     interpret_execute_power
-} from "core/virtual_machine/instructions/interpret_execute_power";
+} from "core/virtual_machine/instructions/interpreters/interpret_execute_power";
 import {
     interpret_add_powers_as_options
-} from "core/virtual_machine/instructions/interpret_add_powers_as_options";
+} from "core/virtual_machine/instructions/interpreters/interpret_add_powers_as_options";
 import {
     interpret_apply_status
-} from "core/virtual_machine/instructions/interpret_apply_status";
+} from "core/virtual_machine/instructions/interpreters/interpret_apply_status";
 import {
     interpret_expend_action
-} from "core/virtual_machine/instructions/interpret_expend_action";
+} from "core/virtual_machine/instructions/interpreters/interpret_expend_action";
 import {INSTRUCTION_TYPE, Instruction} from "core/virtual_machine/instructions/instructions";
-import {interpret_end_turn} from "core/virtual_machine/instructions/interpret_end_turn";
+import {interpret_end_turn} from "core/virtual_machine/instructions/interpreters/interpret_end_turn";
 import {
     interpret_attack_roll_consequence
-} from "core/virtual_machine/instructions/interpret_attack_roll_consequence";
+} from "core/virtual_machine/instructions/interpreters/interpret_attack_roll_consequence";
 import {
     interpret_add_current_turn_base_options
-} from "core/virtual_machine/instructions/interpret_add_current_turn_base_options";
-import {interpret_jump} from "core/virtual_machine/instructions/interpret_jump";
+} from "core/virtual_machine/instructions/interpreters/interpret_add_current_turn_base_options";
+import {interpret_jump} from "core/virtual_machine/instructions/interpreters/interpret_jump";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>): void => {
     const {instruction} = props
