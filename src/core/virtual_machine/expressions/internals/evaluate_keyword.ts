@@ -1,6 +1,6 @@
 import type {Expr} from "core/virtual_machine/expressions/types";
 import type {AstNodeKeyword} from "core/expressions/parser/nodes/AstNodeKeyword";
-import type {TurnState} from "core/battlegrid/player_turn_handler/TurnState";
+import type {TurnState} from "core/battlegrid/virtual_machine/TurnState";
 import {get_creature_property} from "core/character_sheet/get_creature_property";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 

@@ -1,14 +1,14 @@
 import {Instruction} from "core/virtual_machine/instructions/instructions";
 import {Expr} from "core/virtual_machine/expressions/types";
 import {GameEvents} from "core/events/GameEvents";
-import {InstructionFrame} from "core/battlegrid/player_turn_handler/TurnState";
+import {InstructionFrame} from "core/battlegrid/virtual_machine/TurnState";
 import {create_html_element} from "web/utils/create_html_element";
 import {create_expression_html} from "web/expression/create_expression_html";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {Position} from "core/battlegrid/Position";
-import {HIT_STATUS, HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
+import {HIT_STATUS, HitStatus} from "core/battlegrid/virtual_machine/HitStatus";
 
 type FrameElements = {
     core_frame: InstructionFrame

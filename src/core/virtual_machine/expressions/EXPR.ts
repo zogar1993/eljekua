@@ -2,7 +2,7 @@ import {Expr, ExprNumber, ExprNumberResolved} from "core/virtual_machine/express
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {Position} from "core/battlegrid/Position";
 import {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
-import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
+import {HitStatus} from "core/battlegrid/virtual_machine/HitStatus";
 
 export const EXPR = {
     as_creature: (expr: Expr): Creature => {

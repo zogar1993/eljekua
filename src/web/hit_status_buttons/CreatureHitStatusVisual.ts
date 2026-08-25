@@ -1,5 +1,5 @@
 import {Creature} from "core/battlegrid/creatures/Creature";
-import {HIT_STATUS, HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
+import {HIT_STATUS, HitStatus} from "core/battlegrid/virtual_machine/HitStatus";
 import {create_html_element} from "web/utils/create_html_element";
 
 const HIT_STATUS_OPTIONS: Array<{ status: HitStatus, label: string }> = [

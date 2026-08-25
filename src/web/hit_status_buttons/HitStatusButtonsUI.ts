@@ -1,5 +1,5 @@
 import {GameEvents} from "core/events/GameEvents";
-import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
+import {HitStatus} from "core/battlegrid/virtual_machine/HitStatus";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {
     create_creature_hit_status_visual,

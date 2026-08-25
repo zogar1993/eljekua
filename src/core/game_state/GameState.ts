@@ -1,7 +1,7 @@
 import {create_battle_grid} from "core/battlegrid/BattleGrid";
 import {create_initiative_order} from "core/initiative_order/InitiativeOrder";
 import {create_settings} from "core/settings/Settings";
-import {create_turn_state} from "core/battlegrid/player_turn_handler/TurnState";
+import {create_turn_state} from "core/battlegrid/virtual_machine/TurnState";
 import type {GameEvents} from "core/events/GameEvents";
 
 export const create_game_state = ({

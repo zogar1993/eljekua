@@ -1,7 +1,7 @@
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {Position} from "core/battlegrid/Position";
 import {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
-import {HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
+import {HitStatus} from "core/battlegrid/virtual_machine/HitStatus";
 
 export type Expr =
     ExprNumber

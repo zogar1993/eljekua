@@ -12,7 +12,7 @@ import {StatusEffectGainResistance} from "core/battlegrid/creatures/Creature";
 import {InstructionApplyDamage} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {assert_is_not_undefined} from "stdlib/assert";
-import {HIT_STATUS, HitStatus} from "core/battlegrid/player_turn_handler/HitStatus";
+import {HIT_STATUS, HitStatus} from "core/battlegrid/virtual_machine/HitStatus";
 
 export const interpret_apply_damage = ({
                                            instruction,
