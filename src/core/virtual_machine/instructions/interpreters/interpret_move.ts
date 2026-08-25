@@ -35,7 +35,6 @@ export const interpret_move = ({
             vm_state.set_variable(destination_label, {
                 type: "positions",
                 value: path.slice(i),
-                description: "movement"
             })
 
             vm_state.add_instruction_frame({

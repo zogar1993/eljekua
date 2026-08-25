@@ -49,7 +49,6 @@ export type ExprBoolean = {
 export type ExprPositions = {
     type: "positions"
     value: Array<Position>
-    description: string
     params?: Array<Expr>
 }
 

@@ -45,16 +45,12 @@ export const interpret_select_target = ({
                 // TODO P2 automatic resolution for movement feels odd when its a movement action, but not when its a secondary action
                 const path = get_shortest_path({creature: owner, destination: position, battle_grid})
 
-                vm_state.set_variable(target_label, {type: "positions", value: path, description: target_label})
+                vm_state.set_variable(target_label, {type: "positions", value: path})
             } else if (instruction.targeting_type === "push") {
-                vm_state.set_variable(target_label, {type: "positions", value: [position], description: target_label})
+                vm_state.set_variable(target_label, {type: "positions", value: [position]})
             } else {
                 if (instruction.target_type === "terrain") {
-                    vm_state.set_variable(target_label, {
-                        type: "positions",
-                        value: [position],
-                        description: target_label
-                    })
+                    vm_state.set_variable(target_label, {type: "positions", value: [position]})
                 } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
                     const creature = battle_grid.get_creature_by_position(position)
                     vm_state.set_variable(target_label, {type: "creatures", value: [creature]})
@@ -88,10 +84,6 @@ export const interpret_select_target = ({
             return get_shortest_path({creature: moving_creature, destination, battle_grid})
         }
 
-        const select = (path: Array<Position>) => {
-            vm_state.set_variable(target_label, {type: "positions", value: path, description: "target"})
-        }
-
         const footprint = moving_creature.data.position.footprint
 
         player_turn_handler.set_available_interactions({
@@ -100,7 +92,6 @@ export const interpret_select_target = ({
             clickable,
             footprint,
             get_path_to_destination,
-            select,
         })
     } else if (instruction.targeting_type === "area_burst") {
         const get_area_for_position = (position: Position) => {
@@ -116,11 +107,6 @@ export const interpret_select_target = ({
             return battle_grid.get_creatures_in_positions(target_positions)
         }
 
-        const select = (position: Position) => {
-            const targets = get_targets_for_position(position)
-            vm_state.set_variable(target_label, {type: "creatures", value: targets})
-        }
-
         player_turn_handler.set_available_interactions({
             type: "select_area",
             target_label,
@@ -128,24 +114,13 @@ export const interpret_select_target = ({
             get_area_for_position,
             get_targets_for_position,
             get_attack_hit_chance_against,
-            select,
         })
     } else if (instruction.target_type === "terrain") {
-        const select = (position: Position) => {
-            assert_position_is_clickable({position, clickable})
-
-            vm_state.set_variable(target_label, {
-                type: "positions",
-                value: [position],
-                description: "target",
-            })
-        }
 
         player_turn_handler.set_available_interactions({
             type: "select_terrain",
             target_label,
             clickable,
-            select,
         })
     } else if (instruction.target_type === "creature" || instruction.target_type === "enemy") {
         const get_target_for_position = (position: Position): Creature => {
@@ -154,17 +129,12 @@ export const interpret_select_target = ({
             return battle_grid.get_creature_by_position(position)
         }
 
-        const select = (creature: Creature) => {
-            vm_state.set_variable(target_label, {type: "creatures", value: [creature]})
-        }
-
         player_turn_handler.set_available_interactions({
             type: "select_creature",
             target_label,
             clickable,
             get_target_for_position,
             get_attack_hit_chance_against,
-            select,
         })
     } else {
         throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)

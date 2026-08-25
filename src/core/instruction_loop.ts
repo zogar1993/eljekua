@@ -7,8 +7,8 @@ import {GameEvents} from "core/events/GameEvents";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {AttackSuccessChance} from "core/battlegrid/queries/get_attack_success_chance";
 import {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
-import {Position} from "core/battlegrid/Position";
-import {assert_is_not_null} from "stdlib/assert";
+import {Position, positions_share_surface} from "core/battlegrid/Position";
+import {assert_is_not_null, assert_is_true} from "stdlib/assert";
 import {is_branching_instruction} from "core/virtual_machine/instructions/instructions";
 
 export type Interaction =
@@ -39,7 +39,7 @@ export type InteractionsSelectCreature = {
     clickable: Array<Position>
     get_target_for_position: (position: Position) => Creature
     get_attack_hit_chance_against: (creature: Creature) => AttackSuccessChance | null
-    select: (position: Creature) => void
+    select: (creature: Creature) => void
 }
 
 export type InteractionsSelectArea = {
@@ -66,10 +66,6 @@ type InteractionsSelectOption = {
     available_options: Array<OptionButton>
 }
 
-//TODO clean up usages of the player turn handler
-export type PlayerTurnHandler = {
-    set_available_interactions: (interactions: Interaction) => void
-}
 
 export const create_instruction_loop = ({
                                             game_state,
@@ -99,16 +95,61 @@ export const create_instruction_loop = ({
     }
 
     // This is needed so that all interactions resume after being resolved
-    const add_cleanup_to_interaction_confirmation = (interaction: Interaction): Interaction => {
+    const add_cleanup_to_interaction_confirmation = (interaction:
+                                            Omit<InteractionsSelectTerrain, 'select'>
+                                            | Omit<InteractionsSelectCreature, 'select'>
+                                            | InteractionsSelectOption
+                                            | InteractionsSelectHitStatus
+                                            | Omit<InteractionsSelectPath, 'select'>
+                                            | Omit<InteractionsSelectArea, 'select'>): Interaction => {
         switch (interaction.type) {
             case "select_terrain":
-                return {...interaction, select: add_cleanup_to_function(interaction.select)}
+                return {
+                    ...interaction,
+                    select: (position: Position) => {
+                        assert_position_is_contained({position, area: interaction.clickable})
+
+                        vm_state.set_variable(interaction.target_label, {type: "positions", value: [position]})
+
+                        clear_current_interaction()
+                    }
+
+                }
             case "select_creature":
-                return {...interaction, select: add_cleanup_to_function(interaction.select)}
+                return {
+                    ...interaction,
+                    select: (creature: Creature) => {
+                        assert_position_is_contained({position: creature.data.position, area: interaction.clickable})
+
+                        vm_state.set_variable(interaction.target_label, {type: "creatures", value: [creature]})
+
+                        clear_current_interaction()
+                    }
+                }
             case "select_area":
-                return {...interaction, select: add_cleanup_to_function(interaction.select)}
+                return {
+                    ...interaction,
+                    select: (position: Position) => {
+                        assert_position_is_contained({position, area: interaction.clickable})
+
+                        const targets = interaction.get_targets_for_position(position)
+                        vm_state.set_variable(interaction.target_label, {type: "creatures", value: targets})
+
+                        clear_current_interaction()
+                    }
+                }
             case "select_path":
-                return {...interaction, select: add_cleanup_to_function(interaction.select)}
+                return {
+                    ...interaction,
+                    select: (path: Array<Position>) => {
+                        //TODO validate path is valid
+                        //assert_position_is_contained({position, area: interaction.clickable})
+
+                        vm_state.set_variable(interaction.target_label, {type: "positions", value: path})
+
+                        clear_current_interaction()
+                    }
+                }
             case "option_select":
                 return {
                     ...interaction,
@@ -125,7 +166,14 @@ export const create_instruction_loop = ({
         }
     }
 
-    const set_available_interactions = (interaction: Interaction) => {
+    const set_available_interactions = (interaction:
+                                            Omit<InteractionsSelectTerrain, 'select'>
+                                            | Omit<InteractionsSelectCreature, 'select'>
+                                            | InteractionsSelectOption
+                                            | InteractionsSelectHitStatus
+                                            | Omit<InteractionsSelectPath, 'select'>
+                                            | Omit<InteractionsSelectArea, 'select'>
+    ) => {
         current_interaction = add_cleanup_to_interaction_confirmation(interaction)
         const creature = vm_state.get_acting_creature()
         game_events.on_available_interactions_changed.raise({...current_interaction, creature})
@@ -161,3 +209,15 @@ export const create_instruction_loop = ({
 }
 
 export type InstructionLoop = ReturnType<typeof create_instruction_loop>
+
+
+//TODO clean up usages of the player turn handler
+export type PlayerTurnHandler = Omit<InstructionLoop, "run">
+
+const assert_position_is_contained = ({position, area}: {
+    position: Position,
+    area: Array<Position>
+}) => {
+    //TODO is this needed to share surface or can we just use equal?
+    assert_is_true(area.some(target => positions_share_surface(target, position)))
+}

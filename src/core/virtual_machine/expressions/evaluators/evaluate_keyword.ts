@@ -12,16 +12,12 @@ export const build_evaluate_keyword = ({vm_state}: { vm_state: VMState }) => {
         if (node.property) {
             const creature = EXPR.as_creature(variable)
 
-            if (node.property === "position") {
-                const description = `${creature.data.name}'s position`
-                return {type: "positions", value: [creature.data.position], description}
-            }
-            if (node.property === "template") {
-                return {
-                    type: "string",
-                    value: creature.data.template ?? "",
-                }
-            }
+            if (node.property === "position")
+                return {type: "positions", value: [creature.data.position]}
+
+            if (node.property === "template")
+                return {type: "string", value: creature.data.template ?? "",}
+
             return {
                 type: "number_resolved",
                 ...get_creature_property({creature, property: node.property}),
