@@ -1,7 +1,7 @@
 import {PlayerTurnHandler} from "core/instruction_loop";
 import {Position} from "core/battlegrid/Position";
 import {Creature} from "core/battlegrid/creatures/Creature";
-import {HitStatus} from "core/battlegrid/virtual_machine/HitStatus";
+import {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 
 export const create_interaction_test_helpers = ({player_turn_handler}: {
     player_turn_handler: PlayerTurnHandler

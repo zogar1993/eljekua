@@ -6,7 +6,7 @@ import {add_numbers_resolved} from "core/virtual_machine/expressions/number_util
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {get_creature_defense} from "core/character_sheet/get_creature_defense";
-import {HIT_STATUS, HitStatus} from "core/battlegrid/virtual_machine/HitStatus";
+import {HIT_STATUS, HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {InstructionAttackDiceRoll} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {is_flanking} from "core/battlegrid/queries/is_flanking";

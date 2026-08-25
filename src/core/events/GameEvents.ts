@@ -4,7 +4,7 @@ import type {Expr, ExprNumberResolved} from "core/virtual_machine/expressions/ty
 import type {InstructionFrame} from "core/battlegrid/virtual_machine/TurnState";
 import {Interaction} from "core/instruction_loop";
 import type {Position} from "core/battlegrid/Position";
-import type {HitStatus} from "core/battlegrid/virtual_machine/HitStatus";
+import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import type {InstructionAttackDiceRoll} from "core/virtual_machine/instructions/instructions";
 
 export type CreatureMovedEvent = {

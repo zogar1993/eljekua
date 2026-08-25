@@ -9,7 +9,7 @@ import {
 } from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {HIT_STATUS} from "core/battlegrid/virtual_machine/HitStatus";
+import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 import {
     get_potential_triggers,
     create_trigger_frame,

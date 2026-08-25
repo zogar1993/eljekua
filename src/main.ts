@@ -17,7 +17,7 @@ import {create_instruction_loop} from "core/instruction_loop";
 import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
 import {create_instruction_visualizer} from "web/instruction_visualizer/instruction_visualizer";
 import {create_set_current_turn_to_creature} from "core/use_cases/gameplay/set_current_turn_to_creature";
-import {HIT_STATUS, HitStatus} from "core/battlegrid/virtual_machine/HitStatus";
+import {HIT_STATUS, HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {create_game_events} from "core/events/GameEvents";
 import {create_game_state} from "core/game_state/GameState";
 import {initialize_battle_grid_ui} from "web/battle_grid/BattleGridUI";

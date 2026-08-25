@@ -8,7 +8,7 @@ import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {Position} from "core/battlegrid/Position";
-import {HIT_STATUS, HitStatus} from "core/battlegrid/virtual_machine/HitStatus";
+import {HIT_STATUS, HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 
 type FrameElements = {
     core_frame: InstructionFrame
