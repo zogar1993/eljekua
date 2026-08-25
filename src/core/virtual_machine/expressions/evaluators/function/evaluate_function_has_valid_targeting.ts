@@ -2,7 +2,7 @@ import type {Expr, ExprBoolean} from "core/virtual_machine/expressions/types";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
 import {AST_NODE} from "core/virtual_machine/expressions/AST_NODE";
-import type {TurnState} from "core/battlegrid/virtual_machine/TurnState";
+import type {TurnState} from "core/virtual_machine/TurnState";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {BattleGrid} from "core/battlegrid/BattleGrid";

@@ -1,7 +1,7 @@
 import {create_event_manager} from "stdlib/event_manager";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {Expr, ExprNumberResolved} from "core/virtual_machine/expressions/types";
-import type {InstructionFrame} from "core/battlegrid/virtual_machine/TurnState";
+import type {InstructionFrame} from "core/virtual_machine/TurnState";
 import {Interaction} from "core/instruction_loop";
 import type {Position} from "core/battlegrid/Position";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";

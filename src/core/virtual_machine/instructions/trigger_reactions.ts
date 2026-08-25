@@ -1,6 +1,6 @@
 import type {GameState} from "core/game_state/GameState";
 import type {Creature} from "core/battlegrid/creatures/Creature";
-import type {TurnState} from "core/battlegrid/virtual_machine/TurnState";
+import type {TurnState} from "core/virtual_machine/TurnState";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {
     Power,

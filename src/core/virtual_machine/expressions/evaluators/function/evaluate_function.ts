@@ -10,7 +10,7 @@ import {
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_has_valid_targeting";
 import {evaluate_function_or} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_or";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import type {TurnState} from "core/battlegrid/virtual_machine/TurnState";
+import type {TurnState} from "core/virtual_machine/TurnState";
 import {evaluate_function_exists} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_exists";
 import {
     evaluate_function_is_greater_or_equal
