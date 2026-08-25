@@ -14,10 +14,10 @@ export const create_set_current_turn_to_creature = (
 ) => (
     {creature}: { creature: Creature }
 ) => {
-    const {turn_state, initiative_order, battle_grid} = game_state
+    const {vm_state, initiative_order, battle_grid} = game_state
     run_end_of_turn_hooks({current_turn_creature: initiative_order.get_current_creature(), battle_grid})
 
-    turn_state.clear()
+    vm_state.clear()
     initiative_order.set_current_turn(creature)
 
     run_start_of_turn_hooks({
@@ -26,5 +26,5 @@ export const create_set_current_turn_to_creature = (
         game_events,
     })
 
-    turn_state.add_instruction_frame({instructions: [{type: INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS}]})
+    vm_state.add_instruction_frame({instructions: [{type: INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS}]})
 }

@@ -2,24 +2,24 @@ import type {Expr, ExprBoolean} from "core/virtual_machine/expressions/types";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
 import {AST_NODE} from "core/virtual_machine/expressions/AST_NODE";
-import type {TurnState} from "core/virtual_machine/TurnState";
+import type {VMState} from "core/virtual_machine/VMState";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
-export const evaluate_function_has_valid_targeting = ({node, turn_state, evaluate_ast, battle_grid}:
+export const evaluate_function_has_valid_targeting = ({node, vm_state, evaluate_ast, battle_grid}:
                                                           {
                                                               node: AstNodeFunction,
-                                                              turn_state: TurnState,
+                                                              vm_state: VMState,
                                                               battle_grid: BattleGrid,
                                                               evaluate_ast: (node: AstNode) => Expr
                                                           }): ExprBoolean => {
     assert_parameters_amount_equals(node, 1)
 
     const power_name = AST_NODE.as_keyword(node.parameters[0]).value
-    const power = EXPR.as_power(turn_state.get_variable(power_name))
+    const power = EXPR.as_power(vm_state.get_variable(power_name))
 
     const targeting_instruction = power.instructions.find(instruction => instruction.type === INSTRUCTION_TYPE.SELECT_TARGET)
 

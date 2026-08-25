@@ -7,7 +7,6 @@ import {
     transform_position_to_f1,
 } from "core/battlegrid/Position";
 import {SQUARE_HIGHLIGHT, SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
-import {TurnState} from "core/virtual_machine/TurnState";
 import {
     get_position_by_coordinate,
     nullable_positions_equal

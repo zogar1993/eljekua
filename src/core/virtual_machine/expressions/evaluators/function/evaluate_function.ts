@@ -10,7 +10,7 @@ import {
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_has_valid_targeting";
 import {evaluate_function_or} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_or";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import type {TurnState} from "core/virtual_machine/TurnState";
+import type {VMState} from "core/virtual_machine/VMState";
 import {evaluate_function_exists} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_exists";
 import {
     evaluate_function_is_greater_or_equal
@@ -49,10 +49,10 @@ import {
     evaluate_function_is_lower
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_is_lower";
 
-export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
+export const build_evaluate_function = ({evaluate_ast, vm_state, battle_grid}:
                                             {
                                                 evaluate_ast: (node: AstNode) => Expr,
-                                                turn_state: TurnState,
+                                                vm_state: VMState,
                                                 battle_grid: BattleGrid
                                             }
 ) => {
@@ -61,7 +61,7 @@ export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
             case "add":
                 return evaluate_function_add({node, evaluate_ast})
             case "exists":
-                return evaluate_function_exists({node, turn_state})
+                return evaluate_function_exists({node, vm_state})
             case "equipped":
                 return evaluate_function_equipped({node, evaluate_ast})
             case "has_action_type_available":
@@ -69,7 +69,7 @@ export const build_evaluate_function = ({evaluate_ast, turn_state, battle_grid}:
             case "not_equals":
                 return evaluate_function_not_equals({node, evaluate_ast})
             case "has_valid_targeting":
-                return evaluate_function_has_valid_targeting({node, turn_state, evaluate_ast, battle_grid})
+                return evaluate_function_has_valid_targeting({node, vm_state, evaluate_ast, battle_grid})
             case "are_enemies":
                 return evaluate_function_are_enemies({node, evaluate_ast})
             case "is_ally":

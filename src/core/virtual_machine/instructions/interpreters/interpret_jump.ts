@@ -7,6 +7,6 @@ export const interpret_jump = ({
                                         instruction,
                                         game_state,
                                     }: InterpretInstructionProps<InstructionJump>) => {
-    const {turn_state} = game_state
-    turn_state.jump(instruction.offset)
+    const {vm_state} = game_state
+    vm_state.jump(instruction.offset)
 }

@@ -7,9 +7,9 @@ import {AST, SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 export const interpret_add_current_turn_base_options = ({
                                                             game_state,
                                                         }: InterpretInstructionProps<InstructionAddCurrentTurnBaseOptions>) => {
-    const {initiative_order, turn_state} = game_state
+    const {initiative_order, vm_state} = game_state
     const owner = initiative_order.get_current_creature()
-    turn_state.add_instruction_frame({
+    vm_state.add_instruction_frame({
         instructions: [CURRENT_TURN_BASE_OPTIONS],
         variables: {[SYSTEM_KEYWORD.OWNER]: {type: "creatures", value: [owner]}}
     })

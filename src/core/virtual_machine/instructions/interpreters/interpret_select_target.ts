@@ -27,16 +27,16 @@ export const interpret_select_target = ({
                                             player_turn_handler,
                                             evaluate_ast
                                         }: InterpretInstructionProps<InstructionSelectTarget>) => {
-    const {battle_grid, turn_state} = game_state
+    const {battle_grid, vm_state} = game_state
     const clickable = get_valid_targets({instruction, battle_grid, evaluate_ast})
 
     if (clickable.length === 0) return
 
-    const owner = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
+    const owner = EXPR.as_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
     const target_label = instruction.target_label
 
     if (clickable.length === 1) {
-        if (turn_state.peek().type !== "attack_dice_roll") {
+        if (vm_state.peek().type !== "attack_dice_roll") {
             const position = clickable[0]
 
             if (instruction.targeting_type === "area_burst") {
@@ -46,24 +46,24 @@ export const interpret_select_target = ({
                 const target_positions = highlighted_area.filter(p => battle_grid.is_terrain_occupied(p))
                 const targets = battle_grid.get_creatures_in_positions(target_positions)
 
-                turn_state.set_variable(target_label, {type: "creatures", value: targets})
+                vm_state.set_variable(target_label, {type: "creatures", value: targets})
             } else if (instruction.targeting_type === "movement") {
                 // TODO P2 automatic resolution for movement feels odd when its a movement action, but not when its a secondary action
                 const path = get_shortest_path({creature: owner, destination: position, battle_grid})
 
-                turn_state.set_variable(target_label, {type: "positions", value: path, description: target_label})
+                vm_state.set_variable(target_label, {type: "positions", value: path, description: target_label})
             } else if (instruction.targeting_type === "push") {
-                turn_state.set_variable(target_label, {type: "positions", value: [position], description: target_label})
+                vm_state.set_variable(target_label, {type: "positions", value: [position], description: target_label})
             } else {
                 if (instruction.target_type === "terrain") {
-                    turn_state.set_variable(target_label, {
+                    vm_state.set_variable(target_label, {
                         type: "positions",
                         value: [position],
                         description: target_label
                     })
                 } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
                     const creature = battle_grid.get_creature_by_position(position)
-                    turn_state.set_variable(target_label, {type: "creatures", value: [creature]})
+                    vm_state.set_variable(target_label, {type: "creatures", value: [creature]})
                 } else {
                     throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
                 }
@@ -74,7 +74,7 @@ export const interpret_select_target = ({
     }
 
     const get_attack_hit_chance_against = (creature: Creature) => {
-        const next_instruction = turn_state.peek()
+        const next_instruction = vm_state.peek()
         if (next_instruction.type !== INSTRUCTION_TYPE.ATTACK_DICE_ROLL) return null
 
         return get_attack_success_chance({
@@ -95,7 +95,7 @@ export const interpret_select_target = ({
         }
 
         const select = (path: Array<Position>) => {
-            turn_state.set_variable(target_label, {type: "positions", value: path, description: "target"})
+            vm_state.set_variable(target_label, {type: "positions", value: path, description: "target"})
         }
 
         const footprint = moving_creature.data.position.footprint
@@ -124,7 +124,7 @@ export const interpret_select_target = ({
 
         const select = (position: Position) => {
             const targets = get_targets_for_position(position)
-            turn_state.set_variable(target_label, {type: "creatures", value: targets})
+            vm_state.set_variable(target_label, {type: "creatures", value: targets})
         }
 
         player_turn_handler.set_available_interactions({
@@ -140,7 +140,7 @@ export const interpret_select_target = ({
         const select = (position: Position) => {
             assert_position_is_clickable({position, clickable})
 
-            turn_state.set_variable(target_label, {
+            vm_state.set_variable(target_label, {
                 type: "positions",
                 value: [position],
                 description: "target",
@@ -161,7 +161,7 @@ export const interpret_select_target = ({
         }
 
         const select = (creature: Creature) => {
-            turn_state.set_variable(target_label, {type: "creatures", value: [creature]})
+            vm_state.set_variable(target_label, {type: "creatures", value: [creature]})
         }
 
         player_turn_handler.set_available_interactions({

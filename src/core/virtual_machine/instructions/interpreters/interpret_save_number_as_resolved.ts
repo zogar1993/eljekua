@@ -10,7 +10,7 @@ export const interpret_save_number_as_resolved = ({
                                                       game_state,
                                                       evaluate_ast
                                                   }: InterpretInstructionProps<InstructionSaveResolvedNumber>) => {
-    const {turn_state} = game_state
+    const {vm_state} = game_state
     const value = resolve_number(EXPR.as_number_expr(evaluate_ast(instruction.value)))
-    turn_state.set_variable(instruction.label, value)
+    vm_state.set_variable(instruction.label, value)
 }

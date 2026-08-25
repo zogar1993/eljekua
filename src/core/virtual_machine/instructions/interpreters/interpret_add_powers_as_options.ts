@@ -19,7 +19,7 @@ export const interpret_add_powers_as_options = ({
                                                     game_state,
                                                     evaluate_ast
                                                 }: InterpretInstructionProps<InstructionAddPowers>) => {
-    const {turn_state} = game_state
+    const {vm_state} = game_state
     const creature = EXPR.as_creature(evaluate_ast(instruction.creature))
     const filtered_powers = filter_powers({powers: creature.data.powers, filter: instruction.filter})
 
@@ -56,15 +56,15 @@ export const interpret_add_powers_as_options = ({
 
         if (is_opportunity_attack) {
             const modified_power = {...power, instructions: remove_default_targeting_instruction(power.instructions)}
-            turn_state.set_variable(power_name, {type: "power", value: modified_power})
+            vm_state.set_variable(power_name, {type: "power", value: modified_power})
         } else {
-            turn_state.set_variable(power_name, {type: "power", value: power})
+            vm_state.set_variable(power_name, {type: "power", value: power})
         }
 
         options.push({text: power.name, instructions, condition})
     }
 
-    turn_state.add_instruction_frame({
+    vm_state.add_instruction_frame({
         instructions: [{
             type: INSTRUCTION_TYPE.OPTIONS,
             options: [

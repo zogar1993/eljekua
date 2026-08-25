@@ -18,7 +18,7 @@ const game_state = create_game_state({
     game_events,
     battle_grid_size: {x: 10, y: 10},
 })
-const {battle_grid, initiative_order, turn_state} = game_state
+const {battle_grid, initiative_order, vm_state} = game_state
 const evaluate_ast = build_evaluate_ast({game_state})
 
 const instruction_loop = create_instruction_loop({
@@ -41,8 +41,8 @@ const start_battle = () => {
 const attack_log: Array<{ attacker: string, target: string, power_name: string }> = []
 
 game_events.on_creature_missed.add_handler((creature) => {
-    const attacker = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
-    const power_name = EXPR.as_string(turn_state.get_variable(SYSTEM_KEYWORD.POWER_NAME))
+    const attacker = EXPR.as_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
+    const power_name = EXPR.as_string(vm_state.get_variable(SYSTEM_KEYWORD.POWER_NAME))
     attack_log.push({
         attacker: attacker.data.name,
         target: creature.data.name,

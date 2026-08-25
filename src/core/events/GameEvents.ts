@@ -1,7 +1,7 @@
 import {create_event_manager} from "stdlib/event_manager";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {Expr, ExprNumberResolved} from "core/virtual_machine/expressions/types";
-import type {InstructionFrame} from "core/virtual_machine/TurnState";
+import type {InstructionFrame} from "core/virtual_machine/VMState";
 import {Interaction} from "core/instruction_loop";
 import type {Position} from "core/battlegrid/Position";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
@@ -50,12 +50,12 @@ export const create_game_events = () => ({
     on_initiative_entry_added: create_event_manager<InitiativeEntryAddedEvent>(),
     on_initiative_current_creature_changed: create_event_manager<Creature>(),
 
-    //Turn State Events
-    on_turn_state_cleared: create_event_manager(),
+    // VM State Events
+    on_vm_state_cleared: create_event_manager(),
     on_instruction_frame_added: create_event_manager<InstructionFrame>(),
     on_instruction_pointer_changed: create_event_manager<InstructionFrame>(),
     on_instruction_frame_popped: create_event_manager(),
-    on_turn_state_variable_set: create_event_manager<[string, Expr]>()
+    on_vm_variable_set: create_event_manager<[string, Expr]>()
 })
 
 export type GameEvents = ReturnType<typeof create_game_events>

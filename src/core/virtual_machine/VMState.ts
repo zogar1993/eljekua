@@ -4,7 +4,7 @@ import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {GameEvents} from "core/events/GameEvents";
 
-export const create_turn_state = ({game_events}: { game_events: GameEvents }) => {
+export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
     let frames: Array<InstructionFrame> = []
 
     const add_instruction_frame = ({instructions, variables = {}}: {
@@ -62,7 +62,7 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
     const set_variable = (name: string, value: Expr) => {
         const frame = get_current_frame()
         frame.variables.set(name, value)
-        game_events.on_turn_state_variable_set.raise([name, value])
+        game_events.on_vm_variable_set.raise([name, value])
     }
 
     const jump = (offset: number) => {
@@ -72,7 +72,7 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
 
     const clear = () => {
         frames = []
-        game_events.on_turn_state_cleared.raise()
+        game_events.on_vm_state_cleared.raise()
     }
 
     return {
@@ -90,7 +90,7 @@ export const create_turn_state = ({game_events}: { game_events: GameEvents }) =>
     }
 }
 
-export type TurnState = ReturnType<typeof create_turn_state>
+export type VMState = ReturnType<typeof create_vm_state>
 
 export type InstructionFrame = {
     current_instruction: number

@@ -10,16 +10,16 @@ export const interpret_execute_power = ({
                                             instruction,
                                             game_state,
                                         }: InterpretInstructionProps<InstructionExecutePower>) => {
-    const {turn_state} = game_state
-    const owner = turn_state.get_acting_creature()
-    const {name, instructions} = EXPR.as_power(turn_state.get_variable(instruction.power))
+    const {vm_state} = game_state
+    const owner = vm_state.get_acting_creature()
+    const {name, instructions} = EXPR.as_power(vm_state.get_variable(instruction.power))
 
     const initialization = instruction.initialization ?? []
     const variables: Record<string, Expr> = {}
     for (const {from, to} of initialization)
-        variables[to] = turn_state.get_variable(from)
+        variables[to] = vm_state.get_variable(from)
     variables[SYSTEM_KEYWORD.OWNER] = {type: "creatures", value: [owner]}
     variables[SYSTEM_KEYWORD.POWER_NAME] = {type: "string", value: name}
 
-    turn_state.add_instruction_frame({instructions, variables})
+    vm_state.add_instruction_frame({instructions, variables})
 }

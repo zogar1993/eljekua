@@ -9,10 +9,10 @@ export const interpret_jump_if = ({
                                         game_state,
                                         evaluate_ast
                                     }: InterpretInstructionProps<InstructionJumpIf>) => {
-    const {turn_state} = game_state
+    const {vm_state} = game_state
     const result = EXPR.as_boolean(evaluate_ast(instruction.condition))
     if (result)
-        turn_state.jump(instruction.offset)
+        vm_state.jump(instruction.offset)
     else
-        turn_state.jump(1)
+        vm_state.jump(1)
 }

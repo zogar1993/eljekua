@@ -1,7 +1,7 @@
 import {Instruction} from "core/virtual_machine/instructions/instructions";
 import {Expr} from "core/virtual_machine/expressions/types";
 import {GameEvents} from "core/events/GameEvents";
-import {InstructionFrame} from "core/virtual_machine/TurnState";
+import {InstructionFrame} from "core/virtual_machine/VMState";
 import {create_html_element} from "web/utils/create_html_element";
 import {create_expression_html} from "web/expression/create_expression_html";
 import {AstNode} from "core/expressions/parser/nodes/AstNode";
@@ -45,7 +45,7 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
         top_frame.instructionElements[current_index].classList.add("instruction--current")
     }
 
-    game_events.on_turn_state_cleared.add_handler(() => {
+    game_events.on_vm_state_cleared.add_handler(() => {
         frame_elements.length = 0
         html_content.replaceChildren()
     })
@@ -99,7 +99,7 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
         refresh_active_instruction_highlight()
     })
 
-    game_events.on_turn_state_variable_set.add_handler(([name, value]) => {
+    game_events.on_vm_variable_set.add_handler(([name, value]) => {
         const frame = frame_elements[frame_elements.length - 1]
         const existing = frame.variableElements.find(element => element.dataset.variableName === name)
 

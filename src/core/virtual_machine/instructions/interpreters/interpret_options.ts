@@ -10,12 +10,12 @@ export const interpret_options = ({
                                       evaluate_ast,
                                       game_state
                                   }: InterpretInstructionProps<InstructionOptions>) => {
-    const {turn_state} = game_state
+    const {vm_state} = game_state
     player_turn_handler.set_available_interactions({
         type: "option_select",
         available_options: instruction.options.map(({text, condition, instructions}) => ({
                 text,
-                on_click: () => turn_state.add_instruction_frame({instructions}),
+                on_click: () => vm_state.add_instruction_frame({instructions}),
                 disabled: condition ? !EXPR.as_boolean(evaluate_ast(condition)) : false
             })
         )

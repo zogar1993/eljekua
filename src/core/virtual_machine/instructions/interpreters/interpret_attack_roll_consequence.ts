@@ -22,15 +22,15 @@ export const interpret_attack_roll_consequence = ({
                                                       instruction,
                                                       game_events,
                                                   }: InterpretInstructionProps<InstructionAttackRollConsequence>) => {
-    const {turn_state} = game_state
+    const {vm_state} = game_state
 
-    const attack_rolls = EXPR.as_attack_rolls(turn_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
+    const attack_rolls = EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
     const entries = [...attack_rolls.entries()]
 
     const has_crit = entries.some(([_, hit_status]) => hit_status === HIT_STATUS.CRIT)
 
     if (has_crit) {
-        const activator = EXPR.as_creature(turn_state.get_variable(SYSTEM_KEYWORD.OWNER))
+        const activator = EXPR.as_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
 
         const potential_triggers = get_potential_triggers({
             game_state,
@@ -40,7 +40,7 @@ export const interpret_attack_roll_consequence = ({
         })
 
         for (const {creature: trigger_owner, powers} of potential_triggers)
-            turn_state.add_instruction_frame(create_trigger_frame({activator, trigger_owner, powers}))
+            vm_state.add_instruction_frame(create_trigger_frame({activator, trigger_owner, powers}))
     }
 
     const new_instructions: Array<Instruction> = []
@@ -57,7 +57,7 @@ export const interpret_attack_roll_consequence = ({
         }
     })
 
-    turn_state.add_instruction_frame({instructions: new_instructions})
+    vm_state.add_instruction_frame({instructions: new_instructions})
 }
 
 const save_variable_instruction = (origin: number, destination: string): InstructionSaveVariable => ({

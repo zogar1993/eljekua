@@ -1,6 +1,6 @@
 import type {GameState} from "core/game_state/GameState";
 import type {Creature} from "core/battlegrid/creatures/Creature";
-import type {TurnState} from "core/virtual_machine/TurnState";
+import type {VMState} from "core/virtual_machine/VMState";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {
     Power,
@@ -29,21 +29,21 @@ export const get_potential_triggers = ({
     activator: Creature
     intercept: TriggerInterception
 }): Array<{ creature: Creature, powers: Array<Power> }> => {
-    const {battle_grid, turn_state, initiative_order} = game_state
+    const {battle_grid, vm_state, initiative_order} = game_state
     // We exclude the ones who already were triggered for this power.
     // This is a little redundant in most cases, but without it, we wouldn't
     // disregard those who ignored the chance to use the trigger.
     const already_triggered_key = `already_triggered_${TRIGGER_INTERCEPTION.MOVEMENT}`
-    const already_triggered = turn_state.has_variable(already_triggered_key) ?
-        EXPR.as_creatures(turn_state.get_variable(already_triggered_key)) : []
+    const already_triggered = vm_state.has_variable(already_triggered_key) ?
+        EXPR.as_creatures(vm_state.get_variable(already_triggered_key)) : []
 
-    turn_state.set_variable(TRIGGER_VARIABLE.ACTIVATOR, {type: "creatures", value: [activator]})
+    vm_state.set_variable(TRIGGER_VARIABLE.ACTIVATOR, {type: "creatures", value: [activator]})
 
     const current_turn_creature = initiative_order.get_current_creature()
     const trigger_owners = battle_grid.creatures
         .filter(creature => !already_triggered.includes(creature))
         .map(creature => {
-            turn_state.set_variable(TRIGGER_VARIABLE.OWNER, {type: "creatures", value: [creature]})
+            vm_state.set_variable(TRIGGER_VARIABLE.OWNER, {type: "creatures", value: [creature]})
             const powers = creature.data.powers.filter(power => {
                 if (!power.trigger) return false
                 if (!power.trigger.intercepts.includes(intercept)) return false
@@ -56,7 +56,7 @@ export const get_potential_triggers = ({
         .filter(({powers}) => powers.length > 0)
 
     const new_already_triggered = [...already_triggered, ...trigger_owners.map(({creature}) => creature)]
-    turn_state.set_variable(already_triggered_key, {type: "creatures", value: new_already_triggered})
+    vm_state.set_variable(already_triggered_key, {type: "creatures", value: new_already_triggered})
 
     return trigger_owners
 }
@@ -65,7 +65,7 @@ export const create_trigger_frame = ({activator, trigger_owner: creature, powers
     activator: Creature
     trigger_owner: Creature
     powers: Array<Power>
-}): Parameters<TurnState["add_instruction_frame"]>[0] => ({
+}): Parameters<VMState["add_instruction_frame"]>[0] => ({
     instructions: [{
         type: INSTRUCTION_TYPE.OPTIONS,
         options: [

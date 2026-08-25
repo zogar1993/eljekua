@@ -29,7 +29,7 @@ const game_state = create_game_state({
     game_events,
     battle_grid_size: {x: 10, y: 10},
 })
-const {battle_grid, turn_state} = game_state
+const {battle_grid} = game_state
 
 const evaluate_ast = build_evaluate_ast({game_state})
 
@@ -45,7 +45,6 @@ const player_turn_handler = instruction_loop
 initialize_battle_grid_ui({
     battle_grid,
     player_turn_handler,
-    turn_state,
     game_events,
 })
 

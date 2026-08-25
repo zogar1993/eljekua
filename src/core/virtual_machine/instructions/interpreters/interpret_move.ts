@@ -11,10 +11,10 @@ export const interpret_move = ({
                                    evaluate_ast,
                                    game_events,
                                }: InterpretInstructionProps<InstructionMovement>) => {
-    const {turn_state} = game_state
-    const moving_creature = EXPR.as_creature(turn_state.get_variable(instruction.target))
+    const {vm_state} = game_state
+    const moving_creature = EXPR.as_creature(vm_state.get_variable(instruction.target))
     const destination_label = instruction.destination
-    const path = EXPR.as_positions(turn_state.get_variable(destination_label))
+    const path = EXPR.as_positions(vm_state.get_variable(destination_label))
 
     for (let i = 0; i < path.length - 1; i++) {
         const potential_reactors = get_potential_triggers({
@@ -34,13 +34,13 @@ export const interpret_move = ({
                 movement_type: "move"
             })
         } else {
-            turn_state.set_variable(destination_label, {
+            vm_state.set_variable(destination_label, {
                 type: "positions",
                 value: path.slice(i),
                 description: "movement"
             })
 
-            turn_state.add_instruction_frame({
+            vm_state.add_instruction_frame({
                 instructions: [{
                     type: INSTRUCTION_TYPE.MOVE,
                     target: instruction.target,
@@ -50,7 +50,7 @@ export const interpret_move = ({
 
             for (const {creature: trigger_owner, powers} of potential_reactors) {
                 const frame = create_trigger_frame({activator: moving_creature, trigger_owner, powers})
-                turn_state.add_instruction_frame(frame)
+                vm_state.add_instruction_frame(frame)
             }
 
             break

@@ -13,9 +13,9 @@ export const interpret_apply_status = ({
                                            game_state,
                                            evaluate_ast,
                                        }: InterpretInstructionProps<InstructionApplyStatus>) => {
-    const {turn_state} = game_state
+    const {vm_state} = game_state
     const targets = EXPR.as_creatures(evaluate_ast(instruction.target))
-    const power_owner = turn_state.get_acting_creature()
+    const power_owner = vm_state.get_acting_creature()
     
     for (const target of targets)
         target.add_status({

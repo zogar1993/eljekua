@@ -54,7 +54,7 @@ export const INSTRUCTION_TYPE = {
 ## @naming-files
 
 - **snake_case** for implementation modules: `interpret_move.ts`, `instruction_loop.ts`.
-- **PascalCase** when the file primarily exports a type or class: `Creature.ts`, `TurnState.ts`.
+- **PascalCase** when the file primarily exports a type or class: `Creature.ts`, `VMState.ts`.
 - Place new files alongside peers; follow that directory's pattern.
 
 ## @imports
@@ -80,7 +80,7 @@ export const INSTRUCTION_TYPE = {
 - `core/` is headless-playable; `web/` renders and forwards input.
 - Core never imports `web/`. Web reads core state; mutations only via core APIs (use cases, interaction callbacks).
 - Core → web only via `GameEvents` (`core/events/GameEvents.ts`). Core raises `game_events` when game state changes; web subscribes. Never raise `game_events` from `web/` — presentation-only state (e.g. hover previews) stays inside the UI module.
-- Thread `game_events` into factories that emit events (`create_battle_grid`, `create_instruction_loop`, `create_turn_state`). Interpreters receive it via `InterpretInstructionProps`.
+- Thread `game_events` into factories that emit events (`create_battle_grid`, `create_instruction_loop`, `create_vm_state`). Interpreters receive it via `InterpretInstructionProps`.
 - Web modules subscribe to `game_events` in `main.ts` or their own `create_*_ui` factory. Per-creature payloads include a `creature` field so handlers can filter or map to visuals.
 
 ## @player-interactions

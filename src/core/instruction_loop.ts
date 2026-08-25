@@ -83,7 +83,7 @@ export const create_instruction_loop = ({
     evaluate_ast: (node: AstNode) => Expr
     game_events: GameEvents
 }) => {
-    const {turn_state} = game_state
+    const {vm_state} = game_state
     let current_interaction: Interaction | null = null
 
     const clear_current_interaction = () => {
@@ -130,7 +130,7 @@ export const create_instruction_loop = ({
 
     const set_available_interactions = (interaction: Interaction) => {
         current_interaction = add_cleanup_to_interaction_confirmation(interaction)
-        const creature = turn_state.get_acting_creature()
+        const creature = vm_state.get_acting_creature()
         game_events.on_available_interactions_changed.raise({...current_interaction, creature})
     }
 
@@ -145,12 +145,12 @@ export const create_instruction_loop = ({
 
     const evaluate_instructions = () => {
         while (player_turn_handler.get_interaction() === null) {
-            const instruction = turn_state.peek()
+            const instruction = vm_state.peek()
 
             assert_is_not_null(instruction)
 
             if (!is_branching_instruction(instruction))
-                turn_state.jump(1)
+                vm_state.jump(1)
 
             interpret_instruction({
                 instruction,
