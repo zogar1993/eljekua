@@ -1,8 +1,8 @@
-import {Expr} from "core/virtual_machine/expressions/types";
-import {Instruction} from "core/virtual_machine/instructions/instructions";
+import type {Expr} from "core/virtual_machine/expressions/types";
+import type {Instruction} from "core/virtual_machine/instructions/instructions";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
-import {GameEvents} from "core/events/GameEvents";
+import type {GameEvents} from "core/events/GameEvents";
 
 export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
     let frames: Array<InstructionFrame> = []

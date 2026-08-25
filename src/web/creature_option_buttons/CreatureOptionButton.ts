@@ -1,4 +1,4 @@
-import {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
+import type {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
 import {create_html_element} from "web/utils/create_html_element";
 
 const html_element = document.querySelector("#actions_menu")!

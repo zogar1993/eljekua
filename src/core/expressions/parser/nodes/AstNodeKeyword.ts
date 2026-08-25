@@ -1,4 +1,4 @@
-import {Scanner} from "core/expressions/parser/scanner";
+import type {Scanner} from "core/expressions/parser/scanner";
 import {is_plain_text, is_text_character} from "core/expressions/parser/regexes";
 import {assert} from "stdlib/assert";
 

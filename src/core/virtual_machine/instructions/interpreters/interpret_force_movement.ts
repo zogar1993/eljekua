@@ -1,6 +1,6 @@
-import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {InstructionForceMovement} from "core/virtual_machine/instructions/instructions";
+import type {InstructionForceMovement} from "core/virtual_machine/instructions/instructions";
 
 export const interpret_force_movement = ({
                                              instruction,

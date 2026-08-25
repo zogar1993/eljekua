@@ -1,10 +1,9 @@
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import type {StatusDuration, StatusEffect} from "core/battlegrid/creatures/Creature";
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {Expr} from "core/virtual_machine/expressions/types";
-import {InstructionApplyStatus} from "core/virtual_machine/instructions/instructions";
+import type {Creature, StatusDuration, StatusEffect} from "core/battlegrid/creatures/Creature";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import type {Expr} from "core/virtual_machine/expressions/types";
+import type {InstructionApplyStatus} from "core/virtual_machine/instructions/instructions";
 
 export const interpret_apply_status = ({
                                            instruction,

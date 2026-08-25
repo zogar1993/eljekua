@@ -1,14 +1,13 @@
-import {CreatureData} from "core/battlegrid/creatures/CreatureData";
+import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {Creature} from "core/battlegrid/creatures/Creature";
+import type {Position, PositionFootprintOne} from "core/battlegrid/Position";
 import {
-    Position,
-    PositionFootprintOne,
     positions_equal_footprint_one,
     positions_share_surface,
     transform_position_to_f1
 } from "core/battlegrid/Position";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "data/powers/basic";
-import {GameEvents} from "core/events/GameEvents";
+import type {GameEvents} from "core/events/GameEvents";
 
 export const create_battle_grid = ({size, game_events}: {
     size: { x: number, y: number }

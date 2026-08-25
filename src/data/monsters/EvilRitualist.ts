@@ -1,7 +1,7 @@
-import {Size} from "core/battlegrid/creatures/SIZES";
-import {AttributeCode} from "core/character_sheet/attributes";
-import {DefenseCode} from "core/character_sheet/get_creature_defense";
-import {IRPower} from "core/types";
+import type {Size} from "core/battlegrid/creatures/SIZES";
+import type {AttributeCode} from "core/character_sheet/attributes";
+import type {DefenseCode} from "core/character_sheet/get_creature_defense";
+import type {IRPower} from "core/types";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
 export type Monster = {

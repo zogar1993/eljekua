@@ -1,4 +1,4 @@
-import {Creature} from "core/battlegrid/creatures/Creature";
+import type {Creature} from "core/battlegrid/creatures/Creature";
 import {run_end_of_turn_hooks} from "core/turns/run_end_of_turn_hooks";
 import {run_start_of_turn_hooks} from "core/turns/run_start_of_turn_hooks";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";

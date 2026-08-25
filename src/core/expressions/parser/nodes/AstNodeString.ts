@@ -1,4 +1,4 @@
-import {Scanner} from "core/expressions/parser/scanner";
+import type {Scanner} from "core/expressions/parser/scanner";
 
 export const parse_string = (scanner: Scanner): AstNodeString => {
     scanner.consume(`"`)

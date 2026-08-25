@@ -1,6 +1,7 @@
-import {GameEvents} from "core/events/GameEvents";
-import {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
-import {create_option_button_visual, CreatureOptionButton} from "web/creature_option_buttons/CreatureOptionButton";
+import type {GameEvents} from "core/events/GameEvents";
+import type {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
+import type {CreatureOptionButton} from "web/creature_option_buttons/CreatureOptionButton";
+import {create_option_button_visual} from "web/creature_option_buttons/CreatureOptionButton";
 import {AssertionError} from "stdlib/AssertionError";
 
 export const create_option_buttons_ui = ({game_events}: { game_events: GameEvents }) => {

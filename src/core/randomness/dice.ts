@@ -1,6 +1,6 @@
 import {assert} from "stdlib/assert";
 
-import {ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 
 (window as any).rig_dice_roll = (faces: number, result: number) => {
     const rigs = rigged_rolls[faces]

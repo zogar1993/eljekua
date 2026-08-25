@@ -1,7 +1,7 @@
-import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {resolve_number} from "core/virtual_machine/expressions/number_utils";
-import {InstructionSaveResolvedNumber} from "core/virtual_machine/instructions/instructions";
+import type {InstructionSaveResolvedNumber} from "core/virtual_machine/instructions/instructions";
 
 export const interpret_save_number_as_resolved = ({
                                                       instruction,

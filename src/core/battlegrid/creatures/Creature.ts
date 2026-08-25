@@ -1,6 +1,7 @@
-import {CreatureData} from "core/battlegrid/creatures/CreatureData";
+import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
-import {ACTION_TYPE_EXPENDITURE_ORDER, ActionType} from "core/battlegrid/creatures/ActionType";
+import type {ActionType} from "core/battlegrid/creatures/ActionType";
+import {ACTION_TYPE_EXPENDITURE_ORDER} from "core/battlegrid/creatures/ActionType";
 import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
 
 export class Creature {

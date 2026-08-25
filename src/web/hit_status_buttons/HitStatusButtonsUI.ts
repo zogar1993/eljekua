@@ -1,11 +1,10 @@
-import {GameEvents} from "core/events/GameEvents";
-import {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {
-    create_creature_hit_status_visual,
-    CreatureHitStatusVisual
-} from "web/hit_status_buttons/CreatureHitStatusVisual";
-import {create_option_button_visual, CreatureOptionButton} from "web/creature_option_buttons/CreatureOptionButton";
+import type {GameEvents} from "core/events/GameEvents";
+import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {CreatureHitStatusVisual} from "web/hit_status_buttons/CreatureHitStatusVisual";
+import {create_creature_hit_status_visual} from "web/hit_status_buttons/CreatureHitStatusVisual";
+import type {CreatureOptionButton} from "web/creature_option_buttons/CreatureOptionButton";
+import {create_option_button_visual} from "web/creature_option_buttons/CreatureOptionButton";
 import {AssertionError} from "stdlib/AssertionError";
 
 export const create_hit_status_buttons_ui = ({game_events}: { game_events: GameEvents }) => {

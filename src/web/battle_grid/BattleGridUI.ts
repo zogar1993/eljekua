@@ -1,19 +1,23 @@
-import {BattleGrid} from "core/battlegrid/BattleGrid";
+import type {BattleGrid} from "core/battlegrid/BattleGrid";
 import {create_battle_grid_visual} from "web/battle_grid/BattleGridVisual";
-import {create_visual_square, SquareVisual} from "web/battle_grid/squares/SquareVisual";
-import {Position, PositionFootprintOne, transform_position_to_f1,} from "core/battlegrid/Position";
-import {SQUARE_HIGHLIGHT, SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
+import type {SquareVisual} from "web/battle_grid/squares/SquareVisual";
+import {create_visual_square} from "web/battle_grid/squares/SquareVisual";
+import type {Position, PositionFootprintOne} from "core/battlegrid/Position";
+import {transform_position_to_f1} from "core/battlegrid/Position";
+import type {SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
+import {SQUARE_HIGHLIGHT} from "web/battle_grid/squares/SquareHighlight";
 import {get_position_by_coordinate, nullable_positions_equal} from "web/battle_grid/coordinates/ClickableCoordinate";
-import {GameEvents} from "core/events/GameEvents";
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {create_visual_creature, CreatureVisual} from "web/creature/CreatureVisual";
+import type {GameEvents} from "core/events/GameEvents";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {CreatureVisual} from "web/creature/CreatureVisual";
+import {create_visual_creature} from "web/creature/CreatureVisual";
 import {AnimationQueue} from "web/animation_queue/AnimationQueue";
-import {
+import type {
     Interaction,
     InteractionsSelectArea,
     InteractionsSelectCreature,
     InteractionsSelectPath,
-    InteractionsSelectTerrain,
+    InteractionsSelectTerrain
 } from "core/instruction_loop";
 import {assert_is_not_undefined} from "stdlib/assert";
 

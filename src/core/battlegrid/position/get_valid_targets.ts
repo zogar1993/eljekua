@@ -1,11 +1,12 @@
-import {BattleGrid} from "core/battlegrid/BattleGrid";
-import {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {Expr} from "core/virtual_machine/expressions/types";
+import type {BattleGrid} from "core/battlegrid/BattleGrid";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import type {Expr} from "core/virtual_machine/expressions/types";
 import {get_reach} from "core/battlegrid/position/get_reach";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {assert_are_footprint_one, Position, positions_equal, positions_share_surface,} from "core/battlegrid/Position";
+import type {Position} from "core/battlegrid/Position";
+import {assert_are_footprint_one, positions_equal, positions_share_surface} from "core/battlegrid/Position";
 import {AST} from "core/virtual_machine/expressions/AST_NODE";
-import {InstructionSelectTarget} from "core/virtual_machine/instructions/instructions";
+import type {InstructionSelectTarget} from "core/virtual_machine/instructions/instructions";
 
 export const get_valid_targets = ({instruction, battle_grid, evaluate_ast}: {
     instruction: InstructionSelectTarget,

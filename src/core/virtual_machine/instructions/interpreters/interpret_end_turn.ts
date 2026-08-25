@@ -1,5 +1,5 @@
-import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {InstructionEndTurn} from "core/virtual_machine/instructions/instructions";
+import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import type {InstructionEndTurn} from "core/virtual_machine/instructions/instructions";
 import {run_start_of_turn_hooks} from "core/turns/run_start_of_turn_hooks";
 import {run_end_of_turn_hooks} from "core/turns/run_end_of_turn_hooks";
 

@@ -1,7 +1,7 @@
-import {CreatureData} from "core/battlegrid/creatures/CreatureData";
+import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import type {GameState} from "core/game_state/GameState";
 import {roll_d} from "core/randomness/dice";
-import {GameEvents} from "core/events/GameEvents";
+import type {GameEvents} from "core/events/GameEvents";
 
 
 export const create_add_creature_to_game = ({

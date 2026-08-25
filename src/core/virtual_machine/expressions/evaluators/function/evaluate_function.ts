@@ -1,5 +1,5 @@
-import {Expr} from "core/virtual_machine/expressions/types";
-import {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
+import type {Expr} from "core/virtual_machine/expressions/types";
+import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {evaluate_function_add} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_add";
 import {
     evaluate_function_equipped
@@ -17,7 +17,7 @@ import {evaluate_function_exists} from "core/virtual_machine/expressions/evaluat
 import {
     evaluate_function_is_greater_or_equal
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_is_greater_or_equal";
-import {BattleGrid} from "core/battlegrid/BattleGrid";
+import type {BattleGrid} from "core/battlegrid/BattleGrid";
 import {
     evaluate_function_can_expend_action_type
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_can_expend_action_type";

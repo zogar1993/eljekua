@@ -1,4 +1,5 @@
-import {Position, positions_equal} from "core/battlegrid/Position";
+import type {Position} from "core/battlegrid/Position";
+import {positions_equal} from "core/battlegrid/Position";
 
 export type ClickableCoordinate = { x: number, y: number }
 

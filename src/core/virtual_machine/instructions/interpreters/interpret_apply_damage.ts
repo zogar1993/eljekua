@@ -1,15 +1,16 @@
-import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {
     max_number_resolved,
     resolve_number,
     subtract_numbers_resolved
 } from "core/virtual_machine/expressions/number_utils";
-import {StatusEffectGainResistance} from "core/battlegrid/creatures/Creature";
-import {InstructionApplyDamage} from "core/virtual_machine/instructions/instructions";
+import type {StatusEffectGainResistance} from "core/battlegrid/creatures/Creature";
+import type {InstructionApplyDamage} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
-import {HIT_STATUS, HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 
 export const interpret_apply_damage = ({
                                            instruction,

@@ -1,10 +1,10 @@
-import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {
+import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import type {
     Instruction,
-    INSTRUCTION_TYPE,
     InstructionAttackRollConsequence,
     InstructionSaveVariable
 } from "core/virtual_machine/instructions/instructions";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";

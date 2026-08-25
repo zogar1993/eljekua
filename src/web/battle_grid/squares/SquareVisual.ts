@@ -1,4 +1,4 @@
-import {SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
+import type {SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
 import {create_html_element} from "web/utils/create_html_element";
 
 export const create_visual_square = ({x, y}: { x: number, y: number }) => {

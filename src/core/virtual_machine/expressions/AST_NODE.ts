@@ -1,8 +1,8 @@
-import {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {AstNodeKeyword} from "core/expressions/parser/nodes/AstNodeKeyword";
-import {AstNodeString} from "core/expressions/parser/nodes/AstNodeString";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import type {AstNodeKeyword} from "core/expressions/parser/nodes/AstNodeKeyword";
+import type {AstNodeString} from "core/expressions/parser/nodes/AstNodeString";
 import {to_ast} from "core/expressions/parser/to_ast";
-import {AstNodeNumber} from "core/expressions/parser/nodes/AstNodeNumber";
+import type {AstNodeNumber} from "core/expressions/parser/nodes/AstNodeNumber";
 
 export const AST_NODE = {
     as_keyword: (node: AstNode): AstNodeKeyword => {

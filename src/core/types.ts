@@ -1,5 +1,5 @@
-import {DefenseCode} from "core/character_sheet/get_creature_defense";
-import {ActionType} from "core/battlegrid/creatures/ActionType";
+import type {DefenseCode} from "core/character_sheet/get_creature_defense";
+import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
 export type IRPower = {

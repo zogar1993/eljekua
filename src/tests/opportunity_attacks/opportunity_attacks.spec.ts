@@ -1,8 +1,8 @@
 import {get_flanker_positions} from "core/battlegrid/position/get_flanker_positions";
-import {CreatureData} from "core/battlegrid/creatures/CreatureData";
-import {Creature} from "core/battlegrid/creatures/Creature";
+import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
+import type {Creature} from "core/battlegrid/creatures/Creature";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
-import {Position} from "core/battlegrid/Position";
+import type {Position} from "core/battlegrid/Position";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
 import {create_instruction_loop} from "core/instruction_loop";

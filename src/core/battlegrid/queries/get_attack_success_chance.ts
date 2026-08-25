@@ -1,8 +1,9 @@
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {DefenseCode, get_creature_defense} from "core/character_sheet/get_creature_defense";
-import {AstNode} from "core/expressions/parser/nodes/AstNode";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {DefenseCode} from "core/character_sheet/get_creature_defense";
+import {get_creature_defense} from "core/character_sheet/get_creature_defense";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {Expr} from "core/virtual_machine/expressions/types";
+import type {Expr} from "core/virtual_machine/expressions/types";
 import {bound_minmax} from "stdlib/bound_minmax";
 
 export type AttackSuccessChance = { attack: number, defense: number, chance: number }

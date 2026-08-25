@@ -1,8 +1,8 @@
-import {Expr, ExprNumber, ExprNumberResolved} from "core/virtual_machine/expressions/types";
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {Position} from "core/battlegrid/Position";
-import {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
-import {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import type {Expr, ExprNumber, ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {Position} from "core/battlegrid/Position";
+import type {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
+import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 
 export const EXPR = {
     as_creature: (expr: Expr): Creature => {

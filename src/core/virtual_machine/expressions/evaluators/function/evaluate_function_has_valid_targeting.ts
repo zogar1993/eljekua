@@ -4,8 +4,8 @@ import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/
 import {AST_NODE} from "core/virtual_machine/expressions/AST_NODE";
 import type {VMState} from "core/virtual_machine/VMState";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {BattleGrid} from "core/battlegrid/BattleGrid";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import type {BattleGrid} from "core/battlegrid/BattleGrid";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 

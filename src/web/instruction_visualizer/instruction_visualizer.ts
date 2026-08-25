@@ -1,14 +1,15 @@
-import {Instruction} from "core/virtual_machine/instructions/instructions";
-import {Expr} from "core/virtual_machine/expressions/types";
-import {GameEvents} from "core/events/GameEvents";
-import {InstructionFrame} from "core/virtual_machine/VMState";
+import type {Instruction} from "core/virtual_machine/instructions/instructions";
+import type {Expr} from "core/virtual_machine/expressions/types";
+import type {GameEvents} from "core/events/GameEvents";
+import type {InstructionFrame} from "core/virtual_machine/VMState";
 import {create_html_element} from "web/utils/create_html_element";
 import {create_expression_html} from "web/expression/create_expression_html";
-import {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
-import {Position} from "core/battlegrid/Position";
-import {HIT_STATUS, HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
+import type {Position} from "core/battlegrid/Position";
+import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 
 type FrameElements = {
     core_frame: InstructionFrame

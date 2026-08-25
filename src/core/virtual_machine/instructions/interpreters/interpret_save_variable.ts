@@ -1,5 +1,5 @@
-import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {InstructionSaveVariable} from "core/virtual_machine/instructions/instructions";
+import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import type {InstructionSaveVariable} from "core/virtual_machine/instructions/instructions";
 
 export const interpret_save_variable = ({
                                             instruction,

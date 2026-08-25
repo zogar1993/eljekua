@@ -1,5 +1,5 @@
 import type {Position, PositionFootprintOne} from "core/battlegrid/Position";
-import {BattleGrid} from "core/battlegrid/BattleGrid";
+import type {BattleGrid} from "core/battlegrid/BattleGrid";
 
 export const get_flanker_positions = (
     {attacker_position, defender_position, battle_grid}:

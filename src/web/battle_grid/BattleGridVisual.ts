@@ -1,4 +1,5 @@
-import {ClickableCoordinate, coordinates_equal} from "web/battle_grid/coordinates/ClickableCoordinate";
+import type {ClickableCoordinate} from "web/battle_grid/coordinates/ClickableCoordinate";
+import {coordinates_equal} from "web/battle_grid/coordinates/ClickableCoordinate";
 
 export const create_battle_grid_visual = ({width, height}: { width: number, height: number }): BattleGridVisual => {
     const html_board = document.querySelector(".board")! as HTMLDivElement

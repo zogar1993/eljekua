@@ -1,8 +1,8 @@
 import type {Interaction} from "core/instruction_loop";
 import type {GameEvents} from "core/events/GameEvents";
-import {Position} from "core/battlegrid/Position";
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import type {Position} from "core/battlegrid/Position";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 
 export const create_interaction_test_helpers = ({game_events}: {
     game_events: GameEvents

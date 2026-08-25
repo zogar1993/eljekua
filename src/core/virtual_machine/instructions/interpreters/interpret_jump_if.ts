@@ -1,6 +1,6 @@
-import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {InstructionJumpIf} from "core/virtual_machine/instructions/instructions";
+import type {InstructionJumpIf} from "core/virtual_machine/instructions/instructions";
 
 export const interpret_jump_if = ({
                                         instruction,

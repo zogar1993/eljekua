@@ -1,14 +1,14 @@
-import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {
+import type {
     Instruction,
-    INSTRUCTION_TYPE,
     InstructionAddPowers,
     InstructionOptionsItem
 } from "core/virtual_machine/instructions/instructions";
-import {AstNode} from "core/expressions/parser/nodes/AstNode";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
-import {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
+import type {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 

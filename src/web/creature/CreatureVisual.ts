@@ -1,7 +1,7 @@
-import {Position} from "core/battlegrid/Position";
-import {CreatureData} from "core/battlegrid/creatures/CreatureData";
+import type {Position} from "core/battlegrid/Position";
+import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {SIZE} from "core/battlegrid/creatures/SIZES";
-import {ActionType} from "core/battlegrid/creatures/ActionType";
+import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {create_html_element} from "web/utils/create_html_element";
 import {create_action_dots_visual} from "web/creature/ActionDotsVisual";
 

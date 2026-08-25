@@ -1,5 +1,6 @@
-import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {INSTRUCTION_TYPE, InstructionAddCurrentTurnBaseOptions} from "core/virtual_machine/instructions/instructions";
+import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import type {InstructionAddCurrentTurnBaseOptions} from "core/virtual_machine/instructions/instructions";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {AST, SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 
 export const interpret_add_current_turn_base_options = ({

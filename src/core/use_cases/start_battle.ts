@@ -1,5 +1,5 @@
 import {run_start_of_turn_hooks} from "core/turns/run_start_of_turn_hooks";
-import {InstructionLoop} from "core/instruction_loop";
+import type {InstructionLoop} from "core/instruction_loop";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import type {GameEvents} from "core/events/GameEvents";
 import type {GameState} from "core/game_state/GameState";

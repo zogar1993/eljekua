@@ -1,6 +1,7 @@
 import {assert} from "stdlib/assert";
 import {Scanner} from "core/expressions/parser/scanner";
-import {AstNode, parse_any} from "core/expressions/parser/nodes/AstNode";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import {parse_any} from "core/expressions/parser/nodes/AstNode";
 
 export const to_ast = (value: string | number): AstNode => {
     const text = `${value}`

@@ -19,7 +19,8 @@ import {
 } from "core/virtual_machine/instructions/interpreters/interpret_add_powers_as_options";
 import {interpret_apply_status} from "core/virtual_machine/instructions/interpreters/interpret_apply_status";
 import {interpret_expend_action} from "core/virtual_machine/instructions/interpreters/interpret_expend_action";
-import {Instruction, INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
+import type {Instruction} from "core/virtual_machine/instructions/instructions";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {interpret_end_turn} from "core/virtual_machine/instructions/interpreters/interpret_end_turn";
 import {
     interpret_attack_roll_consequence

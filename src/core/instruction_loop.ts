@@ -2,12 +2,13 @@ import {interpret_instruction} from "core/virtual_machine/instructions/interpret
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {Expr} from "core/virtual_machine/expressions/types";
 import type {GameState} from "core/game_state/GameState";
-import {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
-import {GameEvents} from "core/events/GameEvents";
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {AttackSuccessChance} from "core/battlegrid/queries/get_attack_success_chance";
-import {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
-import {Position, positions_share_surface} from "core/battlegrid/Position";
+import type {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
+import type {GameEvents} from "core/events/GameEvents";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {AttackSuccessChance} from "core/battlegrid/queries/get_attack_success_chance";
+import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import type {Position} from "core/battlegrid/Position";
+import {positions_share_surface} from "core/battlegrid/Position";
 import {assert_is_not_null, assert_is_true} from "stdlib/assert";
 import {is_branching_instruction} from "core/virtual_machine/instructions/instructions";
 

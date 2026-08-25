@@ -1,15 +1,16 @@
-import {assert_is_footprint_one, Position, positions_share_surface,} from "core/battlegrid/Position";
-import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import type {Position} from "core/battlegrid/Position";
+import {assert_is_footprint_one, positions_share_surface} from "core/battlegrid/Position";
+import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {get_reach_area_burst} from "core/battlegrid/position/get_reach_area_burst";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
 import {get_attack_success_chance} from "core/battlegrid/queries/get_attack_success_chance";
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {
-    INSTRUCTION_TYPE,
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {
     InstructionSelectTarget,
     InstructionSelectTargetMovement,
     InstructionSelectTargetPush
 } from "core/virtual_machine/instructions/instructions";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";

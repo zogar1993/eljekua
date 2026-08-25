@@ -1,5 +1,5 @@
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {BattleGrid} from "core/battlegrid/BattleGrid";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {BattleGrid} from "core/battlegrid/BattleGrid";
 
 export const run_end_of_turn_hooks = ({current_turn_creature, battle_grid}: {
     current_turn_creature: Creature,

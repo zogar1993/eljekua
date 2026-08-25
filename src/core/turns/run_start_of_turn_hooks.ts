@@ -1,6 +1,7 @@
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {BattleGrid} from "core/battlegrid/BattleGrid";
-import {ACTION_TYPE, ActionType} from "core/battlegrid/creatures/ActionType";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {BattleGrid} from "core/battlegrid/BattleGrid";
+import type {ActionType} from "core/battlegrid/creatures/ActionType";
+import {ACTION_TYPE} from "core/battlegrid/creatures/ActionType";
 import type {GameEvents} from "core/events/GameEvents";
 
 export const run_start_of_turn_hooks = ({current_turn_creature, battle_grid, game_events}: {

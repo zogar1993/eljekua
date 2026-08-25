@@ -1,8 +1,8 @@
 import type {Expr} from "core/virtual_machine/expressions/types";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {Instruction} from "core/virtual_machine/instructions/instructions";
-import {PlayerTurnHandler} from "core/instruction_loop";
-import {GameEvents} from "core/events/GameEvents";
+import type {Instruction} from "core/virtual_machine/instructions/instructions";
+import type {PlayerTurnHandler} from "core/instruction_loop";
+import type {GameEvents} from "core/events/GameEvents";
 import type {GameState} from "core/game_state/GameState";
 
 export type InterpretInstructionProps<T extends Instruction> = {

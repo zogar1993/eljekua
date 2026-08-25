@@ -1,7 +1,8 @@
-import {Scanner} from "core/expressions/parser/scanner";
+import type {Scanner} from "core/expressions/parser/scanner";
 import {is_text_character} from "core/expressions/parser/regexes";
 import {assert} from "stdlib/assert";
-import {AstNode, parse_any} from "core/expressions/parser/nodes/AstNode";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import {parse_any} from "core/expressions/parser/nodes/AstNode";
 
 export const parse_function = (scanner: Scanner): AstNodeFunction => {
     scanner.consume("$")

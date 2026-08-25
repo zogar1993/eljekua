@@ -1,7 +1,7 @@
-import {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {DefenseCode} from "core/character_sheet/get_creature_defense";
-import {StatusDurationValue} from "core/types";
-import {ActionType} from "core/battlegrid/creatures/ActionType";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import type {DefenseCode} from "core/character_sheet/get_creature_defense";
+import type {StatusDurationValue} from "core/types";
+import type {ActionType} from "core/battlegrid/creatures/ActionType";
 
 export const INSTRUCTION_TYPE = {
     ATTACK_DICE_ROLL: "attack_dice_roll",

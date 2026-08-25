@@ -1,14 +1,15 @@
 import {to_ast} from "core/expressions/parser/to_ast";
 import type {IRInstruction, IRInstructionApplyStatus, IRInstructionSelectTarget, IRPower} from "core/types";
 import {ATTRIBUTE_CODES} from "core/character_sheet/attributes";
-import {
+import type {
     Instruction,
-    INSTRUCTION_TYPE,
     InstructionApplyStatus,
     InstructionSelectTarget
 } from "core/virtual_machine/instructions/instructions";
-import {ACTION_TYPE, ActionType, TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
-import {AstNode} from "core/expressions/parser/nodes/AstNode";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
+import type {ActionType} from "core/battlegrid/creatures/ActionType";
+import {ACTION_TYPE, TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 

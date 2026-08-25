@@ -1,7 +1,8 @@
-import {Position, positions_of_same_footprint_equal} from "core/battlegrid/Position";
+import type {Position} from "core/battlegrid/Position";
+import {positions_of_same_footprint_equal} from "core/battlegrid/Position";
 import type {BattleGrid} from "core/battlegrid/BattleGrid";
 import {get_reach_adjacent} from "core/battlegrid/position/get_reach_adjacent";
-import {Creature} from "core/battlegrid/creatures/Creature";
+import type {Creature} from "core/battlegrid/creatures/Creature";
 
 export const get_reach_movement = ({creature, distance, battle_grid}: {
     creature: Creature,

@@ -1,9 +1,9 @@
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {BattleGrid} from "core/battlegrid/BattleGrid";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {BattleGrid} from "core/battlegrid/BattleGrid";
+import type {Position} from "core/battlegrid/Position";
 import {
     assert_positions_have_same_footprint,
     distance_between_positions,
-    Position,
     positions_of_same_footprint_equal
 } from "core/battlegrid/Position";
 import {get_reach_adjacent} from "core/battlegrid/position/get_reach_adjacent";

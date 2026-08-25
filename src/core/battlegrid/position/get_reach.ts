@@ -6,11 +6,11 @@ import {get_reach_adjacent} from "core/battlegrid/position/get_reach_adjacent";
 import {get_reach_ranged} from "core/battlegrid/position/get_reach_ranged";
 import {get_reach_area_burst} from "core/battlegrid/position/get_reach_area_burst";
 import {get_reach_push} from "core/battlegrid/position/get_reach_push";
-import {BattleGrid} from "core/battlegrid/BattleGrid";
-import {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {Expr} from "core/virtual_machine/expressions/types";
+import type {BattleGrid} from "core/battlegrid/BattleGrid";
+import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import type {Expr} from "core/virtual_machine/expressions/types";
 import {AST} from "core/virtual_machine/expressions/AST_NODE";
-import {InstructionSelectTarget} from "core/virtual_machine/instructions/instructions";
+import type {InstructionSelectTarget} from "core/virtual_machine/instructions/instructions";
 
 
 export const get_reach = ({instruction, battle_grid, evaluate_ast}: {

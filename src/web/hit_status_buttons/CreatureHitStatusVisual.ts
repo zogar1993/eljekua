@@ -1,5 +1,6 @@
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {HIT_STATUS, HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import type {Creature} from "core/battlegrid/creatures/Creature";
+import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 import {create_html_element} from "web/utils/create_html_element";
 
 const HIT_STATUS_OPTIONS: Array<{ status: HitStatus, label: string }> = [

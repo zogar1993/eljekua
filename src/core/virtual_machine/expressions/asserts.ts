@@ -1,4 +1,4 @@
-import {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
+import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 
 export const assert_parameters_amount_equals = (node: AstNodeFunction, amount: number) => {
     if (node.parameters.length === amount) return
