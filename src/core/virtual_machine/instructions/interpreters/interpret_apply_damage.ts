@@ -1,6 +1,4 @@
-import {
-    InterpretInstructionProps
-} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {

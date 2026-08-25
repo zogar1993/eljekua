@@ -1,6 +1,4 @@
-import {
-    InterpretInstructionProps
-} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {InstructionJump} from "core/virtual_machine/instructions/instructions";
 
 export const interpret_jump = ({

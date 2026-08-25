@@ -2,8 +2,8 @@ import {to_ast} from "core/expressions/parser/to_ast";
 import type {IRInstruction, IRInstructionApplyStatus, IRInstructionSelectTarget, IRPower} from "core/types";
 import {ATTRIBUTE_CODES} from "core/character_sheet/attributes";
 import {
-    INSTRUCTION_TYPE,
     Instruction,
+    INSTRUCTION_TYPE,
     InstructionApplyStatus,
     InstructionSelectTarget
 } from "core/virtual_machine/instructions/instructions";

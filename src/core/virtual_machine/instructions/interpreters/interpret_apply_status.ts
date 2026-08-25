@@ -1,6 +1,4 @@
-import type {
-    InterpretInstructionProps
-} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {StatusDuration, StatusEffect} from "core/battlegrid/creatures/Creature";
 import {Creature} from "core/battlegrid/creatures/Creature";

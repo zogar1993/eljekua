@@ -1,7 +1,5 @@
 import {roll_d} from "core/randomness/dice";
-import {
-    InterpretInstructionProps
-} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {add_numbers_resolved} from "core/virtual_machine/expressions/number_utils";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {ExprNumberResolved} from "core/virtual_machine/expressions/types";

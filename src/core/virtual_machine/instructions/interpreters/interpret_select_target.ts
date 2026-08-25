@@ -1,11 +1,5 @@
-import {
-    assert_is_footprint_one,
-    Position,
-    positions_share_surface,
-} from "core/battlegrid/Position";
-import {
-    InterpretInstructionProps
-} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import {assert_is_footprint_one, Position, positions_share_surface,} from "core/battlegrid/Position";
+import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {get_reach_area_burst} from "core/battlegrid/position/get_reach_area_burst";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
 import {get_attack_success_chance} from "core/battlegrid/queries/get_attack_success_chance";

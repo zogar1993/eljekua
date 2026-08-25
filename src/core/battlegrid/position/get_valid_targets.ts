@@ -3,12 +3,7 @@ import {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {Expr} from "core/virtual_machine/expressions/types";
 import {get_reach} from "core/battlegrid/position/get_reach";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {
-    assert_are_footprint_one,
-    Position,
-    positions_equal,
-    positions_share_surface,
-} from "core/battlegrid/Position";
+import {assert_are_footprint_one, Position, positions_equal, positions_share_surface,} from "core/battlegrid/Position";
 import {AST} from "core/virtual_machine/expressions/AST_NODE";
 import {InstructionSelectTarget} from "core/virtual_machine/instructions/instructions";
 

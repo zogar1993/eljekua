@@ -1,6 +1,4 @@
-import {
-    InterpretInstructionProps
-} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {INSTRUCTION_TYPE, InstructionAddCurrentTurnBaseOptions} from "core/virtual_machine/instructions/instructions";
 import {AST, SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 

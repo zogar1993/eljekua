@@ -1,9 +1,7 @@
-import {
-    InterpretInstructionProps
-} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {INSTRUCTION_TYPE, InstructionMovement} from "core/virtual_machine/instructions/instructions";
-import {get_potential_triggers, create_trigger_frame} from "core/virtual_machine/instructions/trigger_reactions";
+import {create_trigger_frame, get_potential_triggers} from "core/virtual_machine/instructions/trigger_reactions";
 
 export const interpret_move = ({
                                    instruction,

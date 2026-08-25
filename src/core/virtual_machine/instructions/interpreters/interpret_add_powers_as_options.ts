@@ -1,10 +1,8 @@
-import {
-    InterpretInstructionProps
-} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {
-    INSTRUCTION_TYPE,
     Instruction,
+    INSTRUCTION_TYPE,
     InstructionAddPowers,
     InstructionOptionsItem
 } from "core/virtual_machine/instructions/instructions";

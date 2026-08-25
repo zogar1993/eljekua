@@ -1,16 +1,9 @@
 import {BattleGrid} from "core/battlegrid/BattleGrid";
 import {create_battle_grid_visual} from "web/battle_grid/BattleGridVisual";
 import {create_visual_square, SquareVisual} from "web/battle_grid/squares/SquareVisual";
-import {
-    Position,
-    PositionFootprintOne,
-    transform_position_to_f1,
-} from "core/battlegrid/Position";
+import {Position, PositionFootprintOne, transform_position_to_f1,} from "core/battlegrid/Position";
 import {SQUARE_HIGHLIGHT, SquareHighlight} from "web/battle_grid/squares/SquareHighlight";
-import {
-    get_position_by_coordinate,
-    nullable_positions_equal
-} from "web/battle_grid/coordinates/ClickableCoordinate";
+import {get_position_by_coordinate, nullable_positions_equal} from "web/battle_grid/coordinates/ClickableCoordinate";
 import {GameEvents} from "core/events/GameEvents";
 import {Creature} from "core/battlegrid/creatures/Creature";
 import {create_visual_creature, CreatureVisual} from "web/creature/CreatureVisual";

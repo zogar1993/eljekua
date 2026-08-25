@@ -1,6 +1,4 @@
-import {
-    interpret_instruction
-} from "core/virtual_machine/instructions/interpret_instruction";
+import {interpret_instruction} from "core/virtual_machine/instructions/interpret_instruction";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {Expr} from "core/virtual_machine/expressions/types";
 import type {GameState} from "core/game_state/GameState";

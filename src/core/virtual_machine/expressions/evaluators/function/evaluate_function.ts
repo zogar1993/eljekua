@@ -1,7 +1,9 @@
 import {Expr} from "core/virtual_machine/expressions/types";
 import {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {evaluate_function_add} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_add";
-import {evaluate_function_equipped} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_equipped";
+import {
+    evaluate_function_equipped
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_equipped";
 import {
     evaluate_function_not_equals
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_not_equals";
@@ -23,7 +25,9 @@ import {evaluate_function_and} from "core/virtual_machine/expressions/evaluators
 import {
     evaluate_function_is_lower_or_equal
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_is_lower_or_equal";
-import {evaluate_function_distance} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_distance";
+import {
+    evaluate_function_distance
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_distance";
 import {
     evaluate_function_opportunity_attack_range,
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_opportunity_attack_range";

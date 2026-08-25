@@ -1,9 +1,6 @@
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {GameEvents} from "core/events/GameEvents";
-import {
-    create_initiative_entry_visual,
-    InitiativeEntryVisual,
-} from "web/initiative_order/InitiativeEntryVisual";
+import {create_initiative_entry_visual, InitiativeEntryVisual,} from "web/initiative_order/InitiativeEntryVisual";
 
 export const create_initiative_order_ui = ({game_events}: { game_events: GameEvents }) => {
     const visuals = new Map<Creature, InitiativeEntryVisual>()
