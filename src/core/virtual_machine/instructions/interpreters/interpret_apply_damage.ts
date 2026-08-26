@@ -9,8 +9,8 @@ import {
 import type {StatusEffectGainResistance} from "core/battlegrid/creatures/Creature";
 import type {InstructionApplyDamage} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
-import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
+import {assert_is_not_undefined} from "stdlib/assert";
 
 export const interpret_apply_damage = ({
                                            instruction,
@@ -25,14 +25,10 @@ export const interpret_apply_damage = ({
 
     const target = EXPR.as_creature(vm_state.get_variable(instruction.target))
 
-    // TODO this is a hack so that powers that do not have a roll still hit
-    let hit_status_value: HitStatus = HIT_STATUS.HIT
-    if (vm_state.has_variable(SYSTEM_KEYWORD.HIT_STATUS)) {
-        const hit_status = EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
-        const value = hit_status.get(target)
-        if (value !== undefined)
-            hit_status_value = value
-    }
+    const hit_status = EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
+    const hit_status_value = hit_status.get(target)
+
+    assert_is_not_undefined(hit_status_value)
 
     if (hit_status_value === HIT_STATUS.MISS && target.data.archetypes.includes("minion")) return
 

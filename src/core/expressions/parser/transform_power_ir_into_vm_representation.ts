@@ -146,6 +146,12 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 label: instruction.label,
                 value: to_ast(instruction.value)
             }]
+        case INSTRUCTION_TYPE.SET_HIT_STATUS:
+            return [{
+                type: INSTRUCTION_TYPE.SET_HIT_STATUS,
+                target: instruction.target,
+                status: instruction.status,
+            }]
         case "push":
             return [
                 {

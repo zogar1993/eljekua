@@ -3,6 +3,7 @@ import type {Instruction} from "core/virtual_machine/instructions/instructions";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import type {GameEvents} from "core/events/GameEvents";
+import {assert_is_not_null} from "stdlib/assert";
 
 export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
     let frames: Array<InstructionFrame> = []
@@ -42,21 +43,31 @@ export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
     }
 
     const get_variable = (name: string) => {
+        const variable = get_variable_or_null(name)
+        assert_is_not_null(variable)
+        return variable
+        //TODO P3 make error handling smoother everywhere
+    }
+
+    const get_variable_or_null = (name: string) => {
         for (let i = frames.length - 1; i >= 0; i--) {
             const frame = frames[i]
             const variable = frame.variables.get(name)
             if (variable) return variable
         }
-        throw Error(`variable '${name}' not found in frame.'`)
-        //TODO P3 make error handling smoother everywhere
+        return null
     }
 
 
     const get_acting_creature = () => EXPR.as_creature(get_variable(SYSTEM_KEYWORD.OWNER))
 
     const has_variable = (name: string): boolean => {
-        const frame = get_current_frame()
-        return frame.variables.has(name)
+        for (let i = frames.length - 1; i >= 0; i--) {
+            const frame = frames[i]
+            const variable = frame.variables.get(name)
+            if (variable) return true
+        }
+        return false
     }
 
     const set_variable = (name: string, value: Expr) => {

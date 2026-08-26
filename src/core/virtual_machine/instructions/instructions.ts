@@ -2,6 +2,7 @@ import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {DefenseCode} from "core/character_sheet/get_creature_defense";
 import type {StatusDurationValue} from "core/types";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
+import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 
 export const INSTRUCTION_TYPE = {
     ATTACK_DICE_ROLL: "attack_dice_roll",
@@ -12,6 +13,7 @@ export const INSTRUCTION_TYPE = {
     OPTIONS: "options",
     SAVE_VARIABLE: "save_variable",
     SAVE_NUMBER_AS_RESOLVED: "save_number_as_resolved",
+    SET_HIT_STATUS: "set_hit_status",
     ADD_POWERS_AS_OPTIONS: "add_powers_as_options",
     EXECUTE_POWER: "execute_power",
     FORCE_MOVEMENT: "force_movement",
@@ -89,6 +91,12 @@ export type InstructionSaveResolvedNumber = {
     label: string
 }
 
+export type InstructionSetHitStatus = {
+    type: typeof INSTRUCTION_TYPE.SET_HIT_STATUS,
+    target: string,
+    status: HitStatus,
+}
+
 export type InstructionAddPowers = {
     type: typeof INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS,
     creature: AstNode,
@@ -146,6 +154,7 @@ export type Instruction =
     InstructionExecutePower |
     InstructionSaveVariable |
     InstructionSaveResolvedNumber |
+    InstructionSetHitStatus |
     // Branching
     InstructionJumpIf |
     InstructionJump |

@@ -3,6 +3,7 @@ import {
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
+import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 
 const magic_missile: IRPower = {
     name: "Magic Missile",
@@ -18,6 +19,11 @@ const magic_missile: IRPower = {
         distance: "20"
     },
     effect: [
+        {
+            type: INSTRUCTION_TYPE.SET_HIT_STATUS,
+            target: "primary_target",
+            status: HIT_STATUS.HIT,
+        },
         {
             type: INSTRUCTION_TYPE.APPLY_DAMAGE,
             value: "$add(2,owner.int_mod)",

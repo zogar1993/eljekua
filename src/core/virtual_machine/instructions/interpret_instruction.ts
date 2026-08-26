@@ -29,6 +29,7 @@ import {
     interpret_add_current_turn_base_options
 } from "core/virtual_machine/instructions/interpreters/interpret_add_current_turn_base_options";
 import {interpret_jump} from "core/virtual_machine/instructions/interpreters/interpret_jump";
+import {interpret_set_hit_status} from "core/virtual_machine/instructions/interpreters/interpret_set_hit_status";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>): void => {
     const {instruction} = props
@@ -51,6 +52,8 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             return interpret_save_variable({...props, instruction})
         case INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED:
             return interpret_save_number_as_resolved({...props, instruction})
+        case INSTRUCTION_TYPE.SET_HIT_STATUS:
+            return interpret_set_hit_status({...props, instruction})
         case INSTRUCTION_TYPE.OPTIONS:
             return interpret_options({...props, instruction})
         case INSTRUCTION_TYPE.JUMP:
