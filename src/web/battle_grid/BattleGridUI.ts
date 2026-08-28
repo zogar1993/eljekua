@@ -19,6 +19,7 @@ import type {
     InteractionsSelectPath,
     InteractionsSelectTerrain
 } from "core/instruction_loop";
+import {INTERACTION_TYPE} from "core/instruction_loop";
 import {assert_is_not_undefined} from "stdlib/assert";
 
 export const initialize_battle_grid_ui = ({
@@ -97,7 +98,7 @@ export const initialize_battle_grid_ui = ({
     ) => {
         clear_attack_success_chances()
 
-        const targets = interactions.type === "select_creature"
+        const targets = interactions.type === INTERACTION_TYPE.SELECT_CREATURE
             ? [interactions.get_target_for_position(position)]
             : interactions.get_targets_for_position(position)
 
@@ -141,14 +142,14 @@ export const initialize_battle_grid_ui = ({
             return
         }
 
-        if (interactions.type === "select_path") {
+        if (interactions.type === INTERACTION_TYPE.SELECT_PATH) {
             const path = interactions.get_path_to_destination(position)
             set_highlights({positions: path, highlight: SQUARE_HIGHLIGHT.PATH})
-        } else if (interactions.type === "select_area") {
+        } else if (interactions.type === INTERACTION_TYPE.SELECT_AREA) {
             const area = interactions.get_area_for_position(position)
             set_highlights({positions: area, highlight: SQUARE_HIGHLIGHT.AREA})
             show_attack_success_chances_for_position(interactions, position)
-        } else if (interactions.type === "select_creature") {
+        } else if (interactions.type === INTERACTION_TYPE.SELECT_CREATURE) {
             show_attack_success_chances_for_position(interactions, position)
         }
         set_hovers({positions: transform_position_to_f1(position)})
@@ -162,10 +163,10 @@ export const initialize_battle_grid_ui = ({
         if (position === null) return
         if (!is_click_coordinate_interaction(interactions)) return
 
-        if (interactions.type === "select_path") {
+        if (interactions.type === INTERACTION_TYPE.SELECT_PATH) {
             const path = interactions.get_path_to_destination(position)
             interactions.select(path)
-        } else if (interactions.type === "select_creature") {
+        } else if (interactions.type === INTERACTION_TYPE.SELECT_CREATURE) {
             const creature = interactions.get_target_for_position(position)
             interactions.select(creature)
         } else {
@@ -235,7 +236,12 @@ type InteractionClickCoordinate =
     | InteractionsSelectCreature
     | InteractionsSelectPath
     | InteractionsSelectArea
-const CLICK_COORDINATE_INTERACTIONS: Array<Interaction["type"]> = ["select_terrain", "select_creature", "select_path", "select_area"]
+const CLICK_COORDINATE_INTERACTIONS: Array<Interaction["type"]> = [
+    INTERACTION_TYPE.SELECT_TERRAIN,
+    INTERACTION_TYPE.SELECT_CREATURE,
+    INTERACTION_TYPE.SELECT_PATH,
+    INTERACTION_TYPE.SELECT_AREA,
+]
 
 const is_click_coordinate_interaction = (interaction: Interaction | null): interaction is InteractionClickCoordinate => {
     return interaction !== null && CLICK_COORDINATE_INTERACTIONS.includes(interaction.type)

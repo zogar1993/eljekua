@@ -1,5 +1,6 @@
 import {roll_d} from "core/randomness/dice";
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
+import {INTERACTION_TYPE} from "core/instruction_loop";
 import {add_numbers_resolved} from "core/virtual_machine/expressions/number_utils";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
@@ -37,7 +38,7 @@ const handle_hit_status_manually = ({
     vm_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: hit_statuses})
 
     player_turn_handler.set_available_interactions({
-        type: "hit_status_select",
+        type: INTERACTION_TYPE.HIT_STATUS_SELECT,
         hit_statuses,
         on_status_change: (creature: Creature, status: HitStatus) => {
             hit_statuses.set(creature, status)

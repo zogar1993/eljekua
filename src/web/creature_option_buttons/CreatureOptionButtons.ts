@@ -1,4 +1,5 @@
 import type {GameEvents} from "core/events/GameEvents";
+import {INTERACTION_TYPE} from "core/instruction_loop";
 import type {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
 import type {CreatureOptionButton} from "web/creature_option_buttons/CreatureOptionButton";
 import {create_option_button_visual} from "web/creature_option_buttons/CreatureOptionButton";
@@ -19,7 +20,7 @@ export const create_option_buttons_ui = ({game_events}: { game_events: GameEvent
     }
 
     game_events.on_available_interactions_changed.add_handler(interaction => {
-        if (interaction?.type === "option_select")
+        if (interaction?.type === INTERACTION_TYPE.OPTION_SELECT)
             display_options(interaction.available_options)
         else
             remove_options()

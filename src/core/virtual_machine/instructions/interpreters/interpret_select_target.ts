@@ -11,6 +11,7 @@ import type {
     InstructionSelectTargetPush
 } from "core/virtual_machine/instructions/instructions";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
+import {INTERACTION_TYPE} from "core/instruction_loop";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";
@@ -88,7 +89,7 @@ export const interpret_select_target = ({
         const footprint = moving_creature.data.position.footprint
 
         player_turn_handler.set_available_interactions({
-            type: "select_path",
+            type: INTERACTION_TYPE.SELECT_PATH,
             target_label,
             clickable,
             footprint,
@@ -109,7 +110,7 @@ export const interpret_select_target = ({
         }
 
         player_turn_handler.set_available_interactions({
-            type: "select_area",
+            type: INTERACTION_TYPE.SELECT_AREA,
             target_label,
             clickable,
             get_area_for_position,
@@ -119,7 +120,7 @@ export const interpret_select_target = ({
     } else if (instruction.target_type === "terrain") {
 
         player_turn_handler.set_available_interactions({
-            type: "select_terrain",
+            type: INTERACTION_TYPE.SELECT_TERRAIN,
             target_label,
             clickable,
         })
@@ -131,7 +132,7 @@ export const interpret_select_target = ({
         }
 
         player_turn_handler.set_available_interactions({
-            type: "select_creature",
+            type: INTERACTION_TYPE.SELECT_CREATURE,
             target_label,
             clickable,
             get_target_for_position,

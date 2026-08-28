@@ -1,4 +1,5 @@
 import type {GameEvents} from "core/events/GameEvents";
+import {INTERACTION_TYPE} from "core/instruction_loop";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {CreatureHitStatusVisual} from "web/hit_status_buttons/CreatureHitStatusVisual";
@@ -49,7 +50,7 @@ export const create_hit_status_buttons_ui = ({game_events}: { game_events: GameE
     }
 
     game_events.on_available_interactions_changed.add_handler((interaction) => {
-        if (interaction?.type === "hit_status_select")
+        if (interaction?.type === INTERACTION_TYPE.HIT_STATUS_SELECT)
             display({
                 hit_statuses: interaction.hit_statuses,
                 on_status_change: interaction.on_status_change,

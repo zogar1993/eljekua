@@ -12,6 +12,17 @@ import {positions_share_surface} from "core/battlegrid/Position";
 import {assert_is_not_null, assert_is_true} from "stdlib/assert";
 import {is_branching_instruction} from "core/virtual_machine/instructions/instructions";
 
+export const INTERACTION_TYPE = {
+    HIT_STATUS_SELECT: "hit_status_select",
+    SELECT_TERRAIN: "select_terrain",
+    SELECT_CREATURE: "select_creature",
+    SELECT_AREA: "select_area",
+    SELECT_PATH: "select_path",
+    OPTION_SELECT: "option_select",
+} as const
+
+export type InteractionType = typeof INTERACTION_TYPE[keyof typeof INTERACTION_TYPE]
+
 export type Interaction =
     InteractionsSelectTerrain
     | InteractionsSelectCreature
@@ -21,21 +32,21 @@ export type Interaction =
     | InteractionsSelectArea
 
 export type InteractionsSelectHitStatus = {
-    type: "hit_status_select"
+    type: typeof INTERACTION_TYPE.HIT_STATUS_SELECT
     hit_statuses: Map<Creature, HitStatus>
     on_status_change: (creature: Creature, status: HitStatus) => void
     on_confirm: () => void
 }
 
 export type InteractionsSelectTerrain = {
-    type: "select_terrain"
+    type: typeof INTERACTION_TYPE.SELECT_TERRAIN
     target_label: string
     clickable: Array<Position>
     select: (position: Position) => void
 }
 
 export type InteractionsSelectCreature = {
-    type: "select_creature"
+    type: typeof INTERACTION_TYPE.SELECT_CREATURE
     target_label: string
     clickable: Array<Position>
     get_target_for_position: (position: Position) => Creature
@@ -44,7 +55,7 @@ export type InteractionsSelectCreature = {
 }
 
 export type InteractionsSelectArea = {
-    type: "select_area"
+    type: typeof INTERACTION_TYPE.SELECT_AREA
     target_label: string
     clickable: Array<Position>
     get_area_for_position: (position: Position) => Array<Position>
@@ -54,7 +65,7 @@ export type InteractionsSelectArea = {
 }
 
 export type InteractionsSelectPath = {
-    type: "select_path"
+    type: typeof INTERACTION_TYPE.SELECT_PATH
     target_label: string
     clickable: Array<Position>
     get_path_to_destination: (position: Position) => Array<Position>
@@ -63,7 +74,7 @@ export type InteractionsSelectPath = {
 }
 
 type InteractionsSelectOption = {
-    type: "option_select"
+    type: typeof INTERACTION_TYPE.OPTION_SELECT
     available_options: Array<OptionButton>
 }
 
@@ -103,8 +114,10 @@ export const create_instruction_loop = ({
                                             | InteractionsSelectHitStatus
                                             | Omit<InteractionsSelectPath, 'select'>
                                             | Omit<InteractionsSelectArea, 'select'>): Interaction => {
+
+
         switch (interaction.type) {
-            case "select_terrain":
+            case INTERACTION_TYPE.SELECT_TERRAIN:
                 return {
                     ...interaction,
                     select: (position: Position) => {
@@ -116,7 +129,7 @@ export const create_instruction_loop = ({
                     }
 
                 }
-            case "select_creature":
+            case INTERACTION_TYPE.SELECT_CREATURE:
                 return {
                     ...interaction,
                     select: (creature: Creature) => {
@@ -127,7 +140,7 @@ export const create_instruction_loop = ({
                         clear_current_interaction()
                     }
                 }
-            case "select_area":
+            case INTERACTION_TYPE.SELECT_AREA:
                 return {
                     ...interaction,
                     select: (position: Position) => {
@@ -139,7 +152,7 @@ export const create_instruction_loop = ({
                         clear_current_interaction()
                     }
                 }
-            case "select_path":
+            case INTERACTION_TYPE.SELECT_PATH:
                 return {
                     ...interaction,
                     select: (path: Array<Position>) => {
@@ -151,7 +164,7 @@ export const create_instruction_loop = ({
                         clear_current_interaction()
                     }
                 }
-            case "option_select":
+            case INTERACTION_TYPE.OPTION_SELECT:
                 return {
                     ...interaction,
                     available_options: interaction.available_options.map(option => ({
@@ -159,7 +172,7 @@ export const create_instruction_loop = ({
                         on_click: add_cleanup_to_function(option.on_click)
                     }))
                 }
-            case "hit_status_select":
+            case INTERACTION_TYPE.HIT_STATUS_SELECT:
                 return {
                     ...interaction,
                     on_confirm: add_cleanup_to_function(interaction.on_confirm)

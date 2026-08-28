@@ -1,4 +1,5 @@
 import type {Interaction} from "core/instruction_loop";
+import {INTERACTION_TYPE} from "core/instruction_loop";
 import type {GameEvents} from "core/events/GameEvents";
 import type {Position} from "core/battlegrid/Position";
 import type {Creature} from "core/battlegrid/creatures/Creature";
@@ -18,7 +19,7 @@ export const create_interaction_test_helpers = ({game_events}: {
 
         select_option: (text: string) => {
             const interaction = current_interaction
-            if (interaction?.type !== "option_select")
+            if (interaction?.type !== INTERACTION_TYPE.OPTION_SELECT)
                 throw Error(`Expected option_select interaction, got ${interaction?.type ?? "null"}`)
 
             const option = interaction.available_options.find(option => option.text === text)
@@ -30,8 +31,8 @@ export const create_interaction_test_helpers = ({game_events}: {
         select_position: (position: Omit<Position, "footprint">) => {
             const interaction = current_interaction
 
-            if (interaction?.type === "select_terrain"
-                || interaction?.type === "select_area") {
+            if (interaction?.type === INTERACTION_TYPE.SELECT_TERRAIN
+                || interaction?.type === INTERACTION_TYPE.SELECT_AREA) {
                 const full_position = interaction.clickable.find(
                     clickable => clickable.x === position.x && clickable.y === position.y,
                 )
@@ -42,7 +43,7 @@ export const create_interaction_test_helpers = ({game_events}: {
                 return
             }
 
-            if (interaction?.type === "select_creature") {
+            if (interaction?.type === INTERACTION_TYPE.SELECT_CREATURE) {
                 const full_position = interaction.clickable.find(
                     clickable => clickable.x === position.x && clickable.y === position.y,
                 )
@@ -54,7 +55,7 @@ export const create_interaction_test_helpers = ({game_events}: {
                 return
             }
 
-            if (interaction?.type === "select_path") {
+            if (interaction?.type === INTERACTION_TYPE.SELECT_PATH) {
                 const destination = {...position, footprint: interaction.footprint}
                 interaction.select(interaction.get_path_to_destination(destination))
                 return
@@ -65,13 +66,13 @@ export const create_interaction_test_helpers = ({game_events}: {
 
         has_option: (text: string) => {
             const interaction = current_interaction
-            if (interaction?.type !== "option_select") return false
+            if (interaction?.type !== INTERACTION_TYPE.OPTION_SELECT) return false
             return interaction.available_options.some(option => option.text === text)
         },
 
         set_hit_status: (creature: Creature, status: HitStatus) => {
             const interaction = current_interaction
-            if (interaction?.type !== "hit_status_select")
+            if (interaction?.type !== INTERACTION_TYPE.HIT_STATUS_SELECT)
                 throw Error(`Expected hit_status_select interaction, got ${interaction?.type ?? "null"}`)
 
             interaction.on_status_change(creature, status)
@@ -79,7 +80,7 @@ export const create_interaction_test_helpers = ({game_events}: {
 
         confirm_hit_status: () => {
             const interaction = current_interaction
-            if (interaction?.type !== "hit_status_select")
+            if (interaction?.type !== INTERACTION_TYPE.HIT_STATUS_SELECT)
                 throw Error(`Expected hit_status_select interaction, got ${interaction?.type ?? "null"}`)
 
             interaction.on_confirm()
@@ -87,7 +88,7 @@ export const create_interaction_test_helpers = ({game_events}: {
 
         confirm_pending_interaction: () => {
             const interaction = current_interaction
-            if (interaction?.type === "hit_status_select")
+            if (interaction?.type === INTERACTION_TYPE.HIT_STATUS_SELECT)
                 interaction.on_confirm()
         },
     }
