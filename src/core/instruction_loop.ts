@@ -13,12 +13,12 @@ import {assert_is_not_null, assert_is_true} from "stdlib/assert";
 import {is_branching_instruction} from "core/virtual_machine/instructions/instructions";
 
 export const INTERACTION_TYPE = {
-    HIT_STATUS_SELECT: "hit_status_select",
+    HIT_STATUS_SELECT: "select_hit_status",
     SELECT_TERRAIN: "select_terrain",
     SELECT_CREATURE: "select_creature",
     SELECT_AREA: "select_area",
     SELECT_PATH: "select_path",
-    OPTION_SELECT: "option_select",
+    OPTION_SELECT: "select_option",
 } as const
 
 export type InteractionType = typeof INTERACTION_TYPE[keyof typeof INTERACTION_TYPE]
