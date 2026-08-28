@@ -26,5 +26,6 @@ export const create_set_current_turn_to_creature = (
         game_events,
     })
 
+    //TODO this is not good as it gets out of sync with start battle
     vm_state.add_instruction_frame({instructions: [{type: INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS}]})
 }
