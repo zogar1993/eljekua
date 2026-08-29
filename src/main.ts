@@ -27,11 +27,7 @@ import {create_option_buttons_ui} from "web/creature_option_buttons/CreatureOpti
 
 const action_log = create_action_log()
 const game_events = create_game_events()
-const game_state = create_game_state({
-    game_events,
-    battle_grid_size: {x: 10, y: 10},
-})
-const {battle_grid} = game_state
+const game_state = create_game_state({game_events, battle_grid_size: {x: 10, y: 10}})
 
 const evaluate_ast = build_evaluate_ast({game_state})
 
@@ -42,7 +38,7 @@ const instruction_loop = create_instruction_loop({
 })
 
 initialize_battle_grid_ui({
-    battle_grid,
+    game_state,
     game_events,
 })
 
@@ -151,7 +147,7 @@ const start_battle = create_start_battle({game_state, instruction_loop, game_eve
 }
 
 ;(window as any).set_current_turn = (name: string) => {
-    const creature = battle_grid.creatures.find(creature => creature.data.name === name)
+    const creature = game_state.creatures.get_all().find(creature => creature.data.name === name)
     if (!creature) {
         console.log(`Creature with name '${name}' not found`)
         return

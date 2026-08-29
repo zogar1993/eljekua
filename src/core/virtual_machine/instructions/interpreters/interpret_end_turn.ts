@@ -7,14 +7,11 @@ export const interpret_end_turn = ({
                                        game_state,
                                        game_events,
                                    }: InterpretInstructionProps<InstructionEndTurn>) => {
-    const {battle_grid, initiative_order} = game_state
-    run_end_of_turn_hooks({current_turn_creature: initiative_order.get_current_creature(), battle_grid})
+    const {initiative_order} = game_state
+
+    run_end_of_turn_hooks({game_state})
 
     initiative_order.next_turn()
 
-    run_start_of_turn_hooks({
-        current_turn_creature: initiative_order.get_current_creature(),
-        battle_grid,
-        game_events,
-    })
+    run_start_of_turn_hooks({game_state, game_events})
 }

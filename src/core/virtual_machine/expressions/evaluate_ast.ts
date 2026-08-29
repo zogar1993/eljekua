@@ -20,15 +20,14 @@ import type {GameState} from "core/game_state/GameState";
 export const build_evaluate_ast = ({game_state}: {
     game_state: GameState
 }): (node: AstNode) => Expr => {
-    const {vm_state, battle_grid} = game_state
     const evaluate_ast = (node: AstNode) => {
         const func = evaluator_internals[node.type]
         if (!func) throw Error(`evaluator for type '${node.type}' does not exist`)
         return evaluator_internals[node.type](node)
     }
 
-    const evaluate_keyword = build_evaluate_keyword({vm_state})
-    const evaluate_function = build_evaluate_function({evaluate_ast, vm_state, battle_grid})
+    const evaluate_keyword = build_evaluate_keyword({game_state})
+    const evaluate_function = build_evaluate_function({evaluate_ast, game_state})
 
     const evaluator_internals: Record<AstNode["type"], (node: AstNode) => Expr> = {
         "number": (node) => evaluate_number(node as AstNodeNumber),

@@ -1,4 +1,3 @@
-import type {BattleGrid} from "core/battlegrid/BattleGrid";
 import {create_battle_grid_visual} from "web/battle_grid/BattleGridVisual";
 import type {SquareVisual} from "web/battle_grid/squares/SquareVisual";
 import {create_visual_square} from "web/battle_grid/squares/SquareVisual";
@@ -21,14 +20,16 @@ import type {
 } from "core/instruction_loop";
 import {INTERACTION_TYPE} from "core/instruction_loop";
 import {assert_is_not_undefined} from "stdlib/assert";
+import {GameState} from "core/game_state/GameState";
 
 export const initialize_battle_grid_ui = ({
-                                              battle_grid,
+                                              game_state,
                                               game_events,
                                           }: {
-    battle_grid: BattleGrid,
+    game_state: GameState,
     game_events: GameEvents,
 }) => {
+    const {battle_grid, creatures} = game_state
     const {size} = battle_grid
     const creature_visuals = new Map<Creature, CreatureVisual>()
     const click_overlay = create_battle_grid_visual({width: size.x, height: size.y})
@@ -88,7 +89,7 @@ export const initialize_battle_grid_ui = ({
     }
 
     const clear_attack_success_chances = () => {
-        for (const creature of battle_grid.creatures)
+        for (const creature of creatures.get_all())
             get_creature_visual(creature).remove_hit_chance()
     }
 

@@ -1,15 +1,16 @@
-import type {Creature} from "core/battlegrid/creatures/Creature";
-import type {BattleGrid} from "core/battlegrid/BattleGrid";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE} from "core/battlegrid/creatures/ActionType";
 import type {GameEvents} from "core/events/GameEvents";
+import {GameState} from "core/game_state/GameState";
 
-export const run_start_of_turn_hooks = ({current_turn_creature, battle_grid, game_events}: {
-    current_turn_creature: Creature,
-    battle_grid: BattleGrid
+export const run_start_of_turn_hooks = ({game_state, game_events}: {
+    game_state: GameState,
     game_events: GameEvents
 }) => {
-    for (const creature of battle_grid.creatures) {
+    const {creatures, initiative_order} = game_state
+    const current_turn_creature = initiative_order.get_current_creature()
+
+    for (const creature of creatures.get_all()) {
         if (creature === current_turn_creature)
             creature.restore_actions(START_OF_YOUR_TURN_ACTIONS)
         else

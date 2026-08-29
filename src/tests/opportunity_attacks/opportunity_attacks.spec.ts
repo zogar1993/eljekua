@@ -18,7 +18,7 @@ const game_state = create_game_state({
     game_events,
     battle_grid_size: {x: 10, y: 10},
 })
-const {battle_grid, initiative_order, vm_state} = game_state
+const {battle_grid, initiative_order, vm_state, creatures} = game_state
 const evaluate_ast = build_evaluate_ast({game_state})
 
 const instruction_loop = create_instruction_loop({
@@ -115,7 +115,7 @@ const given_a_creature_is_created = (c: Partial<CreatureData> & Pick<CreatureDat
 }
 
 const given_creature = (creature_name: string) => {
-    const creature = battle_grid.creatures.find(creature => creature.data.name === creature_name)
+    const creature = creatures.get_all().find(creature => creature.data.name === creature_name)
     if (!creature) throw Error(`creature name "${creature_name}" not found`)
 
     return {
@@ -131,7 +131,7 @@ const given_creature = (creature_name: string) => {
 
 
 const when_creature = (creature_name: string) => {
-    const creature = battle_grid.creatures.find(creature => creature.data.name === creature_name)
+    const creature = creatures.get_all().find(creature => creature.data.name === creature_name)
     if (!creature) throw Error(`creature name "${creature_name}" not found`)
 
     return {
@@ -147,7 +147,7 @@ const when_creature = (creature_name: string) => {
 }
 
 const then_creature = (creature_name: string) => {
-    const creature = battle_grid.creatures.find(creature => creature.data.name === creature_name)
+    const creature = creatures.get_all().find(creature => creature.data.name === creature_name)
     if (!creature) throw Error(`creature name "${creature_name}" not found`)
 
     return {

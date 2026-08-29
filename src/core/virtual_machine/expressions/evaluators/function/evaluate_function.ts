@@ -12,12 +12,10 @@ import {
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_has_valid_targeting";
 import {evaluate_function_or} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_or";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import type {VMState} from "core/virtual_machine/VMState";
 import {evaluate_function_exists} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_exists";
 import {
     evaluate_function_is_greater_or_equal
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_is_greater_or_equal";
-import type {BattleGrid} from "core/battlegrid/BattleGrid";
 import {
     evaluate_function_can_expend_action_type
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_can_expend_action_type";
@@ -52,20 +50,19 @@ import {
 import {
     evaluate_function_is_lower
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_is_lower";
+import {GameState} from "core/game_state/GameState";
 
-export const build_evaluate_function = ({evaluate_ast, vm_state, battle_grid}:
-                                            {
-                                                evaluate_ast: (node: AstNode) => Expr,
-                                                vm_state: VMState,
-                                                battle_grid: BattleGrid
-                                            }
+export const build_evaluate_function = ({evaluate_ast, game_state}: {
+                                            evaluate_ast: (node: AstNode) => Expr,
+                                            game_state: GameState
+                                        }
 ) => {
     return (node: AstNodeFunction): Expr => {
         switch (node.name) {
             case "add":
                 return evaluate_function_add({node, evaluate_ast})
             case "exists":
-                return evaluate_function_exists({node, vm_state})
+                return evaluate_function_exists({node, game_state})
             case "equipped":
                 return evaluate_function_equipped({node, evaluate_ast})
             case "has_action_type_available":
@@ -73,7 +70,7 @@ export const build_evaluate_function = ({evaluate_ast, vm_state, battle_grid}:
             case "not_equals":
                 return evaluate_function_not_equals({node, evaluate_ast})
             case "has_valid_targeting":
-                return evaluate_function_has_valid_targeting({node, vm_state, evaluate_ast, battle_grid})
+                return evaluate_function_has_valid_targeting({node, game_state, evaluate_ast})
             case "are_enemies":
                 return evaluate_function_are_enemies({node, evaluate_ast})
             case "is_ally":
@@ -99,7 +96,7 @@ export const build_evaluate_function = ({evaluate_ast, vm_state, battle_grid}:
             case "is_lower":
                 return evaluate_function_is_lower({node, evaluate_ast})
             case "creature_by_id":
-                return evaluate_function_creature_by_id({node, battle_grid})
+                return evaluate_function_creature_by_id({node, game_state})
             default:
                 throw Error(`function name '${node.name}' not supported when evaluating node`)
         }

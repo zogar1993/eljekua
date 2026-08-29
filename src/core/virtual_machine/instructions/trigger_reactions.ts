@@ -27,7 +27,7 @@ export const get_potential_triggers = ({
     activator: Creature
     intercept: TriggerInterception
 }): Array<{ creature: Creature, powers: Array<Power> }> => {
-    const {battle_grid, vm_state, initiative_order} = game_state
+    const {vm_state, initiative_order, creatures} = game_state
     // We exclude the ones who already were triggered for this power.
     // This is a little redundant in most cases, but without it, we wouldn't
     // disregard those who ignored the chance to use the trigger.
@@ -38,7 +38,7 @@ export const get_potential_triggers = ({
     vm_state.set_variable(TRIGGER_VARIABLE.ACTIVATOR, {type: "creatures", value: [activator]})
 
     const current_turn_creature = initiative_order.get_current_creature()
-    const trigger_owners = battle_grid.creatures
+    const trigger_owners = creatures.get_all()
         .filter(creature => !already_triggered.includes(creature))
         .map(creature => {
             vm_state.set_variable(TRIGGER_VARIABLE.OWNER, {type: "creatures", value: [creature]})
