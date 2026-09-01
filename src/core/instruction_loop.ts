@@ -6,11 +6,13 @@ import type {OptionButton} from "core/battlegrid/creature_option/CreatureOption"
 import type {GameEvents} from "core/events/GameEvents";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {AttackSuccessChance} from "core/battlegrid/queries/get_attack_success_chance";
-import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import {HIT_STATUS, HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import type {Position} from "core/battlegrid/Position";
 import {positions_share_surface} from "core/battlegrid/Position";
-import {assert_is_not_null, assert_is_true} from "stdlib/assert";
+import {assert_is_not_null, assert_is_not_undefined, assert_is_true} from "stdlib/assert";
 import {is_branching_instruction} from "core/virtual_machine/instructions/instructions";
+import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
+import {EXPR} from "core/virtual_machine/expressions/EXPR";
 
 export const INTERACTION_TYPE = {
     HIT_STATUS_SELECT: "select_hit_status",
@@ -33,16 +35,13 @@ export type Interaction =
 
 export type InteractionsSelectHitStatus = {
     type: typeof INTERACTION_TYPE.HIT_STATUS_SELECT
-    hit_statuses: Map<Creature, HitStatus>
-    on_status_change: (creature: Creature, status: HitStatus) => void
-    on_confirm: () => void
+    creature_ids: Array<number>
 }
 
 export type InteractionsSelectTerrain = {
     type: typeof INTERACTION_TYPE.SELECT_TERRAIN
     target_label: string
     clickable: Array<Position>
-    select: (position: Position) => void
 }
 
 export type InteractionsSelectCreature = {
@@ -51,7 +50,6 @@ export type InteractionsSelectCreature = {
     clickable: Array<Position>
     get_target_for_position: (position: Position) => Creature
     get_attack_hit_chance_against: (creature: Creature) => AttackSuccessChance | null
-    select: (creature: Creature) => void
 }
 
 export type InteractionsSelectArea = {
@@ -61,7 +59,6 @@ export type InteractionsSelectArea = {
     get_area_for_position: (position: Position) => Array<Position>
     get_targets_for_position: (position: Position) => Array<Creature>
     get_attack_hit_chance_against: (creature: Creature) => AttackSuccessChance | null
-    select: (position: Position) => void
 }
 
 export type InteractionsSelectPath = {
@@ -69,7 +66,6 @@ export type InteractionsSelectPath = {
     target_label: string
     clickable: Array<Position>
     get_path_to_destination: (position: Position) => Array<Position>
-    select: (position: Array<Position>) => void
     footprint: number
 }
 
@@ -78,6 +74,43 @@ type InteractionsSelectOption = {
     available_options: Array<OptionButton>
 }
 
+export type InteractionSelection =
+    InteractionSelectionSelectTerrain
+    | InteractionSelectionSelectCreature
+    | InteractionSelectionSelectOption
+    | InteractionSelectionSelectHitStatus
+    | InteractionSelectionSelectPath
+    | InteractionSelectionSelectArea
+
+export type InteractionSelectionSelectHitStatus = {
+    type: typeof INTERACTION_TYPE.HIT_STATUS_SELECT
+    hit_statuses: Array<{ creature_id: number, hit_status: HitStatus }>
+}
+
+export type InteractionSelectionSelectTerrain = {
+    type: typeof INTERACTION_TYPE.SELECT_TERRAIN
+    position: Position
+}
+
+export type InteractionSelectionSelectCreature = {
+    type: typeof INTERACTION_TYPE.SELECT_CREATURE
+    creature_id: number
+}
+
+export type InteractionSelectionSelectArea = {
+    type: typeof INTERACTION_TYPE.SELECT_AREA
+    center: Position
+}
+
+export type InteractionSelectionSelectPath = {
+    type: typeof INTERACTION_TYPE.SELECT_PATH
+    path: Array<Position>
+}
+
+export type InteractionSelectionSelectOption = {
+    type: typeof INTERACTION_TYPE.OPTION_SELECT
+    option: string
+}
 
 export const create_instruction_loop = ({
                                             game_state,
@@ -88,7 +121,7 @@ export const create_instruction_loop = ({
     evaluate_ast: (node: AstNode) => Expr
     game_events: GameEvents
 }) => {
-    const {vm_state} = game_state
+    const {vm_state, creatures} = game_state
     let current_interaction: Interaction | null = null
 
     const clear_current_interaction = () => {
@@ -99,102 +132,93 @@ export const create_instruction_loop = ({
         evaluate_instructions()
     }
 
-    const add_cleanup_to_function = <T extends unknown[]>(fn: (...args: T) => void) => {
-        return (...args: T) => {
-            fn(...args)
-            clear_current_interaction()
-        }
-    }
-
-    // This is needed so that all interactions resume after being resolved
-    const add_cleanup_to_interaction_confirmation = (interaction:
-                                            Omit<InteractionsSelectTerrain, 'select'>
-                                            | Omit<InteractionsSelectCreature, 'select'>
-                                            | InteractionsSelectOption
-                                            | InteractionsSelectHitStatus
-                                            | Omit<InteractionsSelectPath, 'select'>
-                                            | Omit<InteractionsSelectArea, 'select'>): Interaction => {
-
-
-        switch (interaction.type) {
-            case INTERACTION_TYPE.SELECT_TERRAIN:
-                return {
-                    ...interaction,
-                    select: (position: Position) => {
-                        assert_position_is_contained({position, area: interaction.clickable})
-
-                        vm_state.set_variable(interaction.target_label, {type: "positions", value: [position]})
-
-                        clear_current_interaction()
-                    }
-
-                }
-            case INTERACTION_TYPE.SELECT_CREATURE:
-                return {
-                    ...interaction,
-                    select: (creature: Creature) => {
-                        assert_position_is_contained({position: creature.data.position, area: interaction.clickable})
-
-                        vm_state.set_variable(interaction.target_label, {type: "creatures", value: [creature]})
-
-                        clear_current_interaction()
-                    }
-                }
-            case INTERACTION_TYPE.SELECT_AREA:
-                return {
-                    ...interaction,
-                    select: (position: Position) => {
-                        assert_position_is_contained({position, area: interaction.clickable})
-
-                        const targets = interaction.get_targets_for_position(position)
-                        vm_state.set_variable(interaction.target_label, {type: "creatures", value: targets})
-
-                        clear_current_interaction()
-                    }
-                }
-            case INTERACTION_TYPE.SELECT_PATH:
-                return {
-                    ...interaction,
-                    select: (path: Array<Position>) => {
-                        //TODO validate path is valid
-                        //assert_position_is_contained({position, area: interaction.clickable})
-
-                        vm_state.set_variable(interaction.target_label, {type: "positions", value: path})
-
-                        clear_current_interaction()
-                    }
-                }
-            case INTERACTION_TYPE.OPTION_SELECT:
-                return {
-                    ...interaction,
-                    available_options: interaction.available_options.map(option => ({
-                        ...option,
-                        on_click: add_cleanup_to_function(option.on_click)
-                    }))
-                }
-            case INTERACTION_TYPE.HIT_STATUS_SELECT:
-                return {
-                    ...interaction,
-                    on_confirm: add_cleanup_to_function(interaction.on_confirm)
-                }
-        }
-    }
-
-    const set_available_interactions = (interaction:
-                                            Omit<InteractionsSelectTerrain, 'select'>
-                                            | Omit<InteractionsSelectCreature, 'select'>
-                                            | InteractionsSelectOption
-                                            | InteractionsSelectHitStatus
-                                            | Omit<InteractionsSelectPath, 'select'>
-                                            | Omit<InteractionsSelectArea, 'select'>
-    ) => {
-        current_interaction = add_cleanup_to_interaction_confirmation(interaction)
+    const set_available_interactions = (interaction: Interaction) => {
+        current_interaction = interaction
         const creature = vm_state.get_acting_creature()
         game_events.on_available_interactions_changed.raise({...current_interaction, creature})
     }
 
     const player_turn_handler = {
         set_available_interactions,
+    }
+
+    const select = (selection: InteractionSelection) => {
+        //TODO add assertions for checking that each selection is valid
+        switch (selection.type) {
+            case INTERACTION_TYPE.SELECT_TERRAIN: {
+                if (current_interaction?.type !== INTERACTION_TYPE.SELECT_TERRAIN) throw Error(`incompatible type ${selection.type}`)
+
+                const position = selection.position
+
+                assert_position_is_contained({position, area: current_interaction.clickable})
+
+                vm_state.set_variable(current_interaction.target_label, {type: "positions", value: [position]})
+                break
+            }
+            case INTERACTION_TYPE.SELECT_CREATURE: {
+                if (current_interaction?.type !== INTERACTION_TYPE.SELECT_CREATURE) throw Error(`incompatible type ${selection.type}`)
+
+                // TODO should encapsulate creatures
+                const creature = creatures.get_by_id(selection.creature_id)
+
+                vm_state.set_variable(current_interaction.target_label, {type: "creatures", value: [creature]})
+                break
+            }
+            case INTERACTION_TYPE.SELECT_AREA: {
+                if (current_interaction?.type !== INTERACTION_TYPE.SELECT_AREA) throw Error(`incompatible type ${selection.type}`)
+
+                const position = selection.center
+
+                assert_position_is_contained({position, area: current_interaction.clickable})
+
+                const targets = current_interaction.get_targets_for_position(position)
+                vm_state.set_variable(current_interaction.target_label, {type: "creatures", value: targets})
+                break
+            }
+            case INTERACTION_TYPE.SELECT_PATH: {
+                if (current_interaction?.type !== INTERACTION_TYPE.SELECT_PATH) throw Error(`incompatible type ${selection.type}`)
+
+                //TODO validate path is valid
+                //assert_position_is_contained({position, area: interaction.clickable})
+
+                vm_state.set_variable(current_interaction.target_label, {type: "positions", value: selection.path})
+
+                break
+            }
+            case INTERACTION_TYPE.OPTION_SELECT: {
+                if (current_interaction?.type !== INTERACTION_TYPE.OPTION_SELECT) throw Error(`incompatible type ${selection.type}`)
+
+                const option = current_interaction.available_options.find(option => option.text === selection.option)
+                assert_is_not_undefined(option)
+                option.on_click()
+
+                break
+            }
+            case INTERACTION_TYPE.HIT_STATUS_SELECT: {
+                if (current_interaction?.type !== INTERACTION_TYPE.HIT_STATUS_SELECT) throw Error(`incompatible type ${selection.type}`)
+
+                /*
+                //TODO better organize how hit statuses are stored into variables
+                const previous_hit_statuses = [...EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS)).entries()]
+                for (const [creature] of previous_hit_statuses)
+                    assert_is_true(selection.hit_statuses.some(status => creature.id === status.creature_id))
+
+                for (const {creature_id, hit_status} of selection.hit_statuses) {
+                    assert_is_true(previous_hit_statuses.some(([creature]) => creature.id === creature_id))
+                    assert_is_true(HIT_STATUS.MISS <= hit_status && hit_status <= HIT_STATUS.CRIT)
+                }
+                */
+                
+                const new_hit_statuses = new Map<Creature, HitStatus>()
+                for (const {creature_id, hit_status} of selection.hit_statuses)
+                    new_hit_statuses.set(creatures.get_by_id(creature_id), hit_status)
+
+                vm_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: new_hit_statuses})
+
+                break
+            }
+        }
+        clear_current_interaction()
     }
 
     const evaluate_instructions = () => {
@@ -219,6 +243,7 @@ export const create_instruction_loop = ({
     return {
         set_available_interactions,
         run: evaluate_instructions,
+        select
     }
 }
 
@@ -226,7 +251,7 @@ export type InstructionLoop = ReturnType<typeof create_instruction_loop>
 
 
 //TODO clean up usages of the player turn handler
-export type PlayerTurnHandler = Omit<InstructionLoop, "run">
+export type PlayerTurnHandler = Omit<InstructionLoop, "run" | "select">
 
 const assert_position_is_contained = ({position, area}: {
     position: Position,

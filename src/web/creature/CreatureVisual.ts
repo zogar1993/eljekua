@@ -1,9 +1,9 @@
 import type {Position} from "core/battlegrid/Position";
-import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {SIZE} from "core/battlegrid/creatures/SIZES";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {create_html_element} from "web/utils/create_html_element";
 import {create_action_dots_visual} from "web/creature/ActionDotsVisual";
+import type {Creature} from "core/battlegrid/creatures/Creature";
 
 export type CreatureVisual = {
     place_at: (position: Position) => void
@@ -20,19 +20,19 @@ export type CreatureVisual = {
     set_available_actions: (actions: Array<ActionType>) => void
 }
 
-export const create_visual_creature = (data: CreatureData): CreatureVisual => {
+export const create_visual_creature = (creature: Creature): CreatureVisual => {
     const html_creature = create_html_element("div", "creature")
 
-    html_creature.setAttribute("id", data.name.toLowerCase())
-    html_creature.style.setProperty("--creature__image", data.image)
+    html_creature.setAttribute("id", `creature-${creature.id}`)
+    html_creature.style.setProperty("--creature__image", creature.data.image)
 
-    html_creature.style.setProperty("--creature_size", `${SIZE[data.size]}`)
+    html_creature.style.setProperty("--creature_size", `${SIZE[creature.data.size]}`)
 
-    html_creature.style.setProperty("--creature_position-x", `${data.position.x}`)
-    html_creature.style.setProperty("--creature_position-y", `${data.position.y}`)
+    html_creature.style.setProperty("--creature_position-x", `${creature.data.position.x}`)
+    html_creature.style.setProperty("--creature_position-y", `${creature.data.position.y}`)
 
-    html_creature.style.setProperty("--creature__lifebar_max-hp", `${data.hp_max}`)
-    html_creature.style.setProperty("--creature__lifebar_current-hp", `${data.hp_current}`)
+    html_creature.style.setProperty("--creature__lifebar_max-hp", `${creature.data.hp_max}`)
+    html_creature.style.setProperty("--creature__lifebar_current-hp", `${creature.data.hp_current}`)
 
     html_creature.style.setProperty("--fading-text_animation-duration", `${FADING_TEXT_ANIMATION_DURATION}ms`)
 

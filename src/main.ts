@@ -31,19 +31,11 @@ const game_state = create_game_state({game_events, battle_grid_size: {x: 10, y: 
 
 const evaluate_ast = build_evaluate_ast({game_state})
 
-const instruction_loop = create_instruction_loop({
-    game_state,
-    evaluate_ast,
-    game_events,
-})
+const instruction_loop = create_instruction_loop({game_state, evaluate_ast, game_events})
 
-initialize_battle_grid_ui({
-    game_state,
-    game_events,
-})
-
-create_option_buttons_ui({game_events})
-create_hit_status_buttons_ui({game_events})
+initialize_battle_grid_ui({game_state, game_events, game_input: instruction_loop})
+create_option_buttons_ui({game_events, game_input: instruction_loop})
+create_hit_status_buttons_ui({game_events, game_inputs: instruction_loop})
 create_initiative_order_ui({game_events})
 create_instruction_visualizer({game_events})
 
@@ -59,7 +51,15 @@ const HIT_STATUS_TEXT = new Map<HitStatus, string>([
     [HIT_STATUS.CRIT, "crits"]
 ])
 
-game_events.on_creature_attacked.add_handler(({creature, attack, defense, hit_status, defender, instruction, power_name}) => {
+game_events.on_creature_attacked.add_handler(({
+                                                  creature,
+                                                  attack,
+                                                  defense,
+                                                  hit_status,
+                                                  defender,
+                                                  instruction,
+                                                  power_name
+                                              }) => {
     action_log.add_new_action_log(
         `${creature.data.name}'s ${power_name} (`,
         attack,

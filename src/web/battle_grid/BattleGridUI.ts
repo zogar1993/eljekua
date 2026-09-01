@@ -12,6 +12,7 @@ import type {CreatureVisual} from "web/creature/CreatureVisual";
 import {create_visual_creature} from "web/creature/CreatureVisual";
 import {AnimationQueue} from "web/animation_queue/AnimationQueue";
 import type {
+    InstructionLoop,
     Interaction,
     InteractionsSelectArea,
     InteractionsSelectCreature,
@@ -25,9 +26,11 @@ import {GameState} from "core/game_state/GameState";
 export const initialize_battle_grid_ui = ({
                                               game_state,
                                               game_events,
+                                              game_input
                                           }: {
     game_state: GameState,
     game_events: GameEvents,
+    game_input: InstructionLoop
 }) => {
     const {battle_grid, creatures} = game_state
     const {size} = battle_grid
@@ -164,14 +167,21 @@ export const initialize_battle_grid_ui = ({
         if (position === null) return
         if (!is_click_coordinate_interaction(interactions)) return
 
-        if (interactions.type === INTERACTION_TYPE.SELECT_PATH) {
-            const path = interactions.get_path_to_destination(position)
-            interactions.select(path)
-        } else if (interactions.type === INTERACTION_TYPE.SELECT_CREATURE) {
-            const creature = interactions.get_target_for_position(position)
-            interactions.select(creature)
-        } else {
-            interactions.select(position)
+        switch (interactions.type) {
+            case INTERACTION_TYPE.SELECT_PATH:
+                const path = interactions.get_path_to_destination(position)
+                game_input.select({type: INTERACTION_TYPE.SELECT_PATH, path})
+                break
+            case INTERACTION_TYPE.SELECT_CREATURE:
+                const creature = interactions.get_target_for_position(position)
+                game_input.select({type: INTERACTION_TYPE.SELECT_CREATURE, creature_id: creature.id})
+                break
+            case INTERACTION_TYPE.SELECT_AREA:
+                game_input.select({type: INTERACTION_TYPE.SELECT_AREA, center: position})
+                break
+            case INTERACTION_TYPE.SELECT_TERRAIN:
+                game_input.select({type: INTERACTION_TYPE.SELECT_TERRAIN, position})
+                break
         }
     })
 
@@ -180,7 +190,7 @@ export const initialize_battle_grid_ui = ({
     }
 
     game_events.on_creature_added_to_game.add_handler((creature) => {
-        creature_visuals.set(creature, create_visual_creature(creature.data))
+        creature_visuals.set(creature, create_visual_creature(creature))
         update_creature_action_dots(creature)
     })
 

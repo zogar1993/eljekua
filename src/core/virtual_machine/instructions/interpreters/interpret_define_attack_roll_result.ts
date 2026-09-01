@@ -34,19 +34,9 @@ const handle_hit_status_manually = ({
                                     }: InterpretInstructionProps<InstructionAttackDiceRoll>) => {
     const {vm_state} = game_state
     const defenders = EXPR.as_creatures(vm_state.get_variable(instruction.defender))
-    const hit_statuses = new Map<Creature, HitStatus>(defenders.map(defender => [defender, HIT_STATUS.MISS]))
-    vm_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: hit_statuses})
 
-    player_turn_handler.set_available_interactions({
-        type: INTERACTION_TYPE.HIT_STATUS_SELECT,
-        hit_statuses,
-        on_status_change: (creature: Creature, status: HitStatus) => {
-            hit_statuses.set(creature, status)
-            vm_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: hit_statuses})
-        },
-        on_confirm: () => {
-        }
-    })
+    const creature_ids = defenders.map(defender => defender.id)
+    player_turn_handler.set_available_interactions({type: INTERACTION_TYPE.HIT_STATUS_SELECT, creature_ids })
 }
 
 const handle_hit_status_with_dice_roll = ({
@@ -92,6 +82,14 @@ const handle_hit_status_with_dice_roll = ({
 
         vm_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: roll_results})
 
-        game_events.on_creature_attacked.raise({creature: attacker, attack, hit_status, defender, defense, instruction, power_name})
+        game_events.on_creature_attacked.raise({
+            creature: attacker,
+            attack,
+            hit_status,
+            defender,
+            defense,
+            instruction,
+            power_name
+        })
     })
 }
