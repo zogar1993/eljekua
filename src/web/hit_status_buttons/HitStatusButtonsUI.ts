@@ -33,7 +33,7 @@ export const create_hit_status_buttons_ui = ({game_events, game_inputs}: {
                     },
                 })
             )
-        } else {
+        } else if (creature_visuals.length > 0) {
             creature_visuals.forEach(visual => visual.remove())
             creature_visuals = []
         }
