@@ -1,5 +1,6 @@
 import type {Expr} from "core/virtual_machine/expressions/types";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
+import {FUNCTION_NAME} from "core/expressions/function_names";
 import {evaluate_function_add} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_add";
 import {
     evaluate_function_equipped
@@ -59,43 +60,43 @@ export const build_evaluate_function = ({evaluate_ast, game_state}: {
 ) => {
     return (node: AstNodeFunction): Expr => {
         switch (node.name) {
-            case "add":
+            case FUNCTION_NAME.ADD:
                 return evaluate_function_add({node, evaluate_ast})
-            case "exists":
+            case FUNCTION_NAME.EXISTS:
                 return evaluate_function_exists({node, game_state})
-            case "equipped":
+            case FUNCTION_NAME.EQUIPPED:
                 return evaluate_function_equipped({node, evaluate_ast})
-            case "has_action_type_available":
+            case FUNCTION_NAME.HAS_ACTION_TYPE_AVAILABLE:
                 return evaluate_function_has_action_type_available({node, evaluate_ast})
-            case "not_equals":
+            case FUNCTION_NAME.NOT_EQUALS:
                 return evaluate_function_not_equals({node, evaluate_ast})
-            case "has_valid_targeting":
+            case FUNCTION_NAME.HAS_VALID_TARGETING:
                 return evaluate_function_has_valid_targeting({node, game_state, evaluate_ast})
-            case "are_enemies":
+            case FUNCTION_NAME.ARE_ENEMIES:
                 return evaluate_function_are_enemies({node, evaluate_ast})
-            case "is_ally":
+            case FUNCTION_NAME.IS_ALLY:
                 return evaluate_function_is_ally({node, evaluate_ast})
-            case "is_monster_template":
+            case FUNCTION_NAME.IS_MONSTER_TEMPLATE:
                 return evaluate_function_is_monster_template({node, evaluate_ast})
-            case "can_expend_action_type":
+            case FUNCTION_NAME.CAN_EXPEND_ACTION_TYPE:
                 return evaluate_function_can_expend_action_type({node, evaluate_ast})
-            case "distance":
+            case FUNCTION_NAME.DISTANCE:
                 return evaluate_function_distance({node, evaluate_ast})
-            case "opportunity_attack_range":
+            case FUNCTION_NAME.OPPORTUNITY_ATTACK_RANGE:
                 return evaluate_function_opportunity_attack_range({node, evaluate_ast})
-            case "or":
+            case FUNCTION_NAME.OR:
                 return evaluate_function_or({node, evaluate_ast})
-            case "and":
+            case FUNCTION_NAME.AND:
                 return evaluate_function_and({node, evaluate_ast})
-            case "is_greater_or_equal":
+            case FUNCTION_NAME.IS_GREATER_OR_EQUAL:
                 return evaluate_function_is_greater_or_equal({node, evaluate_ast})
-            case "is_lower_or_equal":
+            case FUNCTION_NAME.IS_LOWER_OR_EQUAL:
                 return evaluate_function_is_lower_or_equal({node, evaluate_ast})
-            case "is_greater":
+            case FUNCTION_NAME.IS_GREATER:
                 return evaluate_function_is_greater({node, evaluate_ast})
-            case "is_lower":
+            case FUNCTION_NAME.IS_LOWER:
                 return evaluate_function_is_lower({node, evaluate_ast})
-            case "creature_by_id":
+            case FUNCTION_NAME.CREATURE_BY_ID:
                 return evaluate_function_creature_by_id({node, game_state})
             default:
                 throw Error(`function name '${node.name}' not supported when evaluating node`)

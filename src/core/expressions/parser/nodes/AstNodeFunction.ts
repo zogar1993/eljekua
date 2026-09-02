@@ -1,15 +1,16 @@
 import type {Scanner} from "core/expressions/parser/scanner";
 import {is_text_character} from "core/expressions/parser/regexes";
-import {assert} from "stdlib/assert";
+import {assert, assert_is_included} from "stdlib/assert";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {parse_any} from "core/expressions/parser/nodes/AstNode";
+import {FUNCTION_NAMES} from "core/expressions/function_names";
 
 export const parse_function = (scanner: Scanner): AstNodeFunction => {
     scanner.consume("$")
 
     const name = scanner.get_text_while(is_text_character)
+    assert_is_included(name, FUNCTION_NAMES)
 
-    assert(FUNCTION_NAMES.includes(name), () => `function name '${name}' does not exist. Parsing ${scanner.text}`)
     scanner.consume("(")
 
     const parameters = []
@@ -32,28 +33,6 @@ export const parse_function = (scanner: Scanner): AstNodeFunction => {
         parameters
     }
 }
-
-//TODO P4 simplify this
-const FUNCTION_NAMES = [
-    "exists",
-    "or",
-    "and",
-    "add",
-    "distance",
-    "are_enemies",
-    "is_ally",
-    "is_monster_template",
-    "has_action_type_available",
-    "is_lower_or_equal",
-    "is_greater_or_equal",
-    "is_lower",
-    "is_greater",
-    "not_equals",
-    "equipped",
-    "has_valid_targeting",
-    "opportunity_attack_range",
-    "creature_by_id"
-]
 
 export type AstNodeFunction = {
     type: "function"
