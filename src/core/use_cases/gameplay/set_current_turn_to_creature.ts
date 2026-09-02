@@ -20,5 +20,14 @@ export const create_set_current_turn_to_creature = ({game_state, game_events}: {
     run_start_of_turn_hooks({game_state, game_events})
 
     //TODO this is not good as it gets out of sync with start battle
-    vm_state.add_instruction_frame({instructions: [{type: INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS}]})
+    vm_state.add_instruction_frame({instructions: [ADD_CURRENT_TURN_BASE_OPTIONS, JUMP_TO_START]})
 }
+
+const ADD_CURRENT_TURN_BASE_OPTIONS = {
+    type: INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS
+} as const
+
+const JUMP_TO_START = {
+    type: INSTRUCTION_TYPE.JUMP,
+    offset: -1
+} as const

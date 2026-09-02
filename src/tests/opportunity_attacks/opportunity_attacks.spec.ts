@@ -5,13 +5,13 @@ import {ATTRIBUTES} from "core/character_sheet/attributes";
 import type {Position} from "core/battlegrid/Position";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
-import {create_instruction_loop} from "core/instruction_loop";
+import {create_instruction_loop, INTERACTION_TYPE} from "core/instruction_loop";
 import {create_set_current_turn_to_creature} from "core/use_cases/gameplay/set_current_turn_to_creature";
 import {create_game_events} from "core/events/GameEvents";
 import {create_game_state} from "core/game_state/GameState";
-import {create_interaction_test_helpers} from "tests/utils/interaction_test_helpers";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
+import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 
 const game_events = create_game_events()
 const game_state = create_game_state({
@@ -21,13 +21,7 @@ const game_state = create_game_state({
 const {battle_grid, initiative_order, vm_state, creatures} = game_state
 const evaluate_ast = build_evaluate_ast({game_state})
 
-const instruction_loop = create_instruction_loop({
-    game_state,
-    evaluate_ast,
-    game_events,
-})
-
-const interactions = create_interaction_test_helpers({game_events})
+const instruction_loop = create_instruction_loop({game_state, evaluate_ast, game_events})
 
 const set_current_turn_to_creature = create_set_current_turn_to_creature({game_state, game_events})
 
@@ -60,13 +54,13 @@ describe("when an enemy leaves a space adjacent to a creature", () => {
         start_battle()
         given_creature("ragoz").is_in_its_turn()
 
-        when_creature("ragoz").moves_to({x: 2, y: 0})
+        when_creature("ragoz").moves_through({x: 2, y: 0})
 
         then_creature("ragoz").is_at_position({x: 1, y: 0}) //hasn't moved yet
-        then_creature("linuar").has_action("Opportunity Attack")
 
         when_creature("linuar").selects_action("Opportunity Attack")
         when_creature("linuar").selects_action("Melee Basic Attack")
+        when_creature("linuar").misses_attack_roll_against("ragoz")
 
         then_creature("linuar").has_performed_action("Melee Basic Attack", {target: "ragoz"})
 
@@ -120,28 +114,32 @@ const given_creature = (creature_name: string) => {
 
     return {
         is_in_its_turn: () => {
-            if (interactions.has_pending_interaction())
-                throw Error("instruction loop still has a pending interaction — call start_battle() without running the loop first")
-
             set_current_turn_to_creature({creature})
             instruction_loop.run()
         }
     }
 }
 
-
 const when_creature = (creature_name: string) => {
     const creature = creatures.get_all().find(creature => creature.data.name === creature_name)
     if (!creature) throw Error(`creature name "${creature_name}" not found`)
+    expect(vm_state.get_acting_creature().data.name).toEqual(creature.data.name)
 
     return {
-        moves_to: (position: Omit<Position, "footprint">) => {
-            interactions.select_option("Move")
-            interactions.select_position(position)
+        moves_through: (...positions: Array<Omit<Position, "footprint"> & { footprint?: Position["footprint"] }>) => {
+            const path = positions.map(p => ({...p, footprint: p.footprint ?? 1}))
+            instruction_loop.select({type: INTERACTION_TYPE.OPTION_SELECT, option: "Move"})
+            instruction_loop.select({type: INTERACTION_TYPE.SELECT_PATH, path: [creature.data.position, ...path]})
         },
         selects_action: (action_name: string) => {
-            interactions.select_option(action_name)
-            interactions.confirm_pending_interaction()
+            instruction_loop.select({type: INTERACTION_TYPE.OPTION_SELECT, option: action_name})
+        },
+        misses_attack_roll_against: (creature_name: string) => {
+            const defender = creatures.get_all().find(c => c.data.name === creature_name)
+            expect(defender).not.toBeUndefined()
+            const attack_rolls = [{creature_id: defender!.id, hit_status: HIT_STATUS.MISS}]
+            //TODO homogenize hit statuses and attack rolls verbiage
+            instruction_loop.select({type: INTERACTION_TYPE.HIT_STATUS_SELECT, hit_statuses: attack_rolls})
         }
     }
 }
@@ -153,9 +151,6 @@ const then_creature = (creature_name: string) => {
     return {
         is_at_position: (position: Omit<Position, "footprint">) => {
             expect(creature.data.position).toEqual({...position, footprint: 1})
-        },
-        has_action: (action_name: string) => {
-            expect(interactions.has_option(action_name)).toEqual(true)
         },
         has_performed_action: (action_name: string, options: { target: string }) => {
             expect(attack_log).toContainEqual({
