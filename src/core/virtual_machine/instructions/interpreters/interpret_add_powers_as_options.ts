@@ -11,6 +11,7 @@ import {TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
 import type {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
+import {FUNCTION_NAME} from "core/expressions/function_names";
 
 export const interpret_add_powers_as_options = ({
                                                     instruction,
@@ -41,12 +42,12 @@ export const interpret_add_powers_as_options = ({
             parameters: [
                 {
                     type: "function",
-                    name: "has_valid_targeting",
+                    name: FUNCTION_NAME.HAS_VALID_TARGETING,
                     parameters: [{type: "keyword", value: power_name}]
                 },
                 {
                     type: "function",
-                    name: "can_expend_action_type",
+                    name: FUNCTION_NAME.CAN_EXPEND_ACTION_TYPE,
                     parameters: [instruction.creature, {type: "string", value: action_type_cost}]
                 }
             ]
