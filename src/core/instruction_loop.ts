@@ -84,7 +84,7 @@ export type InteractionSelection =
 
 export type InteractionSelectionSelectHitStatus = {
     type: typeof INTERACTION_TYPE.HIT_STATUS_SELECT
-    hit_statuses: Array<{ creature_id: number, hit_status: HitStatus }>
+    attack_rolls: Array<{ creature_id: number, hit_status: HitStatus }>
 }
 
 export type InteractionSelectionSelectTerrain = {
@@ -197,23 +197,13 @@ export const create_instruction_loop = ({
             case INTERACTION_TYPE.HIT_STATUS_SELECT: {
                 if (current_interaction?.type !== INTERACTION_TYPE.HIT_STATUS_SELECT) throw Error(`incompatible type ${selection.type}`)
 
-                /*
                 //TODO better organize how hit statuses are stored into variables
-                const previous_hit_statuses = [...EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS)).entries()]
-                for (const [creature] of previous_hit_statuses)
-                    assert_is_true(selection.hit_statuses.some(status => creature.id === status.creature_id))
-
-                for (const {creature_id, hit_status} of selection.hit_statuses) {
-                    assert_is_true(previous_hit_statuses.some(([creature]) => creature.id === creature_id))
-                    assert_is_true(HIT_STATUS.MISS <= hit_status && hit_status <= HIT_STATUS.CRIT)
-                }
-                */
                 
-                const new_hit_statuses = new Map<Creature, HitStatus>()
-                for (const {creature_id, hit_status} of selection.hit_statuses)
-                    new_hit_statuses.set(creatures.get_by_id(creature_id), hit_status)
+                const attack_rolls = new Map<Creature, HitStatus>()
+                for (const {creature_id, hit_status} of selection.attack_rolls)
+                    attack_rolls.set(creatures.get_by_id(creature_id), hit_status)
 
-                vm_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: new_hit_statuses})
+                vm_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: attack_rolls})
 
                 break
             }

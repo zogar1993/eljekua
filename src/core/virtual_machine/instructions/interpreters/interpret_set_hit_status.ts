@@ -12,10 +12,10 @@ export const interpret_set_hit_status = ({
     const {vm_state} = game_state
     const target = EXPR.as_creature(vm_state.get_variable(instruction.target))
 
-    const hit_statuses: Map<Creature, HitStatus> = vm_state.has_variable(SYSTEM_KEYWORD.HIT_STATUS) ?
+    const attack_rolls: Map<Creature, HitStatus> = vm_state.has_variable(SYSTEM_KEYWORD.HIT_STATUS) ?
          EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS)) :
          new Map()
 
-    hit_statuses.set(target, instruction.status)
-    vm_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: hit_statuses})
+    attack_rolls.set(target, instruction.status)
+    vm_state.set_variable(SYSTEM_KEYWORD.HIT_STATUS, {type: "attack_rolls", value: attack_rolls})
 }

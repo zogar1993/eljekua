@@ -27,8 +27,8 @@ export const create_hit_status_buttons_ui = ({game_events, game_inputs}: {
 
                         const entries = Array.from(hit_statuses.entries())
                         if (entries.length === interaction.creature_ids.length) {
-                            const result = entries.map(([creature_id, hit_status]) => ({creature_id, hit_status}))
-                            game_inputs.select({type: INTERACTION_TYPE.HIT_STATUS_SELECT, hit_statuses: result})
+                            const attack_rolls = entries.map(([creature_id, hit_status]) => ({creature_id, hit_status}))
+                            game_inputs.select({type: INTERACTION_TYPE.HIT_STATUS_SELECT, attack_rolls})
                         }
                     },
                 })

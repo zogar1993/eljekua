@@ -138,8 +138,7 @@ const when_creature = (creature_name: string) => {
             const defender = creatures.get_all().find(c => c.data.name === creature_name)
             expect(defender).not.toBeUndefined()
             const attack_rolls = [{creature_id: defender!.id, hit_status: HIT_STATUS.MISS}]
-            //TODO homogenize hit statuses and attack rolls verbiage
-            instruction_loop.select({type: INTERACTION_TYPE.HIT_STATUS_SELECT, hit_statuses: attack_rolls})
+            instruction_loop.select({type: INTERACTION_TYPE.HIT_STATUS_SELECT, attack_rolls})
         }
     }
 }
