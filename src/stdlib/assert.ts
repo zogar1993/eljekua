@@ -24,4 +24,8 @@ export function assert_is_included<T>(item: T, array: Array<T>) {
     if (!array.includes(item)) throw Error(`Item not included in array.\n Item: ${to_json(item)}\n Array: ${to_json(array)}`)
 }
 
+export function assert_is_not_empty<T>(array: Array<T>) {
+    if (array.length === 0) throw Error(`Expected array to not be empty.`)
+}
+
 const to_json = (value: unknown) => JSON.stringify(value, null, 2)
