@@ -28,4 +28,8 @@ export function assert_is_not_empty<T>(array: Array<T>) {
     if (array.length === 0) throw Error(`Expected array to not be empty.`)
 }
 
+export function assert_are_equal<T = number | string>(a: T, b: T) {
+    if (a !== b) throw Error(`Expected ${to_json(a)} to equal ${to_json(b)}.`)
+}
+
 const to_json = (value: unknown) => JSON.stringify(value, null, 2)
