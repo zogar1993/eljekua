@@ -40,6 +40,7 @@ export type InstructionAttackDiceRoll = {
 }
 
 export type InstructionAttackRollConsequence = {
+//TODO strings that are meant to be variable names should be named appropriately as "labels"
     defender: string
     type: typeof INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE
     hit: Array<Instruction>
