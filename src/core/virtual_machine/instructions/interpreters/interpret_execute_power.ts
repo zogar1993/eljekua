@@ -19,5 +19,5 @@ export const interpret_execute_power = ({
     variables[SYSTEM_KEYWORD.OWNER] = {type: "creatures", value: [owner]}
     variables[SYSTEM_KEYWORD.POWER_NAME] = {type: "string", value: name}
 
-    vm_state.add_instruction_frame({instructions, variables})
+    vm_state.add_scoped_instruction_frame({instructions, variables})
 }

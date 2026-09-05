@@ -63,7 +63,7 @@ export const interpret_add_powers_as_options = ({
         options.push({text: power.name, instructions, condition})
     }
 
-    vm_state.add_instruction_frame({
+    vm_state.add_child_instruction_frame({
         instructions: [{
             type: INSTRUCTION_TYPE.OPTIONS,
             options: [

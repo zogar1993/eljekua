@@ -37,6 +37,11 @@ export type InitiativeEntryAddedEvent = {
 //TODO a null event feels wrong
 export type AvailableActionsChangedEvent = (Interaction & { creature: Creature }) | null
 
+export type InstructionFrameAddedEvent = {
+    frame: InstructionFrame
+    variables: Map<string, Expr>
+}
+
 export const create_game_events = () => ({
     on_available_interactions_changed: create_event_manager<AvailableActionsChangedEvent>(),
     on_creature_added_to_game: create_event_manager<Creature>(),
@@ -52,7 +57,7 @@ export const create_game_events = () => ({
 
     // VM State Events
     on_vm_state_cleared: create_event_manager(),
-    on_instruction_frame_added: create_event_manager<InstructionFrame>(),
+    on_instruction_frame_added: create_event_manager<InstructionFrameAddedEvent>(),
     on_instruction_pointer_changed: create_event_manager<InstructionFrame>(),
     on_instruction_frame_popped: create_event_manager(),
     on_vm_variable_set: create_event_manager<[string, Expr]>()

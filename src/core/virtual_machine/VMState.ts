@@ -3,43 +3,22 @@ import type {Instruction} from "core/virtual_machine/instructions/instructions";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import type {GameEvents} from "core/events/GameEvents";
-import {assert_is_not_null} from "stdlib/assert";
+import {assert_are_equal, assert_is_not_empty, assert_is_not_null} from "stdlib/assert";
 
 export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
-    let frames: Array<InstructionFrame> = []
+    const instruction_frames: Array<InstructionFrame> = []
+    const variable_scopes: Array<Map<string, Expr>> = []
 
-    const add_instruction_frame = ({instructions, variables = {}}: {
-        instructions: ReadonlyArray<Instruction>
-        variables?: Record<string, Expr>
-    }) => {
-        const frame_variables = new Map<string, Expr>()
-        for (const [key, value] of Object.entries(variables))
-            frame_variables.set(key, value)
-
-        const frame = {instructions: [...instructions], variables: frame_variables, current_instruction: 0}
-        frames.push(frame)
-
-        game_events.on_instruction_frame_added.raise(frame)
+    const push_variable_scope = (variables: Record<string, Expr>) => {
+        const scope = new Map<string, Expr>(Object.entries(variables))
+        variable_scopes.push(scope)
     }
 
-    const get_current_frame = () => {
-        if (frames.length === 0) throw Error("No frames available")
-        return frames[frames.length - 1]
-    }
+    const get_current_scope = () => variable_scopes[variable_scopes.length - 1]
 
-    const peek = (): Instruction => {
-        while (frames.length > 0) {
-            const frame = get_current_frame()
-
-            if (frame.instructions.length > frame.current_instruction) {
-                game_events.on_instruction_pointer_changed.raise(frame)
-                return frame.instructions[frame.current_instruction]
-            }
-
-            frames.pop()
-            game_events.on_instruction_frame_popped.raise()
-        }
-        throw Error("no instructions left")
+    const get_variable_or_null = (name: string) => {
+        const variable = get_current_scope().get(name)
+        return variable ?? null
     }
 
     const get_variable = (name: string) => {
@@ -49,32 +28,78 @@ export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
         //TODO P3 make error handling smoother everywhere
     }
 
-    const get_variable_or_null = (name: string) => {
-        for (let i = frames.length - 1; i >= 0; i--) {
-            const frame = frames[i]
-            const variable = frame.variables.get(name)
-            if (variable) return variable
-        }
-        return null
-    }
-
-
-    const get_acting_creature = () => EXPR.as_creature(get_variable(SYSTEM_KEYWORD.OWNER))
-
-    const has_variable = (name: string): boolean => {
-        for (let i = frames.length - 1; i >= 0; i--) {
-            const frame = frames[i]
-            const variable = frame.variables.get(name)
-            if (variable) return true
-        }
-        return false
-    }
+    const has_variable = (name: string): boolean => get_current_scope().has(name)
 
     const set_variable = (name: string, value: Expr) => {
-        const frame = get_current_frame()
-        frame.variables.set(name, value)
+        get_current_scope().set(name, value)
         game_events.on_vm_variable_set.raise([name, value])
     }
+
+    const add_scoped_instruction_frame = ({instructions, variables}: {
+        instructions: ReadonlyArray<Instruction>,
+        variables: Record<string, Expr>
+    }) => {
+        const frame = {
+            instructions,
+            current_instruction: 0,
+            variable_scope_index: variable_scopes.length,
+            is_child: false
+        }
+        push_variable_scope(variables)
+        instruction_frames.push(frame)
+        game_events.on_instruction_frame_added.raise({frame, variables: get_current_scope()})
+    }
+
+    const add_child_instruction_frame = ({instructions}: { instructions: ReadonlyArray<Instruction> }) => {
+        assert_is_not_empty(variable_scopes)
+        assert_is_not_empty(instruction_frames)
+
+        const frame = {
+            instructions,
+            current_instruction: 0,
+            variable_scope_index: variable_scopes.length - 1,
+            is_child: true
+        }
+
+        assert_are_equal(frame.variable_scope_index, get_current_frame().variable_scope_index)
+
+        instruction_frames.push(frame)
+
+        game_events.on_instruction_frame_added.raise({frame, variables: new Map()})
+    }
+
+    const get_current_frame = () => {
+        if (instruction_frames.length === 0) throw Error("No frames available")
+        return instruction_frames[instruction_frames.length - 1]
+    }
+
+    const pop_frame = () => {
+        assert_is_not_empty(instruction_frames)
+        const frame = instruction_frames.pop()
+
+        if (!frame!.is_child) {
+            assert_is_not_empty(variable_scopes)
+            variable_scopes.pop()
+        }
+    }
+
+    const peek = (): Instruction => {
+        while (instruction_frames.length > 0) {
+            const frame = get_current_frame()
+
+            if (frame.instructions.length > frame.current_instruction) {
+                game_events.on_instruction_pointer_changed.raise(frame)
+                return frame.instructions[frame.current_instruction]
+            }
+
+            pop_frame()
+
+            game_events.on_instruction_frame_popped.raise()
+        }
+        throw Error("no instructions left")
+    }
+
+    const get_acting_creature = () => EXPR.as_creature(get_variable(SYSTEM_KEYWORD.OWNER))
 
     const jump = (offset: number) => {
         const frame = get_current_frame()
@@ -82,12 +107,16 @@ export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
     }
 
     const clear = () => {
-        frames = []
+        while (instruction_frames.length > 0)
+            instruction_frames.pop()
+        while (variable_scopes.length > 0)
+            variable_scopes.pop()
         game_events.on_vm_state_cleared.raise()
     }
 
     return {
-        add_instruction_frame,
+        add_scoped_instruction_frame,
+        add_child_instruction_frame,
         clear,
 
         peek,
@@ -106,5 +135,6 @@ export type VMState = ReturnType<typeof create_vm_state>
 export type InstructionFrame = {
     current_instruction: number
     instructions: ReadonlyArray<Instruction>
-    variables: Map<string, Expr>
+    variable_scope_index: number
+    is_child: boolean
 }

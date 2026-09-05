@@ -1,13 +1,12 @@
 import type {GameState} from "core/game_state/GameState";
 import type {Creature} from "core/battlegrid/creatures/Creature";
-import type {VMState} from "core/virtual_machine/VMState";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {Power, TriggerInterception} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {TRIGGER_INTERCEPTION} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import type {Expr} from "core/virtual_machine/expressions/types";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
-import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
+import {Instruction, INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE} from "core/battlegrid/creatures/ActionType";
 
@@ -63,7 +62,7 @@ export const create_trigger_frame = ({activator, trigger_owner: creature, powers
     activator: Creature
     trigger_owner: Creature
     powers: Array<Power>
-}): Parameters<VMState["add_instruction_frame"]>[0] => ({
+}): { instructions: Array<Instruction>; variables: Record<string, Expr> } => ({
     instructions: [{
         type: INSTRUCTION_TYPE.OPTIONS,
         options: [

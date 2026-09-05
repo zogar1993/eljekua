@@ -17,7 +17,8 @@ export const create_start_battle = (
     initiative_order.start()
 
     run_start_of_turn_hooks({game_state, game_events})
-    vm_state.add_instruction_frame({instructions: [ADD_CURRENT_TURN_BASE_OPTIONS, JUMP_TO_START]})
+    const frame = {instructions: [ADD_CURRENT_TURN_BASE_OPTIONS, JUMP_TO_START], variables: {}}
+    vm_state.add_scoped_instruction_frame(frame)
     instruction_loop.run()
 }
 

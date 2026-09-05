@@ -38,7 +38,7 @@ export const interpret_move = ({
                 value: path.slice(i),
             })
 
-            vm_state.add_instruction_frame({
+            vm_state.add_child_instruction_frame({
                 instructions: [{
                     type: INSTRUCTION_TYPE.MOVE,
                     target: instruction.target,
@@ -48,7 +48,7 @@ export const interpret_move = ({
 
             for (const {creature: trigger_owner, powers} of potential_reactors) {
                 const frame = create_trigger_frame({activator: moving_creature, trigger_owner, powers})
-                vm_state.add_instruction_frame(frame)
+                vm_state.add_scoped_instruction_frame(frame)
             }
 
             break

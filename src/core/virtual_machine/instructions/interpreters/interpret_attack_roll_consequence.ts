@@ -24,6 +24,7 @@ export const interpret_attack_roll_consequence = ({
 
     const has_crit = entries.some(([_, hit_status]) => hit_status === HIT_STATUS.CRIT)
 
+/* TODO fix how crit triggers work
     if (has_crit) {
         const activator = EXPR.as_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
 
@@ -34,10 +35,12 @@ export const interpret_attack_roll_consequence = ({
             intercept: TRIGGER_INTERCEPTION.CRITICAL_HIT,
         })
 
-        for (const {creature: trigger_owner, powers} of potential_triggers)
-            vm_state.add_instruction_frame(create_trigger_frame({activator, trigger_owner, powers}))
+        for (const {creature: trigger_owner, powers} of potential_triggers) {
+            const frame = create_trigger_frame({activator, trigger_owner, powers})
+            vm_state.add_scoped_instruction_frame(frame)
+        }
     }
-
+*/
     const new_instructions: Array<Instruction> = []
 
     entries.forEach(([defender, hit_status]) => {
@@ -52,7 +55,7 @@ export const interpret_attack_roll_consequence = ({
         }
     })
 
-    vm_state.add_instruction_frame({instructions: new_instructions})
+    vm_state.add_child_instruction_frame({instructions: new_instructions})
 }
 
 const save_variable_instruction = (origin: number, destination: string): InstructionSaveVariable => ({

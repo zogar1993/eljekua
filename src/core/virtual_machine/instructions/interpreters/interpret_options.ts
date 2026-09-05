@@ -14,7 +14,7 @@ export const interpret_options = ({
         type: INTERACTION_TYPE.OPTION_SELECT,
         available_options: instruction.options.map(({text, condition, instructions}) => ({
                 text,
-                on_click: () => vm_state.add_instruction_frame({instructions}),
+                on_click: () => vm_state.add_child_instruction_frame({instructions}),
                 disabled: condition ? !EXPR.as_boolean(evaluate_ast(condition)) : false
             })
         )

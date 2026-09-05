@@ -1,5 +1,5 @@
 import type {Instruction} from "core/virtual_machine/instructions/instructions";
-import type {Expr} from "core/virtual_machine/expressions/types";
+import type {Expr, ExprPositions} from "core/virtual_machine/expressions/types";
 import type {GameEvents} from "core/events/GameEvents";
 import type {InstructionFrame} from "core/virtual_machine/VMState";
 import {create_html_element} from "web/utils/create_html_element";
@@ -51,7 +51,7 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
         html_content.replaceChildren()
     })
 
-    game_events.on_instruction_frame_added.add_handler((core_frame) => {
+    game_events.on_instruction_frame_added.add_handler(({frame: core_frame, variables}) => {
         const frame: FrameElements = {
             core_frame,
             variableElements: [],
@@ -63,10 +63,10 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
             html_content.append(frame.separator)
         }
 
-        if (core_frame.variables.size > 0) {
+        if (!core_frame.is_child && variables.size > 0) {
             ensure_variables_section(frame, html_content)
 
-            for (const [name, value] of core_frame.variables) {
+            for (const [name, value] of variables) {
                 const html_variable = create_variable_element(name, value)
                 frame.variableElements.push(html_variable)
                 frame.variablesContainer!.append(html_variable)
@@ -101,7 +101,9 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
     })
 
     game_events.on_vm_variable_set.add_handler(([name, value]) => {
-        const frame = frame_elements[frame_elements.length - 1]
+        const frame = get_variables_frame(frame_elements)
+        if (!frame) return
+
         const existing = frame.variableElements.find(element => element.dataset.variableName === name)
 
         if (existing) {
@@ -116,6 +118,14 @@ export const create_instruction_visualizer = ({game_events}: { game_events: Game
 }
 
 export type InstructionVisualizer = ReturnType<typeof create_instruction_visualizer>
+
+const get_variables_frame = (frame_elements: Array<FrameElements>) => {
+    for (let i = frame_elements.length - 1; i >= 0; i--) {
+        if (!frame_elements[i].core_frame.is_child)
+            return frame_elements[i]
+    }
+    return null
+}
 
 const ensure_variables_section = (frame: FrameElements, html_content: HTMLElement) => {
     if (frame.variablesContainer) return
@@ -301,7 +311,7 @@ const create_power_details = (power: Power): HTMLElement => {
     return container
 }
 
-const create_positions_details = (expr: Expr & { type: "positions" }): HTMLElement => {
+const create_positions_details = (expr: ExprPositions): HTMLElement => {
     const container = create_html_element("div", "instruction__variable-details-inner")
 
     for (const position of expr.value)
@@ -310,9 +320,6 @@ const create_positions_details = (expr: Expr & { type: "positions" }): HTMLEleme
             `(${position.x}, ${position.y})`,
             `footprint ${position.footprint}`,
         )
-
-    if (expr.description)
-        append_detail_row(container, "description", expr.description)
 
     if (expr.params?.length)
         container.append(create_expr_params_details(expr.params))
