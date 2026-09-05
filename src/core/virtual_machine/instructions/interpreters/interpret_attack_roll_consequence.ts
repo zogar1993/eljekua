@@ -18,7 +18,7 @@ export const interpret_attack_roll_consequence = ({
                                                       game_events,
                                                   }: InterpretInstructionProps<InstructionAttackRollConsequence>) => {
     const {vm_state} = game_state
-
+instruction.defender
     const attack_rolls = EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
     const entries = [...attack_rolls.entries()]
 

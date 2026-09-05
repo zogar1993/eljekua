@@ -40,7 +40,6 @@ export type InstructionAttackDiceRoll = {
 }
 
 export type InstructionAttackRollConsequence = {
-//TODO this duplication of defender should be not needed
     defender: string
     type: typeof INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE
     hit: Array<Instruction>
