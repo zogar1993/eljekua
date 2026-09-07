@@ -1,5 +1,5 @@
 import type {GameState} from "core/game_state/GameState";
-import type {Creature} from "core/battlegrid/creatures/Creature";
+import {has_creature_action_available, type Creature} from "core/battlegrid/creatures/Creature";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {Power, TriggerInterception} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {TRIGGER_INTERCEPTION} from "core/expressions/parser/transform_power_ir_into_vm_representation";
@@ -45,7 +45,7 @@ export const get_potential_triggers = ({
                 if (!power.trigger) return false
                 if (!power.trigger.intercepts.includes(intercept)) return false
                 if (!can_use_power_on_own_turn(power) && creature === current_turn_creature) return false
-                if (!creature.has_action_available(power.type.action)) return false
+                if (!has_creature_action_available({creature, action: power.type.action})) return false
                 return power.trigger.conditions.every(condition => EXPR.as_boolean(evaluate_ast(condition)))
             })
             return {creature, powers}

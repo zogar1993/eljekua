@@ -1,3 +1,4 @@
+import {has_creature_equipped} from "core/battlegrid/creatures/Creature";
 import type {Expr, ExprBoolean} from "core/virtual_machine/expressions/types";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
@@ -18,7 +19,7 @@ export const evaluate_function_equipped = ({node, evaluate_ast}:
 
     return {
         type: "boolean",
-        value: creature.has_equipped(text),
+        value: has_creature_equipped({creature, weapon_type: text}),
         description: "equipped",
         params: [creature_expr, text_expr]
     }

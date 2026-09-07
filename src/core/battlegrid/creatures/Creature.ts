@@ -14,47 +14,54 @@ export class Creature {
         this.data = data
         this.id = id
     }
+}
 
-    //P1 add weapon types
-    has_equipped = (weapon_type: string) => false
+//P1 add weapon types
+export const has_creature_equipped = ({creature, weapon_type}: { creature: Creature, weapon_type: string }) => false
 
-    half_level = () =>
-        Math.floor(this.data.level / 2)
+export const get_creature_half_level = ({creature}: { creature: Creature }) =>
+    Math.floor(creature.data.level / 2)
 
-    attribute_mod = (attribute_code: keyof Creature["data"]["attributes"]) =>
-        Math.floor((this.data.attributes[attribute_code] - 10) / 2)
+export const get_creature_attribute_mod = ({creature, attribute_code}: {
+    creature: Creature,
+    attribute_code: keyof Creature["data"]["attributes"]
+}) =>
+    Math.floor((creature.data.attributes[attribute_code] - 10) / 2)
 
-    add_status(status: Status) {
-        this.statuses.push(status)
-    }
+export const add_creature_status = ({creature, status}: { creature: Creature, status: Status }) => {
+    creature.statuses.push(status)
+}
 
-    remove_statuses = ({type, creature}: { type: StatusDuration["until"], creature: Creature | undefined }) => {
-        const new_statuses: Array<Status> = []
-        for (const status of this.statuses)
-            if (!status.durations.some((d) => d.until == type && d.creature === undefined || d.creature === creature))
-                new_statuses.push(status)
+export const remove_creature_statuses = ({creature, type, until_creature}: {
+    creature: Creature,
+    type: StatusDuration["until"],
+    until_creature: Creature | undefined
+}) => {
+    const new_statuses: Array<Status> = []
+    for (const status of creature.statuses)
+        if (!status.durations.some((d) => d.until == type && d.creature === undefined || d.creature === until_creature))
+            new_statuses.push(status)
 
-        this.statuses = new_statuses
-    }
+    creature.statuses = new_statuses
+}
 
-    has_action_available = (action: ActionType) => {
-        for (const expenditure of ACTION_TYPE_EXPENDITURE_ORDER[action])
-            if (this.available_actions.some(available => available === expenditure))
-                return true
-        return false
-    }
+export const has_creature_action_available = ({creature, action}: { creature: Creature, action: ActionType }) => {
+    for (const expenditure of ACTION_TYPE_EXPENDITURE_ORDER[action])
+        if (creature.available_actions.some(available => available === expenditure))
+            return true
+    return false
+}
 
-    expend_action = (action: ActionType) => {
-        for (const expenditure of ACTION_TYPE_EXPENDITURE_ORDER[action]) {
-            const index = this.available_actions.indexOf(expenditure)
+export const expend_creature_action = ({creature, action}: { creature: Creature, action: ActionType }) => {
+    for (const expenditure of ACTION_TYPE_EXPENDITURE_ORDER[action]) {
+        const index = creature.available_actions.indexOf(expenditure)
 
-            if (index >= 0) {
-                this.available_actions = remove_from_array_by_index(this.available_actions, index)
-                return
-            }
+        if (index >= 0) {
+            creature.available_actions = remove_from_array_by_index(creature.available_actions, index)
+            return
         }
-        throw Error(`Expected "${action}" to be available for "${this.data.name}"`)
     }
+    throw Error(`Expected "${action}" to be available for "${creature.data.name}"`)
 }
 
 export const restore_creature_actions = ({creature, actions}: {creature: Creature, actions: Array<ActionType>}) => {

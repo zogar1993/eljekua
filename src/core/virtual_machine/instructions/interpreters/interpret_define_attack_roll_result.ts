@@ -10,7 +10,7 @@ import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 import type {InstructionAttackDiceRoll} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {is_flanking} from "core/battlegrid/queries/is_flanking";
-import type {Creature} from "core/battlegrid/creatures/Creature";
+import {remove_creature_statuses, type Creature} from "core/battlegrid/creatures/Creature";
 
 const COMBAT_ADVANTAGE: ExprNumberResolved = {
     type: "number_resolved",
@@ -62,7 +62,7 @@ const handle_hit_status_with_dice_roll = ({
             if (effect.type === "gain_attack_bonus" && effect.against.includes(defender))
                 attack_parts.push(effect.value)
 
-        attacker.remove_statuses({type: "next_attack_roll_against_target", creature: defender})
+        remove_creature_statuses({creature: attacker, type: "next_attack_roll_against_target", until_creature: defender})
 
         if (
             is_flanking({attacker, defender, battle_grid}) ||

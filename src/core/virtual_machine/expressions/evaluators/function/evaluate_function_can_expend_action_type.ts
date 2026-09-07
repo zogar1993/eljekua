@@ -1,3 +1,4 @@
+import {has_creature_action_available} from "core/battlegrid/creatures/Creature";
 import type {Expr, ExprBoolean} from "core/virtual_machine/expressions/types";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
@@ -18,7 +19,7 @@ export const evaluate_function_can_expend_action_type = ({node, evaluate_ast}:
 
     return {
         type: "boolean",
-        value: creature.has_action_available(action_type),
+        value: has_creature_action_available({creature, action: action_type}),
         description: "has action available"
     }
 }

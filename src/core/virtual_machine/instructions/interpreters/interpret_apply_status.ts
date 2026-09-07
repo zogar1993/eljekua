@@ -1,6 +1,11 @@
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import type {Creature, StatusDuration, StatusEffect} from "core/battlegrid/creatures/Creature";
+import {
+    add_creature_status,
+    type Creature,
+    type StatusDuration,
+    type StatusEffect
+} from "core/battlegrid/creatures/Creature";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {Expr} from "core/virtual_machine/expressions/types";
 import type {InstructionApplyStatus} from "core/virtual_machine/instructions/instructions";
@@ -13,20 +18,27 @@ export const interpret_apply_status = ({
     const {vm_state} = game_state
     const targets = EXPR.as_creatures(evaluate_ast(instruction.target))
     const power_owner = vm_state.get_acting_creature()
-    
+
     for (const target of targets)
-        target.add_status({
-            effect: interpret_status({status: instruction.status, evaluate_ast}),
-            durations: interpret_duration({duration: instruction.duration, power_owner})
+        add_creature_status({
+            creature: target,
+            status: interpret_status_effect({instruction, evaluate_ast, power_owner})
         })
 }
 
-const interpret_duration = (
-    {duration, power_owner}:
-        {
-            duration: InstructionApplyStatus["duration"],
-            power_owner: Creature
-        }): Array<StatusDuration> => {
+const interpret_status_effect = ({instruction, evaluate_ast, power_owner}: {
+    instruction: InstructionApplyStatus,
+    power_owner: Creature,
+    evaluate_ast: (node: AstNode) => Expr
+}) => ({
+    effect: interpret_status({status: instruction.status, evaluate_ast}),
+    durations: interpret_duration({duration: instruction.duration, power_owner})
+})
+
+const interpret_duration = ({duration, power_owner}: {
+    duration: InstructionApplyStatus["duration"],
+    power_owner: Creature
+}): Array<StatusDuration> => {
     return duration.map(duration => {
         switch (duration) {
             case "until_start_of_your_next_turn":
@@ -54,13 +66,10 @@ const interpret_duration = (
     })
 }
 
-const interpret_status = (
-    {status, evaluate_ast}:
-        {
-            status: InstructionApplyStatus["status"],
-            evaluate_ast: (node: AstNode) => Expr
-        }
-): StatusEffect => {
+const interpret_status = ({status, evaluate_ast}: {
+    status: InstructionApplyStatus["status"],
+    evaluate_ast: (node: AstNode) => Expr
+}): StatusEffect => {
     switch (status.type) {
         case "grant_combat_advantage":
             return {
