@@ -37,12 +37,6 @@ export class Creature {
         this.statuses = new_statuses
     }
 
-    restore_actions = (actions: Array<ActionType>) => {
-        for (const action of actions)
-            if (!this.available_actions.includes(action))
-                this.available_actions.push(action)
-    }
-
     has_action_available = (action: ActionType) => {
         for (const expenditure of ACTION_TYPE_EXPENDITURE_ORDER[action])
             if (this.available_actions.some(available => available === expenditure))
@@ -61,6 +55,12 @@ export class Creature {
         }
         throw Error(`Expected "${action}" to be available for "${this.data.name}"`)
     }
+}
+
+export const restore_creature_actions = ({creature, actions}: {creature: Creature, actions: Array<ActionType>}) => {
+    for (const action of actions)
+        if (!creature.available_actions.includes(action))
+            creature.available_actions.push(action)
 }
 
 export type Status = { durations: Array<StatusDuration> } & { effect: StatusEffect }

@@ -2,6 +2,7 @@ import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE} from "core/battlegrid/creatures/ActionType";
 import type {GameEvents} from "core/events/GameEvents";
 import {GameState} from "core/game_state/GameState";
+import {restore_creature_actions} from "core/battlegrid/creatures/Creature";
 
 export const run_start_of_turn_hooks = ({game_state, game_events}: {
     game_state: GameState,
@@ -12,9 +13,9 @@ export const run_start_of_turn_hooks = ({game_state, game_events}: {
 
     for (const creature of creatures.get_all()) {
         if (creature === current_turn_creature)
-            creature.restore_actions(START_OF_YOUR_TURN_ACTIONS)
+            restore_creature_actions({creature, actions: START_OF_YOUR_TURN_ACTIONS})
         else
-            creature.restore_actions(START_OF_ALL_TURN_ACTIONS)
+            restore_creature_actions({creature, actions: START_OF_ALL_TURN_ACTIONS})
 
         game_events.on_creature_available_actions_changed.raise(creature)
 
