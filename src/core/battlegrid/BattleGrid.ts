@@ -1,4 +1,4 @@
-import {Creature} from "core/battlegrid/creatures/Creature";
+import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {Position, PositionFootprintOne} from "core/battlegrid/Position";
 import {
     positions_equal_footprint_one,

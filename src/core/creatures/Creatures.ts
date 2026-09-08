@@ -1,20 +1,9 @@
-import {Creature} from "core/battlegrid/creatures/Creature";
-import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "data/powers/basic";
-import {CreatureData} from "core/battlegrid/creatures/CreatureData";
+import {create_creature, type Creature} from "core/battlegrid/creatures/Creature";
 import {assert_is_valid_index} from "stdlib/assert";
+import {CreatureData} from "core/battlegrid/creatures/CreatureData";
 
 export const create_creatures = () => {
     const creatures: Array<Creature> = []
-
-    const create_creature = (data: CreatureData) => {
-        const basic_powers = data.template === null
-            ? [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS]
-            : [...BASIC_MOVEMENT_ACTIONS]
-        const d = {...data, powers: [...basic_powers, ...data.powers]}
-        const creature = new Creature({id: creatures.length, data: d})
-        creatures.push(creature)
-        return creature
-    }
 
     return {
         get_all: (): ReadonlyArray<Creature> => creatures,
@@ -22,7 +11,11 @@ export const create_creatures = () => {
             assert_is_valid_index(id, creatures)
             return creatures[id]
         },
-        create: create_creature
+        create: ({data}: { data: CreatureData }) => {
+            const id = creatures.length
+            const creature = create_creature({id, data})
+            creatures.push(creature)
+        }
     }
 }
 

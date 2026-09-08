@@ -3,18 +3,52 @@ import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE_EXPENDITURE_ORDER} from "core/battlegrid/creatures/ActionType";
 import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
+import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "data/powers/basic";
 
-export class Creature {
-    id: number
-    data: CreatureData
-    statuses: Array<Status> = []
-    available_actions: Array<ActionType> = []
+export type Status = { durations: Array<StatusDuration> } & { effect: StatusEffect }
 
-    constructor({id, data}: { id: number, data: CreatureData }) {
-        this.data = data
-        this.id = id
+export type StatusDuration = {
+    until: "next_turn_end" | "turn_start" | "turn_end" | "next_attack_roll_against_target",
+    creature?: Creature
+}
+
+export type StatusEffect =
+    StatusEffectGrantCombatAdvantage |
+    StatusEffectGainResistance |
+    StatusEffectGainAttackBonus
+
+export type StatusEffectGrantCombatAdvantage = {
+    type: "grant_combat_advantage",
+    against: Array<Creature>,
+}
+
+export type StatusEffectGainResistance = {
+    type: "gain_resistance"
+    value: ExprNumberResolved
+    against: Array<Creature>,
+}
+
+export type StatusEffectGainAttackBonus = {
+    type: "gain_attack_bonus"
+    value: ExprNumberResolved
+    against: Array<Creature>,
+}
+
+export const create_creature = ({id, data}: { id: number, data: CreatureData }) => {
+
+    const basic_powers = data.template === null
+        ? [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS]
+        : [...BASIC_MOVEMENT_ACTIONS]
+    const d = {...data, powers: [...basic_powers, ...data.powers]}
+    return {
+        id,
+        data: d,
+        statuses: [] as Array<Status>,
+        available_actions: [] as Array<ActionType>
     }
 }
+
+export type Creature = ReturnType<typeof create_creature>
 
 //P1 add weapon types
 export const has_creature_equipped = ({creature, weapon_type}: { creature: Creature, weapon_type: string }) => false
@@ -64,37 +98,8 @@ export const expend_creature_action = ({creature, action}: { creature: Creature,
     throw Error(`Expected "${action}" to be available for "${creature.data.name}"`)
 }
 
-export const restore_creature_actions = ({creature, actions}: {creature: Creature, actions: Array<ActionType>}) => {
+export const restore_creature_actions = ({creature, actions}: { creature: Creature, actions: Array<ActionType> }) => {
     for (const action of actions)
         if (!creature.available_actions.includes(action))
             creature.available_actions.push(action)
-}
-
-export type Status = { durations: Array<StatusDuration> } & { effect: StatusEffect }
-
-export type StatusDuration = {
-    until: "next_turn_end" | "turn_start" | "turn_end" | "next_attack_roll_against_target",
-    creature?: Creature
-}
-
-export type StatusEffect =
-    StatusEffectGrantCombatAdvantage |
-    StatusEffectGainResistance |
-    StatusEffectGainAttackBonus
-
-export type StatusEffectGrantCombatAdvantage = {
-    type: "grant_combat_advantage",
-    against: Array<Creature>,
-}
-
-export type StatusEffectGainResistance = {
-    type: "gain_resistance"
-    value: ExprNumberResolved
-    against: Array<Creature>,
-}
-
-export type StatusEffectGainAttackBonus = {
-    type: "gain_attack_bonus"
-    value: ExprNumberResolved
-    against: Array<Creature>,
 }
