@@ -18,14 +18,11 @@ import {create_instruction_loop} from "core/instruction_loop";
 import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
 import {create_instruction_visualizer} from "web/instruction_visualizer/instruction_visualizer";
 import {create_set_current_turn_to_creature} from "core/use_cases/gameplay/set_current_turn_to_creature";
-import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
-import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 import {create_game_events} from "core/events/GameEvents";
 import {create_game_state} from "core/game_state/GameState";
 import {initialize_battle_grid_ui} from "web/battle_grid/BattleGridUI";
 import {create_option_buttons_ui} from "web/creature_option_buttons/CreatureOptionButtons";
 
-const action_log = create_action_log()
 const game_events = create_game_events()
 const game_state = create_game_state({game_events, battle_grid_size: {x: 10, y: 10}})
 
@@ -38,35 +35,9 @@ create_option_buttons_ui({game_events, game_input: instruction_loop})
 create_hit_status_buttons_ui({game_events, game_inputs: instruction_loop})
 create_initiative_order_ui({game_events})
 create_instruction_visualizer({game_events})
+create_action_log({game_events})
 
 const set_current_turn_to_creature = create_set_current_turn_to_creature({game_state, game_events})
-
-game_events.on_creature_received_damage.add_handler(({creature, damage}) => {
-    action_log.add_new_action_log(`${creature.data.name} was dealt `, damage, ` damage.`)
-})
-
-const HIT_STATUS_TEXT = new Map<HitStatus, string>([
-    [HIT_STATUS.MISS, "misses"],
-    [HIT_STATUS.HIT, "hits"],
-    [HIT_STATUS.CRIT, "crits"]
-])
-
-game_events.on_creature_attacked.add_handler(({
-                                                  creature,
-                                                  attack,
-                                                  defense,
-                                                  hit_status,
-                                                  defender,
-                                                  instruction,
-                                                  power_name
-                                              }) => {
-    action_log.add_new_action_log(
-        `${creature.data.name}'s ${power_name} (`,
-        attack,
-        `) ${HIT_STATUS_TEXT.get(hit_status)} against ${defender.data.name}'s ${instruction.defense} (`,
-        defense,
-        `).`)
-})
 
 const add_creature = create_add_creature_to_game({game_state, game_events})
 const start_battle = create_start_battle({game_state, instruction_loop, game_events})
