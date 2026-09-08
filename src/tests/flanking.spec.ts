@@ -1,11 +1,9 @@
 import {create_battle_grid} from "core/battlegrid/BattleGrid";
 import {get_flanker_positions} from "core/battlegrid/position/get_flanker_positions";
-import {create_game_events} from "core/events/GameEvents";
 import {create_creatures} from "core/creatures/Creatures";
 
-const game_events = create_game_events()
 const creatures = create_creatures()
-const battle_grid = create_battle_grid({size: {x: 10, y: 10}, game_events, creatures});
+const battle_grid = create_battle_grid({size: {x: 10, y: 10}, creatures});
 
 describe("when a 1x1 attacker attacks a 1x1 defender, there is one flanking position", () => {
     [

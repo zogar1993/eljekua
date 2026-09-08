@@ -4,15 +4,16 @@ import type {InstructionForceMovement} from "core/virtual_machine/instructions/i
 
 export const interpret_force_movement = ({
                                              instruction,
-                                             game_state,
-                                             evaluate_ast
+                                             evaluate_ast,
+                                             game_events,
                                          }: InterpretInstructionProps<InstructionForceMovement>) => {
-    const {battle_grid} = game_state
     const creature = EXPR.as_creature(evaluate_ast(instruction.target))
     switch (instruction.movement_type) {
         case "push": {
             const destination = EXPR.as_positions(evaluate_ast(instruction.destination))
-            battle_grid.push_creature({creature, position: destination[destination.length - 1]})
+            const position = destination[destination.length - 1]
+            creature.data.position = position
+            game_events.on_creature_moved.raise({creature, position, movement_type: "push"})
             break
         }
         default:

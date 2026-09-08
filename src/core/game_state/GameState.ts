@@ -13,7 +13,7 @@ export const create_game_state = ({
     battle_grid_size: { x: number, y: number }
 }) => {
     const creatures = create_creatures()
-    const battle_grid = create_battle_grid({size: battle_grid_size, game_events, creatures})
+    const battle_grid = create_battle_grid({size: battle_grid_size, creatures})
     const initiative_order = create_initiative_order({game_events})
     const settings = create_settings()
     const vm_state = create_vm_state({game_events})

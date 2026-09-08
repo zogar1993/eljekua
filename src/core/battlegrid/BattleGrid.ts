@@ -5,12 +5,10 @@ import {
     positions_share_surface,
     transform_position_to_f1
 } from "core/battlegrid/Position";
-import type {GameEvents} from "core/events/GameEvents";
 import type {Creatures} from "core/creatures/Creatures";
 
-export const create_battle_grid = ({size, game_events, creatures}: {
+export const create_battle_grid = ({size, creatures}: {
     size: { x: number, y: number }
-    game_events: GameEvents,
     creatures: Creatures
 }): BattleGrid => {
     const board: Array<Array<Square>> = Array.from({length: size.y}, (_, y) => {
@@ -51,12 +49,6 @@ export const create_battle_grid = ({size, game_events, creatures}: {
     }
 
 
-
-    const push_creature = ({position, creature}: { position: Position, creature: Creature }) => {
-        creature.data.position = position
-        game_events.on_creature_moved.raise({creature, position, movement_type: "push"})
-    }
-
     return {
         size,
         board,
@@ -66,7 +58,6 @@ export const create_battle_grid = ({size, game_events, creatures}: {
         is_terrain_occupied,
         get_creature_by_position,
         get_creatures_in_positions,
-        push_creature,
     }
 }
 
@@ -80,8 +71,6 @@ export type BattleGrid = {
     is_terrain_occupied: (position: Position, options?: { exclude?: Array<Creature> }) => boolean
     get_creature_by_position: (position: Position) => Creature
     get_creatures_in_positions: (positions: Array<PositionFootprintOne>) => Array<Creature>
-
-    push_creature: (props: { position: Position, creature: Creature }) => void
 }
 
 export type Square = {
