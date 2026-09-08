@@ -11,10 +11,11 @@ export const create_creatures = () => {
             assert_is_valid_index(id, creatures)
             return creatures[id]
         },
-        create: ({data}: { data: CreatureData }) => {
+        create: (data: CreatureData) => {
             const id = creatures.length
             const creature = create_creature({id, data})
             creatures.push(creature)
+            return creature
         }
     }
 }

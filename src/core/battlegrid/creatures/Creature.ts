@@ -35,7 +35,6 @@ export type StatusEffectGainAttackBonus = {
 }
 
 export const create_creature = ({id, data}: { id: number, data: CreatureData }) => {
-
     const basic_powers = data.template === null
         ? [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS]
         : [...BASIC_MOVEMENT_ACTIONS]
