@@ -1,3 +1,14 @@
+.battle-grid-container {
+    position: relative;
+    display: inline-block;
+}
+
+#creatures {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
 .board {
     display: inline-grid;
     grid-template-columns: repeat(10, 1fr);
