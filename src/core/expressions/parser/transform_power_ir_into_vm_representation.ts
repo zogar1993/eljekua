@@ -1,5 +1,5 @@
 import {to_ast} from "core/expressions/parser/to_ast";
-import type {IRInstruction, IRInstructionApplyStatus, IRInstructionSelectTarget, IRPower} from "core/types";
+import {IR_INSTRUCTION_TYPE, type IRInstruction, type IRInstructionApplyStatus, type IRInstructionSelectTarget, type IRPower} from "core/types";
 import {ATTRIBUTE_CODES} from "core/character_sheet/attributes";
 import type {
     Instruction,
@@ -120,7 +120,7 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 target: instruction.target,
                 destination: instruction.destination
             }]
-        case INSTRUCTION_TYPE.CONDITION:
+        case IR_INSTRUCTION_TYPE.CONDITION:
             return create_if_block({
                 condition: to_ast(instruction.condition),
                 instructions_if_true: transform_instructions(instruction.instructions_true),

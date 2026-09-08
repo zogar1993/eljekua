@@ -3,6 +3,10 @@ import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
+export const IR_INSTRUCTION_TYPE = {
+    CONDITION: "condition",
+} as const
+
 export type IRPower = {
     name: string
     description?: string
@@ -51,7 +55,7 @@ export type IRInstruction =
         target: "owner",
         destination: string
     } | {
-    type: typeof INSTRUCTION_TYPE.CONDITION,
+    type: typeof IR_INSTRUCTION_TYPE.CONDITION,
     condition: string,
     instructions_true: Array<IRInstruction>
     instructions_false?: Array<IRInstruction>

@@ -24,7 +24,6 @@ export const INSTRUCTION_TYPE = {
     ADD_CURRENT_TURN_BASE_OPTIONS: "add_current_turn_base_options",
     JUMP: "jump",
     JUMP_IF: "jump_if",
-    CONDITION: "condition",
 } as const
 
 export type InstructionType = typeof INSTRUCTION_TYPE[keyof typeof INSTRUCTION_TYPE];

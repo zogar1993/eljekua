@@ -1,4 +1,4 @@
-import type {IRPower} from "core/types";
+import {IR_INSTRUCTION_TYPE, type IRPower} from "core/types";
 import {
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
@@ -63,7 +63,7 @@ const cleave: IRPower = {
                 target: "primary_target"
             },
             {
-                type: INSTRUCTION_TYPE.CONDITION,
+                type: IR_INSTRUCTION_TYPE.CONDITION,
                 condition: "$exists(secondary_target)",
                 instructions_true: [
                     {
@@ -102,7 +102,7 @@ const reaping_strike: IRPower = {
         ],
         miss: [
             {
-                type: INSTRUCTION_TYPE.CONDITION,
+                type: IR_INSTRUCTION_TYPE.CONDITION,
                 condition: `$equipped(owner,"two-handed")`,
                 instructions_true: [
                     {
@@ -166,7 +166,7 @@ const tide_of_iron: IRPower = {
                                 target: "primary_target"
                             },
                             {
-                                type: INSTRUCTION_TYPE.CONDITION,
+                                type: IR_INSTRUCTION_TYPE.CONDITION,
                                 condition: "$not_equals(primary_target.position,primary_target_original_position)",
                                 instructions_true: [
                                     {
@@ -232,7 +232,7 @@ const brash_strike: IRPower = {
                 target: "primary_target"
             },
             {
-                type: INSTRUCTION_TYPE.CONDITION,
+                type: IR_INSTRUCTION_TYPE.CONDITION,
                 condition: `$or($equipped(owner, "hammer"), $equipped(owner, "axe"), $equipped(owner, "mace"))`,
                 instructions_true: [
                     {
@@ -310,7 +310,7 @@ const tide_of_iron_true = {
                 target: "primary_target"
             },
             {
-                type: INSTRUCTION_TYPE.CONDITION,
+                type: IR_INSTRUCTION_TYPE.CONDITION,
                 condition: "is_greater_or_equal($add(owner.size,1),target.size)",
                 instructions_true: [
                     {
@@ -328,7 +328,7 @@ const tide_of_iron_true = {
                                 target: "primary_target"
                             },
                             {
-                                type: INSTRUCTION_TYPE.CONDITION,
+                                type: IR_INSTRUCTION_TYPE.CONDITION,
                                 condition: "$and($not_equals(primary_target.position,primary_target_last_position),$equals($movement_distance(owner.position,primary_target_last_position),1))",
                                 instructions_true: [
                                     {
