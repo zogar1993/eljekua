@@ -15,6 +15,7 @@ export const create_creature_hit_status_visual = ({creature_id, on_status_change
 }): CreatureHitStatusVisual => {
     const html_creature = document.getElementById(`creature-${creature_id}`)
     assert_is_not_null(html_creature)
+    html_creature.classList.add("creature--hit-status-select")
 
     const container = create_html_element("div", "hit-status-buttons")
     html_creature.appendChild(container)
@@ -34,7 +35,10 @@ export const create_creature_hit_status_visual = ({creature_id, on_status_change
 
     return {
         set_selected,
-        remove: () => container.remove(),
+        remove: () => {
+            container.remove()
+            html_creature.classList.remove("creature--hit-status-select")
+        },
     }
 }
 

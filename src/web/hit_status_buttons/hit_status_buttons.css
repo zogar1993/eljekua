@@ -1,10 +1,18 @@
+.creature--hit-status-select {
+    z-index: 20;
+}
+
 .hit-status-buttons {
     position: absolute;
-    top: -28px;
-    left: 0;
+    inset: var(--creature__inset);
+    top: auto;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 2px;
     pointer-events: auto;
+    z-index: 1;
 }
 
 .hit-status-button {
@@ -14,6 +22,7 @@
     border: 1px solid gray;
     border-radius: 4px;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .hit-status-button:hover {
