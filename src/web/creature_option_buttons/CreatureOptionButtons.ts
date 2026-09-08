@@ -1,5 +1,6 @@
 import type {GameEvents} from "core/events/GameEvents";
-import {InstructionLoop, INTERACTION_TYPE} from "core/instruction_loop";
+import type {InstructionLoop} from "core/instruction_loop";
+import {INTERACTION_TYPE} from "core/interactions/Interactions";
 import type {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
 import type {CreatureOptionButton} from "web/creature_option_buttons/CreatureOptionButton";
 import {create_option_button_visual} from "web/creature_option_buttons/CreatureOptionButton";

@@ -1,5 +1,6 @@
 import type {GameEvents} from "core/events/GameEvents";
-import {InstructionLoop, INTERACTION_TYPE} from "core/instruction_loop";
+import type {InstructionLoop} from "core/instruction_loop";
+import {INTERACTION_TYPE} from "core/interactions/Interactions";
 import type {CreatureHitStatusVisual} from "web/hit_status_buttons/CreatureHitStatusVisual";
 import {create_creature_hit_status_visual} from "web/hit_status_buttons/CreatureHitStatusVisual";
 import {AssertionError} from "stdlib/AssertionError";

@@ -1,6 +1,7 @@
 import type {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
 import {create_html_element} from "web/utils/create_html_element";
-import {InstructionLoop, INTERACTION_TYPE} from "core/instruction_loop";
+import type {InstructionLoop} from "core/instruction_loop";
+import {INTERACTION_TYPE} from "core/interactions/Interactions";
 
 const html_element = document.querySelector("#actions_menu")!
 

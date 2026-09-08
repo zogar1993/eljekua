@@ -11,15 +11,15 @@ import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {CreatureVisual} from "web/creature/CreatureVisual";
 import {create_visual_creature} from "web/creature/CreatureVisual";
 import {AnimationQueue} from "web/animation_queue/AnimationQueue";
-import type {
-    InstructionLoop,
-    Interaction,
-    InteractionsSelectArea,
-    InteractionsSelectCreature,
-    InteractionsSelectPath,
-    InteractionsSelectTerrain
-} from "core/instruction_loop";
-import {INTERACTION_TYPE} from "core/instruction_loop";
+import type {InstructionLoop} from "core/instruction_loop";
+import {
+    INTERACTION_TYPE,
+    type Interaction,
+    type InteractionsSelectArea,
+    type InteractionsSelectCreature,
+    type InteractionsSelectPath,
+    type InteractionsSelectTerrain,
+} from "core/interactions/Interactions";
 import {assert_is_not_undefined} from "stdlib/assert";
 import {GameState} from "core/game_state/GameState";
 

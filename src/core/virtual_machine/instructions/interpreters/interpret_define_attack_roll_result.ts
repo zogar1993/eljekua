@@ -1,6 +1,6 @@
 import {roll_d} from "core/randomness/dice";
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {INTERACTION_TYPE} from "core/instruction_loop";
+import {INTERACTION_TYPE} from "core/interactions/Interactions";
 import {add_numbers_resolved} from "core/virtual_machine/expressions/number_utils";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";

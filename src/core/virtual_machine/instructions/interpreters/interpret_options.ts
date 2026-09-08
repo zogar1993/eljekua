@@ -1,5 +1,5 @@
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {INTERACTION_TYPE} from "core/instruction_loop";
+import {INTERACTION_TYPE} from "core/interactions/Interactions";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {InstructionOptions} from "core/virtual_machine/instructions/instructions";
 

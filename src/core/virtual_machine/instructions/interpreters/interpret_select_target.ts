@@ -11,7 +11,7 @@ import type {
     InstructionSelectTargetPush
 } from "core/virtual_machine/instructions/instructions";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
-import {INTERACTION_TYPE} from "core/instruction_loop";
+import {INTERACTION_TYPE} from "core/interactions/Interactions";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";
