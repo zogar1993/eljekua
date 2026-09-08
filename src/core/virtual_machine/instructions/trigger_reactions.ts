@@ -6,7 +6,7 @@ import {TRIGGER_INTERCEPTION} from "core/expressions/parser/transform_power_ir_i
 import type {Expr} from "core/virtual_machine/expressions/types";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
-import {Instruction, INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
+import {INSTRUCTION_TYPE, type Instruction} from "core/virtual_machine/instructions/instructions";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE} from "core/battlegrid/creatures/ActionType";
 

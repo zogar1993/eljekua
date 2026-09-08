@@ -51,7 +51,7 @@ import {
 import {
     evaluate_function_is_lower
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_is_lower";
-import {GameState} from "core/game_state/GameState";
+import type {GameState} from "core/game_state/GameState";
 
 export const build_evaluate_function = ({evaluate_ast, game_state}: {
                                             evaluate_ast: (node: AstNode) => Expr,

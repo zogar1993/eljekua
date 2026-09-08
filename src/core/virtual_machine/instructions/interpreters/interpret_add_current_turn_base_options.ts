@@ -2,7 +2,7 @@ import type {InterpretInstructionProps} from "core/virtual_machine/instructions/
 import type {InstructionAddCurrentTurnBaseOptions} from "core/virtual_machine/instructions/instructions";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {AST, SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
-import {Expr} from "core/virtual_machine/expressions/types";
+import type {Expr} from "core/virtual_machine/expressions/types";
 
 export const interpret_add_current_turn_base_options = ({
                                                             game_state,

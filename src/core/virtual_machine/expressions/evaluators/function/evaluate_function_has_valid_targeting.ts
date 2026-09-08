@@ -6,7 +6,7 @@ import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
-import {GameState} from "core/game_state/GameState";
+import type {GameState} from "core/game_state/GameState";
 
 export const evaluate_function_has_valid_targeting = ({node, evaluate_ast, game_state}:
                                                           {

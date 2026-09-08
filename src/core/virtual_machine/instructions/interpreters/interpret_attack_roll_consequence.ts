@@ -8,12 +8,9 @@ import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
-import {create_trigger_frame, get_potential_triggers,} from "core/virtual_machine/instructions/trigger_reactions";
-import {TRIGGER_INTERCEPTION} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 
 export const interpret_attack_roll_consequence = ({
                                                       game_state,
-                                                      evaluate_ast,
                                                       instruction,
                                                       game_events,
                                                   }: InterpretInstructionProps<InstructionAttackRollConsequence>) => {

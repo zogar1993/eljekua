@@ -1,9 +1,8 @@
 import type {Expr} from "core/virtual_machine/expressions/types";
 import type {AstNodeKeyword} from "core/expressions/parser/nodes/AstNodeKeyword";
-import type {VMState} from "core/virtual_machine/VMState";
+import type {GameState} from "core/game_state/GameState";
 import {get_creature_property} from "core/character_sheet/get_creature_property";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {GameState} from "core/game_state/GameState";
 
 export const build_evaluate_keyword = ({game_state}: { game_state: GameState }) => {
     const {vm_state} = game_state

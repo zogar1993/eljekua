@@ -1,6 +1,6 @@
 import {create_creature, type Creature} from "core/battlegrid/creatures/Creature";
 import {assert_is_valid_index} from "stdlib/assert";
-import {CreatureData} from "core/battlegrid/creatures/CreatureData";
+import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 
 export const create_creatures = () => {
     const creatures: Array<Creature> = []

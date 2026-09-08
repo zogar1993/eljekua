@@ -21,7 +21,7 @@ import {
     type InteractionsSelectTerrain,
 } from "core/interactions/Interactions";
 import {assert_is_not_undefined} from "stdlib/assert";
-import {GameState} from "core/game_state/GameState";
+import type {GameState} from "core/game_state/GameState";
 
 export const initialize_battle_grid_ui = ({
                                               game_state,

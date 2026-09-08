@@ -8,7 +8,6 @@ import {positions_share_surface} from "core/battlegrid/Position";
 import {assert_is_not_null, assert_is_not_undefined, assert_is_true} from "stdlib/assert";
 import {is_branching_instruction} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {

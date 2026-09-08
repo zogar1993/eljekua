@@ -1,5 +1,5 @@
 import {remove_creature_statuses} from "core/battlegrid/creatures/Creature";
-import {GameState} from "core/game_state/GameState";
+import type {GameState} from "core/game_state/GameState";
 
 export const run_end_of_turn_hooks = ({game_state}: { game_state: GameState }) => {
     const {creatures, initiative_order} = game_state
