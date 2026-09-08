@@ -15,7 +15,7 @@ import {INTERACTION_TYPE} from "core/instruction_loop";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";
-import {assert_is_true} from "stdlib/assert";
+import {assert_is_not_empty, assert_is_true} from "stdlib/assert";
 
 export const interpret_select_target = ({
                                             instruction,
@@ -26,7 +26,7 @@ export const interpret_select_target = ({
     const {battle_grid, vm_state} = game_state
     const clickable = get_valid_targets({instruction, battle_grid, evaluate_ast})
 
-    if (clickable.length === 0) return
+    assert_is_not_empty(clickable)
 
     const owner = EXPR.as_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
     const target_label = instruction.target_label
