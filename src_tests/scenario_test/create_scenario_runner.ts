@@ -1,9 +1,9 @@
 import type {GameEvents} from "core/events/GameEvents";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
+import {apply_scenario_level_setup_to_game} from "scenario_test/apply_scenario_level_setup_to_game";
 import {create_scenario_game, type ScenarioGame} from "scenario_test/create_scenario_game";
 import {evaluate_expectation} from "scenario_test/evaluate_expectation";
-import {resolve_creature_setup} from "scenario_test/resolve_creature_setup";
 import {resolve_interaction_selection} from "scenario_test/resolve_interaction_selection";
 import {
     SCENARIO_STEP_TYPE,
@@ -66,11 +66,16 @@ const run_scenario = async ({
     step_delay_ms: number
     on_step?: (step_index: number) => void
 }): Promise<ScenarioRunResult> => {
-    const game = existing_game ?? create_scenario_game({battle_grid_size: scenario.battle_grid_size})
+    const game = existing_game ?? create_scenario_game({battle_grid_size: scenario.level_setup.battle_grid_size})
     const {game_events, game_state, instruction_loop, add_creature_to_game, start_battle, set_current_turn_to_creature} = game
     const {creatures} = game_state
     const attack_log = create_attack_log({game_events, game})
     const failures: ScenarioRunResult["failures"] = []
+
+    if (!existing_game)
+        apply_scenario_level_setup_to_game({scenario, add_creature_to_game})
+
+    start_battle()
 
     for (let step_index = 0; step_index < scenario.steps.length; step_index++) {
         const step = scenario.steps[step_index]
@@ -78,12 +83,6 @@ const run_scenario = async ({
 
         try {
             switch (step.type) {
-                case SCENARIO_STEP_TYPE.ADD_CREATURE:
-                    add_creature_to_game({data: resolve_creature_setup(step.creature)})
-                    break
-                case SCENARIO_STEP_TYPE.START_BATTLE:
-                    start_battle()
-                    break
                 case SCENARIO_STEP_TYPE.SET_TURN: {
                     const creature = creatures.get_all().find(entry => entry.data.name === step.creature_name)
                     if (!creature) throw Error(`creature name "${step.creature_name}" not found`)

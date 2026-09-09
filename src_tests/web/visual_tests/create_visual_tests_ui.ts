@@ -1,6 +1,7 @@
 import type {GameEvents} from "core/events/GameEvents";
 import type {GameState} from "core/game_state/GameState";
 import type {InstructionLoop} from "core/instruction_loop";
+import {apply_scenario_level_setup_to_game} from "scenario_test/apply_scenario_level_setup_to_game";
 import {create_scenario_runner} from "scenario_test/create_scenario_runner";
 import {resolve_creature_setup} from "scenario_test/resolve_creature_setup";
 import {create_empty_scenario, type ScenarioTest} from "scenario_test/ScenarioTest";
@@ -16,6 +17,7 @@ import {
     load_scenario_test_by_path,
     save_scenario_test,
 } from "web/visual_tests/scenario_test_api";
+import {read_scheduled_visual_test_reload, schedule_visual_test_reload} from "web/visual_tests/schedule_visual_test_reload";
 import type {BattleGridVisual} from "web/battle_grid/BattleGridVisual";
 import type {SquareVisual} from "web/battle_grid/squares/SquareVisual";
 import {create_html_element} from "web/utils/create_html_element";
@@ -56,13 +58,17 @@ export const create_visual_tests_ui = ({
         refresh_scenario_name_input()
     }
 
+    const html_level_setup_list = create_html_element("ul", "visual-tests__level-setup-list")
     const html_steps_list = create_html_element("ol", "visual-tests__steps-list")
 
     const step_recorder = create_step_recorder({
         get_scenario,
         set_scenario,
         get_creatures: () => game_state.creatures,
-        on_steps_changed: () => refresh_steps_list(),
+        on_scenario_changed: () => {
+            refresh_level_setup_list()
+            refresh_steps_list()
+        },
     })
     step_recorder.wrap_instruction_loop(instruction_loop)
 
@@ -112,8 +118,9 @@ export const create_visual_tests_ui = ({
     const html_saved_tests_title = create_field_group_title("Saved tests")
 
     const html_controls_title = create_field_group_title("Run")
+    const html_level_setup_title = create_field_group_title("Level setup")
     const html_result_title = create_field_group_title("Result")
-    const html_steps_title = create_field_group_title("Scenario steps")
+    const html_steps_title = create_field_group_title("Steps")
 
     const html_result = create_html_element("div", "visual-tests__result")
 
@@ -129,13 +136,23 @@ export const create_visual_tests_ui = ({
         on_expectation_added: () => refresh_steps_list(),
     })
 
+    const refresh_level_setup_list = () => {
+        html_level_setup_list.replaceChildren()
+        for (const creature of scenario.level_setup.creatures) {
+            const html_creature = create_html_element("li", "visual-tests__level-setup-item")
+            html_creature.textContent = `${creature.name} @ (${creature.position.x}, ${creature.position.y})`
+            html_level_setup_list.append(html_creature)
+        }
+    }
+
     const refresh_steps_list = () => {
         html_steps_list.replaceChildren()
-        const steps = step_recorder.is_battle_started()
-            ? scenario.steps
-            : step_recorder.get_display_steps()
+        if (!step_recorder.is_battle_started()) {
+            refresh_expectation_controls()
+            return
+        }
 
-        steps.forEach((step, index) => {
+        scenario.steps.forEach((step, index) => {
             const html_step = create_html_element("li", "visual-tests__step")
             html_step.textContent = `${index + 1}. ${step.type}`
             html_steps_list.append(html_step)
@@ -171,17 +188,22 @@ export const create_visual_tests_ui = ({
         return saved_path
     }
 
-    const load_scenario_by_path = async (path: string) => {
+    const apply_loaded_scenario = (loaded: ScenarioTest) => {
         cancel_creature_placement()
-        const loaded = await load_scenario_test_by_path(path)
         set_scenario(loaded)
         html_name_input.value = loaded.name
         scenario_test_tree.set_selected_path(loaded.name)
-        step_recorder.mark_loaded_scenario_as_recording()
-        html_start_battle_button.disabled = step_recorder.is_battle_started()
+        apply_scenario_level_setup_to_game({scenario: loaded, add_creature_to_game})
+        step_recorder.mark_loaded_scenario()
+        html_start_battle_button.disabled = false
         scenario_dirty_state.mark_clean(loaded)
+        refresh_level_setup_list()
         refresh_steps_list()
-        set_result(`Loaded ${path}.`, true)
+    }
+
+    const load_scenario_by_path = async (path: string) => {
+        const loaded = await load_scenario_test_by_path(path)
+        schedule_visual_test_reload(loaded)
     }
 
     const handle_test_tree_click = async (path: string) => {
@@ -210,12 +232,13 @@ export const create_visual_tests_ui = ({
     }
 
     html_clear_button.addEventListener("click", () => {
-        cancel_creature_placement()
-        step_recorder.reset()
-        set_scenario(create_empty_scenario({name: scenario.name, battle_grid_size: scenario.battle_grid_size}))
-        html_start_battle_button.disabled = false
-        refresh_steps_list()
-        set_result("")
+        schedule_visual_test_reload(create_empty_scenario({
+            name: scenario.name,
+            level_setup: {
+                battle_grid_size: scenario.level_setup.battle_grid_size,
+                creatures: [],
+            },
+        }))
     })
 
     html_start_battle_button.addEventListener("click", () => {
@@ -223,12 +246,13 @@ export const create_visual_tests_ui = ({
         step_recorder.begin_recording_at_battle_start()
         start_battle()
         html_start_battle_button.disabled = true
+        refresh_steps_list()
     })
 
     html_run_button.addEventListener("click", async () => {
         set_result("Running...")
         const runner = create_scenario_runner()
-        const result = await runner.run({scenario})
+        const result = await runner.run({scenario: get_current_scenario()})
         if (result.passed) {
             set_result("Scenario passed.", true)
             return
@@ -239,7 +263,7 @@ export const create_visual_tests_ui = ({
 
     html_replay_button.addEventListener("click", () => {
         sessionStorage.setItem(REPLAY_STORAGE_KEY, JSON.stringify({
-            scenario,
+            scenario: get_current_scenario(),
             step_delay_ms: REPLAY_STEP_DELAY_MS,
         }))
         window.location.reload()
@@ -278,6 +302,8 @@ export const create_visual_tests_ui = ({
         html_save_button,
         html_saved_tests_title,
         scenario_test_tree.html_tree,
+        html_level_setup_title,
+        html_level_setup_list,
         html_expectations,
         html_result_title,
         html_result,
@@ -285,7 +311,15 @@ export const create_visual_tests_ui = ({
         html_steps_list,
     )
 
-    refresh_steps_list()
+    const scheduled_scenario = read_scheduled_visual_test_reload()
+    if (scheduled_scenario) {
+        apply_loaded_scenario(scheduled_scenario)
+        set_result(`Loaded ${scheduled_scenario.name}.`, true)
+    } else {
+        refresh_level_setup_list()
+        refresh_steps_list()
+    }
+
     void refresh_saved_scenarios_list()
 
     return {
@@ -300,8 +334,8 @@ export const create_visual_tests_ui = ({
                 scenario: ScenarioTest
                 step_delay_ms: number
             }
-            set_scenario(replay_scenario)
-            step_recorder.mark_loaded_scenario_as_recording()
+            apply_loaded_scenario(replay_scenario)
+            step_recorder.begin_recording_at_battle_start()
             html_start_battle_button.disabled = true
             refresh_steps_list()
             set_result("Replaying...")

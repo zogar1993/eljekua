@@ -4,8 +4,6 @@ import type {Size} from "core/battlegrid/creatures/SIZES";
 import type {PowerSetName} from "scenario_test/resolve_creature_setup";
 
 export const SCENARIO_STEP_TYPE = {
-    ADD_CREATURE: "add_creature",
-    START_BATTLE: "start_battle",
     SET_TURN: "set_turn",
     INTERACTION: "interaction",
     EXPECT: "expect",
@@ -46,6 +44,11 @@ export type ScenarioCreatureSetup = {
     archetypes?: Array<string>
 }
 
+export type ScenarioLevelSetup = {
+    battle_grid_size: { x: number, y: number }
+    creatures: Array<ScenarioCreatureSetup>
+}
+
 export type ScenarioSerializableInteractionSelection =
     ScenarioInteractionSelectOption
     | ScenarioInteractionSelectPath
@@ -82,15 +85,6 @@ export type ScenarioInteractionSelectArea = {
 export type ScenarioInteractionSelectHitStatus = {
     type: "select_hit_status"
     attack_rolls: Array<{ creature_name: string, hit_status: ScenarioHitStatusName }>
-}
-
-export type ScenarioStepAddCreature = {
-    type: typeof SCENARIO_STEP_TYPE.ADD_CREATURE
-    creature: ScenarioCreatureSetup
-}
-
-export type ScenarioStepStartBattle = {
-    type: typeof SCENARIO_STEP_TYPE.START_BATTLE
 }
 
 export type ScenarioStepSetTurn = {
@@ -139,15 +133,13 @@ export type ScenarioStepExpect = {
 }
 
 export type ScenarioStep =
-    ScenarioStepAddCreature
-    | ScenarioStepStartBattle
-    | ScenarioStepSetTurn
+    ScenarioStepSetTurn
     | ScenarioStepInteraction
     | ScenarioStepExpect
 
 export type ScenarioTest = {
     name: string
-    battle_grid_size: { x: number, y: number }
+    level_setup: ScenarioLevelSetup
     steps: Array<ScenarioStep>
 }
 
@@ -167,14 +159,19 @@ export type AttackLogEntry = {
     power_name: string
 }
 
+export const create_empty_level_setup = (): ScenarioLevelSetup => ({
+    battle_grid_size: {x: 10, y: 10},
+    creatures: [],
+})
+
 export const create_empty_scenario = ({
                                           name = "untitled_scenario",
-                                          battle_grid_size = {x: 10, y: 10},
+                                          level_setup = create_empty_level_setup(),
                                       }: {
     name?: string
-    battle_grid_size?: { x: number, y: number }
+    level_setup?: ScenarioLevelSetup
 } = {}): ScenarioTest => ({
     name,
-    battle_grid_size,
+    level_setup,
     steps: [],
 })
