@@ -149,6 +149,41 @@
     justify-content: flex-end;
 }
 
+.visual-tests__image-picker {
+    display: flex;
+    gap: 8px;
+}
+
+.visual-tests__image-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border: 2px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+}
+
+.visual-tests__image-option--selected {
+    border-color: #155724;
+    background: #d4edda;
+}
+
+.visual-tests__image-option-preview {
+    display: block;
+    width: 40px;
+    height: 40px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.visual-tests__image-option-label {
+    font-size: 11px;
+    color: #333;
+}
+
 .visual-tests__level-setup-list {
     max-height: 160px;
     overflow: auto;

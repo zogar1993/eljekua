@@ -58,9 +58,11 @@
     flex: 1;
     min-width: 0;
     aspect-ratio: 1;
+    background-color: transparent;
     background-image: var(--creature__image);
     background-repeat: no-repeat;
-    background-size: 100% 100%;
+    background-position: center;
+    background-size: contain;
 }
 
 .creature__action-dots {

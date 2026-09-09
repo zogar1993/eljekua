@@ -6,6 +6,7 @@ import {FIGHTER_POWERS} from "data/powers/fighter";
 import {ROGUE_POWERS} from "data/powers/rogue";
 import {WIZARD_POWERS} from "data/powers/wizard";
 import type {ScenarioCreatureSetup} from "scenario_test/ScenarioTest";
+import {VISUAL_TEST_CREATURE_IMAGE_OPTIONS} from "web/visual_tests/visual_test_creature_images";
 
 export const POWER_SET = {
     BASIC: "basic",
@@ -32,7 +33,7 @@ export const resolve_creature_setup = (creature: ScenarioCreatureSetup): Creatur
         template: creature.template ?? null,
         position: creature.position,
         size: creature.size ?? "medium",
-        image: creature.image ?? `url("/public/saber-and-pistol.svg")`,
+        image: creature.image ?? VISUAL_TEST_CREATURE_IMAGE_OPTIONS[0].image,
         movement: creature.movement ?? 5,
         hp_current: creature.hp_current ?? 10,
         hp_max: creature.hp_max ?? 10,

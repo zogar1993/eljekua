@@ -9,6 +9,7 @@ import {
 } from "web/battle_grid/coordinates/ClickableCoordinate";
 import {SQUARE_HIGHLIGHT} from "web/battle_grid/squares/SquareHighlight";
 import type {SquareVisual} from "web/battle_grid/squares/SquareVisual";
+import {VISUAL_TEST_CREATURE_IMAGE_OPTIONS} from "web/visual_tests/visual_test_creature_images";
 import {create_field_group_title, create_labeled_field} from "web/visual_tests/create_labeled_field";
 import {create_html_element} from "web/utils/create_html_element";
 
@@ -43,6 +44,41 @@ export const create_creature_setup_form = ({
         option.selected = power_set === POWER_SET.BASIC
         html_power_sets.append(option)
     }
+
+    let selected_image = VISUAL_TEST_CREATURE_IMAGE_OPTIONS[0].image
+    const html_image_picker = create_html_element("div", "visual-tests__image-picker")
+
+    const refresh_image_picker = () => {
+        html_image_picker.querySelectorAll(".visual-tests__image-option").forEach(element => {
+            element.classList.toggle(
+                "visual-tests__image-option--selected",
+                element instanceof HTMLElement && element.dataset["image"] === selected_image,
+            )
+        })
+    }
+
+    for (const option of VISUAL_TEST_CREATURE_IMAGE_OPTIONS) {
+        const html_option = document.createElement("button")
+        html_option.type = "button"
+        html_option.className = "visual-tests__image-option"
+        html_option.dataset["image"] = option.image
+        html_option.title = option.label
+
+        const html_preview = create_html_element("span", "visual-tests__image-option-preview")
+        html_preview.style.backgroundImage = option.image
+
+        const html_label = create_html_element("span", "visual-tests__image-option-label")
+        html_label.textContent = option.label
+
+        html_option.append(html_preview, html_label)
+        html_option.addEventListener("click", () => {
+            selected_image = option.image
+            refresh_image_picker()
+        })
+        html_image_picker.append(html_option)
+    }
+
+    refresh_image_picker()
 
     const html_placement_hint = create_html_element("div", "visual-tests__placement-hint")
     html_placement_hint.textContent = "Click a grid square to place the creature."
@@ -86,6 +122,7 @@ export const create_creature_setup_form = ({
             name: html_name.value.trim(),
             team: html_team.value.trim() === "" ? null : Number(html_team.value),
             position,
+            image: selected_image,
             power_sets: selected_power_sets.length > 0 ? selected_power_sets : [POWER_SET.BASIC],
         }
     }
@@ -150,6 +187,8 @@ export const create_creature_setup_form = ({
     html_form.append(
         create_labeled_field({label: "Creature name", control: html_name}),
         create_labeled_field({label: "Team (empty = neutral)", control: html_team}),
+        create_field_group_title("Sprite"),
+        html_image_picker,
         create_labeled_field({label: "Power sets", control: html_power_sets}),
         html_placement_hint,
         html_add_button,
