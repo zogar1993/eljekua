@@ -8,9 +8,10 @@ import {create_creature_setup_form} from "web/visual_tests/create_creature_setup
 import {create_expectation_editor} from "web/visual_tests/create_expectation_editor";
 import {create_field_group_title, create_labeled_field} from "web/visual_tests/create_labeled_field";
 import {create_step_recorder} from "web/visual_tests/create_step_recorder";
+import {create_scenario_test_tree} from "web/visual_tests/create_scenario_test_tree";
 import {
     list_scenario_tests,
-    load_scenario_test_by_name,
+    load_scenario_test_by_path,
     save_scenario_test,
 } from "web/visual_tests/scenario_test_api";
 import type {BattleGridVisual} from "web/battle_grid/BattleGridVisual";
@@ -66,11 +67,17 @@ export const create_visual_tests_ui = ({
 
     const html_name_input = create_html_element("input", "visual-tests__input") as HTMLInputElement
     html_name_input.value = scenario.name
-    html_name_input.addEventListener("change", () => {
-        set_scenario({...scenario, name: html_name_input.value.trim() || "untitled_scenario"})
+    const sync_scenario_name_from_input = () => {
+        const name = html_name_input.value.trim() || "untitled_scenario"
+        set_scenario({...scenario, name})
+        return name
+    }
+
+    html_name_input.addEventListener("input", () => {
+        sync_scenario_name_from_input()
     })
     const html_scenario_name_field = create_labeled_field({
-        label: "Scenario name",
+        label: "Test path",
         control: html_name_input,
     })
 
@@ -88,12 +95,17 @@ export const create_visual_tests_ui = ({
     const html_replay_button = create_button("visual-tests__button", "Visual replay")
     const html_save_button = create_button("visual-tests__button", "Save test")
 
-    const html_load_select = create_html_element("select", "visual-tests__select") as HTMLSelectElement
-    const html_load_button = create_button("visual-tests__button", "Load test")
-    const html_load_field = create_labeled_field({
-        label: "Saved tests",
-        control: html_load_select,
+    html_name_input.placeholder = "folder/test_name"
+
+    const scenario_test_tree = create_scenario_test_tree({
+        on_select: (path) => {
+            html_name_input.value = path
+            set_scenario({...scenario, name: path})
+        },
     })
+
+    const html_load_button = create_button("visual-tests__button", "Load test")
+    const html_saved_tests_title = create_field_group_title("Saved tests")
 
     const html_controls_title = create_field_group_title("Run")
     const html_result_title = create_field_group_title("Result")
@@ -128,22 +140,11 @@ export const create_visual_tests_ui = ({
     }
 
     const refresh_saved_scenarios_list = async () => {
-        html_load_select.replaceChildren()
-        const placeholder = document.createElement("option")
-        placeholder.value = ""
-        placeholder.textContent = "Select saved test"
-        html_load_select.append(placeholder)
-
         try {
-            const scenarios = await list_scenario_tests()
-            for (const name of scenarios) {
-                const option = document.createElement("option")
-                option.value = name
-                option.textContent = name
-                html_load_select.append(option)
-            }
+            const paths = await list_scenario_tests()
+            await scenario_test_tree.refresh(paths)
         } catch {
-            placeholder.textContent = "Scenario server unavailable"
+            scenario_test_tree.show_error("Scenario server unavailable")
         }
     }
 
@@ -192,11 +193,13 @@ export const create_visual_tests_ui = ({
     html_save_button.addEventListener("click", async () => {
         set_result("Saving...")
         try {
-            const saved = await save_scenario_test(scenario)
-            const saved_name = saved.replace(/\.json$/, "")
-            set_scenario({...scenario, name: saved_name})
+            const scenario_to_save = {...scenario, name: sync_scenario_name_from_input()}
+            const saved = await save_scenario_test(scenario_to_save)
+            const saved_path = saved.replace(/\.json$/, "").replace(/\\/g, "/")
+            set_scenario({...scenario_to_save, name: saved_path})
+            html_name_input.value = saved_path
             await refresh_saved_scenarios_list()
-            html_load_select.value = saved_name
+            scenario_test_tree.set_selected_path(saved_path)
             set_result(`Saved to src_tests/scenarios/${saved}.`, true)
         } catch (error) {
             set_result(error instanceof Error ? error.message : String(error), false)
@@ -204,20 +207,22 @@ export const create_visual_tests_ui = ({
     })
 
     html_load_button.addEventListener("click", async () => {
-        const name = html_load_select.value
-        if (!name) {
+        const path = scenario_test_tree.get_selected_path()
+        if (!path) {
             set_result("Select a saved test to load.", false)
             return
         }
 
         set_result("Loading...")
         try {
-            const loaded = await load_scenario_test_by_name(name)
+            const loaded = await load_scenario_test_by_path(path)
             set_scenario(loaded)
+            html_name_input.value = loaded.name
+            scenario_test_tree.set_selected_path(loaded.name)
             step_recorder.mark_loaded_scenario_as_recording()
             html_start_battle_button.disabled = step_recorder.is_battle_started()
             refresh_steps_list()
-            set_result(`Loaded ${name}.`, true)
+            set_result(`Loaded ${path}.`, true)
         } catch (error) {
             set_result(error instanceof Error ? error.message : String(error), false)
         }
@@ -244,7 +249,8 @@ export const create_visual_tests_ui = ({
         html_run_button,
         html_replay_button,
         html_save_button,
-        html_load_field,
+        html_saved_tests_title,
+        scenario_test_tree.html_tree,
         html_load_button,
         html_expectations,
         html_result_title,

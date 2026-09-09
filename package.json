@@ -12,7 +12,7 @@
     "build:scenario-test-server": "esbuild src_tests/scenario_test_server.ts --bundle --platform=node --packages=external --outfile=dist/scenario-test-server.js --format=esm --sourcemap --tsconfig=src_tests/tsconfig.json",
     "watch:scenario-test-server": "esbuild src_tests/scenario_test_server.ts --bundle --platform=node --packages=external --outfile=dist/scenario-test-server.js --format=esm --sourcemap --watch --tsconfig=src_tests/tsconfig.json",
     "dev:visual-tests": "pnpm build:scenario-test-server && concurrently -k \"pnpm:watch:visual-tests\" \"pnpm:watch:scenario-test-server\" \"pnpm:scenario-test-server\"",
-    "scenario-test-server": "node dist/scenario-test-server.js"
+    "scenario-test-server": "node --watch dist/scenario-test-server.js"
   },
   "devDependencies": {
     "@types/jest": "30.0.0",

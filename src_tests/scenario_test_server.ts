@@ -4,6 +4,7 @@ import http from "node:http"
 import path from "node:path"
 import {fileURLToPath} from "node:url"
 import type {IncomingMessage, ServerResponse} from "node:http"
+import {decode_scenario_path_from_url, scenario_path_to_relative_file} from "scenario_test/sanitize_scenario_path"
 
 const PORT = 3456
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
@@ -16,17 +17,13 @@ const CONTENT_TYPES: Record<string, string> = {
     ".json": "application/json",
 }
 
-const sanitize_scenario_filename = (name: string) => {
-    const sanitized = name.trim().toLowerCase().replace(/[^a-z0-9_-]+/g, "_").replace(/^_|_$/g, "")
-    return sanitized.length > 0 ? sanitized : "untitled_scenario"
-}
-
-const get_scenario_path = (name: string) => {
-    const filename = `${sanitize_scenario_filename(name)}.json`
-    const file_path = path.join(SCENARIOS_DIR, filename)
-    if (!file_path.startsWith(SCENARIOS_DIR))
+const get_scenario_file_path = (scenario_path: string) => {
+    const relative_file = scenario_path_to_relative_file(scenario_path)
+    const file_path = path.join(SCENARIOS_DIR, relative_file)
+    const resolved = path.resolve(file_path)
+    if (!resolved.startsWith(path.resolve(SCENARIOS_DIR)))
         throw Error("invalid scenario path")
-    return file_path
+    return resolved
 }
 
 const get_static_file_path = (url_path: string) => {
@@ -64,13 +61,32 @@ const send_static_file = async (response: ServerResponse, url_path: string) => {
     response.end(contents)
 }
 
-const list_scenarios = async () => {
+const list_scenarios = async ({
+                                  directory = SCENARIOS_DIR,
+                                  path_prefix = "",
+                              }: {
+    directory?: string
+    path_prefix?: string
+} = {}): Promise<Array<string>> => {
     await fs.mkdir(SCENARIOS_DIR, {recursive: true})
-    const entries = await fs.readdir(SCENARIOS_DIR)
-    return entries
-        .filter(entry => entry.endsWith(".json"))
-        .map(entry => entry.slice(0, -".json".length))
-        .sort()
+    const entries = await fs.readdir(directory, {withFileTypes: true})
+    const scenarios: Array<string> = []
+
+    for (const entry of entries) {
+        const entry_path = path.join(directory, entry.name)
+        if (entry.isDirectory()) {
+            const nested_prefix = path_prefix ? `${path_prefix}/${entry.name}` : entry.name
+            scenarios.push(...await list_scenarios({directory: entry_path, path_prefix: nested_prefix}))
+            continue
+        }
+
+        if (entry.isFile() && entry.name.endsWith(".json")) {
+            const scenario_name = entry.name.slice(0, -".json".length)
+            scenarios.push(path_prefix ? `${path_prefix}/${scenario_name}` : scenario_name)
+        }
+    }
+
+    return scenarios.sort()
 }
 
 const open_visual_tests = () => {
@@ -89,12 +105,12 @@ const server = http.createServer(async (request, response) => {
             return
         }
 
-        const scenario_match = url.pathname.match(/^\/api\/scenarios\/([^/]+)$/)
+        const scenario_match = url.pathname.match(/^\/api\/scenarios\/(.+)$/)
         if (scenario_match) {
-            const scenario_name = decodeURIComponent(scenario_match[1])
+            const scenario_path = decode_scenario_path_from_url(scenario_match[1])
 
             if (request.method === "GET") {
-                const file_path = get_scenario_path(scenario_name)
+                const file_path = get_scenario_file_path(scenario_path)
                 const contents = await fs.readFile(file_path, "utf8")
                 response.writeHead(200, {"Content-Type": "application/json"})
                 response.end(contents)
@@ -104,10 +120,10 @@ const server = http.createServer(async (request, response) => {
             if (request.method === "PUT") {
                 const body = await read_body(request)
                 const parsed = JSON.parse(body)
-                const file_path = get_scenario_path(scenario_name)
-                await fs.mkdir(SCENARIOS_DIR, {recursive: true})
+                const file_path = get_scenario_file_path(scenario_path)
+                await fs.mkdir(path.dirname(file_path), {recursive: true})
                 await fs.writeFile(file_path, `${JSON.stringify(parsed, null, 2)}\n`, "utf8")
-                send_json(response, 200, {saved: path.basename(file_path)})
+                send_json(response, 200, {saved: path.relative(SCENARIOS_DIR, file_path)})
                 return
             }
         }

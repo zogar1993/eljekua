@@ -1,12 +1,8 @@
 import {parse_scenario_test_json, serialize_scenario_test_json} from "scenario_test/load_scenario_test";
+import {sanitize_scenario_path, encode_scenario_path_for_url} from "scenario_test/sanitize_scenario_path";
 import type {ScenarioTest} from "scenario_test/ScenarioTest";
 
 export const SCENARIO_TEST_API_BASE = ""
-
-export const sanitize_scenario_filename = (name: string) => {
-    const sanitized = name.trim().toLowerCase().replace(/[^a-z0-9_-]+/g, "_").replace(/^_|_$/g, "")
-    return sanitized.length > 0 ? sanitized : "untitled_scenario"
-}
 
 export const list_scenario_tests = async (): Promise<Array<string>> => {
     const response = await fetch(`${SCENARIO_TEST_API_BASE}/api/scenarios`)
@@ -16,19 +12,20 @@ export const list_scenario_tests = async (): Promise<Array<string>> => {
     return body.scenarios
 }
 
-export const load_scenario_test_by_name = async (name: string): Promise<ScenarioTest> => {
-    const response = await fetch(`${SCENARIO_TEST_API_BASE}/api/scenarios/${encodeURIComponent(name)}`)
+export const load_scenario_test_by_path = async (path: string): Promise<ScenarioTest> => {
+    const scenario_path = sanitize_scenario_path(path)
+    const response = await fetch(`${SCENARIO_TEST_API_BASE}/api/scenarios/${encode_scenario_path_for_url(path)}`)
     if (!response.ok)
-        throw Error(`failed to load scenario "${name}" (${response.status})`)
+        throw Error(`failed to load scenario "${scenario_path}" (${response.status})`)
     return parse_scenario_test_json(await response.text())
 }
 
 export const save_scenario_test = async (scenario: ScenarioTest): Promise<string> => {
-    const filename = sanitize_scenario_filename(scenario.name)
-    const response = await fetch(`${SCENARIO_TEST_API_BASE}/api/scenarios/${encodeURIComponent(filename)}`, {
+    const scenario_path = sanitize_scenario_path(scenario.name)
+    const response = await fetch(`${SCENARIO_TEST_API_BASE}/api/scenarios/${encode_scenario_path_for_url(scenario_path)}`, {
         method: "PUT",
         headers: {"Content-Type": "application/json"},
-        body: serialize_scenario_test_json({...scenario, name: filename}),
+        body: serialize_scenario_test_json({...scenario, name: scenario_path}),
     })
     if (!response.ok)
         throw Error(`failed to save scenario (${response.status})`)

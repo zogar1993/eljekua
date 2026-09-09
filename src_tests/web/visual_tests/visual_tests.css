@@ -65,6 +65,56 @@
     color: #555;
 }
 
+.visual-tests__test-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 200px;
+    overflow: auto;
+    border: 1px solid #ccc;
+    background: #fff;
+    padding: 4px;
+}
+
+.visual-tests__test-tree-empty {
+    font-size: 12px;
+    color: #666;
+    padding: 4px;
+}
+
+.visual-tests__test-tree-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.visual-tests__test-tree-folder-toggle,
+.visual-tests__test-tree-item {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    background: transparent;
+    text-align: left;
+    font: inherit;
+    padding: 2px 4px;
+    cursor: pointer;
+}
+
+.visual-tests__test-tree-folder-toggle {
+    font-weight: 600;
+    color: #333;
+}
+
+.visual-tests__test-tree-item:hover,
+.visual-tests__test-tree-folder-toggle:hover {
+    background: #eee;
+}
+
+.visual-tests__test-tree-item--selected {
+    background: #d4edda;
+}
+
 .visual-tests__steps-list {
     max-height: 240px;
     overflow: auto;
