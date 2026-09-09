@@ -115,6 +115,40 @@
     background: #d4edda;
 }
 
+.visual-tests__dialog-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1000;
+}
+
+.visual-tests__dialog {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 280px;
+    max-width: 360px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.visual-tests__dialog-message {
+    margin: 0;
+    font-size: 14px;
+    color: #222;
+}
+
+.visual-tests__dialog-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
 .visual-tests__steps-list {
     max-height: 240px;
     overflow: auto;

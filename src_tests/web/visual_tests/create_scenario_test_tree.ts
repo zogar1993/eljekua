@@ -2,9 +2,9 @@ import {build_scenario_test_tree, type ScenarioTestTreeNode} from "web/visual_te
 import {create_html_element} from "web/utils/create_html_element";
 
 export const create_scenario_test_tree = ({
-                                              on_select,
+                                              on_test_click,
                                           }: {
-    on_select: (path: string) => void
+    on_test_click: (path: string) => void
 }) => {
     let selected_path = ""
     const expanded_paths = new Set<string>()
@@ -69,8 +69,7 @@ export const create_scenario_test_tree = ({
             html_item.dataset["path"] = node.path
             html_item.textContent = node.name
             html_item.addEventListener("click", () => {
-                set_selected_path(node.path)
-                on_select(node.path)
+                on_test_click(node.path)
             })
 
             html_list.append(html_item)
