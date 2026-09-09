@@ -13,6 +13,8 @@ import {
     load_scenario_test_by_name,
     save_scenario_test,
 } from "web/visual_tests/scenario_test_api";
+import type {BattleGridVisual} from "web/battle_grid/BattleGridVisual";
+import type {SquareVisual} from "web/battle_grid/squares/SquareVisual";
 import {create_html_element} from "web/utils/create_html_element";
 import type {ScenarioGame} from "scenario_test/create_scenario_game";
 
@@ -26,6 +28,8 @@ export const create_visual_tests_ui = ({
                                            add_creature_to_game,
                                            start_battle,
                                            set_current_turn_to_creature,
+                                           click_overlay,
+                                           board,
                                        }: {
     game_events: GameEvents
     game_state: GameState
@@ -33,6 +37,8 @@ export const create_visual_tests_ui = ({
     add_creature_to_game: ScenarioGame["add_creature_to_game"]
     start_battle: ScenarioGame["start_battle"]
     set_current_turn_to_creature: ScenarioGame["set_current_turn_to_creature"]
+    click_overlay: BattleGridVisual
+    board: Array<Array<SquareVisual>>
 }) => {
     let scenario = create_empty_scenario()
 
@@ -148,6 +154,7 @@ export const create_visual_tests_ui = ({
     }
 
     html_clear_button.addEventListener("click", () => {
+        cancel_creature_placement()
         step_recorder.reset()
         set_scenario(create_empty_scenario({name: scenario.name, battle_grid_size: scenario.battle_grid_size}))
         html_start_battle_button.disabled = false
@@ -156,6 +163,7 @@ export const create_visual_tests_ui = ({
     })
 
     html_start_battle_button.addEventListener("click", () => {
+        cancel_creature_placement()
         step_recorder.begin_recording_at_battle_start()
         start_battle()
         html_start_battle_button.disabled = true
@@ -215,7 +223,11 @@ export const create_visual_tests_ui = ({
         }
     })
 
-    const {html_form: html_creature_form} = create_creature_setup_form({
+    const {html_form: html_creature_form, cancel_placement: cancel_creature_placement} = create_creature_setup_form({
+        click_overlay,
+        board,
+        game_state,
+        can_place_creature: () => !step_recorder.is_battle_started(),
         on_add_creature: (creature_setup) => {
             add_creature_to_game({data: resolve_creature_setup(creature_setup)})
             step_recorder.record_add_creature(creature_setup)

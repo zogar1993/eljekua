@@ -20,7 +20,7 @@ game_state.settings.attack_roll_resolution_is_random = false
 const evaluate_ast = build_evaluate_ast({game_state})
 const instruction_loop = create_instruction_loop({game_state, evaluate_ast, game_events})
 
-initialize_battle_grid_ui({game_state, game_events, game_input: instruction_loop})
+const battle_grid_ui = initialize_battle_grid_ui({game_state, game_events, game_input: instruction_loop})
 create_option_buttons_ui({game_events, game_input: instruction_loop})
 create_hit_status_buttons_ui({game_events, game_inputs: instruction_loop})
 create_initiative_order_ui({game_events})
@@ -38,6 +38,8 @@ const visual_tests = create_visual_tests_ui({
     add_creature_to_game,
     start_battle,
     set_current_turn_to_creature,
+    click_overlay: battle_grid_ui.click_overlay,
+    board: battle_grid_ui.board,
 })
 
 ;(window as any).set_current_turn = (name: string) => {
