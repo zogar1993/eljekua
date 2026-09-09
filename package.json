@@ -6,10 +6,17 @@
     "build": "esbuild src/main.ts --bundle --outfile=dist/bundle.js --format=esm --sourcemap",
     "watch": "esbuild src/main.ts --bundle --outfile=dist/bundle.js --format=esm --sourcemap --watch",
     "dev": "concurrently -k \"pnpm:watch\" \"pnpm:start\"",
-    "start": "live-server --open=./index.html --watch=./"
+    "start": "live-server --open=./index.html --watch=./",
+    "build:visual-tests": "esbuild src_tests/visual_tests_main.ts --bundle --outfile=dist/visual-tests-bundle.js --format=esm --sourcemap --tsconfig=src_tests/tsconfig.json",
+    "watch:visual-tests": "esbuild src_tests/visual_tests_main.ts --bundle --outfile=dist/visual-tests-bundle.js --format=esm --sourcemap --watch --tsconfig=src_tests/tsconfig.json",
+    "build:scenario-test-server": "esbuild src_tests/scenario_test_server.ts --bundle --platform=node --packages=external --outfile=dist/scenario-test-server.js --format=esm --sourcemap --tsconfig=src_tests/tsconfig.json",
+    "watch:scenario-test-server": "esbuild src_tests/scenario_test_server.ts --bundle --platform=node --packages=external --outfile=dist/scenario-test-server.js --format=esm --sourcemap --watch --tsconfig=src_tests/tsconfig.json",
+    "dev:visual-tests": "pnpm build:scenario-test-server && concurrently -k \"pnpm:watch:visual-tests\" \"pnpm:watch:scenario-test-server\" \"pnpm:scenario-test-server\"",
+    "scenario-test-server": "node dist/scenario-test-server.js"
   },
   "devDependencies": {
     "@types/jest": "30.0.0",
+    "@types/node": "22.15.3",
     "concurrently": "9.1.2",
     "cypress": "15.1.0",
     "esbuild": "0.25.3",

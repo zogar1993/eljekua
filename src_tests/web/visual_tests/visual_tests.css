@@ -1,0 +1,96 @@
+.visual-tests {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 280px;
+    max-width: 360px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    background: #fafafa;
+    font-family: sans-serif;
+    font-size: 14px;
+}
+
+.visual-tests__header {
+    font-weight: bold;
+}
+
+.visual-tests__field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.visual-tests__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+}
+
+.visual-tests__field-group-title {
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #222;
+}
+
+.visual-tests__input,
+.visual-tests__select {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.visual-tests__setup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.visual-tests__expectations {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.visual-tests__button {
+    cursor: pointer;
+}
+
+.visual-tests__button--active {
+    background: #d4edda;
+}
+
+.visual-tests__steps-list {
+    max-height: 240px;
+    overflow: auto;
+    padding-left: 20px;
+}
+
+.visual-tests__step--active {
+    font-weight: bold;
+    background: #fff3cd;
+}
+
+.visual-tests__result--passed {
+    color: #155724;
+}
+
+.visual-tests__result--failed {
+    color: #721c24;
+}
+
+.visual-tests-layout {
+    display: flex;
+    gap: 8px;
+}
+
+.visual-tests-layout__game {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.visual-tests-layout__game-row {
+    display: flex;
+    gap: 8px;
+}
