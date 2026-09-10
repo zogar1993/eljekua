@@ -31,10 +31,6 @@ export const create_modal = ({
     }
 
     html_close_button.addEventListener("click", close)
-    html_overlay.addEventListener("click", (event) => {
-        if (event.target === html_overlay)
-            close()
-    })
 
     html_header.append(html_title, html_close_button)
 
