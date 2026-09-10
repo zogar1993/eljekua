@@ -59,7 +59,10 @@ export const open_creature_editor_modal = ({
     create_modal({
         title,
         html_body: html_layout,
-        on_close,
+        on_close: () => {
+            notify_creature_changed()
+            on_close?.()
+        },
     })
 
     return {refresh_power_options: creature_form.refresh_power_options}

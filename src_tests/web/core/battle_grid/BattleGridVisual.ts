@@ -1,4 +1,4 @@
-import {assert_coordinates_are_equal, ClickableCoordinate} from "web/core/battle_grid/coordinates/ClickableCoordinate";
+import type {ClickableCoordinate} from "web/core/battle_grid/coordinates/ClickableCoordinate";
 import {coordinates_equal} from "web/core/battle_grid/coordinates/ClickableCoordinate";
 
 export const create_battle_grid_visual = ({width, height}: { width: number, height: number }): BattleGridVisual => {
@@ -26,12 +26,8 @@ export const create_battle_grid_visual = ({width, height}: { width: number, heig
     const onMouseMoveHandlers: Array<(coordinate: ClickableCoordinate | null) => void> = []
     const onClickHandlers: Array<(coordinate: ClickableCoordinate) => void> = []
 
-    html_board.addEventListener('click', (e: MouseEvent) => {
+    html_board.addEventListener("click", (e: MouseEvent) => {
         const coordinate = get_click_coordinate_from_mouse_event(e)
-
-        if (latest_coordinate === null) return
-        assert_coordinates_are_equal(coordinate, latest_coordinate)
-
         onClickHandlers.forEach(handler => handler(coordinate))
     });
 

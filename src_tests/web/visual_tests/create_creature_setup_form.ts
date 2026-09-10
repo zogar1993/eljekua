@@ -1,6 +1,7 @@
 import type {PositionFootprintOne} from "core/battlegrid/Position";
 import type {GameState} from "core/game_state/GameState";
 import type {IRPower} from "core/types";
+import {validate_creature_setup_draft} from "scenario_test/resolve_creature_setup";
 import type {ScenarioCreatureSetup} from "scenario_test/ScenarioTest";
 import type {BattleGridVisual} from "web/core/battle_grid/BattleGridVisual";
 import {
@@ -26,6 +27,7 @@ export const create_creature_setup_form = ({
                                                game_state,
                                                can_place_creature,
                                                on_add_creature,
+                                               on_placement_error,
                                                get_available_powers,
                                            }: {
     click_overlay: BattleGridVisual
@@ -33,6 +35,7 @@ export const create_creature_setup_form = ({
     game_state: GameState
     can_place_creature: () => boolean
     on_add_creature: (creature: ScenarioCreatureSetup) => void
+    on_placement_error: (message: string) => void
     get_available_powers: () => Array<IRPower>
 }) => {
     const html_form = create_html_element("div", "content-editor content-editor__editor-root")
@@ -87,9 +90,23 @@ export const create_creature_setup_form = ({
         clear_board_highlights()
     }
 
+    const report_placement_error = (error: unknown) => {
+        on_placement_error(error instanceof Error ? error.message : String(error))
+    }
+
     const start_placement = (creature_draft: CreatureSetupDraft) => {
         if (!can_place_creature()) return
-        if (get_clickable_positions().length === 0) return
+        if (get_clickable_positions().length === 0) {
+            on_placement_error("No empty squares available on the battle grid.")
+            return
+        }
+
+        try {
+            validate_creature_setup_draft(creature_draft)
+        } catch (error) {
+            report_placement_error(error)
+            return
+        }
 
         pending_creature_draft = creature_draft
         placement_active = true
@@ -151,8 +168,12 @@ export const create_creature_setup_form = ({
         const position = get_position_by_coordinate({coordinate, positions: get_clickable_positions()}) as PositionFootprintOne | null
         if (position === null) return
 
-        on_add_creature({...pending_creature_draft, position})
-        cancel_placement()
+        try {
+            on_add_creature({...pending_creature_draft, position})
+            cancel_placement()
+        } catch (error) {
+            report_placement_error(error)
+        }
     })
 
     html_form.append(

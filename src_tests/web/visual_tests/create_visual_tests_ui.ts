@@ -215,6 +215,9 @@ export const create_visual_tests_ui = ({
             add_creature_to_game({data: resolve_creature_setup(creature_setup)})
             step_recorder.record_add_creature(creature_setup)
         },
+        on_placement_error: (message) => {
+            set_result(message, false)
+        },
     })
 
     const test_powers_panel = create_test_powers_panel({
