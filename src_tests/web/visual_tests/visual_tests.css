@@ -237,6 +237,91 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
+.visual-tests__modal {
+    width: min(96vw, 960px);
+    max-width: none;
+    max-height: 92vh;
+}
+
+.visual-tests__modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.visual-tests__modal-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.visual-tests__modal-close {
+    font-size: 20px;
+    line-height: 1;
+    padding: 0 6px;
+}
+
+.visual-tests__modal-body {
+    overflow: auto;
+    min-height: 0;
+}
+
+.visual-tests__modal-footer {
+    flex-shrink: 0;
+}
+
+.visual-tests__power-editor-modal {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+
+.visual-tests__power-editor-modal-json {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 0;
+}
+
+.visual-tests__power-json-preview {
+    width: 100%;
+    min-height: 240px;
+    box-sizing: border-box;
+    font-family: monospace;
+    font-size: 12px;
+    resize: vertical;
+}
+
+.visual-tests__power-form--modal {
+    max-height: 70vh;
+    overflow: auto;
+}
+
+.visual-tests__power-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+}
+
+.visual-tests__power-list-item-name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.visual-tests__power-list-item-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
 .visual-tests__dialog-message {
     margin: 0;
     font-size: 14px;

@@ -60,12 +60,20 @@ const is_trigger_action = (action: ActionType) =>
 export const create_power_form = ({
                                       power,
                                       on_remove,
+                                      variant = "inline",
                                   }: {
     power: IRPower
-    on_remove: () => void
+    on_remove?: () => void
+    variant?: "inline" | "modal"
 }) => {
-    const html_root = create_html_element("details", "visual-tests__power-form") as HTMLDetailsElement
-    html_root.open = true
+    const html_root = variant === "modal"
+        ? create_html_element("div", "visual-tests__power-form visual-tests__power-form--modal")
+        : create_html_element("details", "visual-tests__power-form") as HTMLDetailsElement
+
+    if (variant === "inline") {
+        const html_details = html_root as HTMLDetailsElement
+        html_details.open = true
+    }
 
     const html_summary = document.createElement("summary")
     html_summary.className = "visual-tests__power-form-summary"
@@ -156,7 +164,8 @@ export const create_power_form = ({
     html_remove_button.type = "button"
     html_remove_button.className = "visual-tests__button visual-tests__button--small"
     html_remove_button.textContent = "Remove power"
-    html_remove_button.addEventListener("click", on_remove)
+    if (on_remove)
+        html_remove_button.addEventListener("click", on_remove)
 
     const refresh_targeting_fields = () => {
         html_targeting_fields.replaceChildren()
@@ -208,7 +217,8 @@ export const create_power_form = ({
     }
 
     const refresh_summary = () => {
-        html_summary.textContent = read_text_value(html_name) || "Unnamed power"
+        if (variant === "inline")
+            html_summary.textContent = read_text_value(html_name) || "Unnamed power"
     }
 
     html_name.addEventListener("input", refresh_summary)
@@ -223,7 +233,7 @@ export const create_power_form = ({
     refresh_trigger_fields()
     refresh_roll_fields()
 
-    html_body.append(
+    const html_fields = [
         create_labeled_field({label: "Name", control: html_name}),
         create_labeled_field({label: "Description", control: html_description}),
         create_field_group_title("Type"),
@@ -238,10 +248,17 @@ export const create_power_form = ({
         create_field_group_title("Attack roll"),
         html_roll_fields,
         effect_editor.html_root,
-        html_remove_button,
-    )
+    ]
 
-    html_root.append(html_summary, html_body)
+    if (variant === "inline")
+        html_fields.push(html_remove_button)
+
+    html_body.append(...html_fields)
+
+    if (variant === "inline")
+        html_root.append(html_summary, html_body)
+    else
+        html_root.append(html_body)
 
     const parse_distance = (value: string): string | number => {
         const trimmed = value.trim()
