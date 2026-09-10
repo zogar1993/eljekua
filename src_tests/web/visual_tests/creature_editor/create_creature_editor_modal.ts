@@ -1,4 +1,9 @@
 import type {IRPower} from "core/types";
+import {
+    create_content_button,
+    CONTENT_EDITOR_BUTTON_SIZE,
+    CONTENT_EDITOR_BUTTON_VARIANT,
+} from "web/content_editor/create_content_button";
 import type {CreatureSetupDraft} from "web/visual_tests/creature_editor/creature_editor_defaults";
 import {create_creature_form} from "web/visual_tests/creature_editor/create_creature_form";
 import {create_modal} from "web/visual_tests/create_modal";
@@ -11,13 +16,13 @@ export const open_creature_editor_modal = ({
                                                creature,
                                                get_available_powers,
                                                on_creature_changed,
-                                               on_close,
+                                               on_place,
                                            }: {
     title: string
     creature: CreatureSetupDraft
     get_available_powers: () => Array<IRPower>
     on_creature_changed: (creature: CreatureSetupDraft) => void
-    on_close?: () => void
+    on_place: () => void
 }) => {
     const html_layout = create_html_element("div", "content-editor__split-layout")
 
@@ -56,13 +61,34 @@ export const open_creature_editor_modal = ({
 
     html_layout.append(creature_form.html_root, html_json_section)
 
-    create_modal({
+    const html_footer = create_html_element("div", "visual-tests__modal-footer")
+
+    const html_cancel_button = create_content_button({
+        text: "Cancel",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.SECONDARY,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+    })
+
+    const html_place_button = create_content_button({
+        text: "Place on grid",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.PRIMARY,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+    })
+
+    html_footer.append(html_cancel_button, html_place_button)
+
+    const {close} = create_modal({
         title,
         html_body: html_layout,
-        on_close: () => {
-            notify_creature_changed()
-            on_close?.()
-        },
+        html_footer,
+    })
+
+    html_cancel_button.addEventListener("click", close)
+
+    html_place_button.addEventListener("click", () => {
+        notify_creature_changed()
+        close()
+        on_place()
     })
 
     return {refresh_power_options: creature_form.refresh_power_options}

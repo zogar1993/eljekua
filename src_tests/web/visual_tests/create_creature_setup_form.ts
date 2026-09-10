@@ -80,7 +80,6 @@ export const create_creature_setup_form = ({
     }
 
     const cancel_placement = () => {
-        if (!placement_active) return
         placement_active = false
         pending_creature_draft = null
         latest_hovered_position = null
@@ -88,6 +87,8 @@ export const create_creature_setup_form = ({
         html_add_button.textContent = "Add creature"
         html_placement_hint.hidden = true
         clear_board_highlights()
+        click_overlay.reset_mouse_tracking()
+        click_overlay.refresh_mouse_handlers()
     }
 
     const report_placement_error = (error: unknown) => {
@@ -108,12 +109,17 @@ export const create_creature_setup_form = ({
             return
         }
 
+        cancel_placement()
+
         pending_creature_draft = creature_draft
         placement_active = true
+        latest_hovered_position = null
         html_add_button.classList.add("content-editor__button--active")
         html_add_button.textContent = "Cancel placement"
         html_placement_hint.hidden = false
         set_placement_highlights()
+        click_overlay.reset_mouse_tracking()
+        click_overlay.refresh_mouse_handlers()
     }
 
     const open_creature_modal = () => {
@@ -128,7 +134,7 @@ export const create_creature_setup_form = ({
             on_creature_changed: (creature) => {
                 creature_draft = creature
             },
-            on_close: () => {
+            on_place: () => {
                 start_placement(creature_draft)
             },
         })

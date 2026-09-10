@@ -32,8 +32,10 @@ export const create_battle_grid_visual = ({width, height}: { width: number, heig
     });
 
     let latest_coordinate: ClickableCoordinate | null = null
+    let last_mouse_event: MouseEvent | null = null
 
-    html_board.addEventListener('mousemove', (e: MouseEvent) => {
+    html_board.addEventListener("mousemove", (e: MouseEvent) => {
+        last_mouse_event = e
         const coordinate = get_click_coordinate_from_mouse_event(e)
         if (latest_coordinate === null || !coordinates_equal(coordinate, latest_coordinate)) {
             latest_coordinate = coordinate
@@ -41,10 +43,26 @@ export const create_battle_grid_visual = ({width, height}: { width: number, heig
         }
     });
 
-    html_board.addEventListener('mouseleave', () => {
+    html_board.addEventListener("mouseleave", () => {
+        last_mouse_event = null
         latest_coordinate = null
         onMouseMoveHandlers.forEach(handler => handler(null))
     })
+
+    const reset_mouse_tracking = () => {
+        latest_coordinate = null
+    }
+
+    const refresh_mouse_handlers = () => {
+        if (last_mouse_event === null) {
+            onMouseMoveHandlers.forEach(handler => handler(null))
+            return
+        }
+
+        const coordinate = get_click_coordinate_from_mouse_event(last_mouse_event)
+        latest_coordinate = coordinate
+        onMouseMoveHandlers.forEach(handler => handler(coordinate))
+    }
 
     return {
         addOnMouseMoveHandler: (handler: (coordinate: ClickableCoordinate | null) => void) => {
@@ -52,7 +70,9 @@ export const create_battle_grid_visual = ({width, height}: { width: number, heig
         },
         addOnClickHandler: (handler: (coordinate: ClickableCoordinate) => void) => {
             onClickHandlers.push(handler)
-        }
+        },
+        reset_mouse_tracking,
+        refresh_mouse_handlers,
     }
 }
 
@@ -62,4 +82,6 @@ type ClickableCoordinateOrNullFunction = (coordinate: ClickableCoordinate | null
 export type BattleGridVisual = {
     addOnMouseMoveHandler: (handler: ClickableCoordinateOrNullFunction) => void
     addOnClickHandler: (handler: ClickableCoordinateFunction) => void
+    reset_mouse_tracking: () => void
+    refresh_mouse_handlers: () => void
 }
