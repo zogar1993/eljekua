@@ -7,6 +7,9 @@
     "rootDir": "./src",
     "baseUrl": "./src",
     "paths": {
+      "web/core/*": [
+        "../src_tests/web/core/*"
+      ],
       "*": [
         "*"
       ]

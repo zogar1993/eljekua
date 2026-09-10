@@ -12,7 +12,7 @@
     "paths": {
       "web/visual_tests/*": ["web/visual_tests/*"],
       "web/content_editor/*": ["web/content_editor/*"],
-      "web/core/*": ["../src/web/core/*"],
+      "web/core/*": ["web/core/*"],
       "core/*": ["../src/core/*"],
       "data/*": ["../src/data/*"],
       "stdlib/*": ["../src/stdlib/*"],
