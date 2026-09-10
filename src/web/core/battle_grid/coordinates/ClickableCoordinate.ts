@@ -56,3 +56,9 @@ export const nullable_positions_equal = (p1: Position | null, p2: Position | nul
     p1 === null && p2 === null ? true :
         p1 === null || p2 === null ? false :
             positions_equal(p1, p2)
+
+export const assert_coordinates_are_equal = (a: ClickableCoordinate, b: ClickableCoordinate) => {
+    if (a.x !== b.x || a.y !== b.y) {
+        throw Error(`coordinates '${JSON.stringify(a)}' and '${JSON.stringify(b)}' are not equal`)
+    }
+}

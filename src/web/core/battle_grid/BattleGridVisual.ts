@@ -1,4 +1,4 @@
-import type {ClickableCoordinate} from "web/core/battle_grid/coordinates/ClickableCoordinate";
+import {assert_coordinates_are_equal, ClickableCoordinate} from "web/core/battle_grid/coordinates/ClickableCoordinate";
 import {coordinates_equal} from "web/core/battle_grid/coordinates/ClickableCoordinate";
 
 export const create_battle_grid_visual = ({width, height}: { width: number, height: number }): BattleGridVisual => {
@@ -28,39 +28,34 @@ export const create_battle_grid_visual = ({width, height}: { width: number, heig
 
     html_board.addEventListener('click', (e: MouseEvent) => {
         const coordinate = get_click_coordinate_from_mouse_event(e)
+
+        if (latest_coordinate === null) return
+        assert_coordinates_are_equal(coordinate, latest_coordinate)
+
         onClickHandlers.forEach(handler => handler(coordinate))
     });
 
+    let latest_coordinate: ClickableCoordinate | null = null
+
     html_board.addEventListener('mousemove', (e: MouseEvent) => {
         const coordinate = get_click_coordinate_from_mouse_event(e)
-        onMouseMoveHandlers.forEach(handler => handler(coordinate))
+        if (latest_coordinate === null || !coordinates_equal(coordinate, latest_coordinate)) {
+            latest_coordinate = coordinate
+            onMouseMoveHandlers.forEach(handler => handler(coordinate))
+        }
     });
 
     html_board.addEventListener('mouseleave', () => {
+        latest_coordinate = null
         onMouseMoveHandlers.forEach(handler => handler(null))
     })
 
-    let latest_coordinate: ClickableCoordinate | null = null
-
     return {
         addOnMouseMoveHandler: (handler: (coordinate: ClickableCoordinate | null) => void) => {
-            onMouseMoveHandlers.push((coordinate: ClickableCoordinate | null) => {
-                if (coordinate === null) {
-                    latest_coordinate = null
-                    handler(null)
-                } else if (latest_coordinate === null || !coordinates_equal(coordinate, latest_coordinate)) {
-                    latest_coordinate = coordinate
-                    handler(coordinate)
-                }
-            })
+            onMouseMoveHandlers.push(handler)
         },
         addOnClickHandler: (handler: (coordinate: ClickableCoordinate) => void) => {
-            onClickHandlers.push((coordinate: ClickableCoordinate) => {
-                if (latest_coordinate === null) return
-                if (!coordinates_equal(coordinate, latest_coordinate))
-                    throw Error(`clicked coordinate '${JSON.stringify(coordinate)}' does not match latest coordinate '${JSON.stringify(latest_coordinate)}'`)
-                handler(latest_coordinate)
-            })
+            onClickHandlers.push(handler)
         }
     }
 }
