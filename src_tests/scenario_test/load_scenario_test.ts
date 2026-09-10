@@ -1,5 +1,4 @@
 import type {ScenarioTest} from "scenario_test/ScenarioTest";
-import {create_empty_level_setup} from "scenario_test/ScenarioTest";
 
 export const load_scenario_test = (raw: unknown): ScenarioTest => {
     if (typeof raw !== "object" || raw === null)
@@ -42,9 +41,3 @@ export const parse_scenario_test_json = (json: string): ScenarioTest => {
 export const serialize_scenario_test_json = (scenario: ScenarioTest): string => {
     return JSON.stringify(scenario, null, 2)
 }
-
-export const create_empty_scenario_snapshot = (): ScenarioTest => ({
-    name: "untitled_scenario",
-    level_setup: create_empty_level_setup(),
-    steps: [],
-})

@@ -15,54 +15,9 @@
     font-weight: bold;
 }
 
-.visual-tests__field {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.visual-tests__label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #333;
-}
-
-.visual-tests__field-group-title {
-    margin-top: 4px;
-    font-size: 13px;
-    font-weight: 700;
-    color: #222;
-}
-
-.visual-tests__input,
-.visual-tests__select,
-.visual-tests__textarea {
+.visual-tests__input {
     width: 100%;
     box-sizing: border-box;
-}
-
-.visual-tests__textarea {
-    font-family: monospace;
-    resize: vertical;
-}
-
-.visual-tests__setup-form {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.visual-tests__checkbox-field {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 13px;
-}
-
-.visual-tests__button--small {
-    align-self: flex-start;
-    font-size: 12px;
-    padding: 2px 6px;
 }
 
 .visual-tests__test-powers-panel {
@@ -79,10 +34,6 @@
 
 .visual-tests__button {
     cursor: pointer;
-}
-
-.visual-tests__button--active {
-    background: #d4edda;
 }
 
 .visual-tests__placement-hint {
@@ -138,40 +89,6 @@
 
 .visual-tests__test-tree-item--selected {
     background: #d4edda;
-}
-
-.visual-tests__dialog-overlay {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.35);
-    z-index: 1000;
-}
-
-.visual-tests__dialog {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-width: 280px;
-    max-width: 360px;
-    padding: 12px;
-    border: 1px solid #ccc;
-    background: #fff;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-.visual-tests__dialog-message {
-    margin: 0;
-    font-size: 14px;
-    color: #222;
-}
-
-.visual-tests__dialog-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
 }
 
 .visual-tests__image-picker {

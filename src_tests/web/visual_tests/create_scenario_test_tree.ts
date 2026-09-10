@@ -111,7 +111,6 @@ export const create_scenario_test_tree = ({
         html_tree,
         refresh,
         show_error,
-        get_selected_path: () => selected_path,
         set_selected_path,
     }
 }

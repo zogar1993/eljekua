@@ -55,11 +55,6 @@ export const create_step_recorder = ({
 
     const is_battle_started = () => is_recording
 
-    const reset = () => {
-        is_recording = false
-        notify_scenario_changed()
-    }
-
     const mark_loaded_scenario = () => {
         is_recording = false
         notify_scenario_changed()
@@ -85,10 +80,7 @@ export const create_step_recorder = ({
         begin_recording_at_battle_start,
         record_set_turn,
         is_battle_started,
-        reset,
         mark_loaded_scenario,
         wrap_instruction_loop,
     }
 }
-
-export type StepRecorder = ReturnType<typeof create_step_recorder>

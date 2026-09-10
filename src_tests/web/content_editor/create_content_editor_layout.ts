@@ -22,12 +22,6 @@ export const create_content_panel_title = (title: string) => {
     return html_title
 }
 
-export const create_content_subsection_title = (title: string) => {
-    const html_title = create_html_element("div", "content-editor__subsection-title")
-    html_title.textContent = title
-    return html_title
-}
-
 export const create_field_grid = (html_fields: Array<HTMLElement>, columns = 3) => {
     const html_grid = create_html_element("div", "content-editor__field-grid")
     if (columns !== 3)
