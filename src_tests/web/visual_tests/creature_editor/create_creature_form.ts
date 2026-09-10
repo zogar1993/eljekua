@@ -56,7 +56,7 @@ export const create_creature_form = ({
 
     const html_attribute_inputs = new Map<AttributeCode, HTMLInputElement>()
     for (const attribute_code of ATTRIBUTE_CODES) {
-        const value = creature.attributes?.[attribute_code] ?? 14
+        const value = creature.attributes?.[attribute_code] ?? 10
         html_attribute_inputs.set(attribute_code, create_number_input({value, compact: true}))
     }
 
