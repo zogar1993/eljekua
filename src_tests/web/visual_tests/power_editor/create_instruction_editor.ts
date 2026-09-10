@@ -3,6 +3,7 @@ import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {create_default_instruction} from "web/visual_tests/power_editor/power_editor_defaults";
 import {
     append_labeled_field,
+    create_checkbox_input,
     create_select_input,
     create_text_input,
     read_select_value,
@@ -49,6 +50,16 @@ export const create_instruction_editor = ({
     const html_apply_damage_target = create_text_input({
         value: instruction.type === INSTRUCTION_TYPE.APPLY_DAMAGE ? instruction.target : "primary_target",
     })
+    const {html_label: html_half_damage_label, html_input: html_half_damage} = create_checkbox_input({
+        checked: instruction.type === INSTRUCTION_TYPE.APPLY_DAMAGE ? instruction.half_damage ?? false : false,
+        label: "Half damage",
+    })
+    const html_damage_types = create_text_input({
+        value: instruction.type === INSTRUCTION_TYPE.APPLY_DAMAGE
+            ? (instruction.damage_types ?? []).join(", ")
+            : "",
+        placeholder: "force, fire",
+    })
 
     const html_movement_destination = create_text_input({value: "primary_target"})
 
@@ -80,6 +91,12 @@ export const create_instruction_editor = ({
             case INSTRUCTION_TYPE.APPLY_DAMAGE:
                 append_labeled_field({container: html_fields, label: "Damage value", control: html_apply_damage_value})
                 append_labeled_field({container: html_fields, label: "Target", control: html_apply_damage_target})
+                html_fields.append(html_half_damage_label)
+                append_labeled_field({
+                    container: html_fields,
+                    label: "Damage types (comma-separated)",
+                    control: html_damage_types,
+                })
                 break
             case INSTRUCTION_TYPE.MOVE:
             case INSTRUCTION_TYPE.SHIFT:
@@ -99,6 +116,8 @@ export const create_instruction_editor = ({
         if (defaults.type === INSTRUCTION_TYPE.APPLY_DAMAGE) {
             html_apply_damage_value.value = defaults.value
             html_apply_damage_target.value = defaults.target
+            html_half_damage.checked = false
+            html_damage_types.value = ""
         }
         if (defaults.type === INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS) {
             html_add_powers_creature.value = defaults.creature
@@ -116,15 +135,28 @@ export const create_instruction_editor = ({
         html_remove_button,
     )
 
+    const read_damage_types = (): Array<string> =>
+        read_text_value(html_damage_types)
+            .split(",")
+            .map(type => type.trim())
+            .filter(type => type.length > 0)
+
     const get_instruction = (): IRInstruction => {
         const type = read_select_value(html_type)
         switch (type) {
-            case INSTRUCTION_TYPE.APPLY_DAMAGE:
-                return {
+            case INSTRUCTION_TYPE.APPLY_DAMAGE: {
+                const result: Extract<IRInstruction, { type: typeof INSTRUCTION_TYPE.APPLY_DAMAGE }> = {
                     type,
                     value: read_text_value(html_apply_damage_value),
                     target: read_text_value(html_apply_damage_target),
                 }
+                if (html_half_damage.checked)
+                    result.half_damage = true
+                const damage_types = read_damage_types()
+                if (damage_types.length > 0)
+                    result.damage_types = damage_types
+                return result
+            }
             case INSTRUCTION_TYPE.MOVE:
             case INSTRUCTION_TYPE.SHIFT:
                 return {
