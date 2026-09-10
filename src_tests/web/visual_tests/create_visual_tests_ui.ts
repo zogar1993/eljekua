@@ -15,10 +15,11 @@ import {
 import {create_creature_setup_form} from "web/visual_tests/create_creature_setup_form";
 import {create_test_powers_panel} from "web/visual_tests/create_test_powers_panel";
 import {create_expectation_editor} from "web/visual_tests/create_expectation_editor";
-import {create_field_group_title, create_labeled_field} from "web/visual_tests/create_labeled_field";
+import {create_field_group_title} from "web/visual_tests/create_labeled_field";
 import {create_step_recorder} from "web/visual_tests/create_step_recorder";
 import {create_scenario_test_tree} from "web/visual_tests/create_scenario_test_tree";
 import {create_auto_save_scheduler} from "web/visual_tests/create_auto_save_scheduler";
+import {open_create_test_modal} from "web/visual_tests/open_create_test_modal";
 import {
     delete_scenario_test,
     list_scenario_tests,
@@ -76,7 +77,6 @@ export const create_visual_tests_ui = ({
     const get_scenario = () => scenario
     const set_scenario = (next_scenario: ScenarioTest) => {
         scenario = next_scenario
-        refresh_scenario_name_input()
         if (saved_path !== null)
             auto_save.schedule_auto_save()
     }
@@ -98,28 +98,9 @@ export const create_visual_tests_ui = ({
     const html_header = create_html_element("div", "visual-tests__header")
     html_header.textContent = "Visual Tests"
 
-    const html_name_input = create_html_element("input", "visual-tests__input") as HTMLInputElement
-    html_name_input.placeholder = "folder/test_name"
     const get_current_scenario = (): ScenarioTest => ({
         ...scenario,
-        name: saved_path ?? sanitize_scenario_path(html_name_input.value),
-    })
-
-    html_name_input.addEventListener("input", () => {
-        if (saved_path !== null)
-            return
-        scenario = {...scenario, name: html_name_input.value}
-    })
-
-    const html_create_test_button = create_content_button({
-        text: "Create test",
-        variant: CONTENT_EDITOR_BUTTON_VARIANT.PRIMARY,
-        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
-    })
-
-    const html_scenario_name_field = create_labeled_field({
-        label: "Test path",
-        control: html_name_input,
+        name: saved_path ?? scenario.name,
     })
 
     const html_new_test_button = create_content_button({
@@ -135,7 +116,7 @@ export const create_visual_tests_ui = ({
     })
 
     const html_test_actions = create_html_element("div", "visual-tests__test-actions")
-    html_test_actions.append(html_new_test_button, html_create_test_button, html_delete_test_button)
+    html_test_actions.append(html_new_test_button, html_delete_test_button)
 
     const create_button = (class_name: string, text: string) => {
         const button = document.createElement("button")
@@ -248,10 +229,7 @@ export const create_visual_tests_ui = ({
         },
     })
 
-    const refresh_scenario_name_input = () => {
-        html_name_input.value = saved_path ?? scenario.name
-        html_name_input.readOnly = saved_path !== null
-        html_create_test_button.hidden = saved_path !== null
+    const refresh_test_ui_state = () => {
         html_delete_test_button.hidden = saved_path === null
         test_powers_panel.html_root.hidden = saved_path === null
     }
@@ -264,7 +242,7 @@ export const create_visual_tests_ui = ({
         refresh_steps_list()
     }
 
-    const begin_new_test_draft = async () => {
+    const open_new_test_modal = async () => {
         if (saved_path !== null) {
             try {
                 await auto_save.flush_auto_save()
@@ -274,39 +252,27 @@ export const create_visual_tests_ui = ({
             }
         }
 
-        saved_path = null
-        scenario = create_empty_scenario({name: ""})
-        scenario_test_tree.set_selected_path("")
-        available_powers = []
-        refresh_scenario_name_input()
-        reset_editor_state()
-        set_result("Enter a test path and click Create test.")
+        open_create_test_modal({
+            on_accept: (path) => {
+                void create_test_at_path(path).catch((error) => {
+                    set_result(error instanceof Error ? error.message : String(error), false)
+                })
+            },
+        })
     }
 
     const create_test_at_path = async (path: string) => {
-        if (path.trim().length === 0)
-            throw Error("Enter a test path.")
-
         const test_path = sanitize_scenario_path(path)
-        const new_scenario = {...scenario, name: test_path}
+        const new_scenario = create_empty_scenario({name: test_path})
         await save_scenario_test(new_scenario)
-
-        await auto_save.run_without_auto_save(async () => {
-            saved_path = test_path
-            scenario = new_scenario
-            refresh_scenario_name_input()
-            scenario_test_tree.set_selected_path(test_path)
-            await refresh_saved_scenarios_list()
-        })
-
-        void test_powers_panel.load_powers_for_test(test_path)
+        schedule_scenario_load_reload(new_scenario)
     }
 
     const apply_loaded_scenario = (loaded: ScenarioTest) => {
         cancel_creature_placement()
         saved_path = loaded.name
         scenario = loaded
-        refresh_scenario_name_input()
+        refresh_test_ui_state()
         scenario_test_tree.set_selected_path(loaded.name)
         apply_scenario_level_setup_to_game({scenario: loaded, add_creature_to_game})
         step_recorder.mark_loaded_scenario()
@@ -348,15 +314,7 @@ export const create_visual_tests_ui = ({
     })
 
     html_new_test_button.addEventListener("click", () => {
-        void begin_new_test_draft()
-    })
-
-    html_create_test_button.addEventListener("click", () => {
-        void create_test_at_path(html_name_input.value).then(() => {
-            set_result(`Created ${saved_path}.`, true)
-        }).catch((error) => {
-            set_result(error instanceof Error ? error.message : String(error), false)
-        })
+        void open_new_test_modal()
     })
 
     html_delete_test_button.addEventListener("click", () => {
@@ -364,12 +322,17 @@ export const create_visual_tests_ui = ({
             return
 
         const path_to_delete = saved_path
-        if (!confirm(`Delete test "${path_to_delete}"?`))
-            return
 
-        void delete_scenario_test(path_to_delete).then(async () => {
+        void auto_save.run_without_auto_save(async () => {
+            await auto_save.cancel_pending_save()
+            saved_path = null
+            refresh_test_ui_state()
+            await delete_scenario_test(path_to_delete)
             await refresh_saved_scenarios_list()
-            await begin_new_test_draft()
+            scenario = create_empty_scenario({name: ""})
+            scenario_test_tree.set_selected_path("")
+            available_powers = []
+            reset_editor_state()
             set_result(`Deleted ${path_to_delete}.`, true)
         }).catch((error) => {
             set_result(error instanceof Error ? error.message : String(error), false)
@@ -392,7 +355,6 @@ export const create_visual_tests_ui = ({
         html_saved_tests_title,
         scenario_test_tree.html_tree,
         html_test_actions,
-        html_scenario_name_field,
         test_powers_panel.html_root,
         html_creature_form,
         html_controls_title,
@@ -412,7 +374,7 @@ export const create_visual_tests_ui = ({
         apply_loaded_scenario(scheduled_scenario)
         set_result(`Loaded ${scheduled_scenario.name}.`, true)
     } else {
-        refresh_scenario_name_input()
+        refresh_test_ui_state()
         reset_editor_state()
     }
 

@@ -50,9 +50,20 @@ export const create_auto_save_scheduler = ({
         }
     }
 
+    const cancel_pending_save = async () => {
+        if (auto_save_timer !== undefined) {
+            clearTimeout(auto_save_timer)
+            auto_save_timer = undefined
+        }
+
+        if (save_in_flight)
+            await save_in_flight
+    }
+
     return {
         schedule_auto_save,
         flush_auto_save,
         run_without_auto_save,
+        cancel_pending_save,
     }
 }
