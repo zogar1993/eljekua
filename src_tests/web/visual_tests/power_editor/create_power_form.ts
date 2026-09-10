@@ -13,8 +13,10 @@ import {
     read_select_value,
     read_text_value,
 } from "web/visual_tests/power_editor/create_form_controls";
+import {create_content_section} from "web/content_editor/create_content_editor_layout";
+import {create_content_button, CONTENT_EDITOR_BUTTON_SIZE, CONTENT_EDITOR_BUTTON_VARIANT} from "web/content_editor/create_content_button";
 import {create_instruction_list_editor} from "web/visual_tests/power_editor/create_instruction_list_editor";
-import {create_field_group_title, create_labeled_field} from "web/visual_tests/create_labeled_field";
+import {create_labeled_field} from "web/visual_tests/create_labeled_field";
 import {create_html_element} from "web/utils/create_html_element";
 
 const ACTION_TYPE_OPTIONS = Object.values(ACTION_TYPE).map(action => ({value: action, label: action}))
@@ -67,8 +69,8 @@ export const create_power_form = ({
     variant?: "inline" | "modal"
 }) => {
     const html_root = variant === "modal"
-        ? create_html_element("div", "visual-tests__power-form visual-tests__power-form--modal")
-        : create_html_element("details", "visual-tests__power-form") as HTMLDetailsElement
+        ? create_html_element("div", "content-editor content-editor__form content-editor__form-scroll")
+        : create_html_element("details", "content-editor content-editor__form") as HTMLDetailsElement
 
     if (variant === "inline") {
         const html_details = html_root as HTMLDetailsElement
@@ -76,10 +78,10 @@ export const create_power_form = ({
     }
 
     const html_summary = document.createElement("summary")
-    html_summary.className = "visual-tests__power-form-summary"
+    html_summary.className = "content-editor__subsection-title"
     html_summary.textContent = power.name
 
-    const html_body = create_html_element("div", "visual-tests__power-form-body")
+    const html_body = create_html_element("div", "content-editor__form")
 
     const html_name = create_text_input({value: power.name})
     const html_description = create_text_input({value: power.description ?? ""})
@@ -143,9 +145,9 @@ export const create_power_form = ({
         value: power.roll?.defense ?? "ac",
     })
 
-    const html_targeting_fields = create_html_element("div", "visual-tests__power-form-section")
-    const html_trigger_fields = create_html_element("div", "visual-tests__power-form-section")
-    const html_roll_fields = create_html_element("div", "visual-tests__power-form-section")
+    const html_targeting_fields = create_html_element("div", "content-editor__section-body")
+    const html_trigger_fields = create_html_element("div", "content-editor__section-body")
+    const html_roll_fields = create_html_element("div", "content-editor__section-body")
 
     const effect_editor = create_instruction_list_editor({
         title: "Effect instructions",
@@ -160,12 +162,12 @@ export const create_power_form = ({
         instructions: power.roll?.miss ?? [],
     })
 
-    const html_remove_button = document.createElement("button")
-    html_remove_button.type = "button"
-    html_remove_button.className = "visual-tests__button visual-tests__button--small"
-    html_remove_button.textContent = "Remove power"
-    if (on_remove)
-        html_remove_button.addEventListener("click", on_remove)
+    const html_remove_button = create_content_button({
+        text: "Remove power",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.DANGER,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+        on_click: on_remove,
+    })
 
     const refresh_targeting_fields = () => {
         html_targeting_fields.replaceChildren()
@@ -233,27 +235,48 @@ export const create_power_form = ({
     refresh_trigger_fields()
     refresh_roll_fields()
 
-    const html_fields = [
-        create_labeled_field({label: "Name", control: html_name}),
-        create_labeled_field({label: "Description", control: html_description}),
-        create_field_group_title("Type"),
-        create_labeled_field({label: "Action", control: html_action}),
-        create_labeled_field({label: "Cooldown", control: html_cooldown}),
-        html_attack_label,
-        html_melee_trait_label,
-        create_field_group_title("Targeting"),
-        html_targeting_fields,
-        create_field_group_title("Trigger"),
-        html_trigger_fields,
-        create_field_group_title("Attack roll"),
-        html_roll_fields,
-        effect_editor.html_root,
+    const html_sections = [
+        create_content_section({
+            title: "Basics",
+            html_children: [
+                create_labeled_field({label: "Name", control: html_name}),
+                create_labeled_field({label: "Description", control: html_description}),
+            ],
+        }),
+        create_content_section({
+            title: "Type",
+            html_children: [
+                create_labeled_field({label: "Action", control: html_action}),
+                create_labeled_field({label: "Cooldown", control: html_cooldown}),
+                html_attack_label,
+                html_melee_trait_label,
+            ],
+        }),
+        create_content_section({
+            title: "Targeting",
+            html_children: [html_targeting_fields],
+        }),
+        create_content_section({
+            title: "Trigger",
+            html_children: [html_trigger_fields],
+        }),
+        create_content_section({
+            title: "Attack roll",
+            html_children: [html_roll_fields],
+        }),
+        create_content_section({
+            title: "Effect",
+            html_children: [effect_editor.html_root],
+        }),
     ]
 
     if (variant === "inline")
-        html_fields.push(html_remove_button)
+        html_sections.push(create_content_section({
+            title: "Actions",
+            html_children: [html_remove_button],
+        }))
 
-    html_body.append(...html_fields)
+    html_body.append(...html_sections)
 
     if (variant === "inline")
         html_root.append(html_summary, html_body)

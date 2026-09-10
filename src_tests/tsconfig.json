@@ -11,6 +11,7 @@
     "baseUrl": ".",
     "paths": {
       "web/visual_tests/*": ["web/visual_tests/*"],
+      "web/content_editor/*": ["web/content_editor/*"],
       "web/*": ["../src/web/*"],
       "core/*": ["../src/core/*"],
       "data/*": ["../src/data/*"],

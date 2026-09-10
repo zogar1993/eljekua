@@ -9,6 +9,11 @@ import {
     read_select_value,
     read_text_value,
 } from "web/visual_tests/power_editor/create_form_controls";
+import {
+    create_content_button,
+    CONTENT_EDITOR_BUTTON_SIZE,
+    CONTENT_EDITOR_BUTTON_VARIANT,
+} from "web/content_editor/create_content_button";
 import {create_labeled_field} from "web/visual_tests/create_labeled_field";
 import {create_html_element} from "web/utils/create_html_element";
 
@@ -37,7 +42,7 @@ export const create_instruction_editor = ({
     instruction: IRInstruction
     on_remove: () => void
 }) => {
-    const html_root = create_html_element("div", "visual-tests__instruction-form")
+    const html_root = create_html_element("div", "content-editor__instruction-card")
 
     const html_type = create_select_input({
         options: INSTRUCTION_TYPE_OPTIONS,
@@ -75,13 +80,14 @@ export const create_instruction_editor = ({
         value: instruction.type === INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS ? instruction.filter : "melee_basic_attack",
     })
 
-    const html_fields = create_html_element("div", "visual-tests__instruction-form-fields")
+    const html_fields = create_html_element("div", "content-editor__section-body")
 
-    const html_remove_button = document.createElement("button")
-    html_remove_button.type = "button"
-    html_remove_button.className = "visual-tests__button visual-tests__button--small"
-    html_remove_button.textContent = "Remove instruction"
-    html_remove_button.addEventListener("click", on_remove)
+    const html_remove_button = create_content_button({
+        text: "Remove instruction",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.DANGER,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+        on_click: on_remove,
+    })
 
     const refresh_fields = () => {
         html_fields.replaceChildren()

@@ -1,10 +1,15 @@
 import type {IRPower} from "core/types";
 import {
+    create_content_button,
+    CONTENT_EDITOR_BUTTON_SIZE,
+    CONTENT_EDITOR_BUTTON_VARIANT,
+} from "web/content_editor/create_content_button";
+import {create_content_panel_title} from "web/content_editor/create_content_editor_layout";
+import {
     create_default_power,
     POWER_EDITOR_TEMPLATE,
 } from "web/visual_tests/power_editor/power_editor_defaults";
 import {open_power_editor_modal} from "web/visual_tests/power_editor/create_power_editor_modal";
-import {create_field_group_title} from "web/visual_tests/create_labeled_field";
 import {create_html_element} from "web/utils/create_html_element";
 
 type PowerListEntry = {
@@ -20,8 +25,8 @@ export const create_power_editor = ({
     initial_powers?: Array<IRPower>
     on_powers_changed?: () => void
 } = {}) => {
-    const html_root = create_html_element("div", "visual-tests__power-editor")
-    const html_list = create_html_element("div", "visual-tests__power-editor-list")
+    const html_root = create_html_element("div", "content-editor content-editor__editor-root")
+    const html_list = create_html_element("div", "content-editor__card-list")
 
     const entries: Array<PowerListEntry> = []
 
@@ -38,44 +43,44 @@ export const create_power_editor = ({
     }
 
     const create_list_item = (entry: PowerListEntry) => {
-        const html_item = create_html_element("div", "visual-tests__power-list-item")
+        const html_item = create_html_element("div", "content-editor__item-card")
 
-        const html_name = create_html_element("span", "visual-tests__power-list-item-name")
+        const html_name = create_html_element("span", "content-editor__item-card-name")
 
         const update_display = () => {
             html_name.textContent = entry.power.name || "Unnamed power"
         }
 
-        const html_edit_button = document.createElement("button")
-        html_edit_button.type = "button"
-        html_edit_button.className = "visual-tests__button visual-tests__button--small"
-        html_edit_button.textContent = "Edit"
-
-        const html_remove_button = document.createElement("button")
-        html_remove_button.type = "button"
-        html_remove_button.className = "visual-tests__button visual-tests__button--small"
-        html_remove_button.textContent = "Remove"
-
-        html_edit_button.addEventListener("click", () => {
-            open_power_editor_modal({
-                title: "Edit power",
-                power: entry.power,
-                on_power_changed: (power) => {
-                    entry.power = power
-                    update_display()
-                    notify_powers_changed()
-                },
-            })
+        const html_edit_button = create_content_button({
+            text: "Edit",
+            variant: CONTENT_EDITOR_BUTTON_VARIANT.SECONDARY,
+            size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+            on_click: () => {
+                open_power_editor_modal({
+                    title: "Edit power",
+                    power: entry.power,
+                    on_power_changed: (power) => {
+                        entry.power = power
+                        update_display()
+                        notify_powers_changed()
+                    },
+                })
+            },
         })
 
-        html_remove_button.addEventListener("click", () => {
-            const index = entries.indexOf(entry)
-            if (index >= 0) entries.splice(index, 1)
-            refresh_list()
-            notify_powers_changed()
+        const html_remove_button = create_content_button({
+            text: "Remove",
+            variant: CONTENT_EDITOR_BUTTON_VARIANT.DANGER,
+            size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+            on_click: () => {
+                const index = entries.indexOf(entry)
+                if (index >= 0) entries.splice(index, 1)
+                refresh_list()
+                notify_powers_changed()
+            },
         })
 
-        const html_actions = create_html_element("div", "visual-tests__power-list-item-actions")
+        const html_actions = create_html_element("div", "content-editor__item-card-actions")
         html_actions.append(html_edit_button, html_remove_button)
 
         html_item.append(html_name, html_actions)
@@ -130,19 +135,20 @@ export const create_power_editor = ({
     for (const power of initial_powers)
         add_entry(power, {notify: false})
 
-    const html_add_button = document.createElement("button")
-    html_add_button.type = "button"
-    html_add_button.className = "visual-tests__button visual-tests__button--small"
-    html_add_button.textContent = "Add power"
-    html_add_button.addEventListener("click", open_create_modal)
+    const html_add_button = create_content_button({
+        text: "Add power",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.PRIMARY,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+        on_click: open_create_modal,
+    })
 
-    const html_add_controls = create_html_element("div", "visual-tests__power-editor-add")
-    html_add_controls.append(html_add_button)
+    const html_toolbar = create_html_element("div", "content-editor__toolbar")
+    html_toolbar.append(html_add_button)
 
     html_root.append(
-        create_field_group_title("Powers"),
+        create_content_panel_title("Powers"),
         html_list,
-        html_add_controls,
+        html_toolbar,
     )
 
     return {html_root, get_powers, set_powers}

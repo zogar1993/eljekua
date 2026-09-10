@@ -14,14 +14,14 @@ export const open_power_editor_modal = ({
     power: IRPower
     on_power_changed: (power: IRPower) => void
 }) => {
-    const html_layout = create_html_element("div", "visual-tests__power-editor-modal")
+    const html_layout = create_html_element("div", "content-editor__split-layout")
 
     const power_form = create_power_form({
         power,
         variant: "modal",
     })
 
-    const html_json_preview = create_html_element("textarea", "visual-tests__power-json-preview") as HTMLTextAreaElement
+    const html_json_preview = create_html_element("textarea", "content-editor__code-preview") as HTMLTextAreaElement
     html_json_preview.readOnly = true
     html_json_preview.rows = 24
     html_json_preview.spellcheck = false
@@ -40,9 +40,9 @@ export const open_power_editor_modal = ({
     power_form.html_root.addEventListener("change", notify_power_changed)
     refresh_json_preview()
 
-    const html_json_section = create_html_element("div", "visual-tests__power-editor-modal-json")
-    const html_json_label = create_html_element("div", "visual-tests__field-group-title")
-    html_json_label.textContent = "JSON"
+    const html_json_section = create_html_element("div", "content-editor__code-panel")
+    const html_json_label = create_html_element("h3", "content-editor__code-panel-label")
+    html_json_label.textContent = "JSON preview"
     html_json_section.append(html_json_label, html_json_preview)
 
     html_layout.append(power_form.html_root, html_json_section)

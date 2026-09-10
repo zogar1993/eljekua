@@ -8,7 +8,7 @@ export const create_text_input = ({
     value?: string
     placeholder?: string
 } = {}) => {
-    const html_input = create_html_element("input", "visual-tests__input") as HTMLInputElement
+    const html_input = create_html_element("input", "content-editor__input") as HTMLInputElement
     html_input.type = "text"
     html_input.value = value
     if (placeholder) html_input.placeholder = placeholder
@@ -20,7 +20,7 @@ export const create_number_input = ({
                                     }: {
     value?: number
 } = {}) => {
-    const html_input = create_html_element("input", "visual-tests__input") as HTMLInputElement
+    const html_input = create_html_element("input", "content-editor__input") as HTMLInputElement
     html_input.type = "number"
     html_input.value = String(value)
     return html_input
@@ -33,11 +33,11 @@ export const create_checkbox_input = ({
     checked?: boolean
     label: string
 }) => {
-    const html_label = create_html_element("label", "visual-tests__checkbox-field")
-    const html_input = create_html_element("input", "visual-tests__checkbox") as HTMLInputElement
+    const html_label = create_html_element("label", "content-editor__checkbox-field")
+    const html_input = create_html_element("input", "content-editor__checkbox") as HTMLInputElement
     html_input.type = "checkbox"
     html_input.checked = checked
-    html_label.append(html_input, document.createTextNode(` ${label}`))
+    html_label.append(html_input, document.createTextNode(label))
     return {html_label, html_input}
 }
 
@@ -48,7 +48,7 @@ export const create_select_input = <T extends string>({
     options: Array<{ value: T, label: string }>
     value: T
 }) => {
-    const html_select = create_html_element("select", "visual-tests__select") as HTMLSelectElement
+    const html_select = create_html_element("select", "content-editor__select") as HTMLSelectElement
     for (const option of options) {
         const html_option = document.createElement("option")
         html_option.value = option.value
@@ -66,7 +66,7 @@ export const create_textarea_input = ({
     value?: string
     rows?: number
 } = {}) => {
-    const html_textarea = create_html_element("textarea", "visual-tests__textarea") as HTMLTextAreaElement
+    const html_textarea = create_html_element("textarea", "content-editor__textarea") as HTMLTextAreaElement
     html_textarea.rows = rows
     html_textarea.spellcheck = false
     html_textarea.value = value
