@@ -10,6 +10,7 @@ import {create_html_element} from "web/utils/create_html_element";
 type PowerListEntry = {
     power: IRPower
     html_root: HTMLElement
+    update_display: () => void
 }
 
 export const create_power_editor = ({
@@ -40,7 +41,10 @@ export const create_power_editor = ({
         const html_item = create_html_element("div", "visual-tests__power-list-item")
 
         const html_name = create_html_element("span", "visual-tests__power-list-item-name")
-        html_name.textContent = entry.power.name || "Unnamed power"
+
+        const update_display = () => {
+            html_name.textContent = entry.power.name || "Unnamed power"
+        }
 
         const html_edit_button = document.createElement("button")
         html_edit_button.type = "button"
@@ -52,17 +56,13 @@ export const create_power_editor = ({
         html_remove_button.className = "visual-tests__button visual-tests__button--small"
         html_remove_button.textContent = "Remove"
 
-        const update_name = () => {
-            html_name.textContent = entry.power.name || "Unnamed power"
-        }
-
         html_edit_button.addEventListener("click", () => {
             open_power_editor_modal({
+                title: "Edit power",
                 power: entry.power,
-                mode: "edit",
-                on_confirm: (power) => {
+                on_power_changed: (power) => {
                     entry.power = power
-                    update_name()
+                    update_display()
                     notify_powers_changed()
                 },
             })
@@ -80,37 +80,55 @@ export const create_power_editor = ({
 
         html_item.append(html_name, html_actions)
         entry.html_root = html_item
+        entry.update_display = update_display
+        update_display()
     }
 
-    const add_power = (power: IRPower) => {
-        const entry: PowerListEntry = {power, html_root: document.createElement("div")}
+    const add_entry = (power: IRPower, options?: { notify?: boolean }) => {
+        const entry: PowerListEntry = {
+            power,
+            html_root: document.createElement("div"),
+            update_display: () => {},
+        }
         create_list_item(entry)
         entries.push(entry)
         refresh_list()
-        notify_powers_changed()
+        if (options?.notify ?? true)
+            notify_powers_changed()
+        return entry
     }
 
     const open_create_modal = () => {
+        const entry = add_entry(create_default_power(POWER_EDITOR_TEMPLATE.BLANK))
         open_power_editor_modal({
-            power: create_default_power(POWER_EDITOR_TEMPLATE.BLANK),
-            mode: "create",
-            on_confirm: (power) => add_power(power),
+            title: "Create power",
+            power: entry.power,
+            on_power_changed: (power) => {
+                entry.power = power
+                entry.update_display()
+                notify_powers_changed()
+            },
         })
     }
 
-    const set_powers = (powers: Array<IRPower>) => {
+    const set_powers = (powers: Array<IRPower>, options?: { silent?: boolean }) => {
         entries.length = 0
         for (const power of powers) {
-            const entry: PowerListEntry = {power, html_root: document.createElement("div")}
+            const entry: PowerListEntry = {
+                power,
+                html_root: document.createElement("div"),
+                update_display: () => {},
+            }
             create_list_item(entry)
             entries.push(entry)
         }
         refresh_list()
-        notify_powers_changed()
+        if (!options?.silent)
+            notify_powers_changed()
     }
 
     for (const power of initial_powers)
-        add_power(power)
+        add_entry(power, {notify: false})
 
     const html_add_button = document.createElement("button")
     html_add_button.type = "button"
