@@ -26,6 +26,15 @@ const get_scenario_file_path = (scenario_path: string) => {
     return resolved
 }
 
+const get_test_powers_file_path = (folder_path: string) => {
+    const relative_file = folder_path ? `${folder_path}/_powers.json` : "_powers.json"
+    const file_path = path.join(SCENARIOS_DIR, relative_file)
+    const resolved = path.resolve(file_path)
+    if (!resolved.startsWith(path.resolve(SCENARIOS_DIR)))
+        throw Error("invalid test powers path")
+    return resolved
+}
+
 const get_static_file_path = (url_path: string) => {
     const relative_path = url_path === "/" ? "src_tests/visual-tests.html" : url_path.replace(/^\//, "")
     const normalized = path.normalize(relative_path)
@@ -80,7 +89,7 @@ const list_scenarios = async ({
             continue
         }
 
-        if (entry.isFile() && entry.name.endsWith(".json")) {
+        if (entry.isFile() && entry.name.endsWith(".json") && !entry.name.startsWith("_")) {
             const scenario_name = entry.name.slice(0, -".json".length)
             scenarios.push(path_prefix ? `${path_prefix}/${scenario_name}` : scenario_name)
         }
@@ -103,6 +112,31 @@ const server = http.createServer(async (request, response) => {
             const scenarios = await list_scenarios()
             send_json(response, 200, {scenarios})
             return
+        }
+
+        const test_powers_match = url.pathname.match(/^\/api\/test-powers(?:\/(.+))?$/)
+        if (test_powers_match) {
+            const folder_path = test_powers_match[1]
+                ? decode_scenario_path_from_url(test_powers_match[1])
+                : ""
+
+            if (request.method === "GET") {
+                const file_path = get_test_powers_file_path(folder_path)
+                const contents = await fs.readFile(file_path, "utf8")
+                response.writeHead(200, {"Content-Type": "application/json"})
+                response.end(contents)
+                return
+            }
+
+            if (request.method === "PUT") {
+                const body = await read_body(request)
+                const parsed = JSON.parse(body)
+                const file_path = get_test_powers_file_path(folder_path)
+                await fs.mkdir(path.dirname(file_path), {recursive: true})
+                await fs.writeFile(file_path, `${JSON.stringify(parsed, null, 2)}\n`, "utf8")
+                send_json(response, 200, {saved: path.relative(SCENARIOS_DIR, file_path)})
+                return
+            }
         }
 
         const scenario_match = url.pathname.match(/^\/api\/scenarios\/(.+)$/)

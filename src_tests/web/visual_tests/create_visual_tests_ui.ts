@@ -1,11 +1,13 @@
 import type {GameEvents} from "core/events/GameEvents";
 import type {GameState} from "core/game_state/GameState";
 import type {InstructionLoop} from "core/instruction_loop";
+import type {IRPower} from "core/types";
 import {apply_scenario_level_setup_to_game} from "scenario_test/apply_scenario_level_setup_to_game";
 import {create_scenario_runner} from "scenario_test/create_scenario_runner";
 import {resolve_creature_setup} from "scenario_test/resolve_creature_setup";
 import {create_empty_scenario, type ScenarioTest} from "scenario_test/ScenarioTest";
 import {create_creature_setup_form} from "web/visual_tests/create_creature_setup_form";
+import {create_test_powers_panel} from "web/visual_tests/create_test_powers_panel";
 import {create_scenario_dirty_state} from "web/visual_tests/create_scenario_dirty_state";
 import {create_expectation_editor} from "web/visual_tests/create_expectation_editor";
 import {create_field_group_title, create_labeled_field} from "web/visual_tests/create_labeled_field";
@@ -46,6 +48,7 @@ export const create_visual_tests_ui = ({
     board: Array<Array<SquareVisual>>
 }) => {
     let scenario = create_empty_scenario()
+    let available_powers: Array<IRPower> = []
     const scenario_dirty_state = create_scenario_dirty_state()
     scenario_dirty_state.mark_clean(scenario)
 
@@ -185,8 +188,33 @@ export const create_visual_tests_ui = ({
         scenario_dirty_state.mark_clean(saved_scenario)
         await refresh_saved_scenarios_list()
         scenario_test_tree.set_selected_path(saved_path)
+        void test_powers_panel.load_powers_for_test(saved_path)
         return saved_path
     }
+
+    const {html_form: html_creature_form, cancel_placement: cancel_creature_placement, refresh_power_options: refresh_creature_power_options} = create_creature_setup_form({
+        click_overlay,
+        board,
+        game_state,
+        can_place_creature: () => !step_recorder.is_battle_started(),
+        get_available_powers: () => available_powers,
+        on_add_creature: (creature_setup) => {
+            add_creature_to_game({data: resolve_creature_setup(creature_setup)})
+            step_recorder.record_add_creature(creature_setup)
+        },
+    })
+
+    const test_powers_panel = create_test_powers_panel({
+        get_test_path: () => get_current_scenario().name,
+        on_powers_changed: (powers) => {
+            available_powers = powers
+            refresh_creature_power_options()
+        },
+    })
+
+    html_name_input.addEventListener("change", () => {
+        void test_powers_panel.load_powers_for_test(get_current_scenario().name)
+    })
 
     const apply_loaded_scenario = (loaded: ScenarioTest) => {
         cancel_creature_placement()
@@ -199,6 +227,7 @@ export const create_visual_tests_ui = ({
         scenario_dirty_state.mark_clean(loaded)
         refresh_level_setup_list()
         refresh_steps_list()
+        void test_powers_panel.load_powers_for_test(loaded.name)
     }
 
     const load_scenario_by_path = async (path: string) => {
@@ -279,20 +308,10 @@ export const create_visual_tests_ui = ({
         }
     })
 
-    const {html_form: html_creature_form, cancel_placement: cancel_creature_placement} = create_creature_setup_form({
-        click_overlay,
-        board,
-        game_state,
-        can_place_creature: () => !step_recorder.is_battle_started(),
-        on_add_creature: (creature_setup) => {
-            add_creature_to_game({data: resolve_creature_setup(creature_setup)})
-            step_recorder.record_add_creature(creature_setup)
-        },
-    })
-
     html_panel.append(
         html_header,
         html_scenario_name_field,
+        test_powers_panel.html_root,
         html_creature_form,
         html_controls_title,
         html_clear_button,
@@ -318,6 +337,7 @@ export const create_visual_tests_ui = ({
     } else {
         refresh_level_setup_list()
         refresh_steps_list()
+        void test_powers_panel.load_powers_for_test(scenario.name)
     }
 
     void refresh_saved_scenarios_list()

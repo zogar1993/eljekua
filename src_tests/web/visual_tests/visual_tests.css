@@ -35,12 +35,112 @@
 }
 
 .visual-tests__input,
-.visual-tests__select {
+.visual-tests__select,
+.visual-tests__textarea {
     width: 100%;
     box-sizing: border-box;
 }
 
+.visual-tests__textarea {
+    font-family: monospace;
+    resize: vertical;
+}
+
 .visual-tests__setup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.visual-tests__checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.visual-tests__button--small {
+    align-self: flex-start;
+    font-size: 12px;
+    padding: 2px 6px;
+}
+
+.visual-tests__test-powers-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.visual-tests__test-powers-status {
+    color: #666;
+    font-size: 12px;
+}
+
+.visual-tests__power-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.visual-tests__power-editor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 360px;
+    overflow: auto;
+}
+
+.visual-tests__power-editor-add {
+    display: flex;
+    gap: 4px;
+}
+
+.visual-tests__power-form {
+    border: 1px solid #ccc;
+    background: #fff;
+    padding: 4px;
+}
+
+.visual-tests__power-form-summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.visual-tests__power-form-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.visual-tests__power-form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.visual-tests__instruction-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.visual-tests__instruction-list-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.visual-tests__instruction-form {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px;
+    border: 1px dashed #bbb;
+    background: #f8f8f8;
+}
+
+.visual-tests__instruction-form-fields {
     display: flex;
     flex-direction: column;
     gap: 4px;

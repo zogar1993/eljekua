@@ -1,7 +1,7 @@
 import type {PositionFootprintOne} from "core/battlegrid/Position";
 import type {GameState} from "core/game_state/GameState";
+import type {IRPower} from "core/types";
 import type {ScenarioCreatureSetup} from "scenario_test/ScenarioTest";
-import {POWER_SET, type PowerSetName} from "scenario_test/resolve_creature_setup";
 import type {BattleGridVisual} from "web/battle_grid/BattleGridVisual";
 import {
     get_position_by_coordinate,
@@ -19,12 +19,14 @@ export const create_creature_setup_form = ({
                                                game_state,
                                                can_place_creature,
                                                on_add_creature,
+                                               get_available_powers,
                                            }: {
     click_overlay: BattleGridVisual
     board: Array<Array<SquareVisual>>
     game_state: GameState
     can_place_creature: () => boolean
     on_add_creature: (creature: ScenarioCreatureSetup) => void
+    get_available_powers: () => Array<IRPower>
 }) => {
     const html_form = create_html_element("div", "visual-tests__setup-form")
     html_form.append(create_field_group_title("Add creature"))
@@ -35,15 +37,24 @@ export const create_creature_setup_form = ({
     const html_team = create_html_element("input", "visual-tests__input") as HTMLInputElement
     html_team.value = "1"
 
-    const html_power_sets = create_html_element("select", "visual-tests__select") as HTMLSelectElement
-    html_power_sets.multiple = true
-    for (const power_set of Object.values(POWER_SET)) {
-        const option = document.createElement("option")
-        option.value = power_set
-        option.textContent = power_set
-        option.selected = power_set === POWER_SET.BASIC
-        html_power_sets.append(option)
+    const html_powers = create_html_element("select", "visual-tests__select") as HTMLSelectElement
+    html_powers.multiple = true
+
+    const refresh_power_options = () => {
+        const selected_names = new Set(
+            Array.from(html_powers.selectedOptions).map(option => option.value),
+        )
+        html_powers.replaceChildren()
+        for (const power of get_available_powers()) {
+            const option = document.createElement("option")
+            option.value = power.name
+            option.textContent = power.name
+            option.selected = selected_names.has(power.name)
+            html_powers.append(option)
+        }
     }
+
+    refresh_power_options()
 
     let selected_image = VISUAL_TEST_CREATURE_IMAGE_OPTIONS[0].image
     const html_image_picker = create_html_element("div", "visual-tests__image-picker")
@@ -117,13 +128,18 @@ export const create_creature_setup_form = ({
     }
 
     const build_creature_setup = (position: PositionFootprintOne): ScenarioCreatureSetup => {
-        const selected_power_sets = Array.from(html_power_sets.selectedOptions).map(option => option.value as PowerSetName)
+        const available_powers = get_available_powers()
+        const powers_by_name = new Map(available_powers.map(power => [power.name, power]))
+        const selected_powers = Array.from(html_powers.selectedOptions)
+            .map(option => powers_by_name.get(option.value))
+            .filter((power): power is IRPower => power !== undefined)
+
         return {
             name: html_name.value.trim(),
             team: html_team.value.trim() === "" ? null : Number(html_team.value),
             position,
             image: selected_image,
-            power_sets: selected_power_sets.length > 0 ? selected_power_sets : [POWER_SET.BASIC],
+            powers: selected_powers,
         }
     }
 
@@ -189,7 +205,7 @@ export const create_creature_setup_form = ({
         create_labeled_field({label: "Team (empty = neutral)", control: html_team}),
         create_field_group_title("Sprite"),
         html_image_picker,
-        create_labeled_field({label: "Power sets", control: html_power_sets}),
+        create_labeled_field({label: "Powers", control: html_powers}),
         html_placement_hint,
         html_add_button,
     )
@@ -199,5 +215,6 @@ export const create_creature_setup_form = ({
     return {
         html_form,
         cancel_placement,
+        refresh_power_options,
     }
 }

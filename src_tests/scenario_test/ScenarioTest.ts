@@ -1,7 +1,7 @@
 import type {Position} from "core/battlegrid/Position";
 import type {AttributeCode} from "core/character_sheet/attributes";
 import type {Size} from "core/battlegrid/creatures/SIZES";
-import type {PowerSetName} from "scenario_test/resolve_creature_setup";
+import type {IRPower} from "core/types";
 
 export const SCENARIO_STEP_TYPE = {
     SET_TURN: "set_turn",
@@ -40,7 +40,7 @@ export type ScenarioCreatureSetup = {
     level?: number
     team?: number | null
     attributes?: Record<AttributeCode, number>
-    power_sets?: Array<PowerSetName>
+    powers?: Array<IRPower>
     archetypes?: Array<string>
 }
 
