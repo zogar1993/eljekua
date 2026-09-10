@@ -50,6 +50,33 @@
     gap: var(--ce-space-xs);
 }
 
+.content-editor__field--compact {
+    flex: 0 0 auto;
+}
+
+.content-editor__field-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--ce-space-sm) var(--ce-space-md);
+}
+
+.content-editor__field-grid .content-editor__input,
+.content-editor__field-grid .content-editor__select {
+    width: 100%;
+    min-width: 0;
+}
+
+.content-editor__field-grid .content-editor__input--compact {
+    width: 100%;
+    min-width: 0;
+}
+
+.content-editor__input--compact {
+    width: 4.5rem;
+    min-width: 4.5rem;
+    padding: 6px 8px;
+}
+
 .content-editor__label {
     font-size: 12px;
     font-weight: 600;
@@ -227,6 +254,12 @@
     padding: 4px 8px;
     font-size: 20px;
     line-height: 1;
+}
+
+.content-editor__button--active {
+    background: var(--ce-color-accent-soft);
+    border-color: var(--ce-color-accent);
+    color: var(--ce-color-accent);
 }
 
 .content-editor__panel-title {

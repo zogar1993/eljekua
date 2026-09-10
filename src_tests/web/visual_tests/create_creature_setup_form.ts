@@ -9,8 +9,15 @@ import {
 } from "web/core/battle_grid/coordinates/ClickableCoordinate";
 import {SQUARE_HIGHLIGHT} from "web/core/battle_grid/squares/SquareHighlight";
 import type {SquareVisual} from "web/core/battle_grid/squares/SquareVisual";
-import {VISUAL_TEST_CREATURE_IMAGE_OPTIONS} from "web/visual_tests/visual_test_creature_images";
-import {create_field_group_title, create_labeled_field} from "web/visual_tests/create_labeled_field";
+import {
+    create_content_button,
+    CONTENT_EDITOR_BUTTON_SIZE,
+    CONTENT_EDITOR_BUTTON_VARIANT,
+} from "web/content_editor/create_content_button";
+import {create_content_panel_title} from "web/content_editor/create_content_editor_layout";
+import type {CreatureSetupDraft} from "web/visual_tests/creature_editor/creature_editor_defaults";
+import {create_default_creature_setup_draft} from "web/visual_tests/creature_editor/creature_editor_defaults";
+import {open_creature_editor_modal} from "web/visual_tests/creature_editor/create_creature_editor_modal";
 import {create_html_element} from "web/core/utils/create_html_element";
 
 export const create_creature_setup_form = ({
@@ -28,79 +35,21 @@ export const create_creature_setup_form = ({
     on_add_creature: (creature: ScenarioCreatureSetup) => void
     get_available_powers: () => Array<IRPower>
 }) => {
-    const html_form = create_html_element("div", "visual-tests__setup-form")
-    html_form.append(create_field_group_title("Add creature"))
-
-    const html_name = create_html_element("input", "visual-tests__input") as HTMLInputElement
-    html_name.value = "hero"
-
-    const html_team = create_html_element("input", "visual-tests__input") as HTMLInputElement
-    html_team.value = "1"
-
-    const html_powers = create_html_element("select", "visual-tests__select") as HTMLSelectElement
-    html_powers.multiple = true
-
-    const refresh_power_options = () => {
-        const selected_names = new Set(
-            Array.from(html_powers.selectedOptions).map(option => option.value),
-        )
-        html_powers.replaceChildren()
-        for (const power of get_available_powers()) {
-            const option = document.createElement("option")
-            option.value = power.name
-            option.textContent = power.name
-            option.selected = selected_names.has(power.name)
-            html_powers.append(option)
-        }
-    }
-
-    refresh_power_options()
-
-    let selected_image = VISUAL_TEST_CREATURE_IMAGE_OPTIONS[0].image
-    const html_image_picker = create_html_element("div", "visual-tests__image-picker")
-
-    const refresh_image_picker = () => {
-        html_image_picker.querySelectorAll(".visual-tests__image-option").forEach(element => {
-            element.classList.toggle(
-                "visual-tests__image-option--selected",
-                element instanceof HTMLElement && element.dataset["image"] === selected_image,
-            )
-        })
-    }
-
-    for (const option of VISUAL_TEST_CREATURE_IMAGE_OPTIONS) {
-        const html_option = document.createElement("button")
-        html_option.type = "button"
-        html_option.className = "visual-tests__image-option"
-        html_option.dataset["image"] = option.image
-        html_option.title = option.label
-
-        const html_preview = create_html_element("span", "visual-tests__image-option-preview")
-        html_preview.style.backgroundImage = option.image
-
-        const html_label = create_html_element("span", "visual-tests__image-option-label")
-        html_label.textContent = option.label
-
-        html_option.append(html_preview, html_label)
-        html_option.addEventListener("click", () => {
-            selected_image = option.image
-            refresh_image_picker()
-        })
-        html_image_picker.append(html_option)
-    }
-
-    refresh_image_picker()
+    const html_form = create_html_element("div", "content-editor content-editor__editor-root")
 
     const html_placement_hint = create_html_element("div", "visual-tests__placement-hint")
     html_placement_hint.textContent = "Click a grid square to place the creature."
 
-    const html_add_button = document.createElement("button")
-    html_add_button.className = "visual-tests__button"
-    html_add_button.type = "button"
-    html_add_button.textContent = "Add creature"
+    const html_add_button = create_content_button({
+        text: "Add creature",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.PRIMARY,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+    })
 
     let placement_active = false
     let latest_hovered_position: PositionFootprintOne | null = null
+    let pending_creature_draft: CreatureSetupDraft | null = null
+    let open_modal_refresh_power_options: (() => void) | undefined
 
     const get_clickable_positions = (): Array<PositionFootprintOne> => {
         const {size} = game_state.battle_grid
@@ -127,41 +76,47 @@ export const create_creature_setup_form = ({
             board[position.y][position.x].set_highlight(SQUARE_HIGHLIGHT.CLICKABLE)
     }
 
-    const build_creature_setup = (position: PositionFootprintOne): ScenarioCreatureSetup => {
-        const available_powers = get_available_powers()
-        const powers_by_name = new Map(available_powers.map(power => [power.name, power]))
-        const selected_powers = Array.from(html_powers.selectedOptions)
-            .map(option => powers_by_name.get(option.value))
-            .filter((power): power is IRPower => power !== undefined)
-
-        return {
-            name: html_name.value.trim(),
-            team: html_team.value.trim() === "" ? null : Number(html_team.value),
-            position,
-            image: selected_image,
-            powers: selected_powers,
-        }
-    }
-
     const cancel_placement = () => {
         if (!placement_active) return
         placement_active = false
+        pending_creature_draft = null
         latest_hovered_position = null
-        html_add_button.classList.remove("visual-tests__button--active")
+        html_add_button.classList.remove("content-editor__button--active")
         html_add_button.textContent = "Add creature"
         html_placement_hint.hidden = true
         clear_board_highlights()
     }
 
-    const start_placement = () => {
+    const start_placement = (creature_draft: CreatureSetupDraft) => {
         if (!can_place_creature()) return
         if (get_clickable_positions().length === 0) return
 
+        pending_creature_draft = creature_draft
         placement_active = true
-        html_add_button.classList.add("visual-tests__button--active")
+        html_add_button.classList.add("content-editor__button--active")
         html_add_button.textContent = "Cancel placement"
         html_placement_hint.hidden = false
         set_placement_highlights()
+    }
+
+    const open_creature_modal = () => {
+        if (!can_place_creature()) return
+
+        let creature_draft = create_default_creature_setup_draft()
+
+        const modal = open_creature_editor_modal({
+            title: "Create creature",
+            creature: creature_draft,
+            get_available_powers,
+            on_creature_changed: (creature) => {
+                creature_draft = creature
+            },
+            on_close: () => {
+                start_placement(creature_draft)
+            },
+        })
+
+        open_modal_refresh_power_options = modal.refresh_power_options
     }
 
     html_add_button.addEventListener("click", () => {
@@ -169,7 +124,7 @@ export const create_creature_setup_form = ({
             cancel_placement()
             return
         }
-        start_placement()
+        open_creature_modal()
     })
 
     click_overlay.addOnMouseMoveHandler(coordinate => {
@@ -191,26 +146,26 @@ export const create_creature_setup_form = ({
     })
 
     click_overlay.addOnClickHandler(coordinate => {
-        if (!placement_active || !can_place_creature()) return
+        if (!placement_active || !can_place_creature() || pending_creature_draft === null) return
 
         const position = get_position_by_coordinate({coordinate, positions: get_clickable_positions()}) as PositionFootprintOne | null
         if (position === null) return
 
-        on_add_creature(build_creature_setup(position))
+        on_add_creature({...pending_creature_draft, position})
         cancel_placement()
     })
 
     html_form.append(
-        create_labeled_field({label: "Creature name", control: html_name}),
-        create_labeled_field({label: "Team (empty = neutral)", control: html_team}),
-        create_field_group_title("Sprite"),
-        html_image_picker,
-        create_labeled_field({label: "Powers", control: html_powers}),
+        create_content_panel_title("Creatures"),
         html_placement_hint,
         html_add_button,
     )
 
     html_placement_hint.hidden = true
+
+    const refresh_power_options = () => {
+        open_modal_refresh_power_options?.()
+    }
 
     return {
         html_form,

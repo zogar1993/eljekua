@@ -3,11 +3,16 @@ import {create_html_element} from "web/core/utils/create_html_element";
 export const create_labeled_field = ({
                                          label,
                                          control,
+                                         compact = false,
                                      }: {
     label: string
     control: HTMLElement
+    compact?: boolean
 }) => {
-    const html_field = create_html_element("label", "content-editor__field")
+    const html_field = create_html_element(
+        "label",
+        compact ? "content-editor__field content-editor__field--compact" : "content-editor__field",
+    )
     const html_label = create_html_element("span", "content-editor__label")
     html_label.textContent = label
     html_field.append(html_label, control)

@@ -17,12 +17,28 @@ export const create_text_input = ({
 
 export const create_number_input = ({
                                         value = 0,
+                                        compact = false,
                                     }: {
     value?: number
+    compact?: boolean
 } = {}) => {
     const html_input = create_html_element("input", "content-editor__input") as HTMLInputElement
     html_input.type = "number"
     html_input.value = String(value)
+    if (compact)
+        html_input.classList.add("content-editor__input--compact")
+    return html_input
+}
+
+export const create_compact_text_input = ({
+                                              value = "",
+                                              placeholder = "",
+                                          }: {
+    value?: string
+    placeholder?: string
+} = {}) => {
+    const html_input = create_text_input({value, placeholder})
+    html_input.classList.add("content-editor__input--compact")
     return html_input
 }
 

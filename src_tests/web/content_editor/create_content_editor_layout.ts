@@ -27,3 +27,9 @@ export const create_content_subsection_title = (title: string) => {
     html_title.textContent = title
     return html_title
 }
+
+export const create_field_grid = (html_fields: Array<HTMLElement>) => {
+    const html_grid = create_html_element("div", "content-editor__field-grid")
+    html_grid.append(...html_fields)
+    return html_grid
+}
