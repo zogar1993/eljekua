@@ -149,7 +149,7 @@ export const create_creature_form = ({
                 create_field_grid(ATTRIBUTE_CODES.map(attribute_code => create_labeled_field({
                     label: attribute_code,
                     control: html_attribute_inputs.get(attribute_code)!,
-                }))),
+                })), 6),
             ],
         }),
         create_content_section({
