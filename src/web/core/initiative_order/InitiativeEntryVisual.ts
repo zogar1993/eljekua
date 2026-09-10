@@ -1,6 +1,6 @@
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 import {AssertionError} from "stdlib/AssertionError";
 
 export const create_initiative_entry_visual = ({creature, initiative, index}: {

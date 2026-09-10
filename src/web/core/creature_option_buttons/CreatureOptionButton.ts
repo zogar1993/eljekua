@@ -1,5 +1,5 @@
 import type {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 import type {InstructionLoop} from "core/instruction_loop";
 import {INTERACTION_TYPE} from "core/interactions/Interactions";
 

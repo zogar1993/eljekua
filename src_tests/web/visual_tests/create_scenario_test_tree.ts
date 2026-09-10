@@ -1,5 +1,5 @@
 import {build_scenario_test_tree, type ScenarioTestTreeNode} from "web/visual_tests/build_scenario_test_tree";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 
 export const create_scenario_test_tree = ({
                                               on_test_click,

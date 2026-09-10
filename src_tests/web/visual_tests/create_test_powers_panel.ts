@@ -1,7 +1,7 @@
 import type {IRPower} from "core/types";
 import {create_power_editor} from "web/visual_tests/power_editor/create_power_editor";
 import {load_test_powers_by_path, save_test_powers_by_path} from "web/visual_tests/test_powers_api";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 
 const AUTO_SAVE_DELAY_MS = 300
 

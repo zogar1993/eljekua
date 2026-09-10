@@ -1,4 +1,4 @@
-import {create_action_log} from "web/action_log/ActionLog";
+import {create_action_log} from "web/core/action_log/ActionLog";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import {ROGUE_POWERS} from "data/powers/rogue";
 import {FIGHTER_POWERS} from "data/powers/fighter";
@@ -9,19 +9,19 @@ import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
-import {create_hit_status_buttons_ui} from "web/hit_status_buttons/HitStatusButtonsUI";
+import {create_hit_status_buttons_ui} from "web/core/hit_status_buttons/HitStatusButtonsUI";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
-import {create_initiative_order_ui} from "web/initiative_order/InitiativeOrderUI";
+import {create_initiative_order_ui} from "web/core/initiative_order/InitiativeOrderUI";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {create_start_battle} from "core/use_cases/start_battle";
 import {create_instruction_loop} from "core/instruction_loop";
 import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
-import {create_instruction_visualizer} from "web/instruction_visualizer/instruction_visualizer";
+import {create_instruction_visualizer} from "web/core/instruction_visualizer/instruction_visualizer";
 import {create_set_current_turn_to_creature} from "core/use_cases/gameplay/set_current_turn_to_creature";
 import {create_game_events} from "core/events/GameEvents";
 import {create_game_state} from "core/game_state/GameState";
-import {initialize_battle_grid_ui} from "web/battle_grid/BattleGridUI";
-import {create_option_buttons_ui} from "web/creature_option_buttons/CreatureOptionButtons";
+import {initialize_battle_grid_ui} from "web/core/battle_grid/BattleGridUI";
+import {create_option_buttons_ui} from "web/core/creature_option_buttons/CreatureOptionButtons";
 
 const game_events = create_game_events()
 const game_state = create_game_state({game_events, battle_grid_size: {x: 10, y: 10}})

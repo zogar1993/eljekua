@@ -7,7 +7,7 @@ import {
 } from "web/content_editor/create_content_button";
 import {create_default_instruction} from "web/visual_tests/power_editor/power_editor_defaults";
 import {create_instruction_editor} from "web/visual_tests/power_editor/create_instruction_editor";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 
 export const create_instruction_list_editor = ({
                                                    instructions,

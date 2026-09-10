@@ -10,7 +10,7 @@ import {
     POWER_EDITOR_TEMPLATE,
 } from "web/visual_tests/power_editor/power_editor_defaults";
 import {open_power_editor_modal} from "web/visual_tests/power_editor/create_power_editor_modal";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 
 type PowerListEntry = {
     power: IRPower

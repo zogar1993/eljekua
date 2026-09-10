@@ -20,9 +20,9 @@ import {
     save_scenario_test,
 } from "web/visual_tests/scenario_test_api";
 import {read_scheduled_visual_test_reload, schedule_visual_test_reload} from "web/visual_tests/schedule_visual_test_reload";
-import type {BattleGridVisual} from "web/battle_grid/BattleGridVisual";
-import type {SquareVisual} from "web/battle_grid/squares/SquareVisual";
-import {create_html_element} from "web/utils/create_html_element";
+import type {BattleGridVisual} from "web/core/battle_grid/BattleGridVisual";
+import type {SquareVisual} from "web/core/battle_grid/squares/SquareVisual";
+import {create_html_element} from "web/core/utils/create_html_element";
 import type {ScenarioGame} from "scenario_test/create_scenario_game";
 
 const REPLAY_STORAGE_KEY = "eljekua_scenario_replay"

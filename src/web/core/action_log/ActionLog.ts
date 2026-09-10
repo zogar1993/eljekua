@@ -2,8 +2,8 @@ import type {GameEvents} from "core/events/GameEvents";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 import type {Expr} from "core/virtual_machine/expressions/types";
-import {create_expression_html} from "web/expression/create_expression_html";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_expression_html} from "web/core/expression/create_expression_html";
+import {create_html_element} from "web/core/utils/create_html_element";
 
 const HIT_STATUS_TEXT = new Map<HitStatus, string>([
     [HIT_STATUS.MISS, "misses"],

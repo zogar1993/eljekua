@@ -17,7 +17,7 @@ import {create_content_section} from "web/content_editor/create_content_editor_l
 import {create_content_button, CONTENT_EDITOR_BUTTON_SIZE, CONTENT_EDITOR_BUTTON_VARIANT} from "web/content_editor/create_content_button";
 import {create_instruction_list_editor} from "web/visual_tests/power_editor/create_instruction_list_editor";
 import {create_labeled_field} from "web/visual_tests/create_labeled_field";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 
 const ACTION_TYPE_OPTIONS = Object.values(ACTION_TYPE).map(action => ({value: action, label: action}))
 

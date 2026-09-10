@@ -2,16 +2,16 @@ import type {PositionFootprintOne} from "core/battlegrid/Position";
 import type {GameState} from "core/game_state/GameState";
 import type {IRPower} from "core/types";
 import type {ScenarioCreatureSetup} from "scenario_test/ScenarioTest";
-import type {BattleGridVisual} from "web/battle_grid/BattleGridVisual";
+import type {BattleGridVisual} from "web/core/battle_grid/BattleGridVisual";
 import {
     get_position_by_coordinate,
     nullable_positions_equal,
-} from "web/battle_grid/coordinates/ClickableCoordinate";
-import {SQUARE_HIGHLIGHT} from "web/battle_grid/squares/SquareHighlight";
-import type {SquareVisual} from "web/battle_grid/squares/SquareVisual";
+} from "web/core/battle_grid/coordinates/ClickableCoordinate";
+import {SQUARE_HIGHLIGHT} from "web/core/battle_grid/squares/SquareHighlight";
+import type {SquareVisual} from "web/core/battle_grid/squares/SquareVisual";
 import {VISUAL_TEST_CREATURE_IMAGE_OPTIONS} from "web/visual_tests/visual_test_creature_images";
 import {create_field_group_title, create_labeled_field} from "web/visual_tests/create_labeled_field";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 
 export const create_creature_setup_form = ({
                                                click_overlay,

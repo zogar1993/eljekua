@@ -2,8 +2,8 @@ import type {GameEvents} from "core/events/GameEvents";
 import type {InstructionLoop} from "core/instruction_loop";
 import {INTERACTION_TYPE} from "core/interactions/Interactions";
 import type {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
-import type {CreatureOptionButton} from "web/creature_option_buttons/CreatureOptionButton";
-import {create_option_button_visual} from "web/creature_option_buttons/CreatureOptionButton";
+import type {CreatureOptionButton} from "web/core/creature_option_buttons/CreatureOptionButton";
+import {create_option_button_visual} from "web/core/creature_option_buttons/CreatureOptionButton";
 import {AssertionError} from "stdlib/AssertionError";
 
 export const create_option_buttons_ui = ({game_events, game_input}: {

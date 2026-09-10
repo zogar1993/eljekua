@@ -1,5 +1,5 @@
 import {create_content_button, CONTENT_EDITOR_BUTTON_SIZE, CONTENT_EDITOR_BUTTON_VARIANT} from "web/content_editor/create_content_button";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 
 export const create_modal = ({
                                  title,

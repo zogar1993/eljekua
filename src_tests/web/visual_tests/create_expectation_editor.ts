@@ -6,7 +6,7 @@ import {
     type ScenarioTest,
 } from "scenario_test/ScenarioTest";
 import {create_field_group_title} from "web/visual_tests/create_labeled_field";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 
 export const create_expectation_editor = ({
                                                 get_scenario,

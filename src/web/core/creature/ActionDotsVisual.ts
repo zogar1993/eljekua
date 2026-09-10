@@ -1,6 +1,6 @@
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE} from "core/battlegrid/creatures/ActionType";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 
 const ACTION_DOT_DISPLAY_ORDER: Array<ActionType> = [
     ACTION_TYPE.STANDARD,

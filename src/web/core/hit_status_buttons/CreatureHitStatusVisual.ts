@@ -1,6 +1,6 @@
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 import {assert_is_not_null} from "stdlib/assert";
 
 const HIT_STATUS_OPTIONS: Array<{ status: HitStatus, label: string }> = [

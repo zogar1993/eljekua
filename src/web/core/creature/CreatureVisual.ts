@@ -1,8 +1,8 @@
 import type {Position} from "core/battlegrid/Position";
 import {SIZE} from "core/battlegrid/creatures/SIZES";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
-import {create_html_element} from "web/utils/create_html_element";
-import {create_action_dots_visual} from "web/creature/ActionDotsVisual";
+import {create_html_element} from "web/core/utils/create_html_element";
+import {create_action_dots_visual} from "web/core/creature/ActionDotsVisual";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 
 export type CreatureVisual = {

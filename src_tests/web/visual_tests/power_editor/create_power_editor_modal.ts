@@ -1,7 +1,7 @@
 import type {IRPower} from "core/types";
 import {create_modal} from "web/visual_tests/create_modal";
 import {create_power_form} from "web/visual_tests/power_editor/create_power_form";
-import {create_html_element} from "web/utils/create_html_element";
+import {create_html_element} from "web/core/utils/create_html_element";
 
 const format_power_json = (power: IRPower): string => JSON.stringify(power, null, 2)
 
