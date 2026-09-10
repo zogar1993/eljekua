@@ -20,6 +20,15 @@ export const load_scenario_test_by_path = async (path: string): Promise<Scenario
     return parse_scenario_test_json(await response.text())
 }
 
+export const delete_scenario_test = async (path: string): Promise<void> => {
+    const scenario_path = sanitize_scenario_path(path)
+    const response = await fetch(`${SCENARIO_TEST_API_BASE}/api/scenarios/${encode_scenario_path_for_url(scenario_path)}`, {
+        method: "DELETE",
+    })
+    if (!response.ok)
+        throw Error(`failed to delete scenario "${scenario_path}" (${response.status})`)
+}
+
 export const save_scenario_test = async (scenario: ScenarioTest): Promise<string> => {
     const scenario_path = sanitize_scenario_path(scenario.name)
     const response = await fetch(`${SCENARIO_TEST_API_BASE}/api/scenarios/${encode_scenario_path_for_url(scenario_path)}`, {

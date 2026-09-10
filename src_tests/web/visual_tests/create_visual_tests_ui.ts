@@ -20,6 +20,7 @@ import {create_step_recorder} from "web/visual_tests/create_step_recorder";
 import {create_scenario_test_tree} from "web/visual_tests/create_scenario_test_tree";
 import {create_auto_save_scheduler} from "web/visual_tests/create_auto_save_scheduler";
 import {
+    delete_scenario_test,
     list_scenario_tests,
     load_scenario_test_by_path,
     save_scenario_test,
@@ -127,8 +128,14 @@ export const create_visual_tests_ui = ({
         size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
     })
 
+    const html_delete_test_button = create_content_button({
+        text: "Delete test",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.DANGER,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+    })
+
     const html_test_actions = create_html_element("div", "visual-tests__test-actions")
-    html_test_actions.append(html_new_test_button, html_create_test_button)
+    html_test_actions.append(html_new_test_button, html_create_test_button, html_delete_test_button)
 
     const create_button = (class_name: string, text: string) => {
         const button = document.createElement("button")
@@ -245,6 +252,7 @@ export const create_visual_tests_ui = ({
         html_name_input.value = saved_path ?? scenario.name
         html_name_input.readOnly = saved_path !== null
         html_create_test_button.hidden = saved_path !== null
+        html_delete_test_button.hidden = saved_path === null
         test_powers_panel.html_root.hidden = saved_path === null
     }
 
@@ -346,6 +354,23 @@ export const create_visual_tests_ui = ({
     html_create_test_button.addEventListener("click", () => {
         void create_test_at_path(html_name_input.value).then(() => {
             set_result(`Created ${saved_path}.`, true)
+        }).catch((error) => {
+            set_result(error instanceof Error ? error.message : String(error), false)
+        })
+    })
+
+    html_delete_test_button.addEventListener("click", () => {
+        if (saved_path === null)
+            return
+
+        const path_to_delete = saved_path
+        if (!confirm(`Delete test "${path_to_delete}"?`))
+            return
+
+        void delete_scenario_test(path_to_delete).then(async () => {
+            await refresh_saved_scenarios_list()
+            await begin_new_test_draft()
+            set_result(`Deleted ${path_to_delete}.`, true)
         }).catch((error) => {
             set_result(error instanceof Error ? error.message : String(error), false)
         })

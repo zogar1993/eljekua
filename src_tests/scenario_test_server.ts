@@ -160,6 +160,13 @@ const server = http.createServer(async (request, response) => {
                 send_json(response, 200, {saved: path.relative(SCENARIOS_DIR, file_path)})
                 return
             }
+
+            if (request.method === "DELETE") {
+                const file_path = get_scenario_file_path(scenario_path)
+                await fs.unlink(file_path)
+                send_json(response, 200, {deleted: path.relative(SCENARIOS_DIR, file_path)})
+                return
+            }
         }
 
         if (request.method === "GET")
