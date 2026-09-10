@@ -20,6 +20,11 @@
     box-sizing: border-box;
 }
 
+.visual-tests__test-actions {
+    display: flex;
+    gap: 8px;
+}
+
 .visual-tests__test-powers-panel {
     display: flex;
     flex-direction: column;

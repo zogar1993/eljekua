@@ -5,7 +5,13 @@ import type {IRPower} from "core/types";
 import {apply_scenario_level_setup_to_game} from "scenario_test/apply_scenario_level_setup_to_game";
 import {create_scenario_runner} from "scenario_test/create_scenario_runner";
 import {resolve_creature_setup} from "scenario_test/resolve_creature_setup";
+import {sanitize_scenario_path} from "scenario_test/sanitize_scenario_path";
 import {create_empty_scenario, type ScenarioTest} from "scenario_test/ScenarioTest";
+import {
+    create_content_button,
+    CONTENT_EDITOR_BUTTON_SIZE,
+    CONTENT_EDITOR_BUTTON_VARIANT,
+} from "web/content_editor/create_content_button";
 import {create_creature_setup_form} from "web/visual_tests/create_creature_setup_form";
 import {create_test_powers_panel} from "web/visual_tests/create_test_powers_panel";
 import {create_expectation_editor} from "web/visual_tests/create_expectation_editor";
@@ -59,7 +65,8 @@ export const create_visual_tests_ui = ({
     click_overlay: BattleGridVisual
     board: Array<Array<SquareVisual>>
 }) => {
-    let scenario = create_empty_scenario()
+    let scenario = create_empty_scenario({name: ""})
+    let saved_path: string | null = null
     let available_powers: Array<IRPower> = []
 
     const html_panel = document.querySelector("#visual_tests")!
@@ -69,7 +76,8 @@ export const create_visual_tests_ui = ({
     const set_scenario = (next_scenario: ScenarioTest) => {
         scenario = next_scenario
         refresh_scenario_name_input()
-        auto_save.schedule_auto_save()
+        if (saved_path !== null)
+            auto_save.schedule_auto_save()
     }
 
     const html_level_setup_list = create_html_element("ul", "visual-tests__level-setup-list")
@@ -90,21 +98,37 @@ export const create_visual_tests_ui = ({
     html_header.textContent = "Visual Tests"
 
     const html_name_input = create_html_element("input", "visual-tests__input") as HTMLInputElement
-    html_name_input.value = scenario.name
-    const get_current_scenario = () => ({...scenario, name: html_name_input.value.trim() || "untitled_scenario"})
-
-    const sync_scenario_name_from_input = () => {
-        const name = html_name_input.value.trim() || "untitled_scenario"
-        set_scenario({...scenario, name})
-    }
+    html_name_input.placeholder = "folder/test_name"
+    const get_current_scenario = (): ScenarioTest => ({
+        ...scenario,
+        name: saved_path ?? sanitize_scenario_path(html_name_input.value),
+    })
 
     html_name_input.addEventListener("input", () => {
-        sync_scenario_name_from_input()
+        if (saved_path !== null)
+            return
+        scenario = {...scenario, name: html_name_input.value}
     })
+
+    const html_create_test_button = create_content_button({
+        text: "Create test",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.PRIMARY,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+    })
+
     const html_scenario_name_field = create_labeled_field({
         label: "Test path",
         control: html_name_input,
     })
+
+    const html_new_test_button = create_content_button({
+        text: "New test",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.SECONDARY,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+    })
+
+    const html_test_actions = create_html_element("div", "visual-tests__test-actions")
+    html_test_actions.append(html_new_test_button, html_create_test_button)
 
     const create_button = (class_name: string, text: string) => {
         const button = document.createElement("button")
@@ -117,15 +141,13 @@ export const create_visual_tests_ui = ({
     const html_start_battle_button = create_button("visual-tests__button", "Start battle")
     const html_replay_button = create_button("visual-tests__button", "Visual replay")
 
-    html_name_input.placeholder = "folder/test_name"
-
     const scenario_test_tree = create_scenario_test_tree({
         on_test_click: (path) => {
             void handle_test_tree_click(path)
         },
     })
 
-    const html_saved_tests_title = create_field_group_title("Saved tests")
+    const html_saved_tests_title = create_field_group_title("Tests")
 
     const html_controls_title = create_field_group_title("Run")
     const html_level_setup_title = create_field_group_title("Level setup")
@@ -133,10 +155,6 @@ export const create_visual_tests_ui = ({
     const html_steps_title = create_field_group_title("Steps")
 
     const html_result = create_html_element("div", "visual-tests__result")
-
-    const refresh_scenario_name_input = () => {
-        html_name_input.value = scenario.name
-    }
 
     const {html_panel: html_expectations, refresh_controls: refresh_expectation_controls} = create_expectation_editor({
         get_scenario,
@@ -187,18 +205,13 @@ export const create_visual_tests_ui = ({
 
     const auto_save = create_auto_save_scheduler({
         persist: async () => {
-            try {
-                const scenario_to_save = get_current_scenario()
-                const saved = await save_scenario_test(scenario_to_save)
-                const saved_path = saved.replace(/\.json$/, "").replace(/\\/g, "/")
-                const saved_scenario = {...scenario_to_save, name: saved_path}
+            if (saved_path === null)
+                return
 
-                await auto_save.run_without_auto_save(async () => {
-                    scenario = saved_scenario
-                    refresh_scenario_name_input()
-                    scenario_test_tree.set_selected_path(saved_path)
-                    await refresh_saved_scenarios_list()
-                })
+            try {
+                const scenario_to_save = {...scenario, name: saved_path}
+                await save_scenario_test(scenario_to_save)
+                await refresh_saved_scenarios_list()
             } catch (error) {
                 set_result(error instanceof Error ? error.message : String(error), false)
             }
@@ -221,19 +234,69 @@ export const create_visual_tests_ui = ({
     })
 
     const test_powers_panel = create_test_powers_panel({
-        get_test_path: () => get_current_scenario().name,
+        get_test_path: () => saved_path ?? "",
         on_powers_changed: (powers) => {
             available_powers = powers
             refresh_creature_power_options()
         },
     })
 
-    html_name_input.addEventListener("change", () => {
-        void test_powers_panel.load_powers_for_test(get_current_scenario().name)
-    })
+    const refresh_scenario_name_input = () => {
+        html_name_input.value = saved_path ?? scenario.name
+        html_name_input.readOnly = saved_path !== null
+        html_create_test_button.hidden = saved_path !== null
+        test_powers_panel.html_root.hidden = saved_path === null
+    }
+
+    const reset_editor_state = () => {
+        cancel_creature_placement()
+        step_recorder.mark_loaded_scenario()
+        html_start_battle_button.disabled = false
+        refresh_level_setup_list()
+        refresh_steps_list()
+    }
+
+    const begin_new_test_draft = async () => {
+        if (saved_path !== null) {
+            try {
+                await auto_save.flush_auto_save()
+            } catch (error) {
+                set_result(error instanceof Error ? error.message : String(error), false)
+                return
+            }
+        }
+
+        saved_path = null
+        scenario = create_empty_scenario({name: ""})
+        scenario_test_tree.set_selected_path("")
+        available_powers = []
+        refresh_scenario_name_input()
+        reset_editor_state()
+        set_result("Enter a test path and click Create test.")
+    }
+
+    const create_test_at_path = async (path: string) => {
+        if (path.trim().length === 0)
+            throw Error("Enter a test path.")
+
+        const test_path = sanitize_scenario_path(path)
+        const new_scenario = {...scenario, name: test_path}
+        await save_scenario_test(new_scenario)
+
+        await auto_save.run_without_auto_save(async () => {
+            saved_path = test_path
+            scenario = new_scenario
+            refresh_scenario_name_input()
+            scenario_test_tree.set_selected_path(test_path)
+            await refresh_saved_scenarios_list()
+        })
+
+        void test_powers_panel.load_powers_for_test(test_path)
+    }
 
     const apply_loaded_scenario = (loaded: ScenarioTest) => {
         cancel_creature_placement()
+        saved_path = loaded.name
         scenario = loaded
         refresh_scenario_name_input()
         scenario_test_tree.set_selected_path(loaded.name)
@@ -251,11 +314,13 @@ export const create_visual_tests_ui = ({
     }
 
     const handle_test_tree_click = async (path: string) => {
-        try {
-            await auto_save.flush_auto_save()
-        } catch (error) {
-            set_result(error instanceof Error ? error.message : String(error), false)
-            return
+        if (saved_path !== null) {
+            try {
+                await auto_save.flush_auto_save()
+            } catch (error) {
+                set_result(error instanceof Error ? error.message : String(error), false)
+                return
+            }
         }
 
         set_result("Loading...")
@@ -274,8 +339,21 @@ export const create_visual_tests_ui = ({
         refresh_steps_list()
     })
 
+    html_new_test_button.addEventListener("click", () => {
+        void begin_new_test_draft()
+    })
+
+    html_create_test_button.addEventListener("click", () => {
+        void create_test_at_path(html_name_input.value).then(() => {
+            set_result(`Created ${saved_path}.`, true)
+        }).catch((error) => {
+            set_result(error instanceof Error ? error.message : String(error), false)
+        })
+    })
+
     html_replay_button.addEventListener("click", () => {
-        void auto_save.flush_auto_save().then(() => {
+        const flush = saved_path !== null ? auto_save.flush_auto_save() : Promise.resolve()
+        void flush.then(() => {
             sessionStorage.setItem(REPLAY_STORAGE_KEY, JSON.stringify({
                 scenario: get_current_scenario(),
                 step_delay_ms: REPLAY_STEP_DELAY_MS,
@@ -286,14 +364,15 @@ export const create_visual_tests_ui = ({
 
     html_panel.append(
         html_header,
+        html_saved_tests_title,
+        scenario_test_tree.html_tree,
+        html_test_actions,
         html_scenario_name_field,
         test_powers_panel.html_root,
         html_creature_form,
         html_controls_title,
         html_start_battle_button,
         html_replay_button,
-        html_saved_tests_title,
-        scenario_test_tree.html_tree,
         html_level_setup_title,
         html_level_setup_list,
         html_expectations,
@@ -308,9 +387,8 @@ export const create_visual_tests_ui = ({
         apply_loaded_scenario(scheduled_scenario)
         set_result(`Loaded ${scheduled_scenario.name}.`, true)
     } else {
-        refresh_level_setup_list()
-        refresh_steps_list()
-        void test_powers_panel.load_powers_for_test(scenario.name)
+        refresh_scenario_name_input()
+        reset_editor_state()
     }
 
     void refresh_saved_scenarios_list()

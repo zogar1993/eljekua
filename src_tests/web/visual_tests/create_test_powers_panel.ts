@@ -20,6 +20,9 @@ export const create_test_powers_panel = ({
     const auto_save = create_auto_save_scheduler({
         persist: async () => {
             const test_path = get_test_path()
+            if (!test_path)
+                return
+
             const powers = power_editor.get_powers()
             try {
                 await save_test_powers_by_path({
