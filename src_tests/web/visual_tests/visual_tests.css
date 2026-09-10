@@ -71,11 +71,6 @@
     gap: 6px;
 }
 
-.visual-tests__test-powers-status {
-    color: #666;
-    font-size: 12px;
-}
-
 .visual-tests__power-editor {
     display: flex;
     flex-direction: column;
