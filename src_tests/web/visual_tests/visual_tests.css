@@ -67,7 +67,47 @@
 .visual-tests__expectations {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
+}
+
+.visual-tests__expectation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+.visual-tests__expectation-wizard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+.visual-tests__expectation-hint {
+    font-size: 12px;
+    color: #555;
+}
+
+.visual-tests__expectation-type-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.visual-tests__expectation-hp-value {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.visual-tests__expectation-error {
+    font-size: 12px;
+    color: #721c24;
 }
 
 .visual-tests__button {

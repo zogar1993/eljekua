@@ -15,6 +15,7 @@ import {
 import {create_creature_setup_form} from "web/visual_tests/create_creature_setup_form";
 import {create_test_powers_panel} from "web/visual_tests/create_test_powers_panel";
 import {create_expectation_editor} from "web/visual_tests/create_expectation_editor";
+import {format_scenario_step_label} from "scenario_test/format_scenario_step_label";
 import {create_field_group_title} from "web/visual_tests/create_labeled_field";
 import {create_step_recorder} from "web/visual_tests/create_step_recorder";
 import {create_scenario_test_tree} from "web/visual_tests/create_scenario_test_tree";
@@ -144,12 +145,30 @@ export const create_visual_tests_ui = ({
 
     const html_result = create_html_element("div", "visual-tests__result")
 
-    const {html_panel: html_expectations, refresh_controls: refresh_expectation_controls} = create_expectation_editor({
+    const {html_form: html_creature_form, cancel_placement: cancel_creature_placement, refresh_power_options: refresh_creature_power_options} = create_creature_setup_form({
+        click_overlay,
+        board,
+        game_state,
+        can_place_creature: () => !step_recorder.is_battle_started(),
+        get_available_powers: () => available_powers,
+        on_add_creature: (creature_setup) => {
+            add_creature_to_game({data: resolve_creature_setup(creature_setup)})
+            step_recorder.record_add_creature(creature_setup)
+        },
+        on_placement_error: (message) => {
+            set_result(message, false)
+        },
+    })
+
+    const {html_panel: html_expectations, refresh_controls: refresh_expectation_controls, cancel_expectation_flow} = create_expectation_editor({
         get_scenario,
         set_scenario,
         get_game_state: () => game_state,
         is_battle_started: () => step_recorder.is_battle_started(),
         on_expectation_added: () => refresh_steps_list(),
+        click_overlay,
+        board,
+        cancel_creature_placement,
     })
 
     const refresh_level_setup_list = () => {
@@ -170,7 +189,7 @@ export const create_visual_tests_ui = ({
 
         scenario.steps.forEach((step, index) => {
             const html_step = create_html_element("li", "visual-tests__step")
-            html_step.textContent = `${index + 1}. ${step.type}`
+            html_step.textContent = `${index + 1}. ${format_scenario_step_label(step)}`
             html_steps_list.append(html_step)
         })
         refresh_expectation_controls()
@@ -206,21 +225,6 @@ export const create_visual_tests_ui = ({
         },
     })
 
-    const {html_form: html_creature_form, cancel_placement: cancel_creature_placement, refresh_power_options: refresh_creature_power_options} = create_creature_setup_form({
-        click_overlay,
-        board,
-        game_state,
-        can_place_creature: () => !step_recorder.is_battle_started(),
-        get_available_powers: () => available_powers,
-        on_add_creature: (creature_setup) => {
-            add_creature_to_game({data: resolve_creature_setup(creature_setup)})
-            step_recorder.record_add_creature(creature_setup)
-        },
-        on_placement_error: (message) => {
-            set_result(message, false)
-        },
-    })
-
     const test_powers_panel = create_test_powers_panel({
         get_test_path: () => saved_path ?? "",
         on_powers_changed: (powers) => {
@@ -236,6 +240,7 @@ export const create_visual_tests_ui = ({
 
     const reset_editor_state = () => {
         cancel_creature_placement()
+        cancel_expectation_flow()
         step_recorder.mark_loaded_scenario()
         html_start_battle_button.disabled = false
         refresh_level_setup_list()
@@ -270,6 +275,7 @@ export const create_visual_tests_ui = ({
 
     const apply_loaded_scenario = (loaded: ScenarioTest) => {
         cancel_creature_placement()
+        cancel_expectation_flow()
         saved_path = loaded.name
         scenario = loaded
         refresh_test_ui_state()
@@ -307,6 +313,7 @@ export const create_visual_tests_ui = ({
 
     html_start_battle_button.addEventListener("click", () => {
         cancel_creature_placement()
+        cancel_expectation_flow()
         step_recorder.begin_recording_at_battle_start()
         start_battle()
         html_start_battle_button.disabled = true
