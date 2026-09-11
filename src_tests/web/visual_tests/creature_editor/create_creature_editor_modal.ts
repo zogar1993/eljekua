@@ -24,7 +24,7 @@ export const open_creature_editor_modal = ({
     on_creature_changed: (creature: CreatureSetupDraft) => void
     on_place: () => void
 }) => {
-    const html_layout = create_html_element("div", "content-editor__split-layout")
+    const html_layout = create_html_element("div", "content-editor__split-layout visual-tests__creature-editor-modal")
 
     const creature_form = create_creature_form({
         creature,
@@ -33,7 +33,7 @@ export const open_creature_editor_modal = ({
 
     const html_json_preview = create_html_element("textarea", "content-editor__code-preview") as HTMLTextAreaElement
     html_json_preview.readOnly = true
-    html_json_preview.rows = 24
+    html_json_preview.rows = 16
     html_json_preview.spellcheck = false
 
     const notify_creature_changed = () => {

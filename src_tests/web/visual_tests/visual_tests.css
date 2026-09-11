@@ -313,3 +313,54 @@ body.content-editor {
 .visual-tests .content-editor__editor-root {
     gap: var(--ce-space-sm);
 }
+
+.content-editor__modal-body:has(.visual-tests__creature-editor-modal) {
+    padding: var(--ce-space-lg);
+}
+
+.visual-tests__creature-editor-modal.content-editor__split-layout {
+    gap: var(--ce-space-md);
+}
+
+.visual-tests__creature-editor-modal .content-editor__form {
+    gap: var(--ce-space-sm);
+}
+
+.visual-tests__creature-editor-modal .content-editor__section {
+    gap: var(--ce-space-sm);
+    padding: var(--ce-space-sm) var(--ce-space-md);
+    box-shadow: none;
+}
+
+.visual-tests__creature-editor-modal .content-editor__section-title {
+    padding-bottom: var(--ce-space-xs);
+    font-size: 12px;
+}
+
+.visual-tests__creature-editor-modal .content-editor__section-body {
+    gap: var(--ce-space-sm);
+}
+
+.visual-tests__creature-editor-modal .content-editor__field-grid {
+    gap: var(--ce-space-sm) var(--ce-space-md);
+}
+
+.visual-tests__creature-editor-modal .content-editor__field {
+    gap: 2px;
+}
+
+.visual-tests__creature-editor-modal .content-editor__code-panel {
+    gap: var(--ce-space-xs);
+}
+
+.visual-tests__creature-editor-modal .content-editor__code-preview {
+    min-height: 200px;
+}
+
+.visual-tests__creature-editor-modal .visual-tests__image-picker {
+    gap: var(--ce-space-xs);
+}
+
+.visual-tests__creature-editor-modal .visual-tests__image-option {
+    padding: var(--ce-space-xs);
+}
