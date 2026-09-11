@@ -73,7 +73,19 @@ export const create_visual_tests_ui = ({
     let available_powers: Array<IRPower> = []
 
     const html_panel = document.querySelector("#visual_tests")!
-    html_panel.classList.add("visual-tests")
+    html_panel.classList.add("visual-tests", "content-editor")
+
+    const create_section = (...children: Array<HTMLElement>) => {
+        const html_section = create_html_element("section", "visual-tests__section")
+        html_section.append(...children)
+        return html_section
+    }
+
+    const create_run_actions = (...buttons: Array<HTMLElement>) => {
+        const html_actions = create_html_element("div", "visual-tests__run-actions")
+        html_actions.append(...buttons)
+        return html_actions
+    }
 
     const get_scenario = () => scenario
     const set_scenario = (next_scenario: ScenarioTest) => {
@@ -96,7 +108,7 @@ export const create_visual_tests_ui = ({
     })
     step_recorder.wrap_instruction_loop(instruction_loop)
 
-    const html_header = create_html_element("div", "visual-tests__header")
+    const html_header = create_html_element("h1", "visual-tests__header")
     html_header.textContent = "Visual Tests"
 
     const get_current_scenario = (): ScenarioTest => ({
@@ -119,16 +131,17 @@ export const create_visual_tests_ui = ({
     const html_test_actions = create_html_element("div", "visual-tests__test-actions")
     html_test_actions.append(html_new_test_button, html_delete_test_button)
 
-    const create_button = (class_name: string, text: string) => {
-        const button = document.createElement("button")
-        button.className = class_name
-        button.type = "button"
-        button.textContent = text
-        return button
-    }
+    const html_start_battle_button = create_content_button({
+        text: "Start battle",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.PRIMARY,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+    })
 
-    const html_start_battle_button = create_button("visual-tests__button", "Start battle")
-    const html_replay_button = create_button("visual-tests__button", "Visual replay")
+    const html_replay_button = create_content_button({
+        text: "Visual replay",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.SECONDARY,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+    })
 
     const scenario_test_tree = create_scenario_test_tree({
         on_test_click: (path) => {
@@ -143,7 +156,7 @@ export const create_visual_tests_ui = ({
     const html_result_title = create_field_group_title("Result")
     const html_steps_title = create_field_group_title("Steps")
 
-    const html_result = create_html_element("div", "visual-tests__result")
+    const html_result = create_html_element("div", "visual-tests__result visual-tests__panel")
 
     const {html_form: html_creature_form, cancel_placement: cancel_creature_placement, refresh_power_options: refresh_creature_power_options} = create_creature_setup_form({
         click_overlay,
@@ -359,21 +372,30 @@ export const create_visual_tests_ui = ({
 
     html_panel.append(
         html_header,
-        html_saved_tests_title,
-        scenario_test_tree.html_tree,
-        html_test_actions,
-        test_powers_panel.html_root,
-        html_creature_form,
-        html_controls_title,
-        html_start_battle_button,
-        html_replay_button,
-        html_level_setup_title,
-        html_level_setup_list,
-        html_expectations,
-        html_result_title,
-        html_result,
-        html_steps_title,
-        html_steps_list,
+        create_section(
+            html_saved_tests_title,
+            scenario_test_tree.html_tree,
+            html_test_actions,
+        ),
+        create_section(test_powers_panel.html_root),
+        create_section(html_creature_form),
+        create_section(
+            html_controls_title,
+            create_run_actions(html_start_battle_button, html_replay_button),
+        ),
+        create_section(
+            html_level_setup_title,
+            html_level_setup_list,
+        ),
+        create_section(html_expectations),
+        create_section(
+            html_result_title,
+            html_result,
+        ),
+        create_section(
+            html_steps_title,
+            html_steps_list,
+        ),
     )
 
     const scheduled_scenario = read_scheduled_scenario_load()
