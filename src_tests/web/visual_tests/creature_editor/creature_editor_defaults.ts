@@ -9,7 +9,7 @@ const create_default_attributes = (): Record<AttributeCode, number> =>
 
 export const create_default_creature_setup_draft = (): CreatureSetupDraft => ({
     name: "New creature",
-    team: 1,
+    team: null,
     size: "medium",
     image: VISUAL_TEST_CREATURE_IMAGE_OPTIONS[0].image,
     movement: 5,

@@ -3,6 +3,7 @@ import {ATTRIBUTES, type AttributeCode} from "core/character_sheet/attributes";
 import type {IRPower} from "core/types";
 import {create_content_section, create_field_grid} from "web/content_editor/create_content_editor_layout";
 import type {CreatureSetupDraft} from "web/visual_tests/creature_editor/creature_editor_defaults";
+import {create_team_picker} from "web/visual_tests/creature_editor/create_team_picker";
 import {
     create_compact_text_input,
     create_number_input,
@@ -36,10 +37,7 @@ export const create_creature_form = ({
     const html_root = create_html_element("div", "content-editor content-editor__form content-editor__form-scroll")
 
     const html_name = create_compact_text_input({value: creature.name})
-    const html_team = create_compact_text_input({
-        value: creature.team === null || creature.team === undefined ? "" : String(creature.team),
-        placeholder: "neutral",
-    })
+    const team_picker = create_team_picker({value: creature.team ?? null})
     const html_level = create_number_input({value: creature.level ?? 1, compact: true})
     const html_template = create_compact_text_input({
         value: creature.template ?? "",
@@ -123,7 +121,7 @@ export const create_creature_form = ({
             html_children: [
                 create_field_grid([
                     create_labeled_field({label: "Name", control: html_name}),
-                    create_labeled_field({label: "Team", control: html_team}),
+                    create_labeled_field({label: "Team", control: team_picker.html_root}),
                     create_labeled_field({label: "Level", control: html_level}),
                     create_labeled_field({label: "Template", control: html_template}),
                 ]),
@@ -167,13 +165,6 @@ export const create_creature_form = ({
         }),
     )
 
-    const read_team = (): number | null => {
-        const value = read_text_value(html_team)
-        if (value === "") return null
-        const team = Number(value)
-        return Number.isFinite(team) ? team : null
-    }
-
     const read_attributes = (): Record<AttributeCode, number> => {
         const attributes = {} as Record<AttributeCode, number>
         for (const attribute_code of ATTRIBUTE_CODES)
@@ -197,7 +188,7 @@ export const create_creature_form = ({
     const get_creature_draft = (): CreatureSetupDraft => {
         const result: CreatureSetupDraft = {
             name: read_text_value(html_name),
-            team: read_team(),
+            team: team_picker.get_team(),
             level: read_number_value(html_level),
             size: read_select_value<Size>(html_size),
             movement: read_number_value(html_movement),

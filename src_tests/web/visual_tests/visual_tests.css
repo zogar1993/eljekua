@@ -219,6 +219,55 @@ body.content-editor {
     font-weight: 600;
 }
 
+.visual-tests__team-picker {
+    display: flex;
+    align-items: center;
+    gap: var(--ce-space-sm);
+}
+
+.visual-tests__team-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--ce-color-border);
+    border-radius: 50%;
+    background: var(--ce-color-surface-raised);
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.visual-tests__team-option:hover {
+    border-color: var(--ce-color-border-strong);
+}
+
+.visual-tests__team-option--selected {
+    border-color: var(--ce-color-accent);
+    box-shadow: 0 0 0 2px var(--ce-color-accent-ring);
+}
+
+.visual-tests__team-circle {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+}
+
+.visual-tests__team-circle--neutral {
+    border: 2px solid var(--ce-color-text-subtle);
+    background: transparent;
+}
+
+.visual-tests__team-circle--team-1 {
+    background: #3b6ea5;
+}
+
+.visual-tests__team-circle--team-2 {
+    background: #b84a4a;
+}
+
 .visual-tests__image-picker {
     display: flex;
     flex-wrap: wrap;
