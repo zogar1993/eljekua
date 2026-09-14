@@ -13,6 +13,7 @@ import {
     CONTENT_EDITOR_BUTTON_VARIANT,
 } from "web/content_editor/create_content_button";
 import {create_creature_setup_form} from "web/visual_tests/create_creature_setup_form";
+import {create_level_setup_creature_list} from "web/visual_tests/create_level_setup_creature_list";
 import {create_test_powers_panel} from "web/visual_tests/create_test_powers_panel";
 import {create_expectation_editor} from "web/visual_tests/create_expectation_editor";
 import {format_scenario_step_label} from "scenario_test/format_scenario_step_label";
@@ -94,7 +95,6 @@ export const create_visual_tests_ui = ({
             auto_save.schedule_auto_save()
     }
 
-    const html_level_setup_list = create_html_element("ul", "visual-tests__level-setup-list")
     const html_steps_list = create_html_element("ol", "visual-tests__steps-list")
 
     const step_recorder = create_step_recorder({
@@ -184,15 +184,6 @@ export const create_visual_tests_ui = ({
         cancel_creature_placement,
     })
 
-    const refresh_level_setup_list = () => {
-        html_level_setup_list.replaceChildren()
-        for (const creature of scenario.level_setup.creatures) {
-            const html_creature = create_html_element("li", "visual-tests__level-setup-item")
-            html_creature.textContent = `${creature.name} @ (${creature.position.x}, ${creature.position.y})`
-            html_level_setup_list.append(html_creature)
-        }
-    }
-
     const refresh_steps_list = () => {
         html_steps_list.replaceChildren()
         if (!step_recorder.is_battle_started()) {
@@ -238,11 +229,44 @@ export const create_visual_tests_ui = ({
         },
     })
 
+    const reload_scenario_on_board = async () => {
+        try {
+            await auto_save.flush_auto_save()
+        } catch (error) {
+            set_result(error instanceof Error ? error.message : String(error), false)
+            return
+        }
+
+        schedule_scenario_load_reload(get_current_scenario())
+    }
+
+    const level_setup_creature_list = create_level_setup_creature_list({
+        get_creatures: () => scenario.level_setup.creatures,
+        can_edit_creatures: () => !step_recorder.is_battle_started(),
+        get_available_powers: () => available_powers,
+        on_creature_updated: (creature_index, creature) => {
+            step_recorder.update_creature(creature_index, creature)
+            void reload_scenario_on_board()
+        },
+        on_creature_removed: (creature_index) => {
+            step_recorder.remove_creature(creature_index)
+            void reload_scenario_on_board()
+        },
+        on_edit_error: (message) => {
+            set_result(message, false)
+        },
+    })
+
+    const refresh_level_setup_list = () => {
+        level_setup_creature_list.refresh()
+    }
+
     const test_powers_panel = create_test_powers_panel({
         get_test_path: () => saved_path ?? "",
         on_powers_changed: (powers) => {
             available_powers = powers
             refresh_creature_power_options()
+            level_setup_creature_list.refresh_power_options()
         },
     })
 
@@ -385,7 +409,7 @@ export const create_visual_tests_ui = ({
         ),
         create_section(
             html_level_setup_title,
-            html_level_setup_list,
+            level_setup_creature_list.html_root,
         ),
         create_section(html_expectations),
         create_section(

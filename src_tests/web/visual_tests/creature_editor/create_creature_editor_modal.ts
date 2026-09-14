@@ -16,13 +16,16 @@ export const open_creature_editor_modal = ({
                                                creature,
                                                get_available_powers,
                                                on_creature_changed,
-                                               on_place,
+                                               primary_action,
                                            }: {
     title: string
     creature: CreatureSetupDraft
     get_available_powers: () => Array<IRPower>
     on_creature_changed: (creature: CreatureSetupDraft) => void
-    on_place: () => void
+    primary_action: {
+        label: string
+        on_confirm: () => void
+    }
 }) => {
     const html_layout = create_html_element("div", "content-editor__split-layout visual-tests__creature-editor-modal")
 
@@ -69,13 +72,13 @@ export const open_creature_editor_modal = ({
         size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
     })
 
-    const html_place_button = create_content_button({
-        text: "Place on grid",
+    const html_primary_button = create_content_button({
+        text: primary_action.label,
         variant: CONTENT_EDITOR_BUTTON_VARIANT.PRIMARY,
         size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
     })
 
-    html_footer.append(html_cancel_button, html_place_button)
+    html_footer.append(html_cancel_button, html_primary_button)
 
     const {close} = create_modal({
         title,
@@ -85,10 +88,10 @@ export const open_creature_editor_modal = ({
 
     html_cancel_button.addEventListener("click", close)
 
-    html_place_button.addEventListener("click", () => {
+    html_primary_button.addEventListener("click", () => {
         notify_creature_changed()
         close()
-        on_place()
+        primary_action.on_confirm()
     })
 
     return {refresh_power_options: creature_form.refresh_power_options}

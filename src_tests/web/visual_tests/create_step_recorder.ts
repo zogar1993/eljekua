@@ -44,6 +44,34 @@ export const create_step_recorder = ({
         notify_scenario_changed()
     }
 
+    const update_creature = (creature_index: number, creature: ScenarioCreatureSetup) => {
+        if (is_recording) return
+        const scenario = get_scenario()
+        const creatures = [...scenario.level_setup.creatures]
+        creatures[creature_index] = creature
+        set_scenario({
+            ...scenario,
+            level_setup: {
+                ...scenario.level_setup,
+                creatures,
+            },
+        })
+        notify_scenario_changed()
+    }
+
+    const remove_creature = (creature_index: number) => {
+        if (is_recording) return
+        const scenario = get_scenario()
+        set_scenario({
+            ...scenario,
+            level_setup: {
+                ...scenario.level_setup,
+                creatures: scenario.level_setup.creatures.filter((_, index) => index !== creature_index),
+            },
+        })
+        notify_scenario_changed()
+    }
+
     const begin_recording_at_battle_start = () => {
         is_recording = true
         notify_scenario_changed()
@@ -77,6 +105,8 @@ export const create_step_recorder = ({
 
     return {
         record_add_creature,
+        update_creature,
+        remove_creature,
         begin_recording_at_battle_start,
         record_set_turn,
         is_battle_started,

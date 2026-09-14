@@ -134,8 +134,11 @@ export const create_creature_setup_form = ({
             on_creature_changed: (creature) => {
                 creature_draft = creature
             },
-            on_place: () => {
-                start_placement(creature_draft)
+            primary_action: {
+                label: "Place on grid",
+                on_confirm: () => {
+                    start_placement(creature_draft)
+                },
             },
         })
 
