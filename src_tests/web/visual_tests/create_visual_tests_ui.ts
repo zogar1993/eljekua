@@ -12,7 +12,6 @@ import {
     CONTENT_EDITOR_BUTTON_SIZE,
     CONTENT_EDITOR_BUTTON_VARIANT,
 } from "web/content_editor/create_content_button";
-import {create_creature_setup_form} from "web/visual_tests/create_creature_setup_form";
 import {create_level_setup_creature_list} from "web/visual_tests/create_level_setup_creature_list";
 import {create_test_powers_panel} from "web/visual_tests/create_test_powers_panel";
 import {create_expectation_editor} from "web/visual_tests/create_expectation_editor";
@@ -95,6 +94,7 @@ export const create_visual_tests_ui = ({
             auto_save.schedule_auto_save()
     }
 
+    const html_steps = create_html_element("div", "visual-tests__steps")
     const html_steps_list = create_html_element("ol", "visual-tests__steps-list")
 
     const step_recorder = create_step_recorder({
@@ -158,20 +158,7 @@ export const create_visual_tests_ui = ({
 
     const html_result = create_html_element("div", "visual-tests__result visual-tests__panel")
 
-    const {html_form: html_creature_form, cancel_placement: cancel_creature_placement, refresh_power_options: refresh_creature_power_options} = create_creature_setup_form({
-        click_overlay,
-        board,
-        game_state,
-        can_place_creature: () => !step_recorder.is_battle_started(),
-        get_available_powers: () => available_powers,
-        on_add_creature: (creature_setup) => {
-            add_creature_to_game({data: resolve_creature_setup(creature_setup)})
-            step_recorder.record_add_creature(creature_setup)
-        },
-        on_placement_error: (message) => {
-            set_result(message, false)
-        },
-    })
+    let cancel_creature_placement: () => void = () => {}
 
     const {html_panel: html_expectations, refresh_controls: refresh_expectation_controls, cancel_expectation_flow} = create_expectation_editor({
         get_scenario,
@@ -181,7 +168,7 @@ export const create_visual_tests_ui = ({
         on_expectation_added: () => refresh_steps_list(),
         click_overlay,
         board,
-        cancel_creature_placement,
+        cancel_creature_placement: () => cancel_creature_placement(),
     })
 
     const refresh_steps_list = () => {
@@ -241,9 +228,16 @@ export const create_visual_tests_ui = ({
     }
 
     const level_setup_creature_list = create_level_setup_creature_list({
+        click_overlay,
+        board,
+        game_state,
         get_creatures: () => scenario.level_setup.creatures,
         can_edit_creatures: () => !step_recorder.is_battle_started(),
         get_available_powers: () => available_powers,
+        on_add_creature: (creature_setup) => {
+            add_creature_to_game({data: resolve_creature_setup(creature_setup)})
+            step_recorder.record_add_creature(creature_setup)
+        },
         on_creature_updated: (creature_index, creature) => {
             step_recorder.update_creature(creature_index, creature)
             void reload_scenario_on_board()
@@ -256,6 +250,7 @@ export const create_visual_tests_ui = ({
             set_result(message, false)
         },
     })
+    cancel_creature_placement = level_setup_creature_list.cancel_creature_placement
 
     const refresh_level_setup_list = () => {
         level_setup_creature_list.refresh()
@@ -265,7 +260,6 @@ export const create_visual_tests_ui = ({
         get_test_path: () => saved_path ?? "",
         on_powers_changed: (powers) => {
             available_powers = powers
-            refresh_creature_power_options()
             level_setup_creature_list.refresh_power_options()
         },
     })
@@ -394,6 +388,8 @@ export const create_visual_tests_ui = ({
         })
     })
 
+    html_steps.append(html_expectations, html_steps_list)
+
     html_panel.append(
         html_header,
         create_section(
@@ -402,7 +398,6 @@ export const create_visual_tests_ui = ({
             html_test_actions,
         ),
         create_section(test_powers_panel.html_root),
-        create_section(html_creature_form),
         create_section(
             html_controls_title,
             create_run_actions(html_start_battle_button, html_replay_button),
@@ -411,14 +406,13 @@ export const create_visual_tests_ui = ({
             html_level_setup_title,
             level_setup_creature_list.html_root,
         ),
-        create_section(html_expectations),
         create_section(
             html_result_title,
             html_result,
         ),
         create_section(
             html_steps_title,
-            html_steps_list,
+            html_steps,
         ),
     )
 

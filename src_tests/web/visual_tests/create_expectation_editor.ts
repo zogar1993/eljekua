@@ -19,7 +19,6 @@ import {
     CONTENT_EDITOR_BUTTON_SIZE,
     CONTENT_EDITOR_BUTTON_VARIANT,
 } from "web/content_editor/create_content_button";
-import {create_field_group_title} from "web/visual_tests/create_labeled_field";
 import {create_number_input, read_number_value} from "web/visual_tests/power_editor/create_form_controls";
 import {create_labeled_field} from "web/visual_tests/create_labeled_field";
 import {create_html_element} from "web/core/utils/create_html_element";
@@ -61,8 +60,7 @@ export const create_expectation_editor = ({
     board: Array<Array<SquareVisual>>
     cancel_creature_placement: () => void
 }) => {
-    const html_panel = create_html_element("div", "visual-tests__expectations")
-    html_panel.append(create_field_group_title("Expectations"))
+    const html_panel = create_html_element("div", "visual-tests__expectation-controls")
 
     const html_error = create_html_element("div", "visual-tests__expectation-error")
     html_error.hidden = true

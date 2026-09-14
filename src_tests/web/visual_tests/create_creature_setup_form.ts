@@ -15,7 +15,6 @@ import {
     CONTENT_EDITOR_BUTTON_SIZE,
     CONTENT_EDITOR_BUTTON_VARIANT,
 } from "web/content_editor/create_content_button";
-import {create_content_panel_title} from "web/content_editor/create_content_editor_layout";
 import type {CreatureSetupDraft} from "web/visual_tests/creature_editor/creature_editor_defaults";
 import {create_default_creature_setup_draft} from "web/visual_tests/creature_editor/creature_editor_defaults";
 import {open_creature_editor_modal} from "web/visual_tests/creature_editor/create_creature_editor_modal";
@@ -185,11 +184,7 @@ export const create_creature_setup_form = ({
         }
     })
 
-    html_form.append(
-        create_content_panel_title("Creatures"),
-        html_placement_hint,
-        html_add_button,
-    )
+    html_form.append(html_placement_hint, html_add_button)
 
     html_placement_hint.hidden = true
 
