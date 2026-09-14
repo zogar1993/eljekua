@@ -4,7 +4,7 @@ import type {InstructionLoop} from "core/instruction_loop";
 import type {IRPower} from "core/types";
 import {apply_scenario_level_setup_to_game} from "scenario_test/apply_scenario_level_setup_to_game";
 import {create_scenario_runner} from "scenario_test/create_scenario_runner";
-import {resolve_creature_setup} from "scenario_test/resolve_creature_setup";
+import {resolve_creature_setup, sync_level_setup_creature_powers} from "scenario_test/resolve_creature_setup";
 import {sanitize_scenario_path} from "scenario_test/sanitize_scenario_path";
 import {create_empty_scenario, type ScenarioTest} from "scenario_test/ScenarioTest";
 import {
@@ -274,6 +274,27 @@ export const create_visual_tests_ui = ({
         on_powers_changed: (powers) => {
             available_powers = powers
             level_setup_creature_list.refresh_power_options()
+
+            const synced_creatures = sync_level_setup_creature_powers({
+                creatures: scenario.level_setup.creatures,
+                available_powers: powers,
+            })
+            const creatures_changed = synced_creatures.some((creature, index) =>
+                JSON.stringify(creature.powers) !== JSON.stringify(scenario.level_setup.creatures[index]?.powers),
+            )
+            if (!creatures_changed)
+                return
+
+            set_scenario({
+                ...scenario,
+                level_setup: {
+                    ...scenario.level_setup,
+                    creatures: synced_creatures,
+                },
+            })
+
+            if (!step_recorder.is_battle_started())
+                void reload_scenario_on_board()
         },
     })
 

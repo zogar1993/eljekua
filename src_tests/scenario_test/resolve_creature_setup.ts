@@ -4,6 +4,7 @@ import {ATTRIBUTES} from "core/character_sheet/attributes";
 import {
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
+import type {IRPower} from "core/types";
 import type {ScenarioCreatureSetup} from "scenario_test/ScenarioTest";
 import type {CreatureSetupDraft} from "web/visual_tests/creature_editor/creature_editor_defaults";
 import {VISUAL_TEST_CREATURE_IMAGE_OPTIONS} from "web/visual_tests/visual_test_creature_images";
@@ -13,6 +14,32 @@ const PLACEMENT_VALIDATION_POSITION = {x: 0, y: 0, footprint: 1} as const
 export const validate_creature_setup_draft = (creature: CreatureSetupDraft): void => {
     resolve_creature_setup({...creature, position: PLACEMENT_VALIDATION_POSITION})
 }
+
+export const sync_creature_setup_powers = ({
+                                               creature,
+                                               available_powers,
+                                           }: {
+    creature: ScenarioCreatureSetup
+    available_powers: Array<IRPower>
+}): ScenarioCreatureSetup => {
+    if (creature.powers === undefined || creature.powers.length === 0)
+        return creature
+
+    const powers_by_name = new Map(available_powers.map(power => [power.name, power]))
+    return {
+        ...creature,
+        powers: creature.powers.map(power => powers_by_name.get(power.name) ?? power),
+    }
+}
+
+export const sync_level_setup_creature_powers = ({
+                                                     creatures,
+                                                     available_powers,
+                                                 }: {
+    creatures: Array<ScenarioCreatureSetup>
+    available_powers: Array<IRPower>
+}): Array<ScenarioCreatureSetup> =>
+    creatures.map(creature => sync_creature_setup_powers({creature, available_powers}))
 
 export const resolve_creature_setup = (creature: ScenarioCreatureSetup): CreatureData => {
     const powers = (creature.powers ?? []).map(transform_power_ir_into_vm_representation)

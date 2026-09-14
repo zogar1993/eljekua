@@ -23,6 +23,10 @@ export const create_instruction_list_editor = ({
 
     const editors: Array<ReturnType<typeof create_instruction_editor>> = []
 
+    const notify_changed = () => {
+        html_root.dispatchEvent(new Event("change", {bubbles: true}))
+    }
+
     const refresh_list = () => {
         html_list.replaceChildren()
         for (const editor of editors)
@@ -36,6 +40,7 @@ export const create_instruction_list_editor = ({
                 const index = editors.indexOf(editor)
                 if (index >= 0) editors.splice(index, 1)
                 refresh_list()
+                notify_changed()
             },
         })
         editors.push(editor)
@@ -49,7 +54,10 @@ export const create_instruction_list_editor = ({
         text: "Add instruction",
         variant: CONTENT_EDITOR_BUTTON_VARIANT.SECONDARY,
         size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
-        on_click: () => add_instruction(create_default_instruction(INSTRUCTION_TYPE.APPLY_DAMAGE)),
+        on_click: () => {
+            add_instruction(create_default_instruction(INSTRUCTION_TYPE.APPLY_DAMAGE))
+            notify_changed()
+        },
     })
 
     html_root.append(html_title, html_list, html_add_button)
