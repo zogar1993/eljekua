@@ -91,6 +91,10 @@ export const create_power_form = ({
         checked: power.type.attack,
         label: "Attack power",
     })
+    const {html_label: html_has_attack_roll_label, html_input: html_has_attack_roll} = create_checkbox_input({
+        checked: power.roll !== undefined,
+        label: "Has attack roll",
+    })
     const {html_label: html_melee_trait_label, html_input: html_melee_trait} = create_checkbox_input({
         checked: power.type.traits?.includes("melee_basic_attack") ?? false,
         label: "Melee basic attack trait",
@@ -209,8 +213,10 @@ export const create_power_form = ({
     }
 
     const refresh_roll_fields = () => {
-        html_roll_fields.hidden = !html_attack.checked
-        if (!html_attack.checked) return
+        const show_roll_fields = html_attack.checked && html_has_attack_roll.checked
+        html_has_attack_roll_label.hidden = !html_attack.checked
+        html_roll_fields.hidden = !show_roll_fields
+        if (!show_roll_fields) return
 
         html_roll_fields.replaceChildren()
         append_labeled_field({container: html_roll_fields, label: "Attack", control: html_roll_attack})
@@ -229,7 +235,12 @@ export const create_power_form = ({
         refresh_trigger_fields()
         refresh_roll_fields()
     })
-    html_attack.addEventListener("change", refresh_roll_fields)
+    html_attack.addEventListener("change", () => {
+        if (!html_attack.checked)
+            html_has_attack_roll.checked = false
+        refresh_roll_fields()
+    })
+    html_has_attack_roll.addEventListener("change", refresh_roll_fields)
 
     refresh_targeting_fields()
     refresh_trigger_fields()
@@ -249,6 +260,7 @@ export const create_power_form = ({
                 create_labeled_field({label: "Action", control: html_action}),
                 create_labeled_field({label: "Cooldown", control: html_cooldown}),
                 html_attack_label,
+                html_has_attack_roll_label,
                 html_melee_trait_label,
             ],
         }),
@@ -372,7 +384,7 @@ export const create_power_form = ({
         const trigger = get_trigger()
         if (trigger) result.trigger = trigger
 
-        if (attack) {
+        if (attack && html_has_attack_roll.checked) {
             result.roll = {
                 attack: read_text_value(html_roll_attack),
                 defense: read_select_value(html_roll_defense),
