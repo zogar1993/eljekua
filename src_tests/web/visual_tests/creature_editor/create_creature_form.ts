@@ -82,10 +82,7 @@ export const create_creature_form = ({
         const html_preview = create_html_element("span", "visual-tests__image-option-preview")
         html_preview.style.backgroundImage = option.image
 
-        const html_label = create_html_element("span", "visual-tests__image-option-label")
-        html_label.textContent = option.label
-
-        html_option.append(html_preview, html_label)
+        html_option.append(html_preview)
         html_option.addEventListener("click", () => {
             selected_image = option.image
             refresh_image_picker()

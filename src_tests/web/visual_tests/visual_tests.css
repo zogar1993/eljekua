@@ -227,9 +227,8 @@ body.content-editor {
 
 .visual-tests__image-option {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: var(--ce-space-xs);
+    justify-content: center;
     padding: var(--ce-space-sm);
     border: 1px solid var(--ce-color-border);
     border-radius: var(--ce-radius-sm);
@@ -254,11 +253,6 @@ body.content-editor {
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
-}
-
-.visual-tests__image-option-label {
-    font-size: 11px;
-    color: var(--ce-color-text-muted);
 }
 
 .visual-tests__level-setup-list,
