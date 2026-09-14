@@ -60,8 +60,6 @@ export const create_level_setup_creature_list = ({
     on_edit_error: (message: string) => void
 }) => {
     const html_root = create_html_element("div", "visual-tests__level-setup")
-    const html_creature_hint = create_html_element("div", "visual-tests__placement-hint")
-    html_creature_hint.textContent = "Click a creature on the grid to edit or remove it."
 
     let open_modal_refresh_power_options: (() => void) | undefined
     let latest_hovered_position: PositionFootprintOne | null = null
@@ -106,10 +104,11 @@ export const create_level_setup_creature_list = ({
             board[position.y][position.x].set_highlight(SQUARE_HIGHLIGHT.CLICKABLE)
     }
 
-    const refresh_creature_hint = () => {
-        const show_hint = can_edit_creatures() && get_creatures().length > 0
-        html_creature_hint.hidden = !show_hint
-        if (show_hint && is_grid_creature_click_enabled())
+    const refresh_creature_highlights = () => {
+        const show_highlights = can_edit_creatures()
+            && get_creatures().length > 0
+            && is_grid_creature_click_enabled()
+        if (show_highlights)
             set_creature_highlights()
         else
             clear_board_highlights()
@@ -123,7 +122,7 @@ export const create_level_setup_creature_list = ({
         get_available_powers,
         on_add_creature,
         on_placement_error: on_edit_error,
-        on_placement_changed: refresh_creature_hint,
+        on_placement_changed: refresh_creature_highlights,
     })
 
     const open_edit_modal = (creature_index: number, creature: ScenarioCreatureSetup) => {
@@ -196,9 +195,8 @@ export const create_level_setup_creature_list = ({
         open_edit_modal(creature_index, get_creatures()[creature_index])
     })
 
-    html_root.append(creature_setup_form.html_form, html_creature_hint)
-    html_creature_hint.hidden = true
-    refresh_creature_hint()
+    html_root.append(creature_setup_form.html_form)
+    refresh_creature_highlights()
 
     const refresh_power_options = () => {
         creature_setup_form.refresh_power_options()
@@ -207,7 +205,7 @@ export const create_level_setup_creature_list = ({
 
     return {
         html_root,
-        refresh: refresh_creature_hint,
+        refresh: refresh_creature_highlights,
         refresh_power_options,
         cancel_creature_placement: creature_setup_form.cancel_placement,
         is_placement_active: creature_setup_form.is_placement_active,

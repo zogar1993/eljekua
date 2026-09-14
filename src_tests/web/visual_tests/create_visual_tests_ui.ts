@@ -198,10 +198,23 @@ export const create_visual_tests_ui = ({
         }
     }
 
-    const set_result = (text: string, passed?: boolean) => {
+    const html_result_section = create_section(html_result_title, html_result)
+
+    const clear_test_result = () => {
+        html_result.textContent = ""
+        html_result.classList.remove("visual-tests__result--passed", "visual-tests__result--failed")
+        html_result_section.hidden = true
+    }
+
+    const set_test_result = (text: string, passed: boolean) => {
         html_result.textContent = text
-        html_result.classList.toggle("visual-tests__result--passed", passed === true)
-        html_result.classList.toggle("visual-tests__result--failed", passed === false)
+        html_result.classList.toggle("visual-tests__result--passed", passed)
+        html_result.classList.toggle("visual-tests__result--failed", !passed)
+        html_result_section.hidden = false
+    }
+
+    const report_error = (error: unknown) => {
+        console.error(error)
     }
 
     const auto_save = create_auto_save_scheduler({
@@ -214,7 +227,7 @@ export const create_visual_tests_ui = ({
                 await save_scenario_test(scenario_to_save)
                 await refresh_saved_scenarios_list()
             } catch (error) {
-                set_result(error instanceof Error ? error.message : String(error), false)
+                report_error(error)
             }
         },
     })
@@ -223,7 +236,7 @@ export const create_visual_tests_ui = ({
         try {
             await auto_save.flush_auto_save()
         } catch (error) {
-            set_result(error instanceof Error ? error.message : String(error), false)
+            report_error(error)
             return
         }
 
@@ -254,7 +267,7 @@ export const create_visual_tests_ui = ({
             void reload_scenario_on_board()
         },
         on_edit_error: (message) => {
-            set_result(message, false)
+            report_error(message)
         },
     })
     is_placement_active = level_setup_creature_list.is_placement_active
@@ -317,16 +330,14 @@ export const create_visual_tests_ui = ({
             try {
                 await auto_save.flush_auto_save()
             } catch (error) {
-                set_result(error instanceof Error ? error.message : String(error), false)
+                report_error(error)
                 return
             }
         }
 
         open_create_test_modal({
             on_accept: (path) => {
-                void create_test_at_path(path).catch((error) => {
-                    set_result(error instanceof Error ? error.message : String(error), false)
-                })
+                void create_test_at_path(path).catch(report_error)
             },
         })
     }
@@ -341,6 +352,7 @@ export const create_visual_tests_ui = ({
     const apply_loaded_scenario = (loaded: ScenarioTest) => {
         cancel_creature_placement()
         cancel_expectation_flow()
+        clear_test_result()
         saved_path = loaded.name
         scenario = loaded
         refresh_test_ui_state()
@@ -363,22 +375,22 @@ export const create_visual_tests_ui = ({
             try {
                 await auto_save.flush_auto_save()
             } catch (error) {
-                set_result(error instanceof Error ? error.message : String(error), false)
+                report_error(error)
                 return
             }
         }
 
-        set_result("Loading...")
         try {
             await load_scenario_by_path(path)
         } catch (error) {
-            set_result(error instanceof Error ? error.message : String(error), false)
+            report_error(error)
         }
     }
 
     html_start_battle_button.addEventListener("click", () => {
         cancel_creature_placement()
         cancel_expectation_flow()
+        set_scenario({...get_scenario(), steps: []})
         step_recorder.begin_recording_at_battle_start()
         start_battle()
         html_start_battle_button.disabled = true
@@ -404,11 +416,9 @@ export const create_visual_tests_ui = ({
             scenario = create_empty_scenario({name: ""})
             scenario_test_tree.set_selected_path("")
             available_powers = []
+            clear_test_result()
             reset_editor_state()
-            set_result(`Deleted ${path_to_delete}.`, true)
-        }).catch((error) => {
-            set_result(error instanceof Error ? error.message : String(error), false)
-        })
+        }).catch(report_error)
     })
 
     html_replay_button.addEventListener("click", () => {
@@ -441,19 +451,17 @@ export const create_visual_tests_ui = ({
             level_setup_creature_list.html_root,
         ),
         create_section(
-            html_result_title,
-            html_result,
-        ),
-        create_section(
             html_steps_title,
             html_steps,
         ),
+        html_result_section,
     )
+
+    clear_test_result()
 
     const scheduled_scenario = read_scheduled_scenario_load()
     if (scheduled_scenario) {
         apply_loaded_scenario(scheduled_scenario)
-        set_result(`Loaded ${scheduled_scenario.name}.`, true)
     } else {
         refresh_test_ui_state()
         reset_editor_state()
@@ -475,7 +483,7 @@ export const create_visual_tests_ui = ({
             step_recorder.begin_recording_at_battle_start()
             html_start_battle_button.disabled = true
             refresh_steps_list()
-            set_result("Replaying...")
+            clear_test_result()
 
             const runner = create_scenario_runner()
             const result = await runner.run({
@@ -497,10 +505,10 @@ export const create_visual_tests_ui = ({
             })
 
             if (result.passed)
-                set_result("Replay finished. Scenario passed.", true)
+                set_test_result("Scenario passed.", true)
             else {
                 const first_failure = result.failures[0]
-                set_result(`Replay failed at step ${first_failure.step_index + 1}: ${first_failure.message}`, false)
+                set_test_result(`Failed at step ${first_failure.step_index + 1}: ${first_failure.message}`, false)
             }
         },
         expose_set_current_turn: (creature_name: string) => {
