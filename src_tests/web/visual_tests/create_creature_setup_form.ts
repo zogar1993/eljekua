@@ -27,6 +27,7 @@ export const create_creature_setup_form = ({
                                                can_place_creature,
                                                on_add_creature,
                                                on_placement_error,
+                                               on_placement_changed,
                                                get_available_powers,
                                            }: {
     click_overlay: BattleGridVisual
@@ -35,6 +36,7 @@ export const create_creature_setup_form = ({
     can_place_creature: () => boolean
     on_add_creature: (creature: ScenarioCreatureSetup) => void
     on_placement_error: (message: string) => void
+    on_placement_changed?: () => void
     get_available_powers: () => Array<IRPower>
 }) => {
     const html_form = create_html_element("div", "content-editor content-editor__editor-root")
@@ -88,6 +90,7 @@ export const create_creature_setup_form = ({
         clear_board_highlights()
         click_overlay.reset_mouse_tracking()
         click_overlay.refresh_mouse_handlers()
+        on_placement_changed?.()
     }
 
     const report_placement_error = (error: unknown) => {
@@ -119,6 +122,7 @@ export const create_creature_setup_form = ({
         set_placement_highlights()
         click_overlay.reset_mouse_tracking()
         click_overlay.refresh_mouse_handlers()
+        on_placement_changed?.()
     }
 
     const open_creature_modal = () => {
@@ -196,5 +200,6 @@ export const create_creature_setup_form = ({
         html_form,
         cancel_placement,
         refresh_power_options,
+        is_placement_active: () => placement_active,
     }
 }

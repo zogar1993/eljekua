@@ -389,5 +389,10 @@ export const create_expectation_editor = ({
             cancel_expectation_flow()
     }
 
-    return {html_panel, refresh_controls, cancel_expectation_flow}
+    return {
+        html_panel,
+        refresh_controls,
+        cancel_expectation_flow,
+        is_flow_active: () => flow_state !== EXPECTATION_FLOW_STATE.IDLE,
+    }
 }

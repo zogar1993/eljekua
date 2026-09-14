@@ -113,6 +113,10 @@ body.content-editor {
     border-top: 1px solid var(--ce-color-border);
 }
 
+.visual-tests__modal-footer--with-delete .visual-tests__modal-footer-delete {
+    margin-right: auto;
+}
+
 .visual-tests__modal-error,
 .visual-tests__expectation-error {
     padding: var(--ce-space-sm) var(--ce-space-md);
@@ -311,7 +315,6 @@ body.content-editor {
     background-position: center;
 }
 
-.visual-tests__level-setup-list,
 .visual-tests__steps-list {
     margin: 0;
     max-height: 160px;

@@ -159,8 +159,10 @@ export const create_visual_tests_ui = ({
     const html_result = create_html_element("div", "visual-tests__result visual-tests__panel")
 
     let cancel_creature_placement: () => void = () => {}
+    let is_placement_active: () => boolean = () => false
+    let is_expectation_flow_active: () => boolean = () => false
 
-    const {html_panel: html_expectations, refresh_controls: refresh_expectation_controls, cancel_expectation_flow} = create_expectation_editor({
+    const {html_panel: html_expectations, refresh_controls: refresh_expectation_controls, cancel_expectation_flow, is_flow_active} = create_expectation_editor({
         get_scenario,
         set_scenario,
         get_game_state: () => game_state,
@@ -175,6 +177,7 @@ export const create_visual_tests_ui = ({
         html_steps_list.replaceChildren()
         if (!step_recorder.is_battle_started()) {
             refresh_expectation_controls()
+            refresh_level_setup_list()
             return
         }
 
@@ -233,6 +236,10 @@ export const create_visual_tests_ui = ({
         game_state,
         get_creatures: () => scenario.level_setup.creatures,
         can_edit_creatures: () => !step_recorder.is_battle_started(),
+        is_grid_creature_click_enabled: () =>
+            !step_recorder.is_battle_started()
+            && !is_placement_active()
+            && !is_expectation_flow_active(),
         get_available_powers: () => available_powers,
         on_add_creature: (creature_setup) => {
             add_creature_to_game({data: resolve_creature_setup(creature_setup)})
@@ -250,10 +257,16 @@ export const create_visual_tests_ui = ({
             set_result(message, false)
         },
     })
-    cancel_creature_placement = level_setup_creature_list.cancel_creature_placement
+    is_placement_active = level_setup_creature_list.is_placement_active
+    is_expectation_flow_active = is_flow_active
 
     const refresh_level_setup_list = () => {
         level_setup_creature_list.refresh()
+    }
+
+    cancel_creature_placement = () => {
+        level_setup_creature_list.cancel_creature_placement()
+        refresh_level_setup_list()
     }
 
     const test_powers_panel = create_test_powers_panel({

@@ -17,6 +17,7 @@ export const open_creature_editor_modal = ({
                                                get_available_powers,
                                                on_creature_changed,
                                                primary_action,
+                                               delete_action,
                                            }: {
     title: string
     creature: CreatureSetupDraft
@@ -24,6 +25,10 @@ export const open_creature_editor_modal = ({
     on_creature_changed: (creature: CreatureSetupDraft) => void
     primary_action: {
         label: string
+        on_confirm: () => void
+    }
+    delete_action?: {
+        label?: string
         on_confirm: () => void
     }
 }) => {
@@ -78,6 +83,20 @@ export const open_creature_editor_modal = ({
         size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
     })
 
+    const html_delete_button = delete_action === undefined
+        ? null
+        : create_content_button({
+            text: delete_action.label ?? "Delete",
+            variant: CONTENT_EDITOR_BUTTON_VARIANT.DANGER,
+            size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+        })
+
+    if (html_delete_button !== null) {
+        html_delete_button.classList.add("visual-tests__modal-footer-delete")
+        html_footer.append(html_delete_button)
+        html_footer.classList.add("visual-tests__modal-footer--with-delete")
+    }
+
     html_footer.append(html_cancel_button, html_primary_button)
 
     const {close} = create_modal({
@@ -87,6 +106,12 @@ export const open_creature_editor_modal = ({
     })
 
     html_cancel_button.addEventListener("click", close)
+
+    if (html_delete_button !== null && delete_action !== undefined)
+        html_delete_button.addEventListener("click", () => {
+            close()
+            delete_action.on_confirm()
+        })
 
     html_primary_button.addEventListener("click", () => {
         notify_creature_changed()
