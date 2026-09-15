@@ -316,12 +316,12 @@ const create_if_block = ({
         {
             type: INSTRUCTION_TYPE.JUMP_IF,
             condition: condition,
-            offset: instructions_if_true.length + 2
+            offset: instructions_if_false.length + 2
         },
         ...instructions_if_false,
         {
             type: INSTRUCTION_TYPE.JUMP,
-            offset: instructions_if_false.length + 1
+            offset: instructions_if_true.length + 1
         },
         ...instructions_if_true,
     ];

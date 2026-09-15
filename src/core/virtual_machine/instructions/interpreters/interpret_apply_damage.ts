@@ -28,8 +28,7 @@ export const interpret_apply_damage = ({
     const hit_status = EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
     const hit_status_value = hit_status.get(target)
 
-    assert_is_not_undefined(hit_status_value)
-
+    //TODO reevaluate hit status. If an attack misses and does damage to adjacent units on miss, it shouldnt hit.
     if (hit_status_value === HIT_STATUS.MISS && target.data.archetypes.includes("minion")) return
 
     let damage = resolve_number(EXPR.as_number_expr(evaluate_ast(instruction.value)))
