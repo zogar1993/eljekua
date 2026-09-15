@@ -320,7 +320,7 @@ body.content-editor {
     max-height: 160px;
     overflow: auto;
     padding: var(--ce-space-sm) var(--ce-space-md);
-    padding-left: calc(var(--ce-space-md) + 1em);
+    list-style: none;
     border: 1px solid var(--ce-color-border);
     border-radius: var(--ce-radius-sm);
     background: var(--ce-color-surface-raised);

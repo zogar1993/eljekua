@@ -99,7 +99,7 @@ export const create_visual_tests_ui = ({
     }
 
     const html_steps = create_html_element("div", "visual-tests__steps")
-    const html_steps_list = create_html_element("ol", "visual-tests__steps-list")
+    const html_steps_list = create_html_element("ul", "visual-tests__steps-list")
 
     const step_recorder = create_step_recorder({
         get_scenario,
@@ -180,9 +180,9 @@ export const create_visual_tests_ui = ({
     const refresh_steps_list = () => {
         html_steps_list.replaceChildren()
 
-        scenario.steps.forEach((step, index) => {
+        scenario.steps.forEach((step) => {
             const html_step = create_html_element("li", "visual-tests__step")
-            html_step.textContent = `${index + 1}. ${format_scenario_step_label(step)}`
+            html_step.textContent = format_scenario_step_label(step)
             html_steps_list.append(html_step)
         })
 
