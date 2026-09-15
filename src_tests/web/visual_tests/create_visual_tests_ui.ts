@@ -179,18 +179,16 @@ export const create_visual_tests_ui = ({
 
     const refresh_steps_list = () => {
         html_steps_list.replaceChildren()
-        if (!step_recorder.is_battle_started()) {
-            refresh_expectation_controls()
-            refresh_level_setup_list()
-            return
-        }
 
         scenario.steps.forEach((step, index) => {
             const html_step = create_html_element("li", "visual-tests__step")
             html_step.textContent = `${index + 1}. ${format_scenario_step_label(step)}`
             html_steps_list.append(html_step)
         })
+
         refresh_expectation_controls()
+        if (!step_recorder.is_battle_started())
+            refresh_level_setup_list()
     }
 
     const refresh_saved_scenarios_list = async () => {
@@ -487,7 +485,6 @@ export const create_visual_tests_ui = ({
                 step_delay_ms: number
             }
             apply_loaded_scenario(replay_scenario)
-            step_recorder.begin_recording_at_battle_start()
             html_start_battle_button.disabled = true
             refresh_steps_list()
             clear_test_result()
