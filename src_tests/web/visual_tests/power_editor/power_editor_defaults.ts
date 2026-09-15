@@ -1,5 +1,6 @@
 import {ACTION_TYPE} from "core/battlegrid/creatures/ActionType";
 import type {IRInstruction, IRPower} from "core/types";
+import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
 export const POWER_EDITOR_TEMPLATE = {
@@ -21,6 +22,8 @@ export const create_default_instruction = (type: IRInstruction["type"]): IRInstr
             return {type, target: "owner", destination: "primary_target"}
         case INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS:
             return {type, creature: "owner", cost: "opportunity", filter: "melee_basic_attack"}
+        case INSTRUCTION_TYPE.SET_HIT_STATUS:
+            return {type, target: "primary_target", status: HIT_STATUS.HIT}
         default:
             return {type: INSTRUCTION_TYPE.APPLY_DAMAGE, value: "1", target: "primary_target"}
     }

@@ -1,4 +1,5 @@
 import type {IRInstruction} from "core/types";
+import {HIT_STATUS, type HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {create_default_instruction} from "web/visual_tests/power_editor/power_editor_defaults";
 import {
@@ -21,8 +22,15 @@ const INSTRUCTION_TYPE_OPTIONS: Array<{ value: IRInstruction["type"], label: str
     {value: INSTRUCTION_TYPE.APPLY_DAMAGE, label: "apply_damage"},
     {value: INSTRUCTION_TYPE.MOVE, label: "move"},
     {value: INSTRUCTION_TYPE.SHIFT, label: "shift"},
+    {value: INSTRUCTION_TYPE.SET_HIT_STATUS, label: "set_hit_status"},
     {value: INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS, label: "add_powers_as_options"},
 ]
+
+const HIT_STATUS_OPTIONS = [
+    {value: String(HIT_STATUS.MISS), label: "miss"},
+    {value: String(HIT_STATUS.HIT), label: "hit"},
+    {value: String(HIT_STATUS.CRIT), label: "crit"},
+] as const
 
 const ADD_POWERS_COST_OPTIONS = [
     {value: "normal", label: "normal"},
@@ -68,6 +76,14 @@ export const create_instruction_editor = ({
 
     const html_movement_destination = create_text_input({value: "primary_target"})
 
+    const html_set_hit_status_target = create_text_input({
+        value: instruction.type === INSTRUCTION_TYPE.SET_HIT_STATUS ? instruction.target : "primary_target",
+    })
+    const html_set_hit_status_status = create_select_input({
+        options: [...HIT_STATUS_OPTIONS],
+        value: String(instruction.type === INSTRUCTION_TYPE.SET_HIT_STATUS ? instruction.status : HIT_STATUS.HIT),
+    })
+
     const html_add_powers_creature = create_text_input({
         value: instruction.type === INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS ? instruction.creature : "owner",
     })
@@ -108,6 +124,10 @@ export const create_instruction_editor = ({
             case INSTRUCTION_TYPE.SHIFT:
                 append_labeled_field({container: html_fields, label: "Destination", control: html_movement_destination})
                 break
+            case INSTRUCTION_TYPE.SET_HIT_STATUS:
+                append_labeled_field({container: html_fields, label: "Target", control: html_set_hit_status_target})
+                append_labeled_field({container: html_fields, label: "Status", control: html_set_hit_status_status})
+                break
             case INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS:
                 append_labeled_field({container: html_fields, label: "Creature", control: html_add_powers_creature})
                 append_labeled_field({container: html_fields, label: "Cost", control: html_add_powers_cost})
@@ -129,6 +149,10 @@ export const create_instruction_editor = ({
             html_add_powers_creature.value = defaults.creature
             html_add_powers_cost.value = defaults.cost
             html_add_powers_filter.value = defaults.filter
+        }
+        if (defaults.type === INSTRUCTION_TYPE.SET_HIT_STATUS) {
+            html_set_hit_status_target.value = defaults.target
+            html_set_hit_status_status.value = String(defaults.status)
         }
         refresh_fields()
     })
@@ -169,6 +193,12 @@ export const create_instruction_editor = ({
                     type,
                     target: "owner",
                     destination: read_text_value(html_movement_destination),
+                }
+            case INSTRUCTION_TYPE.SET_HIT_STATUS:
+                return {
+                    type,
+                    target: read_text_value(html_set_hit_status_target),
+                    status: Number(read_select_value(html_set_hit_status_status)) as HitStatus,
                 }
             case INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS:
                 return {

@@ -21,29 +21,72 @@ export const create_instruction_list_editor = ({
     html_title.textContent = title
     const html_list = create_html_element("div", "content-editor__instruction-list-items")
 
-    const editors: Array<ReturnType<typeof create_instruction_editor>> = []
+    type InstructionListEntry = {
+        editor: ReturnType<typeof create_instruction_editor>
+    }
+
+    const entries: Array<InstructionListEntry> = []
 
     const notify_changed = () => {
         html_root.dispatchEvent(new Event("change", {bubbles: true}))
     }
 
+    const move_instruction = (from_index: number, to_index: number) => {
+        if (from_index < 0 || from_index >= entries.length || to_index < 0 || to_index >= entries.length)
+            return
+
+        const [entry] = entries.splice(from_index, 1)
+        entries.splice(to_index, 0, entry)
+        refresh_list()
+        notify_changed()
+    }
+
     const refresh_list = () => {
         html_list.replaceChildren()
-        for (const editor of editors)
-            html_list.append(editor.html_root)
+        entries.forEach((entry, index) => {
+            const html_row = create_html_element("div", "content-editor__instruction-list-item")
+
+            const html_reorder = create_html_element("div", "content-editor__instruction-list-reorder")
+
+            const html_move_up_button = create_content_button({
+                text: "↑",
+                variant: CONTENT_EDITOR_BUTTON_VARIANT.GHOST,
+                size: CONTENT_EDITOR_BUTTON_SIZE.ICON,
+                aria_label: "Move instruction up",
+                on_click: () => move_instruction(index, index - 1),
+            })
+            if (index === 0)
+                html_move_up_button.disabled = true
+
+            const html_move_down_button = create_content_button({
+                text: "↓",
+                variant: CONTENT_EDITOR_BUTTON_VARIANT.GHOST,
+                size: CONTENT_EDITOR_BUTTON_SIZE.ICON,
+                aria_label: "Move instruction down",
+                on_click: () => move_instruction(index, index + 1),
+            })
+            if (index === entries.length - 1)
+                html_move_down_button.disabled = true
+
+            html_reorder.append(html_move_up_button, html_move_down_button)
+            html_row.append(html_reorder, entry.editor.html_root)
+            html_list.append(html_row)
+        })
     }
 
     const add_instruction = (instruction: IRInstruction) => {
-        const editor = create_instruction_editor({
-            instruction,
-            on_remove: () => {
-                const index = editors.indexOf(editor)
-                if (index >= 0) editors.splice(index, 1)
-                refresh_list()
-                notify_changed()
-            },
-        })
-        editors.push(editor)
+        const entry: InstructionListEntry = {
+            editor: create_instruction_editor({
+                instruction,
+                on_remove: () => {
+                    const index = entries.indexOf(entry)
+                    if (index >= 0) entries.splice(index, 1)
+                    refresh_list()
+                    notify_changed()
+                },
+            }),
+        }
+        entries.push(entry)
         refresh_list()
     }
 
@@ -62,7 +105,7 @@ export const create_instruction_list_editor = ({
 
     html_root.append(html_title, html_list, html_add_button)
 
-    const get_instructions = (): Array<IRInstruction> => editors.map(editor => editor.get_instruction())
+    const get_instructions = (): Array<IRInstruction> => entries.map(entry => entry.editor.get_instruction())
 
     return {html_root, get_instructions}
 }

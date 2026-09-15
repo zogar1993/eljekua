@@ -4,7 +4,11 @@ import type {InstructionLoop} from "core/instruction_loop";
 import type {IRPower} from "core/types";
 import {apply_scenario_level_setup_to_game} from "scenario_test/apply_scenario_level_setup_to_game";
 import {create_scenario_runner} from "scenario_test/create_scenario_runner";
-import {resolve_creature_setup, sync_level_setup_creature_powers} from "scenario_test/resolve_creature_setup";
+import {
+    apply_synced_powers_to_game_creatures,
+    resolve_creature_setup,
+    sync_level_setup_creature_powers,
+} from "scenario_test/resolve_creature_setup";
 import {sanitize_scenario_path} from "scenario_test/sanitize_scenario_path";
 import {create_empty_scenario, type ScenarioTest} from "scenario_test/ScenarioTest";
 import {
@@ -307,7 +311,10 @@ export const create_visual_tests_ui = ({
             })
 
             if (!step_recorder.is_battle_started())
-                void reload_scenario_on_board()
+                apply_synced_powers_to_game_creatures({
+                    creatures: game_state.creatures,
+                    synced_setups: synced_creatures,
+                })
         },
     })
 

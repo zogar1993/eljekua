@@ -332,6 +332,25 @@
     gap: var(--ce-space-sm);
 }
 
+.content-editor__instruction-list-item {
+    display: flex;
+    gap: var(--ce-space-sm);
+    align-items: flex-start;
+}
+
+.content-editor__instruction-list-item > .content-editor__instruction-card {
+    flex: 1;
+    min-width: 0;
+}
+
+.content-editor__instruction-list-reorder {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ce-space-xs);
+    flex-shrink: 0;
+    padding-top: var(--ce-space-md);
+}
+
 .content-editor__form {
     display: flex;
     flex-direction: column;
