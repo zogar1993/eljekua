@@ -3,6 +3,7 @@ import {ATTRIBUTES, type AttributeCode} from "core/character_sheet/attributes";
 import type {IRPower} from "core/types";
 import {create_content_section, create_field_grid} from "web/content_editor/create_content_editor_layout";
 import type {CreatureSetupDraft} from "web/visual_tests/creature_editor/creature_editor_defaults";
+import {create_creature_power_picker} from "web/visual_tests/creature_editor/create_creature_power_picker";
 import {create_resistance_list_editor} from "web/visual_tests/creature_editor/create_resistance_list_editor";
 import {create_team_picker} from "web/visual_tests/creature_editor/create_team_picker";
 import {
@@ -94,25 +95,10 @@ export const create_creature_form = ({
 
     refresh_image_picker()
 
-    const html_powers = create_html_element("select", "content-editor__select") as HTMLSelectElement
-    html_powers.multiple = true
-
-    const refresh_power_options = () => {
-        const selected_names = new Set(
-            Array.from(html_powers.selectedOptions).map(option => option.value),
-        )
-        const creature_power_names = new Set((creature.powers ?? []).map(power => power.name))
-        html_powers.replaceChildren()
-        for (const power of get_available_powers()) {
-            const html_option = document.createElement("option")
-            html_option.value = power.name
-            html_option.textContent = power.name
-            html_option.selected = selected_names.has(power.name) || creature_power_names.has(power.name)
-            html_powers.append(html_option)
-        }
-    }
-
-    refresh_power_options()
+    const power_picker = create_creature_power_picker({
+        selected_powers: creature.powers ?? [],
+        get_available_powers,
+    })
 
     const html_archetypes = create_compact_text_input({
         value: (creature.archetypes ?? []).join(", "),
@@ -161,7 +147,7 @@ export const create_creature_form = ({
         }),
         create_content_section({
             title: "Powers",
-            html_children: [create_labeled_field({label: "Assigned powers", control: html_powers})],
+            html_children: [power_picker.html_root],
         }),
         create_content_section({
             title: "Archetypes",
@@ -184,13 +170,6 @@ export const create_creature_form = ({
         return attributes
     }
 
-    const read_powers = (): Array<IRPower> => {
-        const powers_by_name = new Map(get_available_powers().map(power => [power.name, power]))
-        return Array.from(html_powers.selectedOptions)
-            .map(option => powers_by_name.get(option.value))
-            .filter((power): power is IRPower => power !== undefined)
-    }
-
     const read_archetypes = (): Array<string> =>
         read_text_value(html_archetypes)
             .split(",")
@@ -208,7 +187,7 @@ export const create_creature_form = ({
             hp_max: read_number_value(html_hp_max),
             attributes: read_attributes(),
             image: selected_image,
-            powers: read_powers(),
+            powers: power_picker.get_selected_powers(),
             archetypes: read_archetypes(),
         }
 
@@ -225,5 +204,5 @@ export const create_creature_form = ({
         return result
     }
 
-    return {html_root, get_creature_draft, refresh_power_options}
+    return {html_root, get_creature_draft, refresh_power_options: power_picker.refresh_power_options}
 }

@@ -441,3 +441,30 @@ body.content-editor {
 .visual-tests__resistance-table-grid .content-editor__input {
     min-width: 0;
 }
+
+.visual-tests__power-picker {
+    width: 100%;
+}
+
+.visual-tests__power-picker-grid {
+    display: grid;
+    grid-template-columns: min-content minmax(0, 1fr);
+    column-gap: var(--ce-space-md);
+    row-gap: var(--ce-space-xs);
+    align-items: center;
+}
+
+.visual-tests__power-picker-header-cell {
+    padding-bottom: var(--ce-space-xs);
+}
+
+.visual-tests__power-picker-checkbox {
+    justify-self: center;
+}
+
+.visual-tests__power-picker-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
