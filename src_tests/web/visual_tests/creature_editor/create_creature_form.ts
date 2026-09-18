@@ -3,6 +3,7 @@ import {ATTRIBUTES, type AttributeCode} from "core/character_sheet/attributes";
 import type {IRPower} from "core/types";
 import {create_content_section, create_field_grid} from "web/content_editor/create_content_editor_layout";
 import type {CreatureSetupDraft} from "web/visual_tests/creature_editor/creature_editor_defaults";
+import {create_resistance_list_editor} from "web/visual_tests/creature_editor/create_resistance_list_editor";
 import {create_team_picker} from "web/visual_tests/creature_editor/create_team_picker";
 import {
     create_compact_text_input,
@@ -115,6 +116,10 @@ export const create_creature_form = ({
         placeholder: "humanoid, beast",
     })
 
+    const resistance_list_editor = create_resistance_list_editor({
+        resistances: creature.resistances ?? {},
+    })
+
     html_root.append(
         create_content_section({
             title: "Basics",
@@ -163,6 +168,10 @@ export const create_creature_form = ({
                 ]),
             ],
         }),
+        create_content_section({
+            title: "Resistances",
+            html_children: [resistance_list_editor.html_root],
+        }),
     )
 
     const read_attributes = (): Record<AttributeCode, number> => {
@@ -205,6 +214,10 @@ export const create_creature_form = ({
             result.template = template
         else
             result.template = null
+
+        const resistances = resistance_list_editor.get_resistances()
+        if (Object.keys(resistances).length > 0)
+            result.resistances = resistances
 
         return result
     }

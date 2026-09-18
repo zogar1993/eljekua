@@ -15,8 +15,19 @@ export const subtract_numbers_resolved = (a: ExprNumberResolved, b: ExprNumberRe
     description: "-"
 })
 
-export const max_number_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved =>
-    numbers.reduce((previous, current) => previous.value > current.value ? previous : current)
+export const max_number_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved =>({
+    type: "number_resolved",
+    value: Math.max(...numbers.map(n => n.value)),
+    params: [...numbers],
+    description: "max"
+})
+
+export const min_number_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved => ({
+    type: "number_resolved",
+    value: Math.min(...numbers.map(n => n.value)),
+    params: [...numbers],
+    description: "min"
+})
 
 export const add_numbers = (numbers: Array<ExprNumber>): ExprNumberUnresolved => ({
     type: "number_unresolved",

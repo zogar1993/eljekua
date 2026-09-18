@@ -417,3 +417,27 @@ body.content-editor {
 .visual-tests__creature-editor-modal .visual-tests__image-option {
     padding: var(--ce-space-xs);
 }
+
+.visual-tests__resistance-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ce-space-sm);
+    width: fit-content;
+    max-width: 100%;
+}
+
+.visual-tests__resistance-table-grid {
+    display: grid;
+    grid-template-columns: 7rem 4.5rem min-content;
+    column-gap: var(--ce-space-sm);
+    row-gap: var(--ce-space-xs);
+    align-items: center;
+}
+
+.visual-tests__resistance-table-header-cell {
+    padding-bottom: var(--ce-space-xs);
+}
+
+.visual-tests__resistance-table-grid .content-editor__input {
+    min-width: 0;
+}

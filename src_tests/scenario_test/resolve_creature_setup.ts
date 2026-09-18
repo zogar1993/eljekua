@@ -93,5 +93,6 @@ export const resolve_creature_setup = (creature: ScenarioCreatureSetup): Creatur
         attributes: creature.attributes ?? Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
         powers,
         archetypes: creature.archetypes ?? [],
+        resistances: creature.resistances ?? {},
     }
 }

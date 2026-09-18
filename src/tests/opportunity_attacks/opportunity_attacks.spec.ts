@@ -103,7 +103,8 @@ const given_a_creature_is_created = (c: Partial<CreatureData> & Pick<CreatureDat
         team: c.team ?? null,
         attributes: c.attributes ?? Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
         powers: c.powers ?? [],
-        archetypes: c.archetypes ?? []
+        archetypes: c.archetypes ?? [],
+        resistances: c.resistances ?? {},
     }
 
     add_creature_to_game({data})

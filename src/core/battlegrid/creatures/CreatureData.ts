@@ -16,5 +16,6 @@ export type CreatureData = {
     hp_max: number
     team: number | null
     archetypes: Array<string>
+    resistances: Record<string, number>
     powers: Array<Power>
 }

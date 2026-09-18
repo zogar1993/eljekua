@@ -21,6 +21,7 @@ export type Monster = {
     speed: number
     powers: Array<IRPower>
     attributes: Record<AttributeCode, number>
+    resistances: Record<string, number>
 }
 
 const sacrificial_dagger: IRPower = {
@@ -109,7 +110,8 @@ const evil_ritualist: Monster = {
         int: 10,
         wis: 10,
         cha: 10
-    }
+    },
+    resistances: {}
 }
 
 export {evil_ritualist}

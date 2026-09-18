@@ -42,6 +42,7 @@ export type ScenarioCreatureSetup = {
     attributes?: Record<AttributeCode, number>
     powers?: Array<IRPower>
     archetypes?: Array<string>
+    resistances?: Record<string, number>
 }
 
 export type ScenarioLevelSetup = {

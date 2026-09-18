@@ -28,7 +28,7 @@ const magic_missile: IRPower = {
             type: INSTRUCTION_TYPE.APPLY_DAMAGE,
             value: "$add(2,owner.int_mod)",
             target: "primary_target",
-            damage_types: ["force"] //TODO P1 add vulnerabilities and resistances
+            damage_types: ["force"]
         }
     ]
 }
