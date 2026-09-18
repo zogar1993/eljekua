@@ -6,6 +6,9 @@ import {
     evaluate_function_equipped
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_equipped";
 import {
+    evaluate_function_not
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_not";
+import {
     evaluate_function_not_equals
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_not_equals";
 import {
@@ -68,6 +71,8 @@ export const build_evaluate_function = ({evaluate_ast, game_state}: {
                 return evaluate_function_equipped({node, evaluate_ast})
             case FUNCTION_NAME.HAS_ACTION_TYPE_AVAILABLE:
                 return evaluate_function_has_action_type_available({node, evaluate_ast})
+            case FUNCTION_NAME.NOT:
+                return evaluate_function_not({node, evaluate_ast})
             case FUNCTION_NAME.NOT_EQUALS:
                 return evaluate_function_not_equals({node, evaluate_ast})
             case FUNCTION_NAME.HAS_VALID_TARGETING:

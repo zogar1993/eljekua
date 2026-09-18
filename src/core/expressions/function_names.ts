@@ -12,6 +12,7 @@ export const FUNCTION_NAME = {
     IS_GREATER_OR_EQUAL: "is_greater_or_equal",
     IS_LOWER: "is_lower",
     IS_GREATER: "is_greater",
+    NOT: "not",
     NOT_EQUALS: "not_equals",
     EQUIPPED: "equipped",
     HAS_VALID_TARGETING: "has_valid_targeting",
