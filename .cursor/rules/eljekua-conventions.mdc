@@ -66,6 +66,11 @@ export const INSTRUCTION_TYPE = {
 - Destructure parameters in the signature.
 - Keep diffs minimal; do not reformat unrelated code.
 
+## @tests
+
+- Do **not** add tests (unit tests, spec files, scenario tests, etc.) unless the user explicitly asks.
+- Running existing tests / `tsc --noEmit` when you touched runtime code is still required per `@workflow`.
+
 ## @architecture
 
 - Prefer **factory functions** (`create_*`) over classes. No TypeScript `enum`.
