@@ -12,8 +12,22 @@ import {VISUAL_TEST_CREATURE_IMAGE_OPTIONS} from "web/visual_tests/visual_test_c
 
 const PLACEMENT_VALIDATION_POSITION = {x: 0, y: 0, footprint: 1} as const
 
-export const validate_creature_setup_draft = (creature: CreatureSetupDraft): void => {
-    resolve_creature_setup({...creature, position: PLACEMENT_VALIDATION_POSITION})
+export const validate_creature_setup_draft = (
+    creature: CreatureSetupDraft,
+    {
+        existing_creature_names = [],
+    }: {
+        existing_creature_names?: Array<string>
+    } = {},
+): void => {
+    const name = creature.name.trim()
+    if (name.length === 0)
+        throw Error("creature name is required")
+
+    if (existing_creature_names.some(existing_name => existing_name === name))
+        throw Error(`creature name "${name}" is already in use`)
+
+    resolve_creature_setup({...creature, name, position: PLACEMENT_VALIDATION_POSITION})
 }
 
 export const sync_creature_setup_powers = ({
@@ -80,7 +94,7 @@ export const resolve_creature_setup = (creature: ScenarioCreatureSetup): Creatur
     const powers = (creature.powers ?? []).map(transform_power_ir_into_vm_representation)
 
     return {
-        name: creature.name,
+        name: creature.name.trim(),
         template: creature.template ?? null,
         position: creature.position,
         size: creature.size ?? "medium",

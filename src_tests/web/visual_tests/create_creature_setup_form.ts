@@ -29,6 +29,7 @@ export const create_creature_setup_form = ({
                                                on_placement_error,
                                                on_placement_changed,
                                                get_available_powers,
+                                               get_existing_creature_names,
                                            }: {
     click_overlay: BattleGridVisual
     board: Array<Array<SquareVisual>>
@@ -38,6 +39,7 @@ export const create_creature_setup_form = ({
     on_placement_error: (message: string) => void
     on_placement_changed?: () => void
     get_available_powers: () => Array<IRPower>
+    get_existing_creature_names: () => Array<string>
 }) => {
     const html_form = create_html_element("div", "content-editor content-editor__editor-root")
 
@@ -97,6 +99,12 @@ export const create_creature_setup_form = ({
         on_placement_error(error instanceof Error ? error.message : String(error))
     }
 
+    const validate_creature_draft = (creature_draft: CreatureSetupDraft) => {
+        validate_creature_setup_draft(creature_draft, {
+            existing_creature_names: get_existing_creature_names(),
+        })
+    }
+
     const start_placement = (creature_draft: CreatureSetupDraft) => {
         if (!can_place_creature()) return
         if (get_clickable_positions().length === 0) {
@@ -105,7 +113,7 @@ export const create_creature_setup_form = ({
         }
 
         try {
-            validate_creature_setup_draft(creature_draft)
+            validate_creature_draft(creature_draft)
         } catch (error) {
             report_placement_error(error)
             return
@@ -137,6 +145,8 @@ export const create_creature_setup_form = ({
             on_creature_changed: (creature) => {
                 creature_draft = creature
             },
+            validate_creature: validate_creature_draft,
+            on_validation_error: report_placement_error,
             primary_action: {
                 label: "Place on grid",
                 on_confirm: () => {
@@ -181,6 +191,7 @@ export const create_creature_setup_form = ({
         if (position === null) return
 
         try {
+            validate_creature_draft(pending_creature_draft)
             on_add_creature({...pending_creature_draft, position})
             cancel_placement()
         } catch (error) {

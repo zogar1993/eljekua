@@ -16,6 +16,8 @@ export const open_creature_editor_modal = ({
                                                creature,
                                                get_available_powers,
                                                on_creature_changed,
+                                               validate_creature,
+                                               on_validation_error,
                                                primary_action,
                                                delete_action,
                                            }: {
@@ -23,6 +25,8 @@ export const open_creature_editor_modal = ({
     creature: CreatureSetupDraft
     get_available_powers: () => Array<IRPower>
     on_creature_changed: (creature: CreatureSetupDraft) => void
+    validate_creature?: (creature: CreatureSetupDraft) => void
+    on_validation_error?: (message: string) => void
     primary_action: {
         label: string
         on_confirm: () => void
@@ -115,6 +119,13 @@ export const open_creature_editor_modal = ({
 
     html_primary_button.addEventListener("click", () => {
         notify_creature_changed()
+        const creature_draft = creature_form.get_creature_draft()
+        try {
+            validate_creature?.(creature_draft)
+        } catch (error) {
+            on_validation_error?.(error instanceof Error ? error.message : String(error))
+            return
+        }
         close()
         primary_action.on_confirm()
     })

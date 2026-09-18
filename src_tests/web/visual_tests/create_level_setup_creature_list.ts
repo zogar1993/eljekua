@@ -114,12 +114,15 @@ export const create_level_setup_creature_list = ({
             clear_board_highlights()
     }
 
+    const get_existing_creature_names = () => get_creatures().map(creature => creature.name)
+
     const creature_setup_form = create_creature_setup_form({
         click_overlay,
         board,
         game_state,
         can_place_creature: can_edit_creatures,
         get_available_powers,
+        get_existing_creature_names,
         on_add_creature,
         on_placement_error: on_edit_error,
         on_placement_changed: refresh_creature_highlights,
@@ -138,16 +141,17 @@ export const create_level_setup_creature_list = ({
             on_creature_changed: (next_creature) => {
                 creature_draft = next_creature
             },
+            validate_creature: (next_creature) => {
+                validate_creature_setup_draft(next_creature, {
+                    existing_creature_names: get_creatures()
+                        .filter((_, index) => index !== creature_index)
+                        .map(entry => entry.name),
+                })
+            },
+            on_validation_error: report_edit_error,
             primary_action: {
                 label: "Save",
                 on_confirm: () => {
-                    try {
-                        validate_creature_setup_draft(creature_draft)
-                    } catch (error) {
-                        report_edit_error(error)
-                        return
-                    }
-
                     on_creature_updated(creature_index, {...creature_draft, position: saved_position})
                 },
             },

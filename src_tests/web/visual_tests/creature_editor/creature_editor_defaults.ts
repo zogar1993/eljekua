@@ -8,7 +8,7 @@ const create_default_attributes = (): Record<AttributeCode, number> =>
     Object.fromEntries(Object.values(ATTRIBUTES).map(attribute => [attribute, 10])) as Record<AttributeCode, number>
 
 export const create_default_creature_setup_draft = (): CreatureSetupDraft => ({
-    name: "New creature",
+    name: "",
     team: null,
     size: "medium",
     image: VISUAL_TEST_CREATURE_IMAGE_OPTIONS[0].image,

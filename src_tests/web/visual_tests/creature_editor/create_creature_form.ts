@@ -37,7 +37,10 @@ export const create_creature_form = ({
 }) => {
     const html_root = create_html_element("div", "content-editor content-editor__form content-editor__form-scroll")
 
-    const html_name = create_compact_text_input({value: creature.name})
+    const html_name = create_compact_text_input({
+        value: creature.name,
+        placeholder: "required",
+    })
     const team_picker = create_team_picker({value: creature.team ?? null})
     const html_level = create_number_input({value: creature.level ?? 1, compact: true})
     const html_template = create_compact_text_input({
@@ -196,7 +199,7 @@ export const create_creature_form = ({
 
     const get_creature_draft = (): CreatureSetupDraft => {
         const result: CreatureSetupDraft = {
-            name: read_text_value(html_name),
+            name: read_text_value(html_name).trim(),
             team: team_picker.get_team(),
             level: read_number_value(html_level),
             size: read_select_value<Size>(html_size),
