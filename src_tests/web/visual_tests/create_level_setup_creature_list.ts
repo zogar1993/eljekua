@@ -116,18 +116,6 @@ export const create_level_setup_creature_list = ({
 
     const get_existing_creature_names = () => get_creatures().map(creature => creature.name)
 
-    const creature_setup_form = create_creature_setup_form({
-        click_overlay,
-        board,
-        game_state,
-        can_place_creature: can_edit_creatures,
-        get_available_powers,
-        get_existing_creature_names,
-        on_add_creature,
-        on_placement_error: on_edit_error,
-        on_placement_changed: refresh_creature_highlights,
-    })
-
     const open_edit_modal = (creature_index: number, creature: ScenarioCreatureSetup) => {
         if (!can_edit_creatures()) return
 
@@ -165,6 +153,33 @@ export const create_level_setup_creature_list = ({
         open_modal_refresh_power_options = modal.refresh_power_options
     }
 
+    click_overlay.addOnClickHandler(coordinate => {
+        if (!is_grid_creature_click_enabled()) return
+
+        const creature = get_creature_at_coordinate(coordinate)
+        if (creature === null) return
+
+        const creature_index = find_creature_index({creatures: get_creatures(), creature})
+        if (creature_index < 0) {
+            on_edit_error(`creature "${creature.data.name}" not found in level setup`)
+            return
+        }
+
+        open_edit_modal(creature_index, get_creatures()[creature_index])
+    })
+
+    const creature_setup_form = create_creature_setup_form({
+        click_overlay,
+        board,
+        game_state,
+        can_place_creature: can_edit_creatures,
+        get_available_powers,
+        get_existing_creature_names,
+        on_add_creature,
+        on_placement_error: on_edit_error,
+        on_placement_changed: refresh_creature_highlights,
+    })
+
     click_overlay.addOnMouseMoveHandler(coordinate => {
         if (!is_grid_creature_click_enabled()) return
 
@@ -182,21 +197,6 @@ export const create_level_setup_creature_list = ({
 
         if (position !== null)
             board[position.y][position.x].set_interaction_status("hover")
-    })
-
-    click_overlay.addOnClickHandler(coordinate => {
-        if (!is_grid_creature_click_enabled()) return
-
-        const creature = get_creature_at_coordinate(coordinate)
-        if (creature === null) return
-
-        const creature_index = find_creature_index({creatures: get_creatures(), creature})
-        if (creature_index < 0) {
-            on_edit_error(`creature "${creature.data.name}" not found in level setup`)
-            return
-        }
-
-        open_edit_modal(creature_index, get_creatures()[creature_index])
     })
 
     html_root.append(creature_setup_form.html_form)
