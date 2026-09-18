@@ -1,5 +1,11 @@
 import {to_ast} from "core/expressions/parser/to_ast";
-import {IR_INSTRUCTION_TYPE, type IRInstruction, type IRInstructionApplyStatus, type IRInstructionSelectTarget, type IRPower} from "core/types";
+import {
+    IR_INSTRUCTION_TYPE,
+    type IRInstruction,
+    type IRInstructionApplyStatus,
+    type IRInstructionSelectTarget,
+    type IRPower
+} from "core/types";
 import {ATTRIBUTE_CODES} from "core/character_sheet/attributes";
 import type {
     Instruction,
@@ -10,6 +16,9 @@ import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE, TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
+import {assert_is_true} from "stdlib/assert";
+import {FUNCTION_NAME} from "core/expressions/function_names";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
@@ -312,6 +321,33 @@ const create_if_block = ({
     instructions_if_true: Array<Instruction>,
     instructions_if_false: Array<Instruction>
 }): Array<Instruction> => {
+    const has_instructions_if_true = instructions_if_true.length > 0
+    const has_instructions_if_false = instructions_if_false.length > 0
+
+    assert_is_true(has_instructions_if_true || has_instructions_if_false)
+
+    if (!has_instructions_if_false) {
+        return [
+            {
+                type: INSTRUCTION_TYPE.JUMP_IF,
+                condition: create_not_ast(condition),
+                offset: instructions_if_true.length + 1
+            },
+            ...instructions_if_true,
+        ]
+    }
+
+    if (!has_instructions_if_true) {
+        return [
+            {
+                type: INSTRUCTION_TYPE.JUMP_IF,
+                condition: condition,
+                offset: instructions_if_false.length + 1
+            },
+            ...instructions_if_false,
+        ]
+    }
+
     return [
         {
             type: INSTRUCTION_TYPE.JUMP_IF,
@@ -326,3 +362,9 @@ const create_if_block = ({
         ...instructions_if_true,
     ];
 }
+
+const create_not_ast = (operand: AstNode): AstNodeFunction => ({
+    type: "function",
+    name: FUNCTION_NAME.NOT,
+    parameters: [operand]
+})
