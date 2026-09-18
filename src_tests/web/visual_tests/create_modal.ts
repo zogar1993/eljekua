@@ -21,8 +21,17 @@ export const create_modal = ({
     html_title.textContent = title
 
     const close = () => {
+        document.removeEventListener("keydown", on_keydown)
         html_overlay.remove()
         on_close?.()
+    }
+
+    const on_keydown = (event: KeyboardEvent) => {
+        if (event.key !== "Escape" || !html_overlay.isConnected)
+            return
+
+        event.preventDefault()
+        close()
     }
 
     const html_close_button = create_content_button({
@@ -44,6 +53,7 @@ export const create_modal = ({
 
     html_overlay.append(html_dialog)
     document.body.append(html_overlay)
+    document.addEventListener("keydown", on_keydown)
 
     return {close}
 }
