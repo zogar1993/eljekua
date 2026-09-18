@@ -71,7 +71,6 @@ export const create_instruction_editor = ({
         value: instruction.type === INSTRUCTION_TYPE.APPLY_DAMAGE
             ? (instruction.damage_types ?? []).join(", ")
             : "",
-        placeholder: "force, fire",
     })
 
     const html_movement_destination = create_text_input({value: "primary_target"})

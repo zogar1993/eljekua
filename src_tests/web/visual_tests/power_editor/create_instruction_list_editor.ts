@@ -14,11 +14,9 @@ export const create_instruction_list_editor = ({
                                                    title,
                                                }: {
     instructions: Array<IRInstruction>
-    title: string
+    title?: string
 }) => {
     const html_root = create_html_element("div", "content-editor__instruction-list")
-    const html_title = create_html_element("div", "content-editor__subsection-title")
-    html_title.textContent = title
     const html_list = create_html_element("div", "content-editor__instruction-list-items")
 
     type InstructionListEntry = {
@@ -103,7 +101,13 @@ export const create_instruction_list_editor = ({
         },
     })
 
-    html_root.append(html_title, html_list, html_add_button)
+    if (title !== undefined && title.length > 0) {
+        const html_title = create_html_element("div", "content-editor__subsection-title")
+        html_title.textContent = title
+        html_root.append(html_title, html_list, html_add_button)
+    } else {
+        html_root.append(html_list, html_add_button)
+    }
 
     const get_instructions = (): Array<IRInstruction> => entries.map(entry => entry.editor.get_instruction())
 

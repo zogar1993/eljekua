@@ -154,15 +154,14 @@ export const create_power_form = ({
     const html_roll_fields = create_html_element("div", "content-editor__section-body")
 
     const effect_editor = create_instruction_list_editor({
-        title: "Effect instructions",
         instructions: power.effect ?? [],
     })
     const hit_editor = create_instruction_list_editor({
-        title: "Hit instructions",
+        title: "Hit",
         instructions: power.roll?.hit ?? [],
     })
     const miss_editor = create_instruction_list_editor({
-        title: "Miss instructions",
+        title: "Miss",
         instructions: power.roll?.miss ?? [],
     })
 
@@ -175,7 +174,7 @@ export const create_power_form = ({
 
     const refresh_targeting_fields = () => {
         html_targeting_fields.replaceChildren()
-        append_labeled_field({container: html_targeting_fields, label: "Targeting type", control: html_targeting_type})
+        html_targeting_fields.append(html_targeting_type)
 
         const targeting_type = read_select_value<TargetingTypeOption>(html_targeting_type)
         switch (targeting_type) {
@@ -203,7 +202,7 @@ export const create_power_form = ({
         if (!is_trigger_action(action)) return
 
         html_trigger_fields.replaceChildren()
-        append_labeled_field({container: html_trigger_fields, label: "Trigger type", control: html_trigger_type})
+        html_trigger_fields.append(html_trigger_type)
         html_trigger_fields.append(html_intercepts_movement_label, html_intercepts_critical_hit_label)
         append_labeled_field({
             container: html_trigger_fields,

@@ -58,10 +58,7 @@ export const create_resistance_list_editor = ({
         value: number
         on_remove: () => void
     }): ResistanceEntry => {
-        const html_damage_type = create_compact_text_input({
-            value: damage_type,
-            placeholder: "fire",
-        })
+        const html_damage_type = create_compact_text_input({value: damage_type})
         const html_value = create_number_input({value, compact: true})
 
         html_damage_type.addEventListener("input", notify_changed)

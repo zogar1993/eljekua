@@ -38,16 +38,10 @@ export const create_creature_form = ({
 }) => {
     const html_root = create_html_element("div", "content-editor content-editor__form content-editor__form-scroll")
 
-    const html_name = create_compact_text_input({
-        value: creature.name,
-        placeholder: "required",
-    })
+    const html_name = create_compact_text_input({value: creature.name})
     const team_picker = create_team_picker({value: creature.team ?? null})
     const html_level = create_number_input({value: creature.level ?? 1, compact: true})
-    const html_template = create_compact_text_input({
-        value: creature.template ?? "",
-        placeholder: "optional",
-    })
+    const html_template = create_compact_text_input({value: creature.template ?? ""})
 
     const html_size = create_select_input({
         options: SIZE_OPTIONS,
@@ -102,7 +96,6 @@ export const create_creature_form = ({
 
     const html_archetypes = create_compact_text_input({
         value: (creature.archetypes ?? []).join(", "),
-        placeholder: "humanoid, beast",
     })
 
     const resistance_list_editor = create_resistance_list_editor({
@@ -151,11 +144,7 @@ export const create_creature_form = ({
         }),
         create_content_section({
             title: "Archetypes",
-            html_children: [
-                create_field_grid([
-                    create_labeled_field({label: "Archetypes", control: html_archetypes}),
-                ]),
-            ],
+            html_children: [html_archetypes],
         }),
         create_content_section({
             title: "Resistances",

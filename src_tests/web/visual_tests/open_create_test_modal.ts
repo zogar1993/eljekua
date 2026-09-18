@@ -13,7 +13,6 @@ export const open_create_test_modal = ({
     on_accept: (path: string) => void | Promise<void>
 }) => {
     const html_name_input = create_html_element("input", "content-editor__input visual-tests__input") as HTMLInputElement
-    html_name_input.placeholder = "folder/test_name"
 
     const html_error = create_html_element("div", "visual-tests__modal-error")
     html_error.hidden = true
