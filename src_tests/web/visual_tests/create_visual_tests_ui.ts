@@ -10,8 +10,10 @@ import {
     resolve_creature_setup,
 } from "scenario_test/resolve_creature_setup";
 import {compact_creature_override} from "scenario_test/scenario_creature_override";
+import {get_test_folder_path} from "scenario_test/get_test_folder_path";
 import {sanitize_scenario_path, suggest_scenario_copy_path} from "scenario_test/sanitize_scenario_path";
 import {copy_scenario_test} from "web/visual_tests/copy_scenario_test";
+import {rename_scenario_test} from "web/visual_tests/rename_scenario_test";
 import {create_empty_scenario, type ScenarioTest} from "scenario_test/ScenarioTest";
 import {
     create_content_button,
@@ -134,6 +136,12 @@ export const create_visual_tests_ui = ({
         size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
     })
 
+    const html_rename_test_button = create_content_button({
+        text: "Rename",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.SECONDARY,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+    })
+
     const html_delete_test_button = create_content_button({
         text: "Delete",
         variant: CONTENT_EDITOR_BUTTON_VARIANT.DANGER,
@@ -141,7 +149,7 @@ export const create_visual_tests_ui = ({
     })
 
     const html_test_actions = create_html_element("div", "visual-tests__test-actions")
-    html_test_actions.append(html_new_test_button, html_copy_test_button, html_delete_test_button)
+    html_test_actions.append(html_new_test_button, html_copy_test_button, html_rename_test_button, html_delete_test_button)
 
     const html_start_battle_button = create_content_button({
         text: "Start battle",
@@ -311,6 +319,7 @@ export const create_visual_tests_ui = ({
 
     const refresh_test_ui_state = () => {
         html_copy_test_button.hidden = saved_path === null
+        html_rename_test_button.hidden = saved_path === null
         html_delete_test_button.hidden = saved_path === null
         test_powers_panel.html_root.hidden = saved_path === null
     }
@@ -388,6 +397,61 @@ export const create_visual_tests_ui = ({
         schedule_scenario_load_reload(copied_scenario)
     }
 
+    const open_rename_test_modal = async () => {
+        if (saved_path === null)
+            return
+
+        try {
+            await auto_save.flush_auto_save()
+        } catch (error) {
+            report_error(error)
+            return
+        }
+
+        const source_path = saved_path
+        open_create_test_modal({
+            title: "Rename",
+            accept_label: "Rename",
+            initial_path: source_path,
+            validate_path: async (path) => {
+                const sanitized_target = sanitize_scenario_path(path)
+                if (sanitized_target === sanitize_scenario_path(source_path))
+                    return "Enter a different name."
+                const existing_paths = await list_scenario_tests()
+                if (existing_paths.includes(sanitized_target))
+                    return `A test named "${sanitized_target}" already exists.`
+                return null
+            },
+            on_accept: (path) => {
+                void rename_test_at_path(source_path, path).catch(report_error)
+            },
+        })
+    }
+
+    const rename_test_at_path = async (source_path: string, target_path: string) => {
+        await auto_save.run_without_auto_save(async () => {
+            await auto_save.cancel_pending_save()
+
+            const sanitized_target = sanitize_scenario_path(target_path)
+            const source_folder = get_test_folder_path(source_path)
+            const target_folder = get_test_folder_path(sanitized_target)
+
+            await rename_scenario_test({
+                source_path,
+                target_path,
+                scenario: get_current_scenario(),
+            })
+
+            saved_path = sanitized_target
+            scenario = {...scenario, name: sanitized_target}
+            await refresh_saved_scenarios_list()
+            scenario_test_tree.set_selected_path(sanitized_target)
+
+            if (source_folder !== target_folder)
+                await test_powers_panel.load_powers_for_test(sanitized_target)
+        })
+    }
+
     const apply_loaded_scenario = (loaded: ScenarioTest) => {
         cancel_creature_placement()
         cancel_expectation_flow()
@@ -448,6 +512,10 @@ export const create_visual_tests_ui = ({
 
     html_copy_test_button.addEventListener("click", () => {
         void open_copy_test_modal()
+    })
+
+    html_rename_test_button.addEventListener("click", () => {
+        void open_rename_test_modal()
     })
 
     html_delete_test_button.addEventListener("click", () => {
