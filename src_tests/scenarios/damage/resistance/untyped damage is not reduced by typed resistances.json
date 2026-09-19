@@ -1,5 +1,5 @@
 {
-  "name": "damage/resistance/when_dual_type_damage_is_dealt_only_lower_resistance_counts",
+  "name": "damage/resistance/untyped damage is not reduced by typed resistances",
   "level_setup": {
     "battle_grid_size": {
       "x": 10,
@@ -15,7 +15,7 @@
         },
         "image": "url(\"/public/visual_tests/creature_spiked_mace.png\")",
         "powers": [
-          "Fire Necrotic Attack"
+          "Fire Attack"
         ]
       },
       {
@@ -27,8 +27,7 @@
         },
         "image": "url(\"/public/visual_tests/creature_skeleton.png\")",
         "resistances": {
-          "fire": 1,
-          "necrotic": 2
+          "fire": 1
         }
       }
     ]
@@ -38,7 +37,7 @@
       "type": "interaction",
       "selection": {
         "type": "select_option",
-        "option": "Fire Necrotic Attack"
+        "option": "Fire Attack"
       }
     },
     {
@@ -53,7 +52,7 @@
       "expectation": {
         "type": "creature_hp",
         "creature_name": "Defender",
-        "hp_current": 7
+        "hp_current": 6
       }
     }
   ]
