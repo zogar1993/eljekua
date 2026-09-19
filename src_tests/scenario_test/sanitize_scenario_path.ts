@@ -1,7 +1,15 @@
+const sanitize_scenario_segment = (segment: string) =>
+    segment
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .replace(/[^a-z0-9_ -]+/g, "")
+        .replace(/^[\s_]+|[\s_]+$/g, "")
+
 export const sanitize_scenario_path = (scenario_path: string) => {
     const segments = scenario_path
         .split("/")
-        .map(segment => segment.trim().toLowerCase().replace(/[^a-z0-9_-]+/g, "_").replace(/^_|_$/g, ""))
+        .map(sanitize_scenario_segment)
         .filter(segment => segment.length > 0)
     return segments.length > 0 ? segments.join("/") : "untitled_scenario"
 }
