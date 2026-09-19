@@ -8,11 +8,20 @@ import {create_labeled_field} from "web/visual_tests/create_labeled_field";
 import {create_html_element} from "web/core/utils/create_html_element";
 
 export const open_create_test_modal = ({
+                                           title = "New test",
+                                           accept_label = "Create",
+                                           initial_path = "",
+                                           validate_path,
                                            on_accept,
                                        }: {
+    title?: string
+    accept_label?: string
+    initial_path?: string
+    validate_path?: (path: string) => Promise<string | null> | string | null
     on_accept: (path: string) => void | Promise<void>
 }) => {
     const html_name_input = create_html_element("input", "content-editor__input visual-tests__input") as HTMLInputElement
+    html_name_input.value = initial_path
 
     const html_error = create_html_element("div", "visual-tests__modal-error")
     html_error.hidden = true
@@ -34,7 +43,7 @@ export const open_create_test_modal = ({
     })
 
     const html_accept_button = create_content_button({
-        text: "Create",
+        text: accept_label,
         variant: CONTENT_EDITOR_BUTTON_VARIANT.PRIMARY,
         size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
     })
@@ -42,7 +51,7 @@ export const open_create_test_modal = ({
     html_footer.append(html_cancel_button, html_accept_button)
 
     const {close} = create_modal({
-        title: "New test",
+        title,
         html_body,
         html_footer,
     })
@@ -57,7 +66,7 @@ export const open_create_test_modal = ({
         html_error.textContent = ""
     }
 
-    const try_accept = () => {
+    const try_accept = async () => {
         clear_error()
         const path = html_name_input.value.trim()
         if (path.length === 0) {
@@ -65,17 +74,27 @@ export const open_create_test_modal = ({
             return
         }
 
+        if (validate_path !== undefined) {
+            const validation_error = await validate_path(path)
+            if (validation_error !== null) {
+                show_error(validation_error)
+                return
+            }
+        }
+
         close()
         void on_accept(path)
     }
 
     html_cancel_button.addEventListener("click", close)
-    html_accept_button.addEventListener("click", try_accept)
+    html_accept_button.addEventListener("click", () => {
+        void try_accept()
+    })
 
     html_name_input.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
             event.preventDefault()
-            try_accept()
+            void try_accept()
         }
     })
 

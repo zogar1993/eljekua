@@ -10,7 +10,8 @@ import {
     resolve_creature_setup,
 } from "scenario_test/resolve_creature_setup";
 import {compact_creature_override} from "scenario_test/scenario_creature_override";
-import {sanitize_scenario_path} from "scenario_test/sanitize_scenario_path";
+import {sanitize_scenario_path, suggest_scenario_copy_path} from "scenario_test/sanitize_scenario_path";
+import {copy_scenario_test} from "web/visual_tests/copy_scenario_test";
 import {create_empty_scenario, type ScenarioTest} from "scenario_test/ScenarioTest";
 import {
     create_content_button,
@@ -127,6 +128,12 @@ export const create_visual_tests_ui = ({
         size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
     })
 
+    const html_copy_test_button = create_content_button({
+        text: "Copy test",
+        variant: CONTENT_EDITOR_BUTTON_VARIANT.SECONDARY,
+        size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
+    })
+
     const html_delete_test_button = create_content_button({
         text: "Delete test",
         variant: CONTENT_EDITOR_BUTTON_VARIANT.DANGER,
@@ -134,7 +141,7 @@ export const create_visual_tests_ui = ({
     })
 
     const html_test_actions = create_html_element("div", "visual-tests__test-actions")
-    html_test_actions.append(html_new_test_button, html_delete_test_button)
+    html_test_actions.append(html_new_test_button, html_copy_test_button, html_delete_test_button)
 
     const html_start_battle_button = create_content_button({
         text: "Start battle",
@@ -303,6 +310,7 @@ export const create_visual_tests_ui = ({
     })
 
     const refresh_test_ui_state = () => {
+        html_copy_test_button.hidden = saved_path === null
         html_delete_test_button.hidden = saved_path === null
         test_powers_panel.html_root.hidden = saved_path === null
     }
@@ -338,6 +346,46 @@ export const create_visual_tests_ui = ({
         const new_scenario = create_empty_scenario({name: test_path})
         await save_scenario_test(new_scenario)
         schedule_scenario_load_reload(new_scenario)
+    }
+
+    const open_copy_test_modal = async () => {
+        if (saved_path === null)
+            return
+
+        try {
+            await auto_save.flush_auto_save()
+        } catch (error) {
+            report_error(error)
+            return
+        }
+
+        const source_path = saved_path
+        open_create_test_modal({
+            title: "Copy test",
+            accept_label: "Copy",
+            initial_path: suggest_scenario_copy_path(source_path),
+            validate_path: async (path) => {
+                const target_path = sanitize_scenario_path(path)
+                const existing_paths = await list_scenario_tests()
+                if (existing_paths.includes(target_path))
+                    return `A test named "${target_path}" already exists.`
+                return null
+            },
+            on_accept: (path) => {
+                void copy_test_at_path(source_path, path).catch(report_error)
+            },
+        })
+    }
+
+    const copy_test_at_path = async (source_path: string, target_path: string) => {
+        await copy_scenario_test({
+            source_path,
+            target_path,
+            scenario: get_current_scenario(),
+        })
+        await refresh_saved_scenarios_list()
+        const copied_scenario = {...get_current_scenario(), name: sanitize_scenario_path(target_path)}
+        schedule_scenario_load_reload(copied_scenario)
     }
 
     const apply_loaded_scenario = (loaded: ScenarioTest) => {
@@ -396,6 +444,10 @@ export const create_visual_tests_ui = ({
 
     html_new_test_button.addEventListener("click", () => {
         void open_new_test_modal()
+    })
+
+    html_copy_test_button.addEventListener("click", () => {
+        void open_copy_test_modal()
     })
 
     html_delete_test_button.addEventListener("click", () => {

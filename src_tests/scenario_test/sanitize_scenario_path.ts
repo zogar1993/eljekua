@@ -19,3 +19,14 @@ export const decode_scenario_path_from_url = (url_path: string) =>
     sanitize_scenario_path(
         url_path.split("/").map(segment => decodeURIComponent(segment)).join("/"),
     )
+
+export const suggest_scenario_copy_path = (source_path: string) => {
+    const sanitized = sanitize_scenario_path(source_path)
+    const last_slash = sanitized.lastIndexOf("/")
+    if (last_slash < 0)
+        return `${sanitized}_copy`
+
+    const folder = sanitized.slice(0, last_slash + 1)
+    const name = sanitized.slice(last_slash + 1)
+    return `${folder}${name}_copy`
+}
