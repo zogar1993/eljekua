@@ -42,7 +42,7 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             return interpret_attack_roll_consequence({...props, instruction})
         case INSTRUCTION_TYPE.APPLY_DAMAGE:
             return interpret_apply_damage({...props, instruction})
-        case INSTRUCTION_TYPE.MOVE:
+        case INSTRUCTION_TYPE.WALK:
             return interpret_move({...props, instruction})
         case INSTRUCTION_TYPE.SHIFT:
             return interpret_shift({...props, instruction})

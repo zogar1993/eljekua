@@ -17,7 +17,7 @@ export const create_default_instruction = (type: IRInstruction["type"]): IRInstr
     switch (type) {
         case INSTRUCTION_TYPE.APPLY_DAMAGE:
             return {type, value: "$add({1W},owner.str_mod)", target: "primary_target"}
-        case INSTRUCTION_TYPE.MOVE:
+        case INSTRUCTION_TYPE.WALK:
         case INSTRUCTION_TYPE.SHIFT:
             return {type, target: "owner", destination: "primary_target"}
         case INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS:
@@ -79,7 +79,7 @@ export const create_default_power = (template: PowerEditorTemplate = POWER_EDITO
                 name: "Move",
                 type: {action: ACTION_TYPE.MOVEMENT, cooldown: "at-will", attack: false},
                 targeting: {targeting_type: "movement", distance: "owner.movement"},
-                effect: [create_default_instruction(INSTRUCTION_TYPE.MOVE)],
+                effect: [create_default_instruction(INSTRUCTION_TYPE.WALK)],
             }
     }
 }

@@ -117,9 +117,9 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
             }]
         case INSTRUCTION_TYPE.SELECT_TARGET:
             return [transform_select_target_ir(instruction)]
-        case INSTRUCTION_TYPE.MOVE:
+        case INSTRUCTION_TYPE.WALK:
             return [{
-                type: INSTRUCTION_TYPE.MOVE,
+                type: INSTRUCTION_TYPE.WALK,
                 target: instruction.target,
                 destination: instruction.destination
             }]

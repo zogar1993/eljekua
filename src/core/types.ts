@@ -51,7 +51,7 @@ export type IRInstruction =
     } |
     IRInstructionSelectTarget |
     {
-        type: typeof INSTRUCTION_TYPE.MOVE | typeof INSTRUCTION_TYPE.SHIFT,
+        type: typeof INSTRUCTION_TYPE.WALK | typeof INSTRUCTION_TYPE.SHIFT,
         target: "owner",
         destination: string
     } | {

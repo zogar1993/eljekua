@@ -20,7 +20,7 @@ import {create_html_element} from "web/core/utils/create_html_element";
 
 const INSTRUCTION_TYPE_OPTIONS: Array<{ value: IRInstruction["type"], label: string }> = [
     {value: INSTRUCTION_TYPE.APPLY_DAMAGE, label: "apply_damage"},
-    {value: INSTRUCTION_TYPE.MOVE, label: "move"},
+    {value: INSTRUCTION_TYPE.WALK, label: "move"},
     {value: INSTRUCTION_TYPE.SHIFT, label: "shift"},
     {value: INSTRUCTION_TYPE.SET_HIT_STATUS, label: "set_hit_status"},
     {value: INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS, label: "add_powers_as_options"},
@@ -119,7 +119,7 @@ export const create_instruction_editor = ({
                     control: html_damage_types,
                 })
                 break
-            case INSTRUCTION_TYPE.MOVE:
+            case INSTRUCTION_TYPE.WALK:
             case INSTRUCTION_TYPE.SHIFT:
                 append_labeled_field({container: html_fields, label: "Destination", control: html_movement_destination})
                 break
@@ -186,7 +186,7 @@ export const create_instruction_editor = ({
                     result.damage_types = damage_types
                 return result
             }
-            case INSTRUCTION_TYPE.MOVE:
+            case INSTRUCTION_TYPE.WALK:
             case INSTRUCTION_TYPE.SHIFT:
                 return {
                     type,

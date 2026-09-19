@@ -25,7 +25,7 @@ const shift: IRPower = {
 }
 
 const movement: IRPower = {
-    name: "Move",
+    name: "Walk",
     type: {
         action: "movement",
         cooldown: "at-will",
@@ -37,7 +37,7 @@ const movement: IRPower = {
     },
     effect: [
         {
-            type: INSTRUCTION_TYPE.MOVE,
+            type: INSTRUCTION_TYPE.WALK,
             target: "owner",
             destination: "primary_target"
         }

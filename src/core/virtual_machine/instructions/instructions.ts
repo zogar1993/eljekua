@@ -8,7 +8,7 @@ export const INSTRUCTION_TYPE = {
     ATTACK_DICE_ROLL: "attack_dice_roll",
     ATTACK_ROLL_CONSEQUENCE: "attack_roll_consequence",
     APPLY_DAMAGE: "apply_damage",
-    MOVE: "move",
+    WALK: "walk",
     SHIFT: "shift",
     OPTIONS: "options",
     SAVE_VARIABLE: "save_variable",
@@ -66,7 +66,7 @@ export type InstructionApplyDamage = {
 }
 
 export type InstructionMovement = {
-    type: typeof INSTRUCTION_TYPE.MOVE | typeof INSTRUCTION_TYPE.SHIFT
+    type: typeof INSTRUCTION_TYPE.WALK | typeof INSTRUCTION_TYPE.SHIFT
     target: string
     destination: string
 }

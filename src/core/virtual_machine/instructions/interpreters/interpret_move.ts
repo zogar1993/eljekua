@@ -40,7 +40,7 @@ export const interpret_move = ({
 
             vm_state.add_child_instruction_frame({
                 instructions: [{
-                    type: INSTRUCTION_TYPE.MOVE,
+                    type: INSTRUCTION_TYPE.WALK,
                     target: instruction.target,
                     destination: instruction.destination
                 }]
