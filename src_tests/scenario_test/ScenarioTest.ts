@@ -28,10 +28,10 @@ export const SCENARIO_HIT_STATUS = {
 
 export type ScenarioHitStatusName = typeof SCENARIO_HIT_STATUS[keyof typeof SCENARIO_HIT_STATUS]
 
-export type ScenarioCreatureSetup = {
+export type ScenarioCreatureOverride = {
     name: string
-    template?: string | null
     position: Position
+    template?: string | null
     size?: Size
     image?: string
     movement?: number
@@ -39,15 +39,32 @@ export type ScenarioCreatureSetup = {
     hp_max?: number
     level?: number
     team?: number | null
-    attributes?: Record<AttributeCode, number>
-    powers?: Array<IRPower>
+    attributes?: Partial<Record<AttributeCode, number>>
+    powers?: Array<string>
     archetypes?: Array<string>
     resistances?: Record<string, number>
 }
 
+export type ScenarioCreatureSetup = {
+    name: string
+    position: Position
+    template: string | null
+    size: Size
+    image: string
+    movement: number
+    hp_current: number
+    hp_max: number
+    level: number
+    team: number | null
+    attributes: Record<AttributeCode, number>
+    powers: Array<IRPower>
+    archetypes: Array<string>
+    resistances: Record<string, number>
+}
+
 export type ScenarioLevelSetup = {
     battle_grid_size: { x: number, y: number }
-    creatures: Array<ScenarioCreatureSetup>
+    creatures: Array<ScenarioCreatureOverride>
 }
 
 export type ScenarioSerializableInteractionSelection =

@@ -166,7 +166,9 @@ export const create_creature_form = ({
             .filter(archetype => archetype.length > 0)
 
     const get_creature_draft = (): CreatureSetupDraft => {
-        const result: CreatureSetupDraft = {
+        const template = read_text_value(html_template)
+
+        return {
             name: read_text_value(html_name).trim(),
             team: team_picker.get_team(),
             level: read_number_value(html_level),
@@ -178,19 +180,9 @@ export const create_creature_form = ({
             image: selected_image,
             powers: power_picker.get_selected_powers(),
             archetypes: read_archetypes(),
+            template: template.length > 0 ? template : null,
+            resistances: resistance_list_editor.get_resistances(),
         }
-
-        const template = read_text_value(html_template)
-        if (template)
-            result.template = template
-        else
-            result.template = null
-
-        const resistances = resistance_list_editor.get_resistances()
-        if (Object.keys(resistances).length > 0)
-            result.resistances = resistances
-
-        return result
     }
 
     return {html_root, get_creature_draft, refresh_power_options: power_picker.refresh_power_options}

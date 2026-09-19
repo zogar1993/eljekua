@@ -8,88 +8,27 @@
     "creatures": [
       {
         "name": "Attacker",
-        "team": null,
-        "level": 1,
-        "size": "medium",
-        "movement": 5,
-        "hp_current": 10,
-        "hp_max": 10,
-        "attributes": {
-          "str": 10,
-          "con": 10,
-          "dex": 10,
-          "int": 10,
-          "wis": 10,
-          "cha": 10
-        },
-        "image": "url(\"/public/visual_tests/creature_spiked_mace.png\")",
-        "powers": [
-          {
-            "name": "Fire Necrotic Attack",
-            "type": {
-              "action": "standard",
-              "cooldown": "at-will",
-              "attack": true
-            },
-            "targeting": {
-              "targeting_type": "melee_weapon",
-              "target_type": "enemy",
-              "amount": 1
-            },
-            "effect": [
-              {
-                "type": "set_hit_status",
-                "target": "primary_target",
-                "status": 1
-              },
-              {
-                "type": "apply_damage",
-                "value": "4",
-                "target": "primary_target",
-                "damage_types": [
-                  "fire",
-                  "necrotic"
-                ]
-              }
-            ]
-          }
-        ],
-        "archetypes": [],
-        "template": null,
         "position": {
           "x": 3,
           "y": 4,
           "footprint": 1
-        }
+        },
+        "image": "url(\"/public/visual_tests/creature_spiked_mace.png\")",
+        "powers": [
+          "Fire Necrotic Attack"
+        ]
       },
       {
         "name": "Defender",
-        "team": null,
-        "level": 1,
-        "size": "medium",
-        "movement": 5,
-        "hp_current": 10,
-        "hp_max": 10,
-        "attributes": {
-          "str": 10,
-          "con": 10,
-          "dex": 10,
-          "int": 10,
-          "wis": 10,
-          "cha": 10
-        },
-        "image": "url(\"/public/visual_tests/creature_skeleton.png\")",
-        "powers": [],
-        "archetypes": [],
-        "template": null,
-        "resistances": {
-          "fire": 1,
-          "necrotic": 2
-        },
         "position": {
           "x": 4,
           "y": 4,
           "footprint": 1
+        },
+        "image": "url(\"/public/visual_tests/creature_skeleton.png\")",
+        "resistances": {
+          "fire": 1,
+          "necrotic": 2
         }
       }
     ]
@@ -106,14 +45,14 @@
       "type": "interaction",
       "selection": {
         "type": "select_creature",
-        "creature_name": "New creature"
+        "creature_name": "Defender"
       }
     },
     {
       "type": "expect",
       "expectation": {
         "type": "creature_hp",
-        "creature_name": "New creature",
+        "creature_name": "Defender",
         "hp_current": 7
       }
     }

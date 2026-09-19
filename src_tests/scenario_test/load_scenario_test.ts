@@ -1,3 +1,4 @@
+import {normalize_creature_override} from "scenario_test/scenario_creature_override";
 import type {ScenarioTest} from "scenario_test/ScenarioTest";
 
 export const load_scenario_test = (raw: unknown): ScenarioTest => {
@@ -28,7 +29,7 @@ export const load_scenario_test = (raw: unknown): ScenarioTest => {
         name: scenario.name,
         level_setup: {
             battle_grid_size: scenario.level_setup.battle_grid_size,
-            creatures: scenario.level_setup.creatures,
+            creatures: scenario.level_setup.creatures.map(normalize_creature_override),
         },
         steps: scenario.steps,
     }

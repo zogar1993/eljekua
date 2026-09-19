@@ -1,4 +1,7 @@
+import type {Position} from "core/battlegrid/Position";
 import type {IRPower} from "core/types";
+import {compact_creature_override} from "scenario_test/scenario_creature_override";
+import type {ScenarioCreatureOverride} from "scenario_test/ScenarioTest";
 import {
     create_content_button,
     CONTENT_EDITOR_BUTTON_SIZE,
@@ -9,11 +12,27 @@ import {create_creature_form} from "web/visual_tests/creature_editor/create_crea
 import {create_modal} from "web/visual_tests/create_modal";
 import {create_html_element} from "web/core/utils/create_html_element";
 
-const format_creature_json = (creature: CreatureSetupDraft): string => JSON.stringify(creature, null, 2)
+const format_creature_json = ({
+                                  creature,
+                                  position,
+                              }: {
+    creature: CreatureSetupDraft
+    position?: Position
+}): string => {
+    const override = compact_creature_override({
+        ...creature,
+        position: position ?? {x: 0, y: 0, footprint: 1},
+    })
+    const preview: ScenarioCreatureOverride | Omit<ScenarioCreatureOverride, "position"> = position === undefined
+        ? (({position: _position, ...rest}) => rest)(override)
+        : override
+    return JSON.stringify(preview, null, 2)
+}
 
 export const open_creature_editor_modal = ({
                                                title,
                                                creature,
+                                               preview_position,
                                                get_available_powers,
                                                on_creature_changed,
                                                validate_creature,
@@ -23,6 +42,7 @@ export const open_creature_editor_modal = ({
                                            }: {
     title: string
     creature: CreatureSetupDraft
+    preview_position?: Position
     get_available_powers: () => Array<IRPower>
     on_creature_changed: (creature: CreatureSetupDraft) => void
     validate_creature?: (creature: CreatureSetupDraft) => void
@@ -55,7 +75,10 @@ export const open_creature_editor_modal = ({
     }
 
     const refresh_json_preview = () => {
-        html_json_preview.value = format_creature_json(creature_form.get_creature_draft())
+        html_json_preview.value = format_creature_json({
+            creature: creature_form.get_creature_draft(),
+            position: preview_position,
+        })
     }
 
     creature_form.html_root.addEventListener("input", notify_creature_changed)

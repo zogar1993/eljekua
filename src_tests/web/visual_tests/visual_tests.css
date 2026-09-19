@@ -337,6 +337,18 @@ body.content-editor {
     color: var(--ce-color-text);
 }
 
+.visual-tests__creature-override {
+    padding: var(--ce-space-xs) 0;
+}
+
+.visual-tests__creature-override-line--section {
+    padding-left: 1em;
+}
+
+.visual-tests__creature-override-line--entry {
+    padding-left: 2em;
+}
+
 .visual-tests__step--active {
     margin: 0 calc(var(--ce-space-sm) * -1);
     padding: 4px var(--ce-space-sm);

@@ -102,6 +102,7 @@ export const create_creature_setup_form = ({
     const validate_creature_draft = (creature_draft: CreatureSetupDraft) => {
         validate_creature_setup_draft(creature_draft, {
             existing_creature_names: get_existing_creature_names(),
+            available_powers: get_available_powers(),
         })
     }
 

@@ -6,9 +6,10 @@ import {apply_scenario_level_setup_to_game} from "scenario_test/apply_scenario_l
 import {create_scenario_runner} from "scenario_test/create_scenario_runner";
 import {
     apply_synced_powers_to_game_creatures,
+    resolve_creature_overrides,
     resolve_creature_setup,
-    sync_level_setup_creature_powers,
 } from "scenario_test/resolve_creature_setup";
+import {compact_creature_override} from "scenario_test/scenario_creature_override";
 import {sanitize_scenario_path} from "scenario_test/sanitize_scenario_path";
 import {create_empty_scenario, type ScenarioTest} from "scenario_test/ScenarioTest";
 import {
@@ -258,10 +259,10 @@ export const create_visual_tests_ui = ({
         get_available_powers: () => available_powers,
         on_add_creature: (creature_setup) => {
             add_creature_to_game({data: resolve_creature_setup(creature_setup)})
-            step_recorder.record_add_creature(creature_setup)
+            step_recorder.record_add_creature(compact_creature_override(creature_setup))
         },
         on_creature_updated: (creature_index, creature) => {
-            step_recorder.update_creature(creature_index, creature)
+            step_recorder.update_creature(creature_index, compact_creature_override(creature))
             void reload_scenario_on_board()
         },
         on_creature_removed: (creature_index) => {
@@ -290,28 +291,13 @@ export const create_visual_tests_ui = ({
             available_powers = powers
             level_setup_creature_list.refresh_power_options()
 
-            const synced_creatures = sync_level_setup_creature_powers({
-                creatures: scenario.level_setup.creatures,
-                available_powers: powers,
-            })
-            const creatures_changed = synced_creatures.some((creature, index) =>
-                JSON.stringify(creature.powers) !== JSON.stringify(scenario.level_setup.creatures[index]?.powers),
-            )
-            if (!creatures_changed)
-                return
-
-            set_scenario({
-                ...scenario,
-                level_setup: {
-                    ...scenario.level_setup,
-                    creatures: synced_creatures,
-                },
-            })
-
             if (!step_recorder.is_battle_started())
                 apply_synced_powers_to_game_creatures({
                     creatures: game_state.creatures,
-                    synced_setups: synced_creatures,
+                    synced_setups: resolve_creature_overrides({
+                        overrides: scenario.level_setup.creatures,
+                        available_powers: powers,
+                    }),
                 })
         },
     })
@@ -362,12 +348,17 @@ export const create_visual_tests_ui = ({
         scenario = loaded
         refresh_test_ui_state()
         scenario_test_tree.set_selected_path(loaded.name)
-        apply_scenario_level_setup_to_game({scenario: loaded, add_creature_to_game})
         step_recorder.mark_loaded_scenario()
         html_start_battle_button.disabled = false
         refresh_level_setup_list()
         refresh_steps_list()
-        void test_powers_panel.load_powers_for_test(loaded.name)
+        void test_powers_panel.load_powers_for_test(loaded.name).then(() => {
+            apply_scenario_level_setup_to_game({
+                scenario: loaded,
+                add_creature_to_game,
+                available_powers,
+            })
+        })
     }
 
     const load_scenario_by_path = async (path: string) => {

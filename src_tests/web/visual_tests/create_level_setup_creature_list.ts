@@ -3,7 +3,12 @@ import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {GameState} from "core/game_state/GameState";
 import type {IRPower} from "core/types";
 import {validate_creature_setup_draft} from "scenario_test/resolve_creature_setup";
-import type {ScenarioCreatureSetup} from "scenario_test/ScenarioTest";
+import {
+    get_scenario_creature_override_label_lines,
+    SCENARIO_CREATURE_OVERRIDE_LABEL_LINE_TYPE,
+    resolve_creature_override,
+} from "scenario_test/scenario_creature_override";
+import type {ScenarioCreatureOverride, ScenarioCreatureSetup} from "scenario_test/ScenarioTest";
 import type {BattleGridVisual} from "web/core/battle_grid/BattleGridVisual";
 import type {ClickableCoordinate} from "web/core/battle_grid/coordinates/ClickableCoordinate";
 import {
@@ -17,6 +22,12 @@ import type {CreatureSetupDraft} from "web/visual_tests/creature_editor/creature
 import {open_creature_editor_modal} from "web/visual_tests/creature_editor/create_creature_editor_modal";
 import {create_html_element} from "web/core/utils/create_html_element";
 
+const CREATURE_OVERRIDE_LINE_CLASS = {
+    [SCENARIO_CREATURE_OVERRIDE_LABEL_LINE_TYPE.HEADER]: "visual-tests__creature-override-line visual-tests__creature-override-line--header",
+    [SCENARIO_CREATURE_OVERRIDE_LABEL_LINE_TYPE.SECTION]: "visual-tests__creature-override-line visual-tests__creature-override-line--section",
+    [SCENARIO_CREATURE_OVERRIDE_LABEL_LINE_TYPE.ENTRY]: "visual-tests__creature-override-line visual-tests__creature-override-line--entry",
+} as const
+
 const creature_setup_to_draft = (creature: ScenarioCreatureSetup): CreatureSetupDraft => {
     const {position: _position, ...draft} = creature
     return draft
@@ -26,7 +37,7 @@ const find_creature_index = ({
                                  creatures,
                                  creature,
                              }: {
-    creatures: Array<ScenarioCreatureSetup>
+    creatures: Array<ScenarioCreatureOverride>
     creature: Creature
 }) => creatures.findIndex(entry =>
     entry.name === creature.data.name
@@ -50,7 +61,7 @@ export const create_level_setup_creature_list = ({
     click_overlay: BattleGridVisual
     board: Array<Array<SquareVisual>>
     game_state: GameState
-    get_creatures: () => Array<ScenarioCreatureSetup>
+    get_creatures: () => Array<ScenarioCreatureOverride>
     can_edit_creatures: () => boolean
     is_grid_creature_click_enabled: () => boolean
     get_available_powers: () => Array<IRPower>
@@ -60,12 +71,26 @@ export const create_level_setup_creature_list = ({
     on_edit_error: (message: string) => void
 }) => {
     const html_root = create_html_element("div", "visual-tests__level-setup")
+    const html_creatures_list = create_html_element("ul", "visual-tests__steps-list")
 
     let open_modal_refresh_power_options: (() => void) | undefined
     let latest_hovered_position: PositionFootprintOne | null = null
 
     const report_edit_error = (error: unknown) => {
         on_edit_error(error instanceof Error ? error.message : String(error))
+    }
+
+    const refresh_creatures_list = () => {
+        html_creatures_list.replaceChildren()
+        for (const creature of get_creatures()) {
+            const html_creature = create_html_element("li", "visual-tests__step visual-tests__creature-override")
+            for (const line of get_scenario_creature_override_label_lines(creature)) {
+                const html_line = create_html_element("div", CREATURE_OVERRIDE_LINE_CLASS[line.type])
+                html_line.textContent = line.text
+                html_creature.append(html_line)
+            }
+            html_creatures_list.append(html_creature)
+        }
     }
 
     const get_creature_occupied_positions = (): Array<PositionFootprintOne> => {
@@ -105,6 +130,7 @@ export const create_level_setup_creature_list = ({
     }
 
     const refresh_creature_highlights = () => {
+        refresh_creatures_list()
         const show_highlights = can_edit_creatures()
             && get_creatures().length > 0
             && is_grid_creature_click_enabled()
@@ -116,15 +142,17 @@ export const create_level_setup_creature_list = ({
 
     const get_existing_creature_names = () => get_creatures().map(creature => creature.name)
 
-    const open_edit_modal = (creature_index: number, creature: ScenarioCreatureSetup) => {
+    const open_edit_modal = (creature_index: number, creature_override: ScenarioCreatureOverride) => {
         if (!can_edit_creatures()) return
 
-        let creature_draft = creature_setup_to_draft(creature)
-        const saved_position = creature.position
+        const resolved_creature = resolve_creature_override(creature_override, get_available_powers())
+        let creature_draft = creature_setup_to_draft(resolved_creature)
+        const saved_position = creature_override.position
 
         const modal = open_creature_editor_modal({
             title: "Edit creature",
             creature: creature_draft,
+            preview_position: saved_position,
             get_available_powers,
             on_creature_changed: (next_creature) => {
                 creature_draft = next_creature
@@ -134,6 +162,7 @@ export const create_level_setup_creature_list = ({
                     existing_creature_names: get_creatures()
                         .filter((_, index) => index !== creature_index)
                         .map(entry => entry.name),
+                    available_powers: get_available_powers(),
                 })
             },
             on_validation_error: report_edit_error,
@@ -199,7 +228,7 @@ export const create_level_setup_creature_list = ({
             board[position.y][position.x].set_interaction_status("hover")
     })
 
-    html_root.append(creature_setup_form.html_form)
+    html_root.append(creature_setup_form.html_form, html_creatures_list)
     refresh_creature_highlights()
 
     const refresh_power_options = () => {

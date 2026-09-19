@@ -3,7 +3,7 @@ import type {Creatures} from "core/creatures/Creatures";
 import {serialize_interaction_selection} from "scenario_test/serialize_interaction_selection";
 import {
     SCENARIO_STEP_TYPE,
-    type ScenarioCreatureSetup,
+    type ScenarioCreatureOverride,
     type ScenarioTest,
 } from "scenario_test/ScenarioTest";
 
@@ -31,7 +31,7 @@ export const create_step_recorder = ({
         notify_scenario_changed()
     }
 
-    const record_add_creature = (creature: ScenarioCreatureSetup) => {
+    const record_add_creature = (creature: ScenarioCreatureOverride) => {
         if (is_recording) return
         const scenario = get_scenario()
         set_scenario({
@@ -44,7 +44,7 @@ export const create_step_recorder = ({
         notify_scenario_changed()
     }
 
-    const update_creature = (creature_index: number, creature: ScenarioCreatureSetup) => {
+    const update_creature = (creature_index: number, creature: ScenarioCreatureOverride) => {
         if (is_recording) return
         const scenario = get_scenario()
         const creatures = [...scenario.level_setup.creatures]
