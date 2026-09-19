@@ -75,6 +75,7 @@ export const create_level_setup_creature_list = ({
 
     let open_modal_refresh_power_options: (() => void) | undefined
     let latest_hovered_position: PositionFootprintOne | null = null
+    let is_placement_active: () => boolean = () => false
 
     const report_edit_error = (error: unknown) => {
         on_edit_error(error instanceof Error ? error.message : String(error))
@@ -129,15 +130,26 @@ export const create_level_setup_creature_list = ({
             board[position.y][position.x].set_highlight(SQUARE_HIGHLIGHT.CLICKABLE)
     }
 
-    const refresh_creature_highlights = () => {
-        refresh_creatures_list()
+    const refresh_creature_board_highlights = () => {
         const show_highlights = can_edit_creatures()
             && get_creatures().length > 0
             && is_grid_creature_click_enabled()
-        if (show_highlights)
+        if (show_highlights) {
             set_creature_highlights()
-        else
+            latest_hovered_position = null
+            click_overlay.refresh_mouse_handlers()
+        } else {
             clear_board_highlights()
+            latest_hovered_position = null
+        }
+    }
+
+    const refresh_creature_highlights = () => {
+        refresh_creatures_list()
+        if (is_placement_active())
+            return
+
+        refresh_creature_board_highlights()
     }
 
     const get_existing_creature_names = () => get_creatures().map(creature => creature.name)
@@ -208,6 +220,7 @@ export const create_level_setup_creature_list = ({
         on_placement_error: on_edit_error,
         on_placement_changed: refresh_creature_highlights,
     })
+    is_placement_active = creature_setup_form.is_placement_active
 
     click_overlay.addOnMouseMoveHandler(coordinate => {
         if (!is_grid_creature_click_enabled()) return

@@ -338,7 +338,15 @@ body.content-editor {
 }
 
 .visual-tests__creature-override {
-    padding: var(--ce-space-xs) 0;
+    padding: var(--ce-space-sm);
+    border: 1px solid transparent;
+    border-radius: var(--ce-radius-sm);
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.visual-tests__creature-override:hover {
+    background: var(--ce-color-surface-inset);
+    border-color: var(--ce-color-border);
 }
 
 .visual-tests__creature-override-line--section {

@@ -358,6 +358,7 @@ export const create_visual_tests_ui = ({
                 add_creature_to_game,
                 available_powers,
             })
+            refresh_level_setup_list()
         })
     }
 
