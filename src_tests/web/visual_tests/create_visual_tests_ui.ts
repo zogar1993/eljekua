@@ -123,19 +123,19 @@ export const create_visual_tests_ui = ({
     })
 
     const html_new_test_button = create_content_button({
-        text: "New test",
+        text: "New",
         variant: CONTENT_EDITOR_BUTTON_VARIANT.SECONDARY,
         size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
     })
 
     const html_copy_test_button = create_content_button({
-        text: "Copy test",
+        text: "Copy",
         variant: CONTENT_EDITOR_BUTTON_VARIANT.SECONDARY,
         size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
     })
 
     const html_delete_test_button = create_content_button({
-        text: "Delete test",
+        text: "Delete",
         variant: CONTENT_EDITOR_BUTTON_VARIANT.DANGER,
         size: CONTENT_EDITOR_BUTTON_SIZE.SMALL,
     })
