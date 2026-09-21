@@ -1,14 +1,11 @@
 import {normalize_creature_override} from "scenario_test/scenario_creature_override";
-import type {ScenarioTest} from "scenario_test/ScenarioTest";
+import type {ScenarioTest, ScenarioTestFile} from "scenario_test/ScenarioTest";
 
-export const load_scenario_test = (raw: unknown): ScenarioTest => {
+export const load_scenario_test_file = (raw: unknown): ScenarioTestFile => {
     if (typeof raw !== "object" || raw === null)
         throw Error("scenario must be an object")
 
-    const scenario = raw as Partial<ScenarioTest>
-
-    if (typeof scenario.name !== "string" || scenario.name.length === 0)
-        throw Error("scenario.name must be a non-empty string")
+    const scenario = raw as Partial<ScenarioTestFile>
 
     if (!Array.isArray(scenario.steps))
         throw Error("scenario.steps must be an array")
@@ -26,7 +23,6 @@ export const load_scenario_test = (raw: unknown): ScenarioTest => {
         throw Error("scenario.level_setup.creatures must be an array")
 
     return {
-        name: scenario.name,
         level_setup: {
             battle_grid_size: scenario.level_setup.battle_grid_size,
             creatures: scenario.level_setup.creatures.map(normalize_creature_override),
@@ -35,10 +31,29 @@ export const load_scenario_test = (raw: unknown): ScenarioTest => {
     }
 }
 
+export const load_scenario_test = ({raw, name}: { raw: unknown, name: string }): ScenarioTest => {
+    if (typeof name !== "string" || name.length === 0)
+        throw Error("scenario path must be a non-empty string")
+
+    return {
+        name,
+        ...load_scenario_test_file(raw),
+    }
+}
+
 export const parse_scenario_test_json = (json: string): ScenarioTest => {
-    return load_scenario_test(JSON.parse(json))
+    const raw = JSON.parse(json) as Partial<ScenarioTest>
+    if (typeof raw.name !== "string" || raw.name.length === 0)
+        throw Error("scenario path must be a non-empty string")
+
+    return load_scenario_test({raw, name: raw.name})
 }
 
 export const serialize_scenario_test_json = (scenario: ScenarioTest): string => {
     return JSON.stringify(scenario, null, 2)
+}
+
+export const serialize_scenario_test_file_json = (scenario: ScenarioTest): string => {
+    const {name: _name, ...file_contents} = scenario
+    return JSON.stringify(file_contents, null, 2)
 }

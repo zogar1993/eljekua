@@ -1,5 +1,4 @@
 {
-  "name": "damage/resistance/untyped damage is not reduced by typed resistances",
   "level_setup": {
     "battle_grid_size": {
       "x": 10,

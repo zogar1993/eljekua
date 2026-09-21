@@ -155,10 +155,13 @@ export type ScenarioStep =
     | ScenarioStepInteraction
     | ScenarioStepExpect
 
-export type ScenarioTest = {
-    name: string
+export type ScenarioTestFile = {
     level_setup: ScenarioLevelSetup
     steps: Array<ScenarioStep>
+}
+
+export type ScenarioTest = ScenarioTestFile & {
+    name: string
 }
 
 export type ScenarioRunFailure = {

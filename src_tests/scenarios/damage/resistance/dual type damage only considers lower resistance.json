@@ -1,5 +1,4 @@
 {
-  "name": "damage/resistance/dual type damage only considers lower resistance",
   "level_setup": {
     "battle_grid_size": {
       "x": 10,

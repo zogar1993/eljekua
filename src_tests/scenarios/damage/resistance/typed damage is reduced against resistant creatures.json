@@ -1,5 +1,4 @@
 {
-  "name": "damage/resistance/typed damage is reduced against resistant creatures",
   "level_setup": {
     "battle_grid_size": {
       "x": 10,

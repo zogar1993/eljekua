@@ -1,4 +1,4 @@
-import {parse_scenario_test_json, serialize_scenario_test_json} from "scenario_test/load_scenario_test";
+import {load_scenario_test, serialize_scenario_test_file_json} from "scenario_test/load_scenario_test";
 import {sanitize_scenario_path, encode_scenario_path_for_url} from "scenario_test/sanitize_scenario_path";
 import type {ScenarioTest} from "scenario_test/ScenarioTest";
 
@@ -17,7 +17,7 @@ export const load_scenario_test_by_path = async (path: string): Promise<Scenario
     const response = await fetch(`${SCENARIO_TEST_API_BASE}/api/scenarios/${encode_scenario_path_for_url(path)}`)
     if (!response.ok)
         throw Error(`failed to load scenario "${scenario_path}" (${response.status})`)
-    return parse_scenario_test_json(await response.text())
+    return load_scenario_test({raw: JSON.parse(await response.text()), name: scenario_path})
 }
 
 export const delete_scenario_test = async (path: string): Promise<void> => {
@@ -34,7 +34,7 @@ export const save_scenario_test = async (scenario: ScenarioTest): Promise<string
     const response = await fetch(`${SCENARIO_TEST_API_BASE}/api/scenarios/${encode_scenario_path_for_url(scenario_path)}`, {
         method: "PUT",
         headers: {"Content-Type": "application/json"},
-        body: serialize_scenario_test_json({...scenario, name: scenario_path}),
+        body: serialize_scenario_test_file_json({...scenario, name: scenario_path}),
     })
     if (!response.ok)
         throw Error(`failed to save scenario (${response.status})`)
