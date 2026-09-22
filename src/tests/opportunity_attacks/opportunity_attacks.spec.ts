@@ -1,38 +1,14 @@
 import {get_flanker_positions} from "core/battlegrid/position/get_flanker_positions";
-import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
-import type {Creature} from "core/battlegrid/creatures/Creature";
-import {ATTRIBUTES} from "core/character_sheet/attributes";
-import type {Position} from "core/battlegrid/Position";
-import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
-import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
-import {create_instruction_loop} from "core/instruction_loop";
-import {INTERACTION_TYPE} from "core/interactions/Interactions";
-import {create_set_current_turn_to_creature} from "core/use_cases/gameplay/set_current_turn_to_creature";
-import {create_game_events} from "core/events/GameEvents";
-import {create_game_state} from "core/game_state/GameState";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
+import {create_creature_test_helpers} from "tests/utils/creature_test_helpers";
+import type {AttackLogEntry} from "tests/utils/creature_test_helpers";
+import {create_test_game} from "tests/utils/create_test_game";
 
-const game_events = create_game_events()
-const game_state = create_game_state({
-    game_events,
-    battle_grid_size: {x: 10, y: 10},
-})
-const {battle_grid, initiative_order, vm_state, creatures} = game_state
-const evaluate_ast = build_evaluate_ast({game_state})
+const test_game = create_test_game()
+const {battle_grid, vm_state, instruction_loop, game_events} = test_game
 
-const instruction_loop = create_instruction_loop({game_state, evaluate_ast, game_events})
-
-const set_current_turn_to_creature = create_set_current_turn_to_creature({game_state, game_events})
-
-const add_creature_to_game = create_add_creature_to_game({game_state, game_events})
-
-const start_battle = () => {
-    initiative_order.start()
-}
-
-const attack_log: Array<{ attacker: string, target: string, power_name: string }> = []
+const attack_log: Array<AttackLogEntry> = []
 
 game_events.on_creature_missed.add_handler((creature) => {
     const attacker = EXPR.as_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
@@ -43,6 +19,17 @@ game_events.on_creature_missed.add_handler((creature) => {
         power_name,
     })
 })
+
+const {given_a_creature_is_created, given_creature, when_creature, then_creature} = create_creature_test_helpers({
+    creatures: test_game.creatures,
+    instruction_loop,
+    vm_state,
+    add_creature_to_game: test_game.add_creature_to_game,
+    set_current_turn_to_creature: test_game.set_current_turn_to_creature,
+    attack_log,
+})
+
+const start_battle = test_game.start_initiative
 
 describe("when an enemy leaves a space adjacent to a creature", () => {
     test(`the creature can perform an opportunity attack to it`, () => {
@@ -88,77 +75,3 @@ describe("when a 1x1 attacker attacks a 2x2 defender", () => {
         expect(result).toIncludeSameMembers([{x: 3, y: 1, footprint: 1}, {x: 3, y: 2, footprint: 1}]);
     });
 })
-
-const given_a_creature_is_created = (c: Partial<CreatureData> & Pick<CreatureData, "position" | "name">) => {
-    const data: CreatureData = {
-        name: c.name || "",
-        template: c.template ?? null,
-        position: c.position,
-        size: c.size ?? "medium",
-        image: c.image ?? `url("/public/saber-and-pistol.svg")`,
-        movement: c.movement ?? 5,
-        hp_current: c.hp_current ?? 10,
-        hp_max: c.hp_max ?? 10,
-        level: c.level ?? 1,
-        team: c.team ?? null,
-        attributes: c.attributes ?? Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
-        powers: c.powers ?? [],
-        archetypes: c.archetypes ?? [],
-        resistances: c.resistances ?? {},
-    }
-
-    add_creature_to_game({data})
-}
-
-const given_creature = (creature_name: string) => {
-    const creature = creatures.get_all().find(creature => creature.data.name === creature_name)
-    if (!creature) throw Error(`creature name "${creature_name}" not found`)
-
-    return {
-        is_in_its_turn: () => {
-            set_current_turn_to_creature({creature})
-            instruction_loop.run()
-        }
-    }
-}
-
-const when_creature = (creature_name: string) => {
-    const creature = creatures.get_all().find(creature => creature.data.name === creature_name)
-    if (!creature) throw Error(`creature name "${creature_name}" not found`)
-    expect(vm_state.get_acting_creature().data.name).toEqual(creature.data.name)
-
-    return {
-        moves_through: (...positions: Array<Omit<Position, "footprint"> & { footprint?: Position["footprint"] }>) => {
-            const path = positions.map(p => ({...p, footprint: p.footprint ?? 1}))
-            instruction_loop.select({type: INTERACTION_TYPE.OPTION_SELECT, option: "Move"})
-            instruction_loop.select({type: INTERACTION_TYPE.SELECT_PATH, path: [creature.data.position, ...path]})
-        },
-        selects_action: (action_name: string) => {
-            instruction_loop.select({type: INTERACTION_TYPE.OPTION_SELECT, option: action_name})
-        },
-        misses_attack_roll_against: (creature_name: string) => {
-            const defender = creatures.get_all().find(c => c.data.name === creature_name)
-            expect(defender).not.toBeUndefined()
-            const attack_rolls = [{creature_id: defender!.id, hit_status: HIT_STATUS.MISS}]
-            instruction_loop.select({type: INTERACTION_TYPE.HIT_STATUS_SELECT, attack_rolls})
-        }
-    }
-}
-
-const then_creature = (creature_name: string) => {
-    const creature = creatures.get_all().find(creature => creature.data.name === creature_name)
-    if (!creature) throw Error(`creature name "${creature_name}" not found`)
-
-    return {
-        is_at_position: (position: Omit<Position, "footprint">) => {
-            expect(creature.data.position).toEqual({...position, footprint: 1})
-        },
-        has_performed_action: (action_name: string, options: { target: string }) => {
-            expect(attack_log).toContainEqual({
-                attacker: creature_name,
-                target: options.target,
-                power_name: action_name,
-            })
-        }
-    }
-}
