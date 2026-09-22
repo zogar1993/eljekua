@@ -112,7 +112,8 @@ enum StatusDurationEnum {
     "until_start_of_your_next_turn",
     "until_end_of_your_next_turn",
     "until_start_of_next_turn",
-    "until_your_next_attack_roll_against_target"
+    "until_your_next_attack_roll_against_target",
+    "until_end_of_encounter",
 }
 
 export type StatusDurationValue = keyof typeof StatusDurationEnum

@@ -60,6 +60,10 @@ const interpret_duration = ({duration, power_owner}: {
                     until: "next_attack_roll_against_target",
                     creature: power_owner
                 }
+            case "until_end_of_encounter":
+                return {
+                    until: "encounter_end",
+                }
             default:
                 throw Error(`duration '${duration}' not supported`)
         }

@@ -8,7 +8,7 @@ import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "data/powers/basic";
 export type Status = { durations: Array<StatusDuration> } & { effect: StatusEffect }
 
 export type StatusDuration = {
-    until: "next_turn_end" | "turn_start" | "turn_end" | "next_attack_roll_against_target",
+    until: "next_turn_end" | "turn_start" | "turn_end" | "next_attack_roll_against_target" | "encounter_end",
     creature?: Creature
 }
 
