@@ -2,11 +2,17 @@ import type {InterpretInstructionProps} from "core/virtual_machine/instructions/
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {
+    add_numbers_resolved,
+    max_number_resolved,
     min_number_resolved,
     resolve_number,
     subtract_numbers_resolved,
 } from "core/virtual_machine/expressions/number_utils";
-import type {Creature, StatusEffectGainResistance} from "core/battlegrid/creatures/Creature";
+import type {
+    Creature,
+    StatusEffectGainResistance,
+    StatusEffectGainVulnerability,
+} from "core/battlegrid/creatures/Creature";
 import type {InstructionApplyDamage} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
@@ -42,6 +48,13 @@ export const interpret_apply_damage = ({
 
     if (status_resistances.length > 0)
         damage = subtract_numbers_resolved(damage, min_number_resolved(status_resistances))
+
+    const status_vulnerabilities = target.statuses
+        .filter(({effect}) => effect.type === "gain_vulnerability" && effect.against.includes(attacker))
+        .map(({effect}) => (effect as StatusEffectGainVulnerability).value)
+
+    if (status_vulnerabilities.length > 0)
+        damage = add_numbers_resolved([damage, max_number_resolved(status_vulnerabilities)])
 
     if (instruction.half_damage)
         damage = apply_half_damage(damage)

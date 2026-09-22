@@ -15,6 +15,7 @@ export type StatusDuration = {
 export type StatusEffect =
     StatusEffectGrantCombatAdvantage |
     StatusEffectGainResistance |
+    StatusEffectGainVulnerability |
     StatusEffectGainAttackBonus
 
 export type StatusEffectGrantCombatAdvantage = {
@@ -24,6 +25,12 @@ export type StatusEffectGrantCombatAdvantage = {
 
 export type StatusEffectGainResistance = {
     type: "gain_resistance"
+    value: ExprNumberResolved
+    against: Array<Creature>,
+}
+
+export type StatusEffectGainVulnerability = {
+    type: "gain_vulnerability"
     value: ExprNumberResolved
     against: Array<Creature>,
 }

@@ -299,6 +299,12 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
                 against: to_ast(status.against),
                 value: to_ast(status.value)
             }
+        case "gain_vulnerability":
+            return {
+                type: "gain_vulnerability",
+                against: to_ast(status.against),
+                value: to_ast(status.value)
+            }
         case "gain_attack_bonus":
             return {
                 type: "gain_attack_bonus",

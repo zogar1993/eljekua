@@ -129,6 +129,10 @@ export type InstructionApplyStatus = {
         value: AstNode
         against: AstNode,
     } | {
+        type: "gain_vulnerability"
+        value: AstNode
+        against: AstNode,
+    } | {
         type: "gain_attack_bonus"
         value: AstNode
         against: AstNode,

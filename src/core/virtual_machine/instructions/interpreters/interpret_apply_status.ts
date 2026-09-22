@@ -88,6 +88,12 @@ const interpret_status = ({status, evaluate_ast}: {
                 against: EXPR.as_creatures(evaluate_ast(status.against)),
                 value: EXPR.as_number_resolved_expr(evaluate_ast(status.value))
             }
+        case "gain_vulnerability":
+            return {
+                type: "gain_vulnerability",
+                against: EXPR.as_creatures(evaluate_ast(status.against)),
+                value: EXPR.as_number_resolved_expr(evaluate_ast(status.value))
+            }
         default:
             throw Error(`could not interpret status '${JSON.stringify(status)}'`)
     }

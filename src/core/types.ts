@@ -98,6 +98,10 @@ export type IRInstructionApplyStatus = {
         value: number | string
         against: string,
     } | {
+        type: "gain_vulnerability"
+        value: number | string
+        against: string,
+    } | {
         type: "gain_attack_bonus"
         value: number | string
         against: string,
