@@ -1,5 +1,6 @@
 import type {Expr, ExprNumber, ExprNumberResolved, ExprNumberUnresolved} from "core/virtual_machine/expressions/types";
 import {roll_d} from "core/randomness/dice";
+import {assert_is_not_empty} from "stdlib/assert";
 
 export const add_numbers_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved => ({
     type: "number_resolved",
@@ -15,19 +16,34 @@ export const subtract_numbers_resolved = (a: ExprNumberResolved, b: ExprNumberRe
     description: "-"
 })
 
-export const max_number_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved =>({
+export const negate_number_resolved = (a: ExprNumberResolved): ExprNumberResolved => ({
     type: "number_resolved",
-    value: Math.max(...numbers.map(n => n.value)),
-    params: [...numbers],
-    description: "max"
+    value: a.value * -1,
+    params: [a],
+    description: "negate"
 })
 
-export const min_number_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved => ({
-    type: "number_resolved",
-    value: Math.min(...numbers.map(n => n.value)),
-    params: [...numbers],
-    description: "min"
-})
+export const max_number_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved => {
+    assert_is_not_empty(numbers)
+    if (numbers.length === 1) return numbers[0]
+    return {
+        type: "number_resolved",
+        value: Math.max(...numbers.map(n => n.value)),
+        params: [...numbers],
+        description: "max"
+    }
+}
+
+export const min_number_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved => {
+    assert_is_not_empty(numbers)
+    if (numbers.length === 1) return numbers[0]
+    return {
+        type: "number_resolved",
+        value: Math.min(...numbers.map(n => n.value)),
+        params: [...numbers],
+        description: "min"
+    }
+}
 
 export const add_numbers = (numbers: Array<ExprNumber>): ExprNumberUnresolved => ({
     type: "number_unresolved",
@@ -58,3 +74,4 @@ export const resolve_number = (number: ExprNumber): ExprNumberResolved => {
         params: resolved_parts
     }
 }
+

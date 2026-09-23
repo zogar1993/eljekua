@@ -38,7 +38,7 @@ export const power_resolute_shield: IRPower = {
                 status: {
                     type: "gain_resistance",
                     value: "owner.con_mod",
-                    against: "primary_target",
+                    against_creatures: "primary_target",
                 }
             }
         ],

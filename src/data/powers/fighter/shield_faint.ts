@@ -38,7 +38,7 @@ export const power_shield_faint: IRPower = {
                 status: {
                     type: "gain_attack_bonus",
                     value: 3,
-                    against: "primary_target",
+                    against_creatures: "primary_target",
                 }
             }
         ],

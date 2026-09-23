@@ -123,19 +123,21 @@ export type InstructionApplyStatus = {
     duration: Array<StatusDurationValue>
     status: {
         type: "grant_combat_advantage",
-        against: AstNode,
+        against_creatures: AstNode | null,
     } | {
         type: "gain_resistance"
         value: AstNode
-        against: AstNode,
+        against_creatures: AstNode | null,
+        against_damage_types: Array<string> | null
     } | {
         type: "gain_vulnerability"
         value: AstNode
-        against: AstNode,
+        against_creatures: AstNode | null,
+        against_damage_types: Array<string> | null
     } | {
         type: "gain_attack_bonus"
         value: AstNode
-        against: AstNode,
+        against_creatures: AstNode | null,
     }
 }
 

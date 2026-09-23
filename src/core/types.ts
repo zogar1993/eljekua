@@ -92,19 +92,21 @@ export type IRInstructionApplyStatus = {
     duration: IRStatusDuration
     status: {
         type: "grant_combat_advantage",
-        against: string,
+        against_creatures?: string,
     } | {
         type: "gain_resistance"
         value: number | string
-        against: string,
+        against_creatures?: string,
+        against_damage_types?: Array<string>,
     } | {
         type: "gain_vulnerability"
         value: number | string
-        against: string,
+        against_creatures?: string,
+        against_damage_types?: Array<string>,
     } | {
         type: "gain_attack_bonus"
         value: number | string
-        against: string,
+        against_creatures?: string,
     }
 }
 

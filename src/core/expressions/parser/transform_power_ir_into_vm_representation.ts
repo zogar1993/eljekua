@@ -17,7 +17,7 @@ import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE, TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
-import {assert_is_true} from "stdlib/assert";
+import {assert_is_not_empty, assert_is_true} from "stdlib/assert";
 import {FUNCTION_NAME} from "core/expressions/function_names";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
@@ -291,24 +291,27 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
         case "grant_combat_advantage":
             return {
                 type: "grant_combat_advantage",
-                against: to_ast(status.against),
+                against_creatures: status.against_creatures ? to_ast(status.against_creatures) : null,
             }
         case "gain_resistance":
             return {
                 type: "gain_resistance",
-                against: to_ast(status.against),
+                against_creatures: status.against_creatures ? to_ast(status.against_creatures) : null,
+                against_damage_types: status.against_damage_types ? status.against_damage_types : null,
                 value: to_ast(status.value)
             }
         case "gain_vulnerability":
+            if (status.against_damage_types) assert_is_not_empty(status.against_damage_types)
             return {
                 type: "gain_vulnerability",
-                against: to_ast(status.against),
+                against_creatures: status.against_creatures ? to_ast(status.against_creatures) : null,
+                against_damage_types: status.against_damage_types ? status.against_damage_types : null,
                 value: to_ast(status.value)
             }
         case "gain_attack_bonus":
             return {
                 type: "gain_attack_bonus",
-                against: to_ast(status.against),
+                against_creatures: status.against_creatures ? to_ast(status.against_creatures) : null,
                 value: to_ast(status.value)
             }
         default:

@@ -20,25 +20,27 @@ export type StatusEffect =
 
 export type StatusEffectGrantCombatAdvantage = {
     type: "grant_combat_advantage",
-    against: Array<Creature>,
+    against_creatures: Array<Creature> | null,
 }
 
 export type StatusEffectGainResistance = {
     type: "gain_resistance"
     value: ExprNumberResolved
-    against: Array<Creature>,
+    against_creatures: Array<Creature> | null,
+    against_damage_types: Array<string> | null,
 }
 
 export type StatusEffectGainVulnerability = {
     type: "gain_vulnerability"
     value: ExprNumberResolved
-    against: Array<Creature>,
+    against_creatures: Array<Creature> | null,
+    against_damage_types: Array<string> | null,
 }
 
 export type StatusEffectGainAttackBonus = {
     type: "gain_attack_bonus"
     value: ExprNumberResolved
-    against: Array<Creature>,
+    against_creatures: Array<Creature> | null,
 }
 
 export const create_creature = ({id, data}: { id: number, data: CreatureData }) => {

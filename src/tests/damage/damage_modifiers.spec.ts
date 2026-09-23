@@ -1,8 +1,12 @@
 import {
+    Power,
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {create_creature_test_helpers} from "tests/utils/creature_test_helpers";
 import {create_test_game} from "tests/utils/create_test_game";
+import type {IRPower} from "core/types";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
+import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 
 const POSITION_LINUAR = {x: 3, y: 4, footprint: 1} as const
 const POSITION_RAGOZ = {x: 4, y: 4, footprint: 1} as const
@@ -30,7 +34,7 @@ beforeEach(() => {
 
 describe("damage resistance", () => {
     test("typed damage is reduced against resistant creatures", () => {
-        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE_FIRE]})
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
         given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, resistances: {fire: 1}})
         start_battle()
 
@@ -41,7 +45,7 @@ describe("damage resistance", () => {
     })
 
     test("untyped damage is not reduced by typed resistances", () => {
-        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE_UNTYPED]})
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE()]})
         given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, resistances: {fire: 1}})
         start_battle()
 
@@ -52,7 +56,7 @@ describe("damage resistance", () => {
     })
 
     test("dual type damage only considers lower resistance", () => {
-        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE_FIRE_NECROTIC]})
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE, NECROTIC)]})
         given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, resistances: {fire: 1, necrotic: 2}})
         start_battle()
 
@@ -65,7 +69,7 @@ describe("damage resistance", () => {
 
 describe("damage vulnerability", () => {
     test("typed damage is increased against vulnerable creatures", () => {
-        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE_FIRE]})
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
         given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, resistances: {fire: -1}})
         start_battle()
 
@@ -76,7 +80,7 @@ describe("damage vulnerability", () => {
     })
 
     test("untyped damage is not increased by typed vulnerability", () => {
-        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE_UNTYPED]})
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE()]})
         given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, resistances: {fire: -1}})
         start_battle()
 
@@ -87,7 +91,8 @@ describe("damage vulnerability", () => {
     })
 
     test("dual type damage only considers higher vulnerability", () => {
-        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE_FIRE_NECROTIC]})
+
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE, NECROTIC)]})
         given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, resistances: {fire: -1, necrotic: -2}})
         start_battle()
 
@@ -98,16 +103,69 @@ describe("damage vulnerability", () => {
     })
 })
 
-const deal_damage_power = ({damage_types}: {damage_types: Array<string>}) => transform_power_ir_into_vm_representation({
+describe("resistance and vulnerability cancel each other", () => {
+    test("when a is more resistant than vulnerable, vulnerability is subtracted from resistance", () => {
+        const linuar_powers: Array<Power> = [DEAL_DAMAGE(FIRE), APPLY_VULNERABILITY(LESSER, FIRE)]
+        const ragoz_resistances: {[FIRE: GREATER]}
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: linuar_powers})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, resistances: ragoz_resistances})
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(5)
+    })
+})
+
+const DEAL_DAMAGE = (...types: Array<string>) => transform_power_ir_into_vm_representation({
     name: "Deal Damage",
     type: {action: "standard", cooldown: "at-will", attack: true},
     targeting: {targeting_type: "melee_weapon", target_type: "enemy", amount: 1},
     effect: [
         {type: "set_hit_status", target: "primary_target", status: 1},
-        {type: "apply_damage", value: "4", target: "primary_target", damage_types: damage_types},
+        {type: "apply_damage", value: "4", target: "primary_target", damage_types: types},
     ],
 })
 
-const DEAL_DAMAGE_UNTYPED = deal_damage_power({damage_types: []})
-const DEAL_DAMAGE_FIRE = deal_damage_power({damage_types: ["fire"]})
-const DEAL_DAMAGE_FIRE_NECROTIC = deal_damage_power({damage_types: ["fire", "necrotic"]})
+const FIRE = "fire"
+const NECROTIC = "necrotic"
+
+const PETTY = 1
+const LESSER = 2
+const GREATER = 3
+
+const GAIN_RESISTANCE = (amount: number, ...types: Array<string>) => transform_power_ir_into_vm_representation({
+    name: "Gain Resistance",
+    type: {action: "minor", cooldown: "at-will", attack: false},
+    effect: [
+        {
+            type: INSTRUCTION_TYPE.APPLY_STATUS,
+            target: "owner",
+            duration: "until_end_of_encounter",
+            status: {
+                type: "gain_resistance",
+                value: amount,
+                against_damage_types: types.length > 0 ? types : undefined
+            },
+        },
+    ],
+})
+
+const APPLY_VULNERABILITY = (amount: number, ...types: Array<string>) => transform_power_ir_into_vm_representation({
+    name: "Apply Vulnerability",
+    type: {action: "minor", cooldown: "at-will", attack: false},
+    targeting: {targeting_type: "melee_weapon", target_type: "creature", amount: 1},
+    effect: [
+        {
+            type: INSTRUCTION_TYPE.APPLY_STATUS,
+            target: SYSTEM_KEYWORD.PRIMARY_TARGET,
+            duration: "until_end_of_encounter",
+            status: {
+                type: "gain_vulnerability",
+                value: amount,
+                against_damage_types: types.length > 0 ? types : undefined
+            },
+        },
+    ],
+})

@@ -251,7 +251,7 @@ const brash_strike: IRPower = {
             duration: "until_start_of_your_next_turn",
             status: {
                 type: "grant_combat_advantage",
-                against: "primary_target",
+                against_creatures: "primary_target",
             }
         }
     ]

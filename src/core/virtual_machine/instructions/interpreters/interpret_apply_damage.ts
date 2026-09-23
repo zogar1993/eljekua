@@ -4,15 +4,11 @@ import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {
     add_numbers_resolved,
     max_number_resolved,
-    min_number_resolved,
+    negate_number_resolved,
     resolve_number,
     subtract_numbers_resolved,
 } from "core/virtual_machine/expressions/number_utils";
-import type {
-    Creature,
-    StatusEffectGainResistance,
-    StatusEffectGainVulnerability,
-} from "core/battlegrid/creatures/Creature";
+import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {InstructionApplyDamage} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
@@ -38,23 +34,9 @@ export const interpret_apply_damage = ({
 
     let damage = resolve_number(EXPR.as_number_expr(evaluate_ast(instruction.value)))
 
-    const relevant_resistances = get_relevant_resistances({creature: target, damage_types: instruction.damage_types})
-    if (relevant_resistances.length > 0)
-        damage = subtract_numbers_resolved(damage, min_number_resolved(relevant_resistances))
+    const modifier = get_damage_modifier({creature: target, damage_types: instruction.damage_types, attacker})
 
-    const status_resistances = target.statuses
-        .filter(({effect}) => effect.type === "gain_resistance" && effect.against.includes(attacker))
-        .map(({effect}) => (effect as StatusEffectGainResistance).value)
-
-    if (status_resistances.length > 0)
-        damage = subtract_numbers_resolved(damage, min_number_resolved(status_resistances))
-
-    const status_vulnerabilities = target.statuses
-        .filter(({effect}) => effect.type === "gain_vulnerability" && effect.against.includes(attacker))
-        .map(({effect}) => (effect as StatusEffectGainVulnerability).value)
-
-    if (status_vulnerabilities.length > 0)
-        damage = add_numbers_resolved([damage, max_number_resolved(status_vulnerabilities)])
+    damage = add_numbers_resolved([damage, modifier])
 
     if (instruction.half_damage)
         damage = apply_half_damage(damage)
@@ -71,20 +53,60 @@ const apply_half_damage = (number: ExprNumberResolved): ExprNumberResolved => ({
     description: "half damage"
 })
 
-const get_relevant_resistances = ({
-                                      creature,
-                                      damage_types,
-                                  }: {
-    creature: Creature
-    damage_types: Array<string>
-}): Array<ExprNumberResolved> => {
-    const relevant_resistances: Array<ExprNumberResolved> = []
-    for (const damage_type of damage_types) {
-        const value = creature.data.resistances[damage_type]
-        if (value) {
-            const description = `${damage_type} ${value > 0 ? "resistance" : "vulnerability"} ${value}`
-            relevant_resistances.push({type: "number_resolved", value, description, params: []})
+function get_modifier_for_damage_type({creature, attacker, damage_type}: {
+    creature: Creature,
+    attacker: Creature,
+    damage_type: string | null
+}) {
+    const type_resistances: Array<ExprNumberResolved> = []
+    const type_vulnerabilities: Array<ExprNumberResolved> = []
+    for (const status of creature.statuses) {
+        const {effect} = status
+        if (effect.type === "gain_resistance") {
+            const includes_attacker = effect.against_creatures === null || effect.against_creatures.includes(attacker)
+            const includes_type = effect.against_damage_types === null || effect.against_damage_types === damage_type
+            if (includes_attacker && includes_type)
+                type_resistances.push(effect.value)
+        }
+        if (effect.type === "gain_vulnerability") {
+            const includes_attacker = effect.against_creatures === null || effect.against_creatures.includes(attacker)
+            const includes_type = effect.against_damage_types === null || effect.against_damage_types === damage_type
+            if (includes_attacker && includes_type)
+                type_vulnerabilities.push(effect.value)
         }
     }
-    return relevant_resistances
+
+    if (type_resistances.length === 0) {
+        if (type_vulnerabilities.length === 0)
+            return BASE_RESISTANCE
+        else
+            return max_number_resolved(type_vulnerabilities)
+    } else {
+        const resistance = max_number_resolved(type_resistances)
+        if (type_vulnerabilities.length === 0)
+            return negate_number_resolved(resistance)
+        else
+            return subtract_numbers_resolved(resistance, max_number_resolved(type_vulnerabilities))
+    }
 }
+
+const get_damage_modifier = ({
+                                 creature,
+                                 damage_types,
+                                 attacker
+                             }: {
+    attacker: Creature
+    creature: Creature
+    damage_types: Array<string>
+}): ExprNumberResolved => {
+    if (damage_types.length === 0)
+        return get_modifier_for_damage_type({creature, attacker, damage_type: null})
+
+    if (damage_types.length === 1)
+        return get_modifier_for_damage_type({creature, attacker, damage_type: damage_types[0]})
+
+    const modifiers = damage_types.map((damage_type) => get_modifier_for_damage_type({creature, attacker, damage_type}))
+    return max_number_resolved(modifiers)
+}
+
+export const BASE_RESISTANCE: ExprNumberResolved = {type: "number_resolved", description: "base resistance", value: 0}

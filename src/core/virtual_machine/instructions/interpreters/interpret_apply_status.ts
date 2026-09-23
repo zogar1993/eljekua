@@ -78,24 +78,26 @@ const interpret_status = ({status, evaluate_ast}: {
         case "grant_combat_advantage":
             return {
                 type: "grant_combat_advantage",
-                against: EXPR.as_creatures(evaluate_ast(status.against))
+                against_creatures: status.against_creatures ? EXPR.as_creatures(evaluate_ast(status.against_creatures)) : null,
             }
         case "gain_attack_bonus":
             return {
                 type: "gain_attack_bonus",
-                against: EXPR.as_creatures(evaluate_ast(status.against)),
+                against_creatures: status.against_creatures ? EXPR.as_creatures(evaluate_ast(status.against_creatures)) : null,
                 value: EXPR.as_number_resolved_expr(evaluate_ast(status.value))
             }
         case "gain_resistance":
             return {
                 type: "gain_resistance",
-                against: EXPR.as_creatures(evaluate_ast(status.against)),
+                against_creatures: status.against_creatures ? EXPR.as_creatures(evaluate_ast(status.against_creatures)) : null,
+                against_damage_types: status.against_damage_types,
                 value: EXPR.as_number_resolved_expr(evaluate_ast(status.value))
             }
         case "gain_vulnerability":
             return {
                 type: "gain_vulnerability",
-                against: EXPR.as_creatures(evaluate_ast(status.against)),
+                against_creatures: status.against_creatures ? EXPR.as_creatures(evaluate_ast(status.against_creatures)) : null,
+                against_damage_types: status.against_damage_types,
                 value: EXPR.as_number_resolved_expr(evaluate_ast(status.value))
             }
         default:
