@@ -25,3 +25,10 @@ Examples:
 - Fire + cold damage; resistance to fire only → full damage (no modifier applies).
 - Fire + cold damage; resistance to fire, vulnerability to cold → vulnerability applies.
 - Fire + cold damage; vulnerability to both fire and cold → only the highest vulnerability applies.
+
+## Half damage
+
+When a power deals half damage:
+
+- Apply resistances and vulnerabilities first.
+- Then halve the resulting damage, rounding down.
