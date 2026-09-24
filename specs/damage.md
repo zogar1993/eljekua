@@ -3,6 +3,7 @@
 ## Application
 
 - Damage is subtracted from the target's hit points.
+- A missed attack cannot damage a minion.
 
 ## Types
 
