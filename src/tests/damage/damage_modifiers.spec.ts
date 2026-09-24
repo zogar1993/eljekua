@@ -257,15 +257,79 @@ describe("resistance and vulnerability cancel each other", () => {
     })
 })
 
-const DEAL_DAMAGE = (...types: Array<string>) => transform_power_ir_into_vm_representation({
-    name: "Deal Damage",
+describe("half damage", () => {
+    test("half damage is applied with no modifiers", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_HALF_DAMAGE()]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ})
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Half Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - Math.floor(DAMAGE / 2))
+    })
+
+    test("half damage is applied after resistance", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_HALF_DAMAGE(FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE)]})
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Half Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - Math.floor((DAMAGE - LESSER) / 2))
+    })
+
+    test("half damage is applied after vulnerability", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_HALF_DAMAGE(FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_VULNERABILITY_EFFECT(GREATER, FIRE)]})
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Half Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - Math.floor((DAMAGE + GREATER) / 2))
+    })
+
+    test("half damage rounds down after modifiers", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_HALF_DAMAGE(FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(GREATER, FIRE)]})
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Half Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - Math.floor((DAMAGE - GREATER) / 2))
+    })
+})
+
+const create_deal_damage_power = ({
+    name,
+    half_damage = false,
+    types,
+}: {
+    name: string
+    half_damage?: boolean
+    types: Array<string>
+}) => transform_power_ir_into_vm_representation({
+    name,
     type: {action: "standard", cooldown: "at-will", attack: true},
     targeting: {targeting_type: "melee_weapon", target_type: "enemy", amount: 1},
     effect: [
         {type: "set_hit_status", target: "primary_target", status: 1},
-        {type: "apply_damage", value: `${DAMAGE}`, target: "primary_target", damage_types: types},
+        {
+            type: "apply_damage",
+            value: `${DAMAGE}`,
+            target: "primary_target",
+            damage_types: types,
+            half_damage,
+        },
     ],
 })
+
+const DEAL_DAMAGE = (...types: Array<string>) => create_deal_damage_power({name: "Deal Damage", types})
+
+const DEAL_HALF_DAMAGE = (...types: Array<string>) => create_deal_damage_power({name: "Deal Half Damage", half_damage: true, types})
 
 const FIRE = "fire"
 const COLD = "cold"
