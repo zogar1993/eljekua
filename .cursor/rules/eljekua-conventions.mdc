@@ -13,7 +13,8 @@ Match surrounding files when adding to an existing module.
 
 1. Implement the change.
 2. Run tests / `tsc --noEmit` when you touched runtime code.
-3. Run `@checklist` — run shell commands where the checklist says to (especially `git status` / `git add`).
+3. If you changed `specs/` or behavior docs, follow `@specs`.
+4. Run `@checklist` — run shell commands where the checklist says to (especially `git status` / `git add`).
 
 ## @naming-constants
 
@@ -68,8 +69,19 @@ export const INSTRUCTION_TYPE = {
 
 ## @tests
 
-- Do **not** add tests (unit tests, spec files, scenario tests, etc.) unless the user explicitly asks.
+- Do **not** add tests (unit tests, spec files, scenario tests, etc.) unless the user explicitly asks — **except** when `@specs` applies (documentation changed).
 - Running existing tests / `tsc --noEmit` when you touched runtime code is still required per `@workflow`.
+
+## @specs
+
+Behavior specs live in `specs/`. When you **add or change** a spec (or other behavior documentation that defines requirements):
+
+1. Read the spec and identify every testable rule.
+2. Verify implementation matches the spec; fix code if it does not.
+3. Add or update tests that cover each new or changed requirement. Follow existing test patterns (e.g. `src/tests/damage/damage_modifiers.spec.ts`).
+4. Run the relevant tests before finishing.
+
+Changing documentation without verifying behavior and tests is not complete per `@workflow`.
 
 ## @architecture
 
@@ -113,4 +125,5 @@ New interaction: (1) type + union in `instruction_loop.ts`, (2) cleanup in `add_
 - [ ] Naming: SCREAMING_SNAKE constants, PascalCase types, snake_case values
 - [ ] Imports: `core/` / `stdlib/` paths, `import type` where appropriate
 - [ ] `Array<T>`, `as const`, layout matches neighbors
+- [ ] Specs: if `specs/` or behavior docs changed, implementation verified and tests added/updated per `@specs`
 - [ ] Git: run `git status`. `git add` every new file you created. Confirm no untracked files remain from your work. Do not commit unless the user asked
