@@ -43,14 +43,32 @@ export type StatusEffectGainAttackBonus = {
     against_creatures: Array<Creature> | null,
 }
 
+export type ConstantEffect =
+    ConstantEffectGainResistance |
+    ConstantEffectGainVulnerability
+
+export type ConstantEffectGainResistance = {
+    type: "gain_resistance"
+    value: number
+    against_damage_types: Array<string> | null
+}
+
+export type ConstantEffectGainVulnerability = {
+    type: "gain_vulnerability"
+    value: number
+    against_damage_types: Array<string> | null
+}
+
 export const create_creature = ({id, data}: { id: number, data: CreatureData }) => {
     const basic_powers = data.template === null
         ? [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS]
         : [...BASIC_MOVEMENT_ACTIONS]
-    const d = {...data, powers: [...basic_powers, ...data.powers]}
+    const {constant_effects, powers, ...creature_data} = data
+    const d = {...creature_data, powers: [...basic_powers, ...powers]}
     return {
         id,
         data: d,
+        constant_effects: [...constant_effects],
         statuses: [] as Array<Status>,
         available_actions: [] as Array<ActionType>
     }

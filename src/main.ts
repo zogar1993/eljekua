@@ -143,7 +143,7 @@ const build_character = (
         attributes: data.attributes ?? Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
         powers: data.powers ?? [],
         archetypes: [],
-        resistances: data.resistances ?? {},
+        constant_effects: data.constant_effects ?? [],
     }
 }
 
@@ -164,7 +164,7 @@ const build_monster = (
         team: overrides.team ?? null,
         attributes: overrides.attributes ?? monster.attributes,
         archetypes: overrides.archetypes ?? monster.archetypes,
-        resistances: overrides.resistances ?? monster.resistances ?? {},
+        constant_effects: overrides.constant_effects ?? monster.constant_effects ?? [],
         powers: overrides.powers ?? monster.powers.map(transform_power_ir_into_vm_representation),
     }
 }

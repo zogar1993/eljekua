@@ -2,6 +2,7 @@ import type {Position} from "core/battlegrid/Position";
 import type {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import type {AttributeCode} from "core/character_sheet/attributes";
 import type {Size} from "core/battlegrid/creatures/SIZES";
+import type {ConstantEffect} from "core/battlegrid/creatures/Creature";
 
 export type CreatureData = {
     name: string
@@ -16,6 +17,6 @@ export type CreatureData = {
     hp_max: number
     team: number | null
     archetypes: Array<string>
-    resistances: Record<string, number>
+    constant_effects: Array<ConstantEffect>
     powers: Array<Power>
 }

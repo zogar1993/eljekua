@@ -53,6 +53,21 @@ const apply_half_damage = (number: ExprNumberResolved): ExprNumberResolved => ({
     description: "half damage"
 })
 
+const effect_applies_to_damage_type = (
+    against_damage_types: Array<string> | null,
+    damage_type: string | null,
+): boolean => {
+    if (damage_type === null)
+        return against_damage_types === null
+    return against_damage_types === null || against_damage_types.includes(damage_type)
+}
+
+const constant_effect_to_number_resolved = (value: number): ExprNumberResolved => ({
+    type: "number_resolved",
+    value,
+    description: "constant effect",
+})
+
 function get_modifier_for_damage_type({creature, attacker, damage_type}: {
     creature: Creature,
     attacker: Creature,
@@ -60,18 +75,24 @@ function get_modifier_for_damage_type({creature, attacker, damage_type}: {
 }) {
     const type_resistances: Array<ExprNumberResolved> = []
     const type_vulnerabilities: Array<ExprNumberResolved> = []
+    for (const effect of creature.constant_effects) {
+        if (!effect_applies_to_damage_type(effect.against_damage_types, damage_type))
+            continue
+        if (effect.type === "gain_resistance")
+            type_resistances.push(constant_effect_to_number_resolved(effect.value))
+        if (effect.type === "gain_vulnerability")
+            type_vulnerabilities.push(constant_effect_to_number_resolved(effect.value))
+    }
     for (const status of creature.statuses) {
         const {effect} = status
         if (effect.type === "gain_resistance") {
             const includes_attacker = effect.against_creatures === null || effect.against_creatures.includes(attacker)
-            const includes_type = effect.against_damage_types === null || effect.against_damage_types === damage_type
-            if (includes_attacker && includes_type)
+            if (includes_attacker && effect_applies_to_damage_type(effect.against_damage_types, damage_type))
                 type_resistances.push(effect.value)
         }
         if (effect.type === "gain_vulnerability") {
             const includes_attacker = effect.against_creatures === null || effect.against_creatures.includes(attacker)
-            const includes_type = effect.against_damage_types === null || effect.against_damage_types === damage_type
-            if (includes_attacker && includes_type)
+            if (includes_attacker && effect_applies_to_damage_type(effect.against_damage_types, damage_type))
                 type_vulnerabilities.push(effect.value)
         }
     }

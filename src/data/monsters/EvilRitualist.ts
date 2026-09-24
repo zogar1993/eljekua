@@ -1,4 +1,5 @@
 import type {Size} from "core/battlegrid/creatures/SIZES";
+import type {ConstantEffect} from "core/battlegrid/creatures/Creature";
 import type {AttributeCode} from "core/character_sheet/attributes";
 import type {DefenseCode} from "core/character_sheet/get_creature_defense";
 import type {IRPower} from "core/types";
@@ -21,7 +22,7 @@ export type Monster = {
     speed: number
     powers: Array<IRPower>
     attributes: Record<AttributeCode, number>
-    resistances: Record<string, number>
+    constant_effects: Array<ConstantEffect>
 }
 
 const sacrificial_dagger: IRPower = {
@@ -111,7 +112,7 @@ const evil_ritualist: Monster = {
         wis: 10,
         cha: 10
     },
-    resistances: {}
+    constant_effects: []
 }
 
 export {evil_ritualist}

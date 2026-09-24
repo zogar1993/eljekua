@@ -59,14 +59,14 @@ const handle_hit_status_with_dice_roll = ({
         attack_parts.push(attack_roll)
 
         for (const {effect} of attacker.statuses)
-            if (effect.type === "gain_attack_bonus" && effect.against_creatures.includes(defender))
+            if (effect.type === "gain_attack_bonus" && (effect.against_creatures === null || effect.against_creatures.includes(defender)))
                 attack_parts.push(effect.value)
 
         remove_creature_statuses({creature: attacker, type: "next_attack_roll_against_target", until_creature: defender})
 
         if (
             is_flanking({attacker, defender, battle_grid}) ||
-            defender.statuses.some(({effect}) => effect.type === "grant_combat_advantage" && effect.against_creatures.includes(attacker))
+            defender.statuses.some(({effect}) => effect.type === "grant_combat_advantage" && (effect.against_creatures === null ||effect.against_creatures.includes(attacker)))
         ) attack_parts.push(COMBAT_ADVANTAGE)
 
         const attack = add_numbers_resolved(attack_parts)
