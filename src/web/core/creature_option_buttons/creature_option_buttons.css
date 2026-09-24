@@ -1,0 +1,22 @@
+#actions_menu {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+#actions_menu:empty {
+    display: none;
+}
+
+#actions_menu button {
+    padding: 0.5rem;
+    font-size: 1rem;
+    text-align: left;
+    background-color: lightpink;
+    border: 4px gray solid;
+    border-radius: 8px;
+}
+
+#actions_menu button:hover {
+    background-color: hotpink;
+}

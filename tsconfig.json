@@ -8,7 +8,7 @@
     "baseUrl": "./src",
     "paths": {
       "web/core/*": [
-        "../src_tests/web/core/*"
+        "web/core/*"
       ],
       "*": [
         "*"

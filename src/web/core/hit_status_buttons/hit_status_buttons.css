@@ -1,0 +1,36 @@
+.creature--hit-status-select {
+    z-index: 20;
+}
+
+.hit-status-buttons {
+    position: absolute;
+    inset: var(--creature__inset);
+    top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+.hit-status-button {
+    padding: 2px 4px;
+    font-size: 0.65rem;
+    background-color: white;
+    border: 1px solid gray;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.hit-status-button:hover {
+    background-color: lightpink;
+}
+
+.hit-status-button--selected {
+    background-color: hotpink;
+    border-color: black;
+    font-weight: bold;
+}
