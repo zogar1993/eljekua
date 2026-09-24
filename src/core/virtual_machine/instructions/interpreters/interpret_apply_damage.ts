@@ -107,7 +107,7 @@ function get_modifier_for_damage_type({creature, attacker, damage_type}: {
         if (type_vulnerabilities.length === 0)
             return negate_number_resolved(resistance)
         else
-            return subtract_numbers_resolved(resistance, max_number_resolved(type_vulnerabilities))
+            return subtract_numbers_resolved(max_number_resolved(type_vulnerabilities), resistance)
     }
 }
 
