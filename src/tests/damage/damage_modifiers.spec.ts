@@ -5,7 +5,6 @@ import {
 import type {ConstantEffect} from "core/battlegrid/creatures/Creature";
 import {create_creature_test_helpers} from "tests/utils/creature_test_helpers";
 import {create_test_game} from "tests/utils/create_test_game";
-import type {IRPower} from "core/types";
 
 const POSITION_LINUAR = {x: 3, y: 4, footprint: 1} as const
 const POSITION_RAGOZ = {x: 4, y: 4, footprint: 1} as const
@@ -34,84 +33,184 @@ beforeEach(() => {
 describe("damage resistance", () => {
     test("typed damage is reduced against resistant creatures", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(PETTY, FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
         when_creature("linuar").selects_target("ragoz")
 
-        then_creature("ragoz").has_hp(7)
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE + LESSER)
     })
 
     test("untyped damage is not reduced by typed resistances", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE()]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(PETTY, FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
         when_creature("linuar").selects_target("ragoz")
 
-        then_creature("ragoz").has_hp(6)
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE)
     })
 
     test("dual type damage only considers lower resistance", () => {
-        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE, NECROTIC)]})
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE, COLD)]})
         given_a_creature_is_created({
             name: "ragoz",
             position: POSITION_RAGOZ,
-            constant_effects: [GAIN_RESISTANCE_EFFECT(PETTY, FIRE), GAIN_RESISTANCE_EFFECT(LESSER, NECROTIC)],
+            constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_RESISTANCE_EFFECT(GREATER, COLD)],
         })
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
         when_creature("linuar").selects_target("ragoz")
 
-        then_creature("ragoz").has_hp(7)
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE + LESSER)
+    })
+
+    test("untyped resistance reduces typed damage", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER)]})
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE + LESSER)
+    })
+
+    test("untyped resistance reduces untyped damage", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE()]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER)]})
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE + LESSER)
+    })
+
+    test("multiple resistances to the same type use only the highest", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
+        given_a_creature_is_created({
+            name: "ragoz",
+            position: POSITION_RAGOZ,
+            constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_RESISTANCE_EFFECT(GREATER, FIRE)],
+        })
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE + GREATER)
+    })
+
+    test("dual type damage with resistance to one type only deals full damage", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE, COLD)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE)]})
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE)
     })
 })
 
 describe("damage vulnerability", () => {
     test("typed damage is increased against vulnerable creatures", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_VULNERABILITY_EFFECT(PETTY, FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_VULNERABILITY_EFFECT(LESSER, FIRE)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
         when_creature("linuar").selects_target("ragoz")
 
-        then_creature("ragoz").has_hp(5)
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE - LESSER)
     })
 
     test("untyped damage is not increased by typed vulnerability", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE()]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_VULNERABILITY_EFFECT(PETTY, FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_VULNERABILITY_EFFECT(LESSER, FIRE)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
         when_creature("linuar").selects_target("ragoz")
 
-        then_creature("ragoz").has_hp(6)
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE)
     })
 
     test("dual type damage only considers higher vulnerability", () => {
 
-        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE, NECROTIC)]})
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE, COLD)]})
         given_a_creature_is_created({
             name: "ragoz",
             position: POSITION_RAGOZ,
-            constant_effects: [GAIN_VULNERABILITY_EFFECT(PETTY, FIRE), GAIN_VULNERABILITY_EFFECT(LESSER, NECROTIC)],
+            constant_effects: [GAIN_VULNERABILITY_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(GREATER, COLD)],
         })
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
         when_creature("linuar").selects_target("ragoz")
 
-        then_creature("ragoz").has_hp(4)
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE - GREATER)
+    })
+
+    test("untyped vulnerability increases typed damage", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_VULNERABILITY_EFFECT(LESSER)]})
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE - LESSER)
+    })
+
+    test("untyped vulnerability increases untyped damage", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE()]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_VULNERABILITY_EFFECT(LESSER)]})
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE - LESSER)
+    })
+
+    test("multiple vulnerabilities to the same type use only the highest", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
+        given_a_creature_is_created({
+            name: "ragoz",
+            position: POSITION_RAGOZ,
+            constant_effects: [GAIN_VULNERABILITY_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(GREATER, FIRE)],
+        })
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE - GREATER)
+    })
+
+    test("dual type damage applies vulnerability when it is least favorable", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE, COLD)]})
+        given_a_creature_is_created({
+            name: "ragoz",
+            position: POSITION_RAGOZ,
+            constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(GREATER, COLD)],
+        })
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE - GREATER)
     })
 })
 
 describe("resistance and vulnerability cancel each other", () => {
-    test("when a is more resistant than vulnerable, vulnerability is subtracted from resistance", () => {
+    test("when resistance exceeds vulnerability, vulnerability is subtracted from resistance", () => {
         const linuar_powers: Array<Power> = [DEAL_DAMAGE(FIRE)]
         const ragoz_constant_effects: Array<ConstantEffect> = [
             GAIN_RESISTANCE_EFFECT(GREATER, FIRE),
@@ -124,7 +223,37 @@ describe("resistance and vulnerability cancel each other", () => {
         when_creature("linuar").selects_action("Deal Damage")
         when_creature("linuar").selects_target("ragoz")
 
-        then_creature("ragoz").has_hp(5)
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE + GREATER - LESSER)
+    })
+
+    test("when vulnerability exceeds resistance, resistance is subtracted from vulnerability", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
+        given_a_creature_is_created({
+            name: "ragoz",
+            position: POSITION_RAGOZ,
+            constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(GREATER, FIRE)],
+        })
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE - GREATER + LESSER)
+    })
+
+    test("equal resistance and vulnerability to the same type cancel out", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
+        given_a_creature_is_created({
+            name: "ragoz",
+            position: POSITION_RAGOZ,
+            constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(LESSER, FIRE)],
+        })
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE)
     })
 })
 
@@ -134,14 +263,15 @@ const DEAL_DAMAGE = (...types: Array<string>) => transform_power_ir_into_vm_repr
     targeting: {targeting_type: "melee_weapon", target_type: "enemy", amount: 1},
     effect: [
         {type: "set_hit_status", target: "primary_target", status: 1},
-        {type: "apply_damage", value: "4", target: "primary_target", damage_types: types},
+        {type: "apply_damage", value: `${DAMAGE}`, target: "primary_target", damage_types: types},
     ],
 })
 
 const FIRE = "fire"
-const NECROTIC = "necrotic"
+const COLD = "cold"
 
-const PETTY = 1
+const FULL_HP = 10
+const DAMAGE = 4
 const LESSER = 2
 const GREATER = 3
 
