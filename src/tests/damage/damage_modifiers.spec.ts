@@ -3,6 +3,8 @@ import {
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import type {ConstantEffect} from "core/battlegrid/creatures/Creature";
+import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
+import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {create_creature_test_helpers} from "tests/utils/creature_test_helpers";
 import {create_test_game} from "tests/utils/create_test_game";
 
@@ -303,20 +305,46 @@ describe("half damage", () => {
     })
 })
 
+describe("minions", () => {
+    test("a missed attack cannot damage a minion", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE_ON_MISS()]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, archetypes: ["minion"]})
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage On Miss")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP)
+    })
+
+    test("a missed attack can still damage a non-minion", () => {
+        given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE_ON_MISS()]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ})
+        start_battle()
+
+        when_creature("linuar").selects_action("Deal Damage On Miss")
+        when_creature("linuar").selects_target("ragoz")
+
+        then_creature("ragoz").has_hp(FULL_HP - DAMAGE)
+    })
+})
+
 const create_deal_damage_power = ({
     name,
     half_damage = false,
+    hit_status = HIT_STATUS.HIT,
     types,
 }: {
     name: string
     half_damage?: boolean
+    hit_status?: HitStatus
     types: Array<string>
 }) => transform_power_ir_into_vm_representation({
     name,
     type: {action: "standard", cooldown: "at-will", attack: true},
     targeting: {targeting_type: "melee_weapon", target_type: "enemy", amount: 1},
     effect: [
-        {type: "set_hit_status", target: "primary_target", status: 1},
+        {type: "set_hit_status", target: "primary_target", status: hit_status},
         {
             type: "apply_damage",
             value: `${DAMAGE}`,
@@ -330,6 +358,12 @@ const create_deal_damage_power = ({
 const DEAL_DAMAGE = (...types: Array<string>) => create_deal_damage_power({name: "Deal Damage", types})
 
 const DEAL_HALF_DAMAGE = (...types: Array<string>) => create_deal_damage_power({name: "Deal Half Damage", half_damage: true, types})
+
+const DEAL_DAMAGE_ON_MISS = (...types: Array<string>) => create_deal_damage_power({
+    name: "Deal Damage On Miss",
+    hit_status: HIT_STATUS.MISS,
+    types,
+})
 
 const FIRE = "fire"
 const COLD = "cold"
