@@ -91,7 +91,6 @@ const kobold_minion: Monster = {
     alignment: "evil",
     // languages: ["Common", "Draconic"] — not implemented
     languages: [],
-    // HP 1; a missed attack never damages a minion — enforced via minion archetype
     hp: 1,
     defenses: {
         ac: 15,
