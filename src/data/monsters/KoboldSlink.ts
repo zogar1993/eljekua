@@ -63,8 +63,7 @@ const kobold_slink: Monster = {
         // darkvision: not implemented
     },
     alignment: "evil",
-    // languages: ["Common", "Draconic"] — not implemented
-    languages: [],
+    languages: ["Common", "Draconic"],
     hp: 24,
     // bloodied: 12 — not implemented
     defenses: {

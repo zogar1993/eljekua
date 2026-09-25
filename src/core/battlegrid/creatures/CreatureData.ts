@@ -18,5 +18,6 @@ export type CreatureData = {
     team: number | null
     archetypes: Array<string>
     constant_effects: Array<ConstantEffect>
+    languages: Array<string>
     powers: Array<Power>
 }

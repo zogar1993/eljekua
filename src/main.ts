@@ -144,6 +144,7 @@ const build_character = (
         powers: data.powers ?? [],
         archetypes: [],
         constant_effects: data.constant_effects ?? [],
+        languages: data.languages ?? [],
     }
 }
 
@@ -165,6 +166,7 @@ const build_monster = (
         attributes: overrides.attributes ?? monster.attributes,
         archetypes: overrides.archetypes ?? monster.archetypes,
         constant_effects: overrides.constant_effects ?? monster.constant_effects ?? [],
+        languages: overrides.languages ?? monster.languages,
         powers: overrides.powers ?? monster.powers.map(transform_power_ir_into_vm_representation),
     }
 }

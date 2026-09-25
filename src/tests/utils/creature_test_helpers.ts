@@ -53,6 +53,7 @@ export const create_creature_test_helpers = ({
             powers: c.powers ?? [],
             archetypes: c.archetypes ?? [],
             constant_effects: c.constant_effects ?? [],
+            languages: c.languages ?? [],
         }
 
         add_creature_to_game({data})

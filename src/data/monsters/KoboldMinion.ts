@@ -89,8 +89,7 @@ const kobold_minion: Monster = {
         // darkvision: not implemented
     },
     alignment: "evil",
-    // languages: ["Common", "Draconic"] — not implemented
-    languages: [],
+    languages: ["Common", "Draconic"],
     hp: 1,
     defenses: {
         ac: 15,

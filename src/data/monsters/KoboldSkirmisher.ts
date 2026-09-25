@@ -62,8 +62,7 @@ const kobold_skirmisher: Monster = {
         // darkvision: not implemented
     },
     alignment: "evil",
-    // languages: ["Common", "Draconic"] — not implemented
-    languages: [],
+    languages: ["Common", "Draconic"],
     hp: 27,
     // bloodied: 13 — not implemented
     defenses: {
