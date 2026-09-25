@@ -3,7 +3,7 @@ import type {Creature} from "core/battlegrid/creatures/Creature";
 import {ROGUE_POWERS} from "data/powers/rogue";
 import {FIGHTER_POWERS} from "data/powers/fighter";
 import {WIZARD_POWERS} from "data/powers/wizard";
-import type {Monster} from "data/monsters/EvilRitualist";
+import type {Monster} from "data/monsters/Monster";
 import {evil_ritualist} from "data/monsters/EvilRitualist";
 import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {
