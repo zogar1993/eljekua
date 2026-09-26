@@ -272,3 +272,5 @@ const GRANT_COMBAT_ADVANTAGE_UNTIL_NEXT_TURN: Power = transform_power_ir_into_vm
         },
     ],
 })
+
+//TODO check if combat advantage should apply even when the attacker is not the one flanking

@@ -1,6 +1,4 @@
-# Flanking
-
-## Combat advantage
+# Combat advantage
 
 - Adds +2 to the attack roll, regardless of whether it comes from flanking or a granted effect.
 - Does not stack across sources.
@@ -9,7 +7,7 @@
 
 - When an attacker and another creature are flanking a target, the attacker has combat advantage against that target.
 
-## Who counts as a flanker
+### Who counts as a flanker
 
 - A creature in a flanker position counts if it is an enemy of the target.
 - It does not need to be an ally of the attacker.
