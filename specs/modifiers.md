@@ -3,7 +3,9 @@
 ## Definition
 
 - A creature may have modifiers.
-- Each modifier has a **value** that is an expression evaluated at runtime.
+- Each modifier has a **name** and a **value**.
+- The name is a plain label.
+- The value is an expression evaluated at runtime.
 
 ## Attack roll
 
