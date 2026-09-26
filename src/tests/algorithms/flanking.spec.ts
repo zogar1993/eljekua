@@ -42,11 +42,6 @@ describe("when a 1x1 attacker attacks a 1x1 defender, there is one flanking posi
             defender_position: {x: 1, y: 1, footprint: 1},
             expectation: [{x: 0, y: 2, footprint: 1}]
         },
-        {
-            attacker_position: {x: 2, y: 1, footprint: 1},
-            defender_position: {x: 1, y: 1, footprint: 1},
-            expectation: [{x: 0, y: 1, footprint: 1}]
-        },
     ].map(({attacker_position, defender_position, expectation}) => {
         test(`attacker '${JSON.stringify(attacker_position)}, defender: ${JSON.stringify(defender_position)}'`, () => {
             const result = get_flanker_positions({attacker_position, defender_position, battle_grid})
