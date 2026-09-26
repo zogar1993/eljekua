@@ -11,6 +11,7 @@ export type Expr =
     | ExprPositions
     | ExprPower
     | ExprAttackRolls
+    | ExprAttackD20Rolls
 
 export type ExprNumber = ExprNumberUnresolved | ExprNumberResolved
 
@@ -60,4 +61,9 @@ export type ExprPower = {
 export type ExprAttackRolls = {
     type: "attack_rolls"
     value: Map<Creature, HitStatus>
+}
+
+export type ExprAttackD20Rolls = {
+    type: "attack_d20_rolls"
+    value: Map<Creature, number>
 }

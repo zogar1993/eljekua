@@ -25,6 +25,7 @@ export const SYSTEM_KEYWORD = {
     PRIMARY_TARGET: "primary_target",
     TRIGGERER: "triggerer",
     HIT_STATUS: "hit_status",
+    ATTACK_D20_ROLLS: "attack_d20_rolls",
 } as const
 
 export const AST = {

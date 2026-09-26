@@ -5,7 +5,10 @@ import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 
 export const INSTRUCTION_TYPE = {
-    ATTACK_DICE_ROLL: "attack_dice_roll",
+    ATTACK_D20_ROLL: "attack_d20_roll",
+    SELECT_ATTACK_D20_ROLL: "select_attack_d20_roll",
+    ASSESS_ATTACK_HIT_STATUS: "assess_attack_hit_status",
+    SELECT_ATTACK_HIT_STATUS: "select_attack_hit_status",
     ATTACK_ROLL_CONSEQUENCE: "attack_roll_consequence",
     APPLY_DAMAGE: "apply_damage",
     WALK: "walk",
@@ -31,10 +34,26 @@ export type InstructionType = typeof INSTRUCTION_TYPE[keyof typeof INSTRUCTION_T
 export const is_branching_instruction = (instruction: Instruction) =>
     ([INSTRUCTION_TYPE.JUMP, INSTRUCTION_TYPE.JUMP_IF] as Array<InstructionType>).includes(instruction.type)
 
-export type InstructionAttackDiceRoll = {
-    type: typeof INSTRUCTION_TYPE.ATTACK_DICE_ROLL
+export type InstructionAttackRollParams = {
     attack: AstNode
     defense: DefenseCode
+    defender: string
+}
+
+export type InstructionAttackD20Roll = {
+    type: typeof INSTRUCTION_TYPE.ATTACK_D20_ROLL
+} & InstructionAttackRollParams
+
+export type InstructionSelectAttackD20Roll = {
+    type: typeof INSTRUCTION_TYPE.SELECT_ATTACK_D20_ROLL
+} & InstructionAttackRollParams
+
+export type InstructionAssessAttackHitStatus = {
+    type: typeof INSTRUCTION_TYPE.ASSESS_ATTACK_HIT_STATUS
+} & InstructionAttackRollParams
+
+export type InstructionSelectAttackHitStatus = {
+    type: typeof INSTRUCTION_TYPE.SELECT_ATTACK_HIT_STATUS
     defender: string
 }
 
@@ -164,7 +183,10 @@ export type Instruction =
     InstructionJumpIf |
     InstructionJump |
     // Misc
-    InstructionAttackDiceRoll |
+    InstructionAttackD20Roll |
+    InstructionSelectAttackD20Roll |
+    InstructionAssessAttackHitStatus |
+    InstructionSelectAttackHitStatus |
     InstructionAttackRollConsequence
 
 
@@ -184,6 +206,7 @@ export type InstructionSelectTargetRanged = {
     distance: AstNode
     target_label: string
     exclude: Array<AstNode>
+    attack_roll: InstructionAttackRollParams | null
 }
 
 export type InstructionSelectTargetMelee = {
@@ -193,6 +216,7 @@ export type InstructionSelectTargetMelee = {
     amount: 1,
     exclude: Array<AstNode>
     target_label: string
+    attack_roll: InstructionAttackRollParams | null
 }
 
 export type InstructionSelectTargetAreaBurst = {
@@ -203,6 +227,7 @@ export type InstructionSelectTargetAreaBurst = {
     distance: AstNode
     radius: number
     target_label: string
+    attack_roll: InstructionAttackRollParams | null
 }
 
 export type InstructionSelectTargetMovement = {

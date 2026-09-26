@@ -111,6 +111,17 @@ export const create_instruction_loop = ({
 
                 break
             }
+            case INTERACTION_TYPE.D20_ROLL_SELECT: {
+                if (current_interaction?.type !== INTERACTION_TYPE.D20_ROLL_SELECT) throw Error(`incompatible type ${selection.type}`)
+
+                const d20_rolls = new Map<Creature, number>()
+                for (const {creature_id, value} of selection.d20_rolls)
+                    d20_rolls.set(creatures.get_by_id(creature_id), value)
+
+                vm_state.set_variable(SYSTEM_KEYWORD.ATTACK_D20_ROLLS, {type: "attack_d20_rolls", value: d20_rolls})
+
+                break
+            }
         }
         clear_current_interaction()
     }

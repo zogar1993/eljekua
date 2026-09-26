@@ -10,6 +10,7 @@ import {
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {create_hit_status_buttons_ui} from "web/core/hit_status_buttons/HitStatusButtonsUI";
+import {create_d20_roll_buttons_ui} from "web/core/d20_roll_buttons/D20RollButtonsUI";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
 import {create_initiative_order_ui} from "web/core/initiative_order/InitiativeOrderUI";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
@@ -33,6 +34,7 @@ const instruction_loop = create_instruction_loop({game_state, evaluate_ast, game
 initialize_battle_grid_ui({game_state, game_events, game_input: instruction_loop})
 create_option_buttons_ui({game_events, game_input: instruction_loop})
 create_hit_status_buttons_ui({game_events, game_inputs: instruction_loop})
+create_d20_roll_buttons_ui({game_events, game_inputs: instruction_loop})
 create_initiative_order_ui({game_events})
 create_instruction_visualizer({game_events})
 create_action_log({game_events})

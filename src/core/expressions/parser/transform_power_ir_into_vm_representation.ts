@@ -10,6 +10,8 @@ import {ATTRIBUTE_CODES} from "core/character_sheet/attributes";
 import type {
     Instruction,
     InstructionApplyStatus,
+    InstructionAttackRollParams,
+    InstructionJumpIf,
     InstructionSelectTarget
 } from "core/virtual_machine/instructions/instructions";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
@@ -19,13 +21,15 @@ import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {assert_is_not_empty, assert_is_true} from "stdlib/assert";
 import {FUNCTION_NAME} from "core/expressions/function_names";
+import {ATTACK_ROLL_RESOLUTION_MODE, type AttackRollResolutionMode} from "core/settings/AttackRollResolutionMode";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
 export const transform_power_ir_into_vm_representation = (power: IRPower): Power => {
+    const attack_roll_params = power.roll ? create_attack_roll_params(power.roll) : null
     const instructions: Array<Instruction> = [
         ...(power.damage ? transform_primary_damage(power.damage) : []),
-        ...(power.targeting ? [transform_select_target_ir(power.targeting)] : []),
+        ...(power.targeting ? [transform_select_target_ir(power.targeting, attack_roll_params)] : []),
         ...(power.roll ? transform_primary_roll(power.roll) : []),
         ...transform_instructions(power.effect)
     ]
@@ -45,7 +49,7 @@ export const transform_power_ir_into_vm_representation = (power: IRPower): Power
     return {
         name: power.name,
         description: power.description,
-        targeting: power.targeting ? transform_select_target_ir(power.targeting) : null,
+        targeting: power.targeting ? transform_select_target_ir(power.targeting, attack_roll_params) : null,
         trigger: power.trigger ? transform_trigger(power.trigger) : null,
         type: {
             ...power.type,
@@ -81,21 +85,69 @@ export const TRIGGER_INTERCEPTION = {
 
 export type TriggerInterception = typeof TRIGGER_INTERCEPTION[keyof typeof TRIGGER_INTERCEPTION]
 
-const transform_primary_roll = (roll: Required<IRPower>["roll"]): Array<Instruction> => [
-    {
-        type: INSTRUCTION_TYPE.ATTACK_DICE_ROLL,
-        attack: to_ast(standardize_attack(roll.attack)),
-        defense: roll.defense,
-        defender: PRIMARY_TARGET_LABEL,
-    },
-    ...transform_instructions(roll.before_consequences),
-    {
+const create_attack_roll_params = (roll: Required<IRPower>["roll"]): InstructionAttackRollParams => ({
+    attack: to_ast(standardize_attack(roll.attack)),
+    defense: roll.defense,
+    defender: PRIMARY_TARGET_LABEL,
+})
+
+const transform_primary_roll = (roll: Required<IRPower>["roll"]): Array<Instruction> => {
+    const attack_roll_params = create_attack_roll_params(roll)
+    const before_attack_roll_consequences = transform_instructions(roll.before_consequences)
+    const attack_roll_consequences: Instruction = {
         type: INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE,
         defender: PRIMARY_TARGET_LABEL,
         hit: transform_instructions(roll.hit),
-        miss: transform_instructions(roll.miss)
+        miss: transform_instructions(roll.miss),
     }
-]
+
+    const hit_status_select: Instruction = {
+        type: INSTRUCTION_TYPE.SELECT_ATTACK_HIT_STATUS,
+        defender: PRIMARY_TARGET_LABEL,
+    }
+    const assess_hit_status: Instruction = {
+        type: INSTRUCTION_TYPE.ASSESS_ATTACK_HIT_STATUS,
+        ...attack_roll_params,
+    }
+    const rigged_d20_select: Instruction = {
+        type: INSTRUCTION_TYPE.SELECT_ATTACK_D20_ROLL,
+        ...attack_roll_params,
+    }
+    const d20_roll: Instruction = {
+        type: INSTRUCTION_TYPE.ATTACK_D20_ROLL,
+        ...attack_roll_params,
+    }
+
+    const jump_if_hit_status: InstructionJumpIf = {
+        type: INSTRUCTION_TYPE.JUMP_IF,
+        condition: is_attack_roll_resolution_mode(ATTACK_ROLL_RESOLUTION_MODE.HIT_STATUS),
+        offset: 0,
+    }
+    const jump_if_rigged_roll: InstructionJumpIf = {
+        type: INSTRUCTION_TYPE.JUMP_IF,
+        condition: is_attack_roll_resolution_mode(ATTACK_ROLL_RESOLUTION_MODE.RIGGED_ROLL),
+        offset: 0,
+    }
+
+    return [
+        {...jump_if_hit_status, offset: 7},
+        {...jump_if_rigged_roll, offset: 3},
+        d20_roll,
+        {type: INSTRUCTION_TYPE.JUMP, offset: 2},
+        rigged_d20_select,
+        assess_hit_status,
+        {type: INSTRUCTION_TYPE.JUMP, offset: 2},
+        hit_status_select,
+        ...before_attack_roll_consequences,
+        attack_roll_consequences,
+    ]
+}
+
+const is_attack_roll_resolution_mode = (resolution: AttackRollResolutionMode): AstNodeFunction => ({
+    type: "function",
+    name: FUNCTION_NAME.ATTACK_ROLL_RESOLUTION_MODE_IS,
+    parameters: [{type: "string", value: resolution}],
+})
 
 const standardize_attack = (text: string) =>
     ATTRIBUTE_CODES.reduce((text, attribute) => text.replaceAll(attribute, `owner.${attribute}_mod_lvl`), text)
@@ -237,7 +289,10 @@ const transform_trigger = (trigger: NonNullable<IRPower["trigger"]>): Trigger =>
     }
 }
 
-const transform_select_target_ir = (props: Omit<IRInstructionSelectTarget, "type" | "target_label">): InstructionSelectTarget => {
+const transform_select_target_ir = (
+    props: Omit<IRInstructionSelectTarget, "type" | "target_label">,
+    attack_roll: InstructionAttackRollParams | null = null,
+): InstructionSelectTarget => {
     const ir = {
         type: INSTRUCTION_TYPE.SELECT_TARGET,
         target_label: PRIMARY_TARGET_LABEL,
@@ -253,6 +308,7 @@ const transform_select_target_ir = (props: Omit<IRInstructionSelectTarget, "type
             target_label: ir.target_label,
             distance: to_ast(ir.distance),
             radius: ir.radius,
+            attack_roll,
         }
     if (ir.targeting_type === "movement")
         return {
@@ -270,7 +326,8 @@ const transform_select_target_ir = (props: Omit<IRInstructionSelectTarget, "type
             amount: ir.amount,
             target_label: ir.target_label,
             distance: to_ast(ir.distance),
-            exclude: ir.exclude ? ir.exclude.map(x => to_ast(x)) : []
+            exclude: ir.exclude ? ir.exclude.map(x => to_ast(x)) : [],
+            attack_roll,
         }
     if (ir.targeting_type === "adjacent" || ir.targeting_type === "melee_weapon")
         return {
@@ -279,7 +336,8 @@ const transform_select_target_ir = (props: Omit<IRInstructionSelectTarget, "type
             target_type: ir.target_type,
             amount: ir.amount,
             target_label: ir.target_label,
-            exclude: ir.exclude ? ir.exclude.map(x => to_ast(x)) : []
+            exclude: ir.exclude ? ir.exclude.map(x => to_ast(x)) : [],
+            attack_roll,
         }
     throw Error(`"${ir.targeting_type}" is not a valid "select_target" targeting_type`)
 }

@@ -1,11 +1,11 @@
 import type {OptionButton} from "core/battlegrid/creature_option/CreatureOption";
 import type {Creature} from "core/battlegrid/creatures/Creature";
-import type {AttackSuccessChance} from "core/battlegrid/queries/get_attack_success_chance";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import type {Position} from "core/battlegrid/Position";
-
+import type {AttackSuccessChance} from "core/virtual_machine/instructions/interpreters/interpret_select_target";
 export const INTERACTION_TYPE = {
     HIT_STATUS_SELECT: "select_hit_status",
+    D20_ROLL_SELECT: "select_d20_roll",
     SELECT_TERRAIN: "select_terrain",
     SELECT_CREATURE: "select_creature",
     SELECT_AREA: "select_area",
@@ -20,11 +20,17 @@ export type Interaction =
     | InteractionsSelectCreature
     | InteractionsSelectOption
     | InteractionsSelectHitStatus
+    | InteractionsSelectD20Roll
     | InteractionsSelectPath
     | InteractionsSelectArea
 
 export type InteractionsSelectHitStatus = {
     type: typeof INTERACTION_TYPE.HIT_STATUS_SELECT
+    creature_ids: Array<number>
+}
+
+export type InteractionsSelectD20Roll = {
+    type: typeof INTERACTION_TYPE.D20_ROLL_SELECT
     creature_ids: Array<number>
 }
 
@@ -69,12 +75,18 @@ export type InteractionSelection =
     | InteractionSelectionSelectCreature
     | InteractionSelectionSelectOption
     | InteractionSelectionSelectHitStatus
+    | InteractionSelectionSelectD20Roll
     | InteractionSelectionSelectPath
     | InteractionSelectionSelectArea
 
 export type InteractionSelectionSelectHitStatus = {
     type: typeof INTERACTION_TYPE.HIT_STATUS_SELECT
     attack_rolls: Array<{ creature_id: number, hit_status: HitStatus }>
+}
+
+export type InteractionSelectionSelectD20Roll = {
+    type: typeof INTERACTION_TYPE.D20_ROLL_SELECT
+    d20_rolls: Array<{ creature_id: number, value: number }>
 }
 
 export type InteractionSelectionSelectTerrain = {

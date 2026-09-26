@@ -3,19 +3,19 @@ import {assert_is_footprint_one, positions_share_surface} from "core/battlegrid/
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {get_reach_area_burst} from "core/battlegrid/position/get_reach_area_burst";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
-import {get_attack_success_chance} from "core/battlegrid/queries/get_attack_success_chance";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {
     InstructionSelectTarget,
     InstructionSelectTargetMovement,
     InstructionSelectTargetPush
 } from "core/virtual_machine/instructions/instructions";
-import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {INTERACTION_TYPE} from "core/interactions/Interactions";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";
 import {assert_is_not_empty, assert_is_true} from "stdlib/assert";
+import {bound_minmax} from "stdlib/bound_minmax";
+import {get_creature_defense} from "core/character_sheet/get_creature_defense";
 
 export const interpret_select_target = ({
                                             instruction,
@@ -63,15 +63,14 @@ export const interpret_select_target = ({
     }
 
     const get_attack_hit_chance_against = (creature: Creature) => {
-        const next_instruction = vm_state.peek()
-        if (next_instruction.type !== INSTRUCTION_TYPE.ATTACK_DICE_ROLL) return null
+        if (!("attack_roll" in instruction) || instruction.attack_roll === null) return null
 
-        return get_attack_success_chance({
-            attack_ast: next_instruction.attack,
-            defense_code: next_instruction.defense,
-            defender: creature,
-            evaluate_ast,
-        })
+        const attack = EXPR.as_number(evaluate_ast(instruction.attack_roll.attack))
+        const defense = get_creature_defense({creature, defense_code: instruction.attack_roll.defense}).value
+        const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
+
+        return {attack, defense, chance}
+
     }
 
     if (is_path_selection_targeting_type(instruction)) {
@@ -150,3 +149,5 @@ const assert_position_is_clickable = ({position, clickable}: {
 }) => {
     assert_is_true(clickable.some(target => positions_share_surface(target, position)))
 }
+
+export type AttackSuccessChance = { attack: number, defense: number, chance: number }

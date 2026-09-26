@@ -1,7 +1,14 @@
 import {interpret_select_target} from "core/virtual_machine/instructions/interpreters/interpret_select_target";
+import {interpret_attack_d20_roll} from "core/virtual_machine/instructions/interpreters/interpret_attack_d20_roll";
 import {
-    interpret_define_attack_roll_result,
-} from "core/virtual_machine/instructions/interpreters/interpret_define_attack_roll_result";
+    interpret_select_attack_d20_roll
+} from "core/virtual_machine/instructions/interpreters/interpret_select_attack_d20_roll";
+import {
+    interpret_assess_attack_hit_status
+} from "core/virtual_machine/instructions/interpreters/interpret_assess_attack_hit_status";
+import {
+    interpret_select_attack_hit_status
+} from "core/virtual_machine/instructions/interpreters/interpret_select_attack_hit_status";
 import {interpret_apply_damage} from "core/virtual_machine/instructions/interpreters/interpret_apply_damage";
 import {interpret_move} from "core/virtual_machine/instructions/interpreters/interpret_move";
 import {interpret_shift} from "core/virtual_machine/instructions/interpreters/interpret_shift";
@@ -36,8 +43,14 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
     switch (instruction.type) {
         case INSTRUCTION_TYPE.SELECT_TARGET:
             return interpret_select_target({...props, instruction})
-        case INSTRUCTION_TYPE.ATTACK_DICE_ROLL:
-            return interpret_define_attack_roll_result({...props, instruction})
+        case INSTRUCTION_TYPE.ATTACK_D20_ROLL:
+            return interpret_attack_d20_roll({...props, instruction})
+        case INSTRUCTION_TYPE.SELECT_ATTACK_D20_ROLL:
+            return interpret_select_attack_d20_roll({...props, instruction})
+        case INSTRUCTION_TYPE.ASSESS_ATTACK_HIT_STATUS:
+            return interpret_assess_attack_hit_status({...props, instruction})
+        case INSTRUCTION_TYPE.SELECT_ATTACK_HIT_STATUS:
+            return interpret_select_attack_hit_status({...props, instruction})
         case INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE:
             return interpret_attack_roll_consequence({...props, instruction})
         case INSTRUCTION_TYPE.APPLY_DAMAGE:

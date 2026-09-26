@@ -181,6 +181,11 @@ const create_variable_value_element = (expr: Expr): HTMLElement => {
                 `${expr.value.size} roll(s)`,
                 () => create_attack_rolls_details(expr.value),
             )
+        case "attack_d20_rolls":
+            return create_expandable_variable_value(
+                `${expr.value.size} d20 roll(s)`,
+                () => create_attack_d20_rolls_details(expr.value),
+            )
         case "power":
             return create_expandable_variable_value(
                 expr.value.name,
@@ -290,6 +295,18 @@ const create_attack_rolls_details = (rolls: Map<Creature, HitStatus>): HTMLEleme
     for (const [creature, hit_status] of rolls) {
         const block = create_html_element("div", "instruction__creature-block")
         append_detail_row(block, creature.data.name, format_hit_status(hit_status))
+        container.append(block)
+    }
+
+    return container
+}
+
+const create_attack_d20_rolls_details = (rolls: Map<Creature, number>): HTMLElement => {
+    const container = create_html_element("div", "instruction__variable-details-inner")
+
+    for (const [creature, value] of rolls) {
+        const block = create_html_element("div", "instruction__creature-block")
+        append_detail_row(block, creature.data.name, String(value))
         container.append(block)
     }
 

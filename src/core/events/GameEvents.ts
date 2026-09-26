@@ -5,7 +5,7 @@ import type {InstructionFrame} from "core/virtual_machine/VMState";
 import type {Interaction} from "core/interactions/Interactions";
 import type {Position} from "core/battlegrid/Position";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
-import type {InstructionAttackDiceRoll} from "core/virtual_machine/instructions/instructions";
+import type {InstructionAssessAttackHitStatus} from "core/virtual_machine/instructions/instructions";
 
 export type CreatureMovedEvent = {
     creature: Creature
@@ -24,7 +24,7 @@ export type CreatureAttackedEvent = {
     hit_status: HitStatus
     defender: Creature
     defense: ExprNumberResolved
-    instruction: InstructionAttackDiceRoll
+    instruction: InstructionAssessAttackHitStatus
     power_name: string
 }
 

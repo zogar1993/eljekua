@@ -5,6 +5,7 @@ import {
 import type {ConstantEffect} from "core/battlegrid/creatures/Creature";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import {ATTACK_ROLL_RESOLUTION_MODE} from "core/settings/AttackRollResolutionMode";
 import {create_creature_test_helpers} from "tests/utils/creature_test_helpers";
 import {create_test_game} from "tests/utils/create_test_game";
 
@@ -17,7 +18,7 @@ let when_creature: ReturnType<typeof create_creature_test_helpers>["when_creatur
 let then_creature: ReturnType<typeof create_creature_test_helpers>["then_creature"]
 
 beforeEach(() => {
-    const test_game = create_test_game({attack_roll_resolution_is_random: false})
+    const test_game = create_test_game({attack_roll_resolution: ATTACK_ROLL_RESOLUTION_MODE.HIT_STATUS})
     start_battle = test_game.start_battle
     const helpers = create_creature_test_helpers({
         creatures: test_game.creatures,

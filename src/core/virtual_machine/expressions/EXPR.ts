@@ -59,7 +59,11 @@ export const EXPR = {
     as_attack_rolls: (expr: Expr): Map<Creature, HitStatus> => {
         if (expr.type === "attack_rolls") return expr.value
         return throw_could_not_cast({expr, to: "attack_rolls"})
-    }
+    },
+    as_attack_d20_rolls: (expr: Expr): Map<Creature, number> => {
+        if (expr.type === "attack_d20_rolls") return expr.value
+        return throw_could_not_cast({expr, to: "attack_d20_rolls"})
+    },
 }
 
 const throw_could_not_cast = ({expr, to}: { expr: Expr, to: string }): never => {

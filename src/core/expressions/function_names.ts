@@ -19,6 +19,7 @@ export const FUNCTION_NAME = {
     OPPORTUNITY_ATTACK_RANGE: "opportunity_attack_range",
     CREATURE_BY_ID: "creature_by_id",
     CAN_EXPEND_ACTION_TYPE: "can_expend_action_type",
+    ATTACK_ROLL_RESOLUTION_MODE_IS: "attack_roll_resolution_mode_is",
 } as const
 
 export type FunctionName = typeof FUNCTION_NAME[keyof typeof FUNCTION_NAME]

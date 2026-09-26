@@ -1,0 +1,58 @@
+.creature--d20-roll-select {
+    z-index: 20;
+}
+
+.d20-roll-buttons {
+    position: absolute;
+    inset: var(--creature__inset);
+    top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+.d20-roll-input-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: white;
+    border: 1px solid gray;
+    border-radius: 4px;
+}
+
+.d20-roll-input-box:hover {
+    background-color: lightblue;
+}
+
+.d20-roll-input-box--selected {
+    background-color: deepskyblue;
+    border-color: black;
+}
+
+.d20-roll-input {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.d20-roll-input:focus {
+    outline: none;
+}
+
+.d20-roll-input::-webkit-outer-spin-button,
+.d20-roll-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

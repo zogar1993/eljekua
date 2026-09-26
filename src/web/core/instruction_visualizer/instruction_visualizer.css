@@ -256,7 +256,10 @@
     letter-spacing: 0.02em;
 }
 
-.instruction--type-attack_dice_roll .instruction__type-badge,
+.instruction--type-attack_d20_roll .instruction__type-badge,
+.instruction--type-select_attack_d20_roll .instruction__type-badge,
+.instruction--type-assess_attack_hit_status .instruction__type-badge,
+.instruction--type-select_attack_hit_status .instruction__type-badge,
 .instruction--type-attack_roll_consequence .instruction__type-badge,
 .instruction--type-apply_damage .instruction__type-badge,
 .instruction--type-apply_status .instruction__type-badge {

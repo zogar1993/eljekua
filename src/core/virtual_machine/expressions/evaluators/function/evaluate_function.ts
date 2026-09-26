@@ -54,6 +54,9 @@ import {
 import {
     evaluate_function_is_lower
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_is_lower";
+import {
+    evaluate_function_attack_roll_resolution_mode_is
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_attack_roll_resolution_mode_is";
 import type {GameState} from "core/game_state/GameState";
 
 export const build_evaluate_function = ({evaluate_ast, game_state}: {
@@ -103,6 +106,8 @@ export const build_evaluate_function = ({evaluate_ast, game_state}: {
                 return evaluate_function_is_lower({node, evaluate_ast})
             case FUNCTION_NAME.CREATURE_BY_ID:
                 return evaluate_function_creature_by_id({node, game_state})
+            case FUNCTION_NAME.ATTACK_ROLL_RESOLUTION_MODE_IS:
+                return evaluate_function_attack_roll_resolution_mode_is({node, game_state, evaluate_ast})
             default:
                 throw Error(`function name '${node.name}' not supported when evaluating node`)
         }

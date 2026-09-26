@@ -3,9 +3,10 @@ import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {create_creature_test_helpers} from "tests/utils/creature_test_helpers";
 import type {AttackLogEntry} from "tests/utils/creature_test_helpers";
+import {ATTACK_ROLL_RESOLUTION_MODE} from "core/settings/AttackRollResolutionMode";
 import {create_test_game} from "tests/utils/create_test_game";
 
-const test_game = create_test_game()
+const test_game = create_test_game({attack_roll_resolution: ATTACK_ROLL_RESOLUTION_MODE.HIT_STATUS})
 const {battle_grid, vm_state, instruction_loop, game_events} = test_game
 
 const attack_log: Array<AttackLogEntry> = []

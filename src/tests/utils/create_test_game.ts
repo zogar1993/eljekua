@@ -5,21 +5,22 @@ import {create_instruction_loop} from "core/instruction_loop";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {create_start_battle} from "core/use_cases/start_battle";
 import {create_set_current_turn_to_creature} from "core/use_cases/gameplay/set_current_turn_to_creature";
+import type {AttackRollResolutionMode} from "core/settings/AttackRollResolutionMode";
 
 export const create_test_game = ({
     battle_grid_size = {x: 10, y: 10},
-    attack_roll_resolution_is_random,
+    attack_roll_resolution,
 }: {
     battle_grid_size?: { x: number, y: number }
-    attack_roll_resolution_is_random?: boolean
+    attack_roll_resolution?: AttackRollResolutionMode
 } = {}) => {
     const game_events = create_game_events()
     const game_state = create_game_state({
         game_events,
         battle_grid_size,
     })
-    if (attack_roll_resolution_is_random !== undefined) {
-        game_state.settings.attack_roll_resolution_is_random = attack_roll_resolution_is_random
+    if (attack_roll_resolution !== undefined) {
+        game_state.settings.attack_roll_resolution = attack_roll_resolution
     }
 
     const {battle_grid, initiative_order, vm_state, creatures} = game_state
