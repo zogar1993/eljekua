@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "packageManager": "pnpm@11.7.0",
   "scripts": {
+    "test": "jest",
     "build": "esbuild src/main.ts --bundle --outfile=dist/bundle.js --format=esm --sourcemap",
     "watch": "esbuild src/main.ts --bundle --outfile=dist/bundle.js --format=esm --sourcemap --watch",
     "dev": "concurrently -k \"pnpm:watch\" \"pnpm:start\"",
