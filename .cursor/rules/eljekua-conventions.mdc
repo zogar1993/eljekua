@@ -68,7 +68,7 @@ export const INSTRUCTION_TYPE = {
 
 ## @tests
 
-- Do **not** add tests unless the user explicitly asks — **except** when creating or changing a spec per `create-spec` skill.
+- Do **not** add tests unless the user explicitly asks or a skill explicitly requires them.
 - Running existing tests / `tsc --noEmit` when you touched runtime code is still required per `@workflow`.
 
 ## @specs
