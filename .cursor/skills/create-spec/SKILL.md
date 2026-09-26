@@ -2,12 +2,24 @@
 name: create-spec
 description: >-
   Add or edit behavior specs in eljekua. Use when the user asks to create,
-  update, or document game rules in specs/.
+  update, or document game rules in specs/. Always implement the behavior
+  and add use case tests in the same pass — never stop at the markdown file.
 ---
 
 # Create Spec
 
 Behavior specs live in `specs/`. Do **not** add or edit specs unless the user explicitly asks.
+
+## @mandatory
+
+**Creating or editing a spec is never spec-only.** Complete the full workflow in one pass:
+
+1. Write or update the spec in `specs/`.
+2. Implement the behavior in `core/` (and `web/` when presentation is involved).
+3. Add or update **use case tests** that prove each rule.
+4. Run relevant tests and `tsc --noEmit`.
+
+Do **not** stop after writing the markdown file. Do **not** tell the user the task is done until implementation and tests are in place.
 
 ## @structure
 
@@ -20,10 +32,10 @@ Behavior specs live in `specs/`. Do **not** add or edit specs unless the user ex
 
 1. Read any existing spec for the topic; merge or replace per the user's request.
 2. Write rules in plain language. Keep user-supplied wording verbatim when provided.
-3. Verify implementation matches the spec; fix code if it does not.
+3. Implement the behavior so it matches the spec.
 4. Add or update **use case tests** for each new or changed rule (see `@tests`). Do not add algorithm tests.
 5. Run relevant tests / `tsc --noEmit` when runtime code changed.
-6. Run `@checklist` from project conventions (`git add` new spec files).
+6. Run `@checklist` from project conventions (`git add` new spec and source files).
 
 ## @tests
 
