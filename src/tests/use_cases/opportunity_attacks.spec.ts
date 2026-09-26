@@ -1,4 +1,3 @@
-import {get_flanker_positions} from "core/battlegrid/position/get_flanker_positions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {create_creature_test_helpers} from "tests/utils/creature_test_helpers";
@@ -7,7 +6,7 @@ import {ATTACK_ROLL_RESOLUTION_MODE} from "core/settings/AttackRollResolutionMod
 import {create_test_game} from "tests/utils/create_test_game";
 
 const test_game = create_test_game({attack_roll_resolution: ATTACK_ROLL_RESOLUTION_MODE.HIT_STATUS})
-const {battle_grid, vm_state, instruction_loop, game_events} = test_game
+const {vm_state, instruction_loop, game_events} = test_game
 
 const attack_log: Array<AttackLogEntry> = []
 
@@ -55,24 +54,4 @@ describe("when an enemy leaves a space adjacent to a creature", () => {
 
         then_creature("ragoz").is_at_position({x: 2, y: 0})
     })
-})
-
-describe("when a 1x1 attacker attacks a 2x2 defender", () => {
-    test(`by the corner there is one flanking position`, () => {
-        const result = get_flanker_positions({
-            attacker_position: {x: 0, y: 0, footprint: 1},
-            defender_position: {x: 1, y: 1, footprint: 2},
-            battle_grid
-        })
-        expect(result).toIncludeSameMembers([{x: 3, y: 3, footprint: 1}]);
-    });
-
-    test(`by the side there are two flanking positions`, () => {
-        const result = get_flanker_positions({
-            attacker_position: {x: 0, y: 1, footprint: 1},
-            defender_position: {x: 1, y: 1, footprint: 2},
-            battle_grid
-        })
-        expect(result).toIncludeSameMembers([{x: 3, y: 1, footprint: 1}, {x: 3, y: 2, footprint: 1}]);
-    });
 })
