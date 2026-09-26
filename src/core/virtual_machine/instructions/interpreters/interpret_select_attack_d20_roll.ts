@@ -5,13 +5,12 @@ import type {InstructionSelectAttackD20Roll} from "core/virtual_machine/instruct
 
 export const interpret_select_attack_d20_roll = ({
                                                      game_state,
-                                                     player_turn_handler,
                                                      instruction,
                                                  }: InterpretInstructionProps<InstructionSelectAttackD20Roll>) => {
-    const {vm_state} = game_state
+    const {vm_state, available_interaction} = game_state
     const defenders = EXPR.as_creatures(vm_state.get_variable(instruction.defender))
 
-    player_turn_handler.set_available_interactions({
+    available_interaction.set_available_interactions({
         type: INTERACTION_TYPE.D20_ROLL_SELECT,
         creature_ids: defenders.map(defender => defender.id),
     })

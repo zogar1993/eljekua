@@ -5,12 +5,11 @@ import type {InstructionOptions} from "core/virtual_machine/instructions/instruc
 
 export const interpret_options = ({
                                       instruction,
-                                      player_turn_handler,
                                       evaluate_ast,
                                       game_state
                                   }: InterpretInstructionProps<InstructionOptions>) => {
-    const {vm_state} = game_state
-    player_turn_handler.set_available_interactions({
+    const {vm_state, available_interaction} = game_state
+    available_interaction.set_available_interactions({
         type: INTERACTION_TYPE.OPTION_SELECT,
         available_options: instruction.options.map(({text, condition, instructions}) => ({
                 text,

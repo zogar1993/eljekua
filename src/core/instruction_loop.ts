@@ -13,8 +13,6 @@ import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStat
 import {
     INTERACTION_NONE,
     INTERACTION_TYPE,
-    type ActiveInteraction,
-    type Interaction,
     type InteractionSelection,
 } from "core/interactions/Interactions";
 
@@ -27,28 +25,17 @@ export const create_instruction_loop = ({
     evaluate_ast: (node: AstNode) => Expr
     game_events: GameEvents
 }) => {
-    const {vm_state, creatures} = game_state
-    let current_interaction: Interaction = INTERACTION_NONE
+    const {available_interaction, vm_state, creatures} = game_state
 
     const clear_current_interaction = () => {
-        current_interaction = INTERACTION_NONE
-
-        game_events.on_available_interactions_changed.raise(INTERACTION_NONE)
+        available_interaction.set_available_interactions(INTERACTION_NONE)
 
         evaluate_instructions()
     }
 
-    const set_available_interactions = (interaction: ActiveInteraction) => {
-        current_interaction = interaction
-        const creature = vm_state.get_acting_creature()
-        game_events.on_available_interactions_changed.raise({...current_interaction, creature})
-    }
-
-    const player_turn_handler = {
-        set_available_interactions,
-    }
-
     const select = (selection: InteractionSelection) => {
+        const current_interaction = available_interaction.get_current()
+
         //TODO add assertions for checking that each selection is valid
         switch (selection.type) {
             case INTERACTION_TYPE.SELECT_TERRAIN: {
@@ -104,7 +91,7 @@ export const create_instruction_loop = ({
                 if (current_interaction.type !== INTERACTION_TYPE.HIT_STATUS_SELECT) throw Error(`incompatible type ${selection.type}`)
 
                 //TODO better organize how hit statuses are stored into variables
-                
+
                 const attack_rolls = new Map<Creature, HitStatus>()
                 for (const {creature_id, hit_status} of selection.attack_rolls)
                     attack_rolls.set(creatures.get_by_id(creature_id), hit_status)
@@ -129,7 +116,7 @@ export const create_instruction_loop = ({
     }
 
     const evaluate_instructions = () => {
-        while (current_interaction.type === INTERACTION_TYPE.NONE) {
+        while (available_interaction.get_current().type === INTERACTION_TYPE.NONE) {
             const instruction = vm_state.peek()
 
             assert_is_not_null(instruction)
@@ -139,7 +126,6 @@ export const create_instruction_loop = ({
 
             interpret_instruction({
                 instruction,
-                player_turn_handler,
                 game_state,
                 evaluate_ast,
                 game_events,
@@ -148,17 +134,12 @@ export const create_instruction_loop = ({
     }
 
     return {
-        set_available_interactions,
         run: evaluate_instructions,
         select
     }
 }
 
 export type InstructionLoop = ReturnType<typeof create_instruction_loop>
-
-
-//TODO clean up usages of the player turn handler
-export type PlayerTurnHandler = Omit<InstructionLoop, "run" | "select">
 
 const assert_position_is_contained = ({position, area}: {
     position: Position,

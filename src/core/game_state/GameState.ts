@@ -4,6 +4,7 @@ import {create_settings} from "core/settings/Settings";
 import {create_vm_state} from "core/virtual_machine/VMState";
 import type {GameEvents} from "core/events/GameEvents";
 import {create_creatures} from "core/creatures/Creatures";
+import {create_available_interaction} from "core/game_state/available_interaction";
 
 export const create_game_state = ({
                                       game_events,
@@ -17,6 +18,7 @@ export const create_game_state = ({
     const initiative_order = create_initiative_order({game_events})
     const settings = create_settings()
     const vm_state = create_vm_state({game_events})
+    const available_interaction = create_available_interaction({game_events, vm_state})
 
     return {
         creatures,
@@ -24,6 +26,7 @@ export const create_game_state = ({
         initiative_order,
         settings,
         vm_state,
+        available_interaction,
     }
 }
 

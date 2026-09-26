@@ -20,9 +20,9 @@ import {get_creature_defense} from "core/character_sheet/get_creature_defense";
 export const interpret_select_target = ({
                                             instruction,
                                             game_state,
-                                            player_turn_handler,
                                             evaluate_ast
                                         }: InterpretInstructionProps<InstructionSelectTarget>) => {
+    const {available_interaction} = game_state
     const {battle_grid, vm_state} = game_state
     const clickable = get_valid_targets({instruction, battle_grid, evaluate_ast})
 
@@ -84,7 +84,7 @@ export const interpret_select_target = ({
 
         const footprint = moving_creature.data.position.footprint
 
-        player_turn_handler.set_available_interactions({
+        available_interaction.set_available_interactions({
             type: INTERACTION_TYPE.SELECT_PATH,
             target_label,
             clickable,
@@ -105,7 +105,7 @@ export const interpret_select_target = ({
             return battle_grid.get_creatures_in_positions(target_positions)
         }
 
-        player_turn_handler.set_available_interactions({
+        available_interaction.set_available_interactions({
             type: INTERACTION_TYPE.SELECT_AREA,
             target_label,
             clickable,
@@ -115,7 +115,7 @@ export const interpret_select_target = ({
         })
     } else if (instruction.target_type === "terrain") {
 
-        player_turn_handler.set_available_interactions({
+        available_interaction.set_available_interactions({
             type: INTERACTION_TYPE.SELECT_TERRAIN,
             target_label,
             clickable,
@@ -127,7 +127,7 @@ export const interpret_select_target = ({
             return battle_grid.get_creature_by_position(position)
         }
 
-        player_turn_handler.set_available_interactions({
+        available_interaction.set_available_interactions({
             type: INTERACTION_TYPE.SELECT_CREATURE,
             target_label,
             clickable,

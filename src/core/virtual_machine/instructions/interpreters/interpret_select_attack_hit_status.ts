@@ -5,13 +5,12 @@ import type {InstructionSelectAttackHitStatus} from "core/virtual_machine/instru
 
 export const interpret_select_attack_hit_status = ({
                                                        game_state,
-                                                       player_turn_handler,
                                                        instruction,
                                                    }: InterpretInstructionProps<InstructionSelectAttackHitStatus>) => {
-    const {vm_state} = game_state
+    const {vm_state, available_interaction} = game_state
     const defenders = EXPR.as_creatures(vm_state.get_variable(instruction.defender))
 
-    player_turn_handler.set_available_interactions({
+    available_interaction.set_available_interactions({
         type: INTERACTION_TYPE.HIT_STATUS_SELECT,
         creature_ids: defenders.map(defender => defender.id),
     })
