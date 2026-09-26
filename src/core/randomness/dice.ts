@@ -2,39 +2,11 @@ import {assert} from "stdlib/assert";
 
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 
-(window as any).rig_dice_roll = (faces: number, result: number) => {
-    const rigs = rigged_rolls[faces]
-    if (rigs === undefined) throw Error(`You can only throw D&D dice, there is no 'd${faces}'`)
-    rigged_rolls[faces] = [...rigs, result]
-}
-
-const rigged_rolls: Record<number, Array<number>> =  {
-    4: [],
-    6: [],
-    8: [],
-    10: [],
-    12: [],
-    20: []
-}
-
-const get_rigged_roll = (faces: number) => {
-    const rigs = rigged_rolls[faces]
-    if (rigs === undefined) throw Error(`You can only throw D&D dice, there is no 'd${faces}'`)
-    if (rigs.length === 0) return null
-    const result = rigs[0]
-    rigged_rolls[faces] = rigs.slice(1)
-    return result
-}
-
-export const roll_d = (faces: number): ExprNumberResolved => {
-    const rigged_roll = get_rigged_roll(faces)
-
-    return {
-        type: "number_resolved",
-        value: rigged_roll === null ? get_random_number({min: 1, max: faces}) : rigged_roll,
-        description: `d${faces}`
-    }
-}
+export const roll_d = (faces: number): ExprNumberResolved => ({
+    type: "number_resolved",
+    value: get_random_number({min: 1, max: faces}),
+    description: `d${faces}`,
+})
 
 const get_random_number = ({min, max}: { min: number, max: number }) => {
     assert(min <= max, () => "min can not be lower than max")
