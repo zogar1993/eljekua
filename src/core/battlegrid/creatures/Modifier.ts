@@ -12,6 +12,7 @@ export type ModifierType = typeof MODIFIER_TYPE[keyof typeof MODIFIER_TYPE]
 export type Modifier = ModifierAttackRoll
 
 export type ModifierAttackRoll = {
+    name: string
     type: typeof MODIFIER_TYPE.ATTACK_ROLL
     value: AstNode
 }
@@ -27,10 +28,8 @@ export const get_attack_roll_modifier_parts = ({
 
     for (const modifier of creature.modifiers) {
         if (modifier.type !== MODIFIER_TYPE.ATTACK_ROLL) continue
-
-        const result = EXPR.as_number_resolved_expr(evaluate_ast(modifier.value))
-        if (result.value === 0) continue
-        parts.push(result)
+        const part = EXPR.as_number_resolved_expr(evaluate_ast(modifier.value))
+        parts.push({...part, description: modifier.name})
     }
 
     return parts
