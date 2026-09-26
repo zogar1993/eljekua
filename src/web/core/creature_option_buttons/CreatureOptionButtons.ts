@@ -24,7 +24,7 @@ export const create_option_buttons_ui = ({game_events, game_input}: {
     }
 
     game_events.on_available_interactions_changed.add_handler(interaction => {
-        if (interaction?.type === INTERACTION_TYPE.OPTION_SELECT)
+        if (interaction.type === INTERACTION_TYPE.OPTION_SELECT)
             display_options(interaction.available_options)
         else
             remove_options()

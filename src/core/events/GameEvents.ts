@@ -2,7 +2,7 @@ import {create_event_manager} from "stdlib/event_manager";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {Expr, ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import type {InstructionFrame} from "core/virtual_machine/VMState";
-import type {Interaction} from "core/interactions/Interactions";
+import type {ActiveInteraction, InteractionsNone} from "core/interactions/Interactions";
 import type {Position} from "core/battlegrid/Position";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import type {InstructionAssessAttackHitStatus} from "core/virtual_machine/instructions/instructions";
@@ -34,8 +34,9 @@ export type InitiativeEntryAddedEvent = {
     index: number
 }
 
-//TODO a null event feels wrong
-export type AvailableActionsChangedEvent = (Interaction & { creature: Creature }) | null
+export type AvailableActionsChangedEvent =
+    | InteractionsNone
+    | (ActiveInteraction & { creature: Creature })
 
 export type InstructionFrameAddedEvent = {
     frame: InstructionFrame

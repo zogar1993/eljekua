@@ -13,7 +13,7 @@ export const create_hit_status_buttons_ui = ({game_events, game_inputs}: {
     let creature_visuals: Array<CreatureHitStatusVisual> = []
 
     game_events.on_available_interactions_changed.add_handler((interaction) => {
-        if (interaction?.type === INTERACTION_TYPE.HIT_STATUS_SELECT) {
+        if (interaction.type === INTERACTION_TYPE.HIT_STATUS_SELECT) {
             const hit_statuses: Map<number, HitStatus> = new Map()
 
             if (creature_visuals.length > 0)

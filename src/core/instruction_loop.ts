@@ -11,7 +11,9 @@ import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {
+    INTERACTION_NONE,
     INTERACTION_TYPE,
+    type ActiveInteraction,
     type Interaction,
     type InteractionSelection,
 } from "core/interactions/Interactions";
@@ -26,17 +28,17 @@ export const create_instruction_loop = ({
     game_events: GameEvents
 }) => {
     const {vm_state, creatures} = game_state
-    let current_interaction: Interaction | null = null
+    let current_interaction: Interaction = INTERACTION_NONE
 
     const clear_current_interaction = () => {
-        current_interaction = null
+        current_interaction = INTERACTION_NONE
 
-        game_events.on_available_interactions_changed.raise(null)
+        game_events.on_available_interactions_changed.raise(INTERACTION_NONE)
 
         evaluate_instructions()
     }
 
-    const set_available_interactions = (interaction: Interaction) => {
+    const set_available_interactions = (interaction: ActiveInteraction) => {
         current_interaction = interaction
         const creature = vm_state.get_acting_creature()
         game_events.on_available_interactions_changed.raise({...current_interaction, creature})
@@ -50,7 +52,7 @@ export const create_instruction_loop = ({
         //TODO add assertions for checking that each selection is valid
         switch (selection.type) {
             case INTERACTION_TYPE.SELECT_TERRAIN: {
-                if (current_interaction?.type !== INTERACTION_TYPE.SELECT_TERRAIN) throw Error(`incompatible type ${selection.type}`)
+                if (current_interaction.type !== INTERACTION_TYPE.SELECT_TERRAIN) throw Error(`incompatible type ${selection.type}`)
 
                 const position = selection.position
 
@@ -60,7 +62,7 @@ export const create_instruction_loop = ({
                 break
             }
             case INTERACTION_TYPE.SELECT_CREATURE: {
-                if (current_interaction?.type !== INTERACTION_TYPE.SELECT_CREATURE) throw Error(`incompatible type ${selection.type}`)
+                if (current_interaction.type !== INTERACTION_TYPE.SELECT_CREATURE) throw Error(`incompatible type ${selection.type}`)
 
                 // TODO should encapsulate creatures
                 const creature = creatures.get_by_id(selection.creature_id)
@@ -69,7 +71,7 @@ export const create_instruction_loop = ({
                 break
             }
             case INTERACTION_TYPE.SELECT_AREA: {
-                if (current_interaction?.type !== INTERACTION_TYPE.SELECT_AREA) throw Error(`incompatible type ${selection.type}`)
+                if (current_interaction.type !== INTERACTION_TYPE.SELECT_AREA) throw Error(`incompatible type ${selection.type}`)
 
                 const position = selection.center
 
@@ -80,7 +82,7 @@ export const create_instruction_loop = ({
                 break
             }
             case INTERACTION_TYPE.SELECT_PATH: {
-                if (current_interaction?.type !== INTERACTION_TYPE.SELECT_PATH) throw Error(`incompatible type ${selection.type}`)
+                if (current_interaction.type !== INTERACTION_TYPE.SELECT_PATH) throw Error(`incompatible type ${selection.type}`)
 
                 //TODO validate path is valid
                 //assert_position_is_contained({position, area: interaction.clickable})
@@ -90,7 +92,7 @@ export const create_instruction_loop = ({
                 break
             }
             case INTERACTION_TYPE.OPTION_SELECT: {
-                if (current_interaction?.type !== INTERACTION_TYPE.OPTION_SELECT) throw Error(`incompatible type ${selection.type}`)
+                if (current_interaction.type !== INTERACTION_TYPE.OPTION_SELECT) throw Error(`incompatible type ${selection.type}`)
 
                 const option = current_interaction.available_options.find(option => option.text === selection.option)
                 assert_is_not_undefined(option)
@@ -99,7 +101,7 @@ export const create_instruction_loop = ({
                 break
             }
             case INTERACTION_TYPE.HIT_STATUS_SELECT: {
-                if (current_interaction?.type !== INTERACTION_TYPE.HIT_STATUS_SELECT) throw Error(`incompatible type ${selection.type}`)
+                if (current_interaction.type !== INTERACTION_TYPE.HIT_STATUS_SELECT) throw Error(`incompatible type ${selection.type}`)
 
                 //TODO better organize how hit statuses are stored into variables
                 
@@ -112,7 +114,7 @@ export const create_instruction_loop = ({
                 break
             }
             case INTERACTION_TYPE.D20_ROLL_SELECT: {
-                if (current_interaction?.type !== INTERACTION_TYPE.D20_ROLL_SELECT) throw Error(`incompatible type ${selection.type}`)
+                if (current_interaction.type !== INTERACTION_TYPE.D20_ROLL_SELECT) throw Error(`incompatible type ${selection.type}`)
 
                 const d20_rolls = new Map<Creature, number>()
                 for (const {creature_id, value} of selection.d20_rolls)
@@ -127,7 +129,7 @@ export const create_instruction_loop = ({
     }
 
     const evaluate_instructions = () => {
-        while (current_interaction === null) {
+        while (current_interaction.type === INTERACTION_TYPE.NONE) {
             const instruction = vm_state.peek()
 
             assert_is_not_null(instruction)

@@ -4,6 +4,7 @@ import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStat
 import type {Position} from "core/battlegrid/Position";
 import type {AttackSuccessChance} from "core/virtual_machine/instructions/interpreters/interpret_select_target";
 export const INTERACTION_TYPE = {
+    NONE: "none",
     HIT_STATUS_SELECT: "select_hit_status",
     D20_ROLL_SELECT: "select_d20_roll",
     SELECT_TERRAIN: "select_terrain",
@@ -15,14 +16,25 @@ export const INTERACTION_TYPE = {
 
 export type InteractionType = typeof INTERACTION_TYPE[keyof typeof INTERACTION_TYPE]
 
+export type InteractionsNone = {
+    type: typeof INTERACTION_TYPE.NONE
+}
+
+export const INTERACTION_NONE: InteractionsNone = {
+    type: INTERACTION_TYPE.NONE,
+}
+
 export type Interaction =
-    InteractionsSelectTerrain
+    InteractionsNone
+    | InteractionsSelectTerrain
     | InteractionsSelectCreature
     | InteractionsSelectOption
     | InteractionsSelectHitStatus
     | InteractionsSelectD20Roll
     | InteractionsSelectPath
     | InteractionsSelectArea
+
+export type ActiveInteraction = Exclude<Interaction, InteractionsNone>
 
 export type InteractionsSelectHitStatus = {
     type: typeof INTERACTION_TYPE.HIT_STATUS_SELECT

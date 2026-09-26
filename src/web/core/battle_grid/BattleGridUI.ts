@@ -13,6 +13,7 @@ import {create_visual_creature} from "web/core/creature/CreatureVisual";
 import {AnimationQueue} from "web/core/animation_queue/AnimationQueue";
 import type {InstructionLoop} from "core/instruction_loop";
 import {
+    INTERACTION_NONE,
     INTERACTION_TYPE,
     type Interaction,
     type InteractionsSelectArea,
@@ -122,7 +123,7 @@ export const initialize_battle_grid_ui = ({
     }
 
     let latest_position: Position | null = null
-    let current_interaction: Interaction | null = null
+    let current_interaction: Interaction = INTERACTION_NONE
 
     click_overlay.addOnMouseMoveHandler(coordinate => {
         const interactions = current_interaction
@@ -224,7 +225,7 @@ export const initialize_battle_grid_ui = ({
     game_events.on_available_interactions_changed.add_handler(interaction => {
         current_interaction = interaction
 
-        if (interaction === null) {
+        if (interaction.type === INTERACTION_TYPE.NONE) {
             clear_visual_selection()
             return
         }
@@ -254,6 +255,6 @@ const CLICK_COORDINATE_INTERACTIONS: Array<Interaction["type"]> = [
     INTERACTION_TYPE.SELECT_AREA,
 ]
 
-const is_click_coordinate_interaction = (interaction: Interaction | null): interaction is InteractionClickCoordinate => {
-    return interaction !== null && CLICK_COORDINATE_INTERACTIONS.includes(interaction.type)
+const is_click_coordinate_interaction = (interaction: Interaction): interaction is InteractionClickCoordinate => {
+    return CLICK_COORDINATE_INTERACTIONS.includes(interaction.type)
 }

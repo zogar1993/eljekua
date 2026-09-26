@@ -12,7 +12,7 @@ export const create_d20_roll_buttons_ui = ({game_events, game_inputs}: {
     let creature_visuals: Array<CreatureD20RollVisual> = []
 
     game_events.on_available_interactions_changed.add_handler((interaction) => {
-        if (interaction?.type === INTERACTION_TYPE.D20_ROLL_SELECT) {
+        if (interaction.type === INTERACTION_TYPE.D20_ROLL_SELECT) {
             const d20_rolls: Map<number, number> = new Map()
 
             if (creature_visuals.length > 0)
