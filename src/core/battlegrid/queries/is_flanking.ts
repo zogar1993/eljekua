@@ -10,15 +10,13 @@ export const is_flanking = ({attacker, defender, battle_grid}: {
 }) => {
     if (attacker.data.team === null) return false
 
-    //TODO P4 test actual flanking
     const positions = get_flanker_positions({
         attacker_position: attacker.data.position,
         defender_position: defender.data.position,
         battle_grid
     })
 
-    if (positions.every(position => !battle_grid.is_terrain_occupied(position))) return false
-
-    const flankers = positions.map(battle_grid.get_creature_by_position)
-    return flankers.some(flanker => are_creatures_allied(flanker, attacker))
+    const occupied = positions.filter(position => battle_grid.is_terrain_occupied(position))
+    const flankers = occupied.map(battle_grid.get_creature_by_position)
+    return flankers.some(flanker => !are_creatures_allied(flanker, defender))
 }
