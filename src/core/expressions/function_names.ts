@@ -20,6 +20,10 @@ export const FUNCTION_NAME = {
     CREATURE_BY_ID: "creature_by_id",
     CAN_EXPEND_ACTION_TYPE: "can_expend_action_type",
     ATTACK_ROLL_RESOLUTION_MODE_IS: "attack_roll_resolution_mode_is",
+    ADJACENT_CREATURES: "adjacent_creatures",
+    IS_RACE: "is_race",
+    COUNT: "count",
+    FILTER_CREATURES: "filter_creatures",
 } as const
 
 export type FunctionName = typeof FUNCTION_NAME[keyof typeof FUNCTION_NAME]

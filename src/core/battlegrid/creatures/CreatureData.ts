@@ -17,6 +17,7 @@ export type CreatureData = {
     hp_current: number
     hp_max: number
     team: number | null
+    race: string | null
     archetypes: Array<string>
     constant_effects: Array<ConstantEffect>
     modifiers: Array<Modifier>

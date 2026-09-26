@@ -3,6 +3,7 @@ import type {Expr, ExprBoolean} from "core/virtual_machine/expressions/types";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
+import {are_creatures_allied} from "core/battlegrid/creatures/are_creatures_allied";
 
 export const evaluate_function_are_enemies = ({node, evaluate_ast}:
                                                                {
@@ -18,7 +19,7 @@ export const evaluate_function_are_enemies = ({node, evaluate_ast}:
 
     return {
         type: "boolean",
-        value: a.data.team === null || b.data.team === null || a.data.team !== b.data.team,
+        value: !are_creatures_allied(a, b),
         description: "are enemies",
         params: parameters
     }

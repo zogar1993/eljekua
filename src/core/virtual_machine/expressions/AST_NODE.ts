@@ -26,6 +26,7 @@ export const SYSTEM_KEYWORD = {
     TRIGGERER: "triggerer",
     HIT_STATUS: "hit_status",
     ATTACK_D20_ROLLS: "attack_d20_rolls",
+    FILTER_CREATURE: "filter_creature",
 } as const
 
 export const AST = {

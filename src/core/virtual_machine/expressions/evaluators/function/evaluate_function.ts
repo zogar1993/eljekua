@@ -57,6 +57,18 @@ import {
 import {
     evaluate_function_attack_roll_resolution_mode_is
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_attack_roll_resolution_mode_is";
+import {
+    evaluate_function_adjacent_creatures
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_adjacent_creatures";
+import {
+    evaluate_function_is_race
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_is_race";
+import {
+    evaluate_function_count
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_count";
+import {
+    evaluate_function_filter_creatures
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_filter_creatures";
 import type {GameState} from "core/game_state/GameState";
 
 export const build_evaluate_function = ({evaluate_ast, game_state}: {
@@ -108,6 +120,14 @@ export const build_evaluate_function = ({evaluate_ast, game_state}: {
                 return evaluate_function_creature_by_id({node, game_state})
             case FUNCTION_NAME.ATTACK_ROLL_RESOLUTION_MODE_IS:
                 return evaluate_function_attack_roll_resolution_mode_is({node, game_state, evaluate_ast})
+            case FUNCTION_NAME.ADJACENT_CREATURES:
+                return evaluate_function_adjacent_creatures({node, game_state, evaluate_ast})
+            case FUNCTION_NAME.IS_RACE:
+                return evaluate_function_is_race({node, evaluate_ast})
+            case FUNCTION_NAME.COUNT:
+                return evaluate_function_count({node, evaluate_ast})
+            case FUNCTION_NAME.FILTER_CREATURES:
+                return evaluate_function_filter_creatures({node, game_state, evaluate_ast})
             default:
                 throw Error(`function name '${node.name}' not supported when evaluating node`)
         }

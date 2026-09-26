@@ -1,5 +1,7 @@
 import type {IRPower} from "core/types";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
+import {MODIFIER_TYPE} from "core/battlegrid/creatures/Modifier";
+import {to_ast} from "core/expressions/parser/to_ast";
 import type {Monster} from "data/monsters/Monster";
 
 const spear: IRPower = {
@@ -48,6 +50,12 @@ const shifty: IRPower = {
     ],
 }
 
+const mob_attack = {
+    name: "Mob Attack",
+    type: MODIFIER_TYPE.ATTACK_ROLL,
+    value: to_ast(`$count($filter_creatures($adjacent_creatures(owner), $and($is_ally(owner, filter_creature), $is_race(filter_creature, "kobold"))))`),
+}
+
 const kobold_skirmisher: Monster = {
     template: "Kobold Skirmisher",
     size: "small",
@@ -85,8 +93,8 @@ const kobold_skirmisher: Monster = {
         cha: 15,
     },
     constant_effects: [],
+    modifiers: [mob_attack],
     // Combat Advantage: extra 1d6 damage on melee and ranged attacks — not implemented
-    // Mob Attack: +1 attack per adjacent kobold ally until end of next turn — not implemented
     // Trap Sense: +2 bonus to all defenses against traps — not implemented
     // Skills: Acrobatics +7, Stealth +9, Thievery +9 — not implemented
     // Equipment: hide armor, spear — not implemented
