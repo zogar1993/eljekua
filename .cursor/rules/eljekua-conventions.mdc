@@ -78,7 +78,7 @@ export const INSTRUCTION_TYPE = {
 
 ## @skills
 
-- Workflow skills live in `.cursor/skills/` (e.g. `create-spec`, `create-instruction`).
+- Workflow skills live in `.cursor/skills/` (e.g. `create-spec`, `create-instruction`, `create-test`).
 - Do **not** create or edit skills unless the user explicitly asks — follow the `create-skill` skill when they do.
 
 ## @architecture
