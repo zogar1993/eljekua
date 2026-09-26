@@ -63,12 +63,13 @@ export const create_creature = ({id, data}: { id: number, data: CreatureData }) 
     const basic_powers = data.template === null
         ? [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS]
         : [...BASIC_MOVEMENT_ACTIONS]
-    const {constant_effects, powers, ...creature_data} = data
+    const {constant_effects, modifiers, powers, ...creature_data} = data
     const d = {...creature_data, powers: [...basic_powers, ...powers]}
     return {
         id,
         data: d,
         constant_effects: [...constant_effects],
+        modifiers: [...modifiers],
         statuses: [] as Array<Status>,
         available_actions: [] as Array<ActionType>
     }

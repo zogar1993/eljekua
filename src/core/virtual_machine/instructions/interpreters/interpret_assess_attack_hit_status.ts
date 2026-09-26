@@ -8,6 +8,7 @@ import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {is_flanking} from "core/battlegrid/queries/is_flanking";
 import {add_numbers_resolved} from "core/virtual_machine/expressions/number_utils";
 import {get_creature_defense} from "core/character_sheet/get_creature_defense";
+import {get_attack_roll_modifier_parts} from "core/battlegrid/creatures/Modifier";
 
 export const interpret_assess_attack_hit_status = (props: InterpretInstructionProps<InstructionAssessAttackHitStatus>) => {
     const {instruction, game_state, evaluate_ast, game_events} = props
@@ -42,6 +43,8 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
             is_flanking({attacker, defender, battle_grid}) ||
             defender.statuses.some(({effect}) => effect.type === "grant_combat_advantage" && (effect.against_creatures === null || effect.against_creatures.includes(attacker)))
         ) attack_parts.push(COMBAT_ADVANTAGE)
+
+        attack_parts.push(...get_attack_roll_modifier_parts({creature: attacker, evaluate_ast}))
 
         const attack = add_numbers_resolved(attack_parts)
         const defense = get_creature_defense({creature: defender, defense_code: instruction.defense})
