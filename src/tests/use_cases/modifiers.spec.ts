@@ -91,7 +91,8 @@ describe("attack roll modifier", () => {
     })
 })
 
-const ATTACK_ROLL_MODIFIER = (value: string): ModifierAttackRoll => ({
+const ATTACK_ROLL_MODIFIER = (value: string, name = "Attack Roll Modifier"): ModifierAttackRoll => ({
+    name,
     type: MODIFIER_TYPE.ATTACK_ROLL,
     value: to_ast(value),
 })

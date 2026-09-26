@@ -47,6 +47,7 @@ export const create_creature_test_helpers = ({
             hp_max: c.hp_max ?? 10,
             level: c.level ?? 1,
             team: c.team ?? null,
+            race: c.race ?? null,
             attributes: c.attributes ?? Object.fromEntries(
                 Object.values(ATTRIBUTES).map(attr => [attr, default_attribute_value]),
             ) as Creature["data"]["attributes"],
