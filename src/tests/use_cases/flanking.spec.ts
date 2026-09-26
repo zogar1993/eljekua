@@ -44,160 +44,7 @@ beforeEach(() => {
     when_creature = helpers.when_creature
 })
 
-describe("flanking combat advantage", () => {
-    test("two creatures flanking a target grants combat advantage to the attacker", () => {
-        given_a_creature_is_created({
-            name: "linuar",
-            team: 1,
-            position: FLANKING_ATTACKER_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-            powers: [MELEE_ATTACK],
-        })
-        given_a_creature_is_created({
-            name: "calendula",
-            team: 1,
-            position: FLANKING_PARTNER_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-        })
-        given_a_creature_is_created({
-            name: "ragoz",
-            team: 2,
-            position: FLANKING_TARGET_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-        })
-        start_battle()
-
-        when_creature("linuar").selects_action("Attack")
-        when_creature("linuar").selects_target("ragoz")
-        when_creature("linuar").rolls_d20_against("ragoz", 10)
-
-        expect(has_combat_advantage(last_attack)).toBe(true)
-    })
-
-    test("combat advantage is not granted when the flanker is an ally of the target", () => {
-        given_a_creature_is_created({
-            name: "linuar",
-            team: 1,
-            position: FLANKING_ATTACKER_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-            powers: [MELEE_ATTACK],
-        })
-        given_a_creature_is_created({
-            name: "calendula",
-            team: 2,
-            position: FLANKING_PARTNER_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-        })
-        given_a_creature_is_created({
-            name: "ragoz",
-            team: 2,
-            position: FLANKING_TARGET_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-        })
-        start_battle()
-
-        when_creature("linuar").selects_action("Attack")
-        when_creature("linuar").selects_target("ragoz")
-        when_creature("linuar").rolls_d20_against("ragoz", 10)
-
-        expect(has_combat_advantage(last_attack)).toBe(false)
-    })
-
-    test("combat advantage is granted when the flanker is neutral relative to the target", () => {
-        given_a_creature_is_created({
-            name: "linuar",
-            team: 1,
-            position: FLANKING_ATTACKER_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-            powers: [MELEE_ATTACK],
-        })
-        given_a_creature_is_created({
-            name: "calendula",
-            team: null,
-            position: FLANKING_PARTNER_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-        })
-        given_a_creature_is_created({
-            name: "ragoz",
-            team: 2,
-            position: FLANKING_TARGET_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-        })
-        start_battle()
-
-        when_creature("linuar").selects_action("Attack")
-        when_creature("linuar").selects_target("ragoz")
-        when_creature("linuar").rolls_d20_against("ragoz", 10)
-
-        expect(has_combat_advantage(last_attack)).toBe(true)
-    })
-
-    test("combat advantage is granted when the flanker is on a different team from both attacker and target", () => {
-        given_a_creature_is_created({
-            name: "linuar",
-            team: 1,
-            position: FLANKING_ATTACKER_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-            powers: [MELEE_ATTACK],
-        })
-        given_a_creature_is_created({
-            name: "calendula",
-            team: 3,
-            position: FLANKING_PARTNER_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-        })
-        given_a_creature_is_created({
-            name: "ragoz",
-            team: 2,
-            position: FLANKING_TARGET_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-        })
-        start_battle()
-
-        when_creature("linuar").selects_action("Attack")
-        when_creature("linuar").selects_target("ragoz")
-        when_creature("linuar").rolls_d20_against("ragoz", 10)
-
-        expect(has_combat_advantage(last_attack)).toBe(true)
-    })
-})
-
-describe("granted combat advantage", () => {
-    test("a power that grants combat advantage until start of next turn applies it only until then", () => {
-        given_a_creature_is_created({
-            name: "linuar",
-            team: 1,
-            position: FLANKING_ATTACKER_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-            powers: [MELEE_ATTACK, GRANT_COMBAT_ADVANTAGE_UNTIL_NEXT_TURN],
-        })
-        given_a_creature_is_created({
-            name: "ragoz",
-            team: 2,
-            position: FLANKING_TARGET_POSITION,
-            attributes: ZERO_ATTRIBUTES,
-        })
-        given_creature("linuar").is_in_its_turn()
-
-        when_creature("linuar").selects_action("Grant Combat Advantage")
-        when_creature("linuar").selects_target("ragoz")
-
-        when_creature("linuar").selects_action("Attack")
-        when_creature("linuar").selects_target("ragoz")
-        when_creature("linuar").rolls_d20_against("ragoz", 10)
-
-        expect(has_combat_advantage(last_attack)).toBe(true)
-
-        when_creature("linuar").selects_action("End turn")
-        when_creature("ragoz").selects_action("End turn")
-
-        when_creature("linuar").selects_action("Attack")
-        when_creature("linuar").selects_target("ragoz")
-        when_creature("linuar").rolls_d20_against("ragoz", 10)
-
-        expect(has_combat_advantage(last_attack)).toBe(false)
-    })
-
+describe("combat advantage", () => {
     test("combat advantage from flanking and a granted status does not stack", () => {
         given_a_creature_is_created({
             name: "calendula",
@@ -231,8 +78,162 @@ describe("granted combat advantage", () => {
     })
 })
 
-const has_combat_advantage = (attack: ExprNumberResolved | undefined): boolean =>
-    combat_advantage_bonus(attack) > 0
+describe("flanking", () => {
+    test("two creatures flanking a target grants combat advantage to the attacker", () => {
+        given_a_creature_is_created({
+            name: "linuar",
+            team: 1,
+            position: FLANKING_ATTACKER_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+            powers: [MELEE_ATTACK],
+        })
+        given_a_creature_is_created({
+            name: "calendula",
+            team: 1,
+            position: FLANKING_PARTNER_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+        })
+        given_a_creature_is_created({
+            name: "ragoz",
+            team: 2,
+            position: FLANKING_TARGET_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+        })
+        start_battle()
+
+        when_creature("linuar").selects_action("Attack")
+        when_creature("linuar").selects_target("ragoz")
+        when_creature("linuar").rolls_d20_against("ragoz", 10)
+
+        expect(combat_advantage_bonus(last_attack)).toBe(2)
+    })
+})
+
+describe("who counts as a flanker", () => {
+    test("combat advantage is not granted when the flanker is an ally of the target", () => {
+        given_a_creature_is_created({
+            name: "linuar",
+            team: 1,
+            position: FLANKING_ATTACKER_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+            powers: [MELEE_ATTACK],
+        })
+        given_a_creature_is_created({
+            name: "calendula",
+            team: 2,
+            position: FLANKING_PARTNER_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+        })
+        given_a_creature_is_created({
+            name: "ragoz",
+            team: 2,
+            position: FLANKING_TARGET_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+        })
+        start_battle()
+
+        when_creature("linuar").selects_action("Attack")
+        when_creature("linuar").selects_target("ragoz")
+        when_creature("linuar").rolls_d20_against("ragoz", 10)
+
+        expect(combat_advantage_bonus(last_attack)).toBe(0)
+    })
+
+    test("combat advantage is granted when the flanker is neutral relative to the target", () => {
+        given_a_creature_is_created({
+            name: "linuar",
+            team: 1,
+            position: FLANKING_ATTACKER_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+            powers: [MELEE_ATTACK],
+        })
+        given_a_creature_is_created({
+            name: "calendula",
+            team: null,
+            position: FLANKING_PARTNER_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+        })
+        given_a_creature_is_created({
+            name: "ragoz",
+            team: 2,
+            position: FLANKING_TARGET_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+        })
+        start_battle()
+
+        when_creature("linuar").selects_action("Attack")
+        when_creature("linuar").selects_target("ragoz")
+        when_creature("linuar").rolls_d20_against("ragoz", 10)
+
+        expect(combat_advantage_bonus(last_attack)).toBe(2)
+    })
+
+    test("combat advantage is granted when the flanker is on a different team from both attacker and target", () => {
+        given_a_creature_is_created({
+            name: "linuar",
+            team: 1,
+            position: FLANKING_ATTACKER_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+            powers: [MELEE_ATTACK],
+        })
+        given_a_creature_is_created({
+            name: "calendula",
+            team: 3,
+            position: FLANKING_PARTNER_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+        })
+        given_a_creature_is_created({
+            name: "ragoz",
+            team: 2,
+            position: FLANKING_TARGET_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+        })
+        start_battle()
+
+        when_creature("linuar").selects_action("Attack")
+        when_creature("linuar").selects_target("ragoz")
+        when_creature("linuar").rolls_d20_against("ragoz", 10)
+
+        expect(combat_advantage_bonus(last_attack)).toBe(2)
+    })
+})
+
+describe("granted combat advantage", () => {
+    test("a granted effect adds +2 to the attack roll and lasts for the power's duration", () => {
+        given_a_creature_is_created({
+            name: "linuar",
+            team: 1,
+            position: FLANKING_ATTACKER_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+            powers: [MELEE_ATTACK, GRANT_COMBAT_ADVANTAGE_UNTIL_NEXT_TURN],
+        })
+        given_a_creature_is_created({
+            name: "ragoz",
+            team: 2,
+            position: FLANKING_TARGET_POSITION,
+            attributes: ZERO_ATTRIBUTES,
+        })
+        given_creature("linuar").is_in_its_turn()
+
+        when_creature("linuar").selects_action("Grant Combat Advantage")
+        when_creature("linuar").selects_target("ragoz")
+
+        when_creature("linuar").selects_action("Attack")
+        when_creature("linuar").selects_target("ragoz")
+        when_creature("linuar").rolls_d20_against("ragoz", 10)
+
+        expect(combat_advantage_bonus(last_attack)).toBe(2)
+
+        when_creature("linuar").selects_action("End turn")
+        when_creature("ragoz").selects_action("End turn")
+
+        when_creature("linuar").selects_action("Attack")
+        when_creature("linuar").selects_target("ragoz")
+        when_creature("linuar").rolls_d20_against("ragoz", 10)
+
+        expect(combat_advantage_bonus(last_attack)).toBe(0)
+    })
+})
 
 const combat_advantage_bonus = (attack: ExprNumberResolved | undefined): number => {
     if (!attack?.params) return 0
