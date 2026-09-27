@@ -50,6 +50,8 @@ export const create_expression_test_context = () => {
             attributes: overrides.attributes ?? Object.fromEntries(
                 Object.values(ATTRIBUTES).map(attribute => [attribute, 10]),
             ) as CreatureData["attributes"],
+            trained_skills: overrides.trained_skills ?? [],
+            skills: overrides.skills ?? {},
             powers: overrides.powers ?? [],
             archetypes: overrides.archetypes ?? [],
             constant_effects: overrides.constant_effects ?? [],

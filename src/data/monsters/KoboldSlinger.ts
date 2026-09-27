@@ -142,8 +142,10 @@ const kobold_slinger: Monster = {
         cha: 10,
     },
     constant_effects: [],
+    skills: {
+        stealth: 8,
+    },
     // Special Shot — not implemented (see commented power above)
-    // Skills: Stealth +8 — not implemented
     // Equipment: 3 special shot ammo, dagger, leather armor, sling, sling bullets x20 — not implemented
 }
 

@@ -51,6 +51,8 @@ export const create_creature_test_helpers = ({
             attributes: c.attributes ?? Object.fromEntries(
                 Object.values(ATTRIBUTES).map(attr => [attr, default_attribute_value]),
             ) as Creature["data"]["attributes"],
+            trained_skills: c.trained_skills ?? [],
+            skills: c.skills ?? {},
             powers: c.powers ?? [],
             archetypes: c.archetypes ?? [],
             constant_effects: c.constant_effects ?? [],

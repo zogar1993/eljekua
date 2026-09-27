@@ -3,6 +3,8 @@ import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {get_creature_attribute_mod} from "core/character_sheet/get_creature_attribute_mod";
 import {get_creature_half_level} from "core/character_sheet/get_creature_half_level";
+import {get_creature_skill} from "core/character_sheet/get_creature_skill";
+import {SKILL_CODES, type SkillCode} from "core/character_sheet/skills";
 
 const ATTRIBUTE_MOD_CODES = ATTRIBUTE_CODES.map(attribute => `${attribute}_mod`)
 const ATTRIBUTE_MOD_CODES_LVL = ATTRIBUTE_CODES.map(attribute => `${attribute}_mod_lvl`)
@@ -30,6 +32,11 @@ export const get_creature_property = ({creature, property}: {
             description: property,
             params: parts
         }
+    }
+
+    if (SKILL_CODES.includes(property as SkillCode)) {
+        const {type: _, ...resolved} = get_creature_skill({creature, skill_code: property as SkillCode})
+        return resolved
     }
 
     throw Error(`Invalid property ${property}`)

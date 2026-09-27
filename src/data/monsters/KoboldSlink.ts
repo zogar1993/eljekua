@@ -86,10 +86,14 @@ const kobold_slink: Monster = {
         cha: 15,
     },
     constant_effects: [],
+    skills: {
+        acrobatics: 7,
+        stealth: 9,
+        thievery: 9,
+    },
     // Combat Advantage: extra 1d6 damage on melee and ranged attacks — not implemented
     // Shift and Slide: shift into ally's space; ally slides to original space — not implemented
     // Slink's Boon: cannot be targeted unless nearest enemy — not implemented
-    // Skills: Acrobatics +7, Stealth +9, Thievery +9 — not implemented
     // Equipment: hide armor, spear — not implemented
 }
 

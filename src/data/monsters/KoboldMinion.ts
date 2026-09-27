@@ -112,8 +112,11 @@ const kobold_minion: Monster = {
         cha: 10,
     },
     constant_effects: [],
+    skills: {
+        stealth: 4,
+        thievery: 4,
+    },
     // Trap Sense: +2 bonus to all defenses against traps — not implemented
-    // Skills: Stealth +4, Thievery +4 — not implemented
     // Equipment: hide armor, javelin x3, light shield — not implemented
 }
 

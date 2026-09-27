@@ -93,10 +93,14 @@ const kobold_skirmisher: Monster = {
         cha: 15,
     },
     constant_effects: [],
+    skills: {
+        acrobatics: 7,
+        stealth: 9,
+        thievery: 9,
+    },
     modifiers: [mob_attack],
     // Combat Advantage: extra 1d6 damage on melee and ranged attacks — not implemented
     // Trap Sense: +2 bonus to all defenses against traps — not implemented
-    // Skills: Acrobatics +7, Stealth +9, Thievery +9 — not implemented
     // Equipment: hide armor, spear — not implemented
 }
 

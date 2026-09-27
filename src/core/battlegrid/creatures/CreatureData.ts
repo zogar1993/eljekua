@@ -1,6 +1,7 @@
 import type {Position} from "core/battlegrid/Position";
 import type {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import type {AttributeCode} from "core/character_sheet/attributes";
+import type {SkillCode} from "core/character_sheet/skills";
 import type {Size} from "core/battlegrid/creatures/SIZES";
 import type {ConstantEffect} from "core/battlegrid/creatures/Creature";
 import type {Modifier} from "core/battlegrid/creatures/Modifier";
@@ -11,6 +12,8 @@ export type CreatureData = {
     level: number
     size: Size
     attributes: Record<AttributeCode, number>
+    trained_skills: Array<SkillCode>
+    skills: Partial<Record<SkillCode, number>>
     position: Position
     image: string
     movement: number
