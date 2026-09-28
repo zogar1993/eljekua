@@ -1,4 +1,5 @@
 import type {BattleGrid} from "core/battlegrid/BattleGrid";
+import {are_creatures_allied} from "core/battlegrid/creatures/are_creatures_allied";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {Expr} from "core/virtual_machine/expressions/types";
 import {get_reach} from "core/battlegrid/position/get_reach";
@@ -43,9 +44,16 @@ export const get_valid_targets = ({instruction, battle_grid, evaluate_ast}: {
     let valid_targets: Array<Position>
     if (instruction.target_type === "terrain") {
         valid_targets = in_range.filter(position => !battle_grid.is_terrain_occupied(position))
-    } else if (instruction.target_type === "enemy" || instruction.target_type === "creature") {
+    } else if (instruction.target_type === "enemy" || instruction.target_type === "creature" || instruction.target_type === "ally") {
         assert_are_footprint_one(in_range)
-        valid_targets = battle_grid.get_creatures_in_positions(in_range).map(c => c.data.position)
+        const owner = EXPR.as_creature(evaluate_ast(AST.OWNER))
+        const creatures_in_range = battle_grid.get_creatures_in_positions(in_range)
+        const creatures = instruction.target_type === "ally"
+            ? creatures_in_range.filter(creature => creature !== owner && are_creatures_allied(owner, creature))
+            : instruction.target_type === "enemy"
+                ? creatures_in_range.filter(creature => !are_creatures_allied(owner, creature))
+                : creatures_in_range
+        valid_targets = creatures.map(creature => creature.data.position)
     } else {
         throw `Target "${instruction.target_type}" not supported`
     }
