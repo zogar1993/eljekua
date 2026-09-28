@@ -11,9 +11,10 @@ import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {
+    Interaction,
     INTERACTION_NONE,
     INTERACTION_TYPE,
-    type InteractionSelection,
+    type InteractionSelection, InteractionType,
 } from "core/interactions/Interactions";
 
 export const create_instruction_loop = ({
@@ -36,10 +37,9 @@ export const create_instruction_loop = ({
     const select = (selection: InteractionSelection) => {
         const current_interaction = available_interaction.get_current()
 
-        //TODO add assertions for checking that each selection is valid
         switch (selection.type) {
             case INTERACTION_TYPE.SELECT_TERRAIN: {
-                if (current_interaction.type !== INTERACTION_TYPE.SELECT_TERRAIN) throw Error(`incompatible type ${selection.type}`)
+                assert_interaction_is_of_type(current_interaction, INTERACTION_TYPE.SELECT_TERRAIN)
 
                 const position = selection.position
 
@@ -49,7 +49,7 @@ export const create_instruction_loop = ({
                 break
             }
             case INTERACTION_TYPE.SELECT_CREATURE: {
-                if (current_interaction.type !== INTERACTION_TYPE.SELECT_CREATURE) throw Error(`incompatible type ${selection.type}`)
+                assert_interaction_is_of_type(current_interaction, INTERACTION_TYPE.SELECT_CREATURE)
 
                 // TODO should encapsulate creatures
                 const creature = creatures.get_by_id(selection.creature_id)
@@ -58,7 +58,7 @@ export const create_instruction_loop = ({
                 break
             }
             case INTERACTION_TYPE.SELECT_AREA: {
-                if (current_interaction.type !== INTERACTION_TYPE.SELECT_AREA) throw Error(`incompatible type ${selection.type}`)
+                assert_interaction_is_of_type(current_interaction, INTERACTION_TYPE.SELECT_AREA)
 
                 const position = selection.center
 
@@ -69,7 +69,7 @@ export const create_instruction_loop = ({
                 break
             }
             case INTERACTION_TYPE.SELECT_PATH: {
-                if (current_interaction.type !== INTERACTION_TYPE.SELECT_PATH) throw Error(`incompatible type ${selection.type}`)
+                assert_interaction_is_of_type(current_interaction, INTERACTION_TYPE.SELECT_PATH)
 
                 //TODO validate path is valid
                 //assert_position_is_contained({position, area: interaction.clickable})
@@ -79,7 +79,7 @@ export const create_instruction_loop = ({
                 break
             }
             case INTERACTION_TYPE.OPTION_SELECT: {
-                if (current_interaction.type !== INTERACTION_TYPE.OPTION_SELECT) throw Error(`incompatible type ${selection.type}`)
+                assert_interaction_is_of_type(current_interaction, INTERACTION_TYPE.OPTION_SELECT)
 
                 const option = current_interaction.available_options.find(option => option.text === selection.option)
                 assert_is_not_undefined(option)
@@ -88,7 +88,7 @@ export const create_instruction_loop = ({
                 break
             }
             case INTERACTION_TYPE.HIT_STATUS_SELECT: {
-                if (current_interaction.type !== INTERACTION_TYPE.HIT_STATUS_SELECT) throw Error(`incompatible type ${selection.type}`)
+                assert_interaction_is_of_type(current_interaction, INTERACTION_TYPE.HIT_STATUS_SELECT)
 
                 //TODO better organize how hit statuses are stored into variables
 
@@ -101,7 +101,7 @@ export const create_instruction_loop = ({
                 break
             }
             case INTERACTION_TYPE.D20_ROLL_SELECT: {
-                if (current_interaction.type !== INTERACTION_TYPE.D20_ROLL_SELECT) throw Error(`incompatible type ${selection.type}`)
+                assert_interaction_is_of_type(current_interaction, INTERACTION_TYPE.D20_ROLL_SELECT)
 
                 const d20_rolls = new Map<Creature, number>()
                 for (const {creature_id, value} of selection.d20_rolls)
@@ -147,4 +147,13 @@ const assert_position_is_contained = ({position, area}: {
 }) => {
     //TODO is this needed to share surface or can we just use equal?
     assert_is_true(area.some(target => positions_share_surface(target, position)))
+}
+
+type InteractionOfType<T extends InteractionType> = Extract<Interaction, { type: T }>
+
+export function assert_interaction_is_of_type<T extends InteractionType>(
+    interaction: Interaction,
+    type: T,
+): asserts interaction is InteractionOfType<T> {
+    if (interaction.type !== type) throw Error(`Expected interaction type ${type}, got ${interaction.type}`)
 }
