@@ -5,12 +5,8 @@
 
 ## Flanking
 
-- When an attacker and another creature are flanking a target, the attacker has combat advantage against that target.
-
-### Who counts as a flanker
-
-- A creature in a flanker position counts if it is an enemy of the target.
-- It does not need to be an ally of the attacker.
+- Two **allied** creatures flank a target when they are on opposite sides of it, both adjacent to it, and the target is **not** their ally.
+- Each of those creatures has combat advantage against the target when it attacks.
 
 ## Granted combat advantage
 
