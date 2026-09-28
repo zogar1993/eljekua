@@ -181,6 +181,12 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 target: instruction.target,
                 destination: instruction.destination
             }]
+        case INSTRUCTION_TYPE.SWAP_PLACES:
+            return [{
+                type: INSTRUCTION_TYPE.SWAP_PLACES,
+                creature_a: instruction.creature_a,
+                creature_b: instruction.creature_b,
+            }]
         case IR_INSTRUCTION_TYPE.CONDITION:
             return create_if_block({
                 condition: to_ast(instruction.condition),

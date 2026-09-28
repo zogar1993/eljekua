@@ -12,6 +12,7 @@ import {
 import {interpret_apply_damage} from "core/virtual_machine/instructions/interpreters/interpret_apply_damage";
 import {interpret_move} from "core/virtual_machine/instructions/interpreters/interpret_move";
 import {interpret_shift} from "core/virtual_machine/instructions/interpreters/interpret_shift";
+import {interpret_swap_places} from "core/virtual_machine/instructions/interpreters/interpret_swap_places";
 import {interpret_force_movement} from "core/virtual_machine/instructions/interpreters/interpret_force_movement";
 import {interpret_save_variable} from "core/virtual_machine/instructions/interpreters/interpret_save_variable";
 import {interpret_options} from "core/virtual_machine/instructions/interpreters/interpret_options";
@@ -59,6 +60,8 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             return interpret_move({...props, instruction})
         case INSTRUCTION_TYPE.SHIFT:
             return interpret_shift({...props, instruction})
+        case INSTRUCTION_TYPE.SWAP_PLACES:
+            return interpret_swap_places({...props, instruction})
         case INSTRUCTION_TYPE.FORCE_MOVEMENT:
             return interpret_force_movement({...props, instruction})
         case INSTRUCTION_TYPE.SAVE_VARIABLE:

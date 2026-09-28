@@ -51,7 +51,7 @@ export const interpret_select_target = ({
         } else {
             if (instruction.target_type === "terrain") {
                 vm_state.set_variable(target_label, {type: "positions", value: [position]})
-            } else if ((instruction.target_type === "creature" || instruction.target_type === "enemy")) {
+            } else if ((["creature", "enemy", "ally"].includes(instruction.target_type))) {
                 const creature = battle_grid.get_creature_by_position(position)
                 vm_state.set_variable(target_label, {type: "creatures", value: [creature]})
             } else {
@@ -120,7 +120,7 @@ export const interpret_select_target = ({
             target_label,
             clickable,
         })
-    } else if (instruction.target_type === "creature" || instruction.target_type === "enemy") {
+    } else if (instruction.target_type === "creature" || instruction.target_type === "enemy" || instruction.target_type === "ally") {
         const get_target_for_position = (position: Position): Creature => {
             assert_position_is_clickable({position, clickable})
 

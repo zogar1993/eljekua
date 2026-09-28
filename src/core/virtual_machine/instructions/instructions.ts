@@ -13,6 +13,7 @@ export const INSTRUCTION_TYPE = {
     APPLY_DAMAGE: "apply_damage",
     WALK: "walk",
     SHIFT: "shift",
+    SWAP_PLACES: "swap_places",
     OPTIONS: "options",
     SAVE_VARIABLE: "save_variable",
     SAVE_NUMBER_AS_RESOLVED: "save_number_as_resolved",
@@ -88,6 +89,12 @@ export type InstructionMovement = {
     type: typeof INSTRUCTION_TYPE.WALK | typeof INSTRUCTION_TYPE.SHIFT
     target: string
     destination: string
+}
+
+export type InstructionSwapPlaces = {
+    type: typeof INSTRUCTION_TYPE.SWAP_PLACES
+    creature_a: string
+    creature_b: string
 }
 
 export type InstructionOptions = {
@@ -166,6 +173,7 @@ export type Instruction =
     // Character
     InstructionApplyDamage |
     InstructionMovement |
+    InstructionSwapPlaces |
     InstructionApplyStatus |
     InstructionForceMovement |
     InstructionExpendAction |
@@ -212,7 +220,7 @@ export type InstructionSelectTargetRanged = {
 export type InstructionSelectTargetMelee = {
     type: typeof INSTRUCTION_TYPE.SELECT_TARGET
     targeting_type: "adjacent" | "melee_weapon"
-    target_type: "enemy" | "creature"
+    target_type: "enemy" | "creature" | "ally"
     amount: 1,
     exclude: Array<AstNode>
     target_label: string

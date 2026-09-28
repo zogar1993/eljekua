@@ -55,6 +55,10 @@ export type IRInstruction =
         target: "owner",
         destination: string
     } | {
+        type: typeof INSTRUCTION_TYPE.SWAP_PLACES,
+        creature_a: string,
+        creature_b: string,
+    } | {
     type: typeof IR_INSTRUCTION_TYPE.CONDITION,
     condition: string,
     instructions_true: Array<IRInstruction>
@@ -131,7 +135,7 @@ export type IRInstructionSelectTarget =
 
 type IRInstructionSelectTargetMelee = {
     targeting_type: "adjacent" | "melee_weapon"
-    target_type: "enemy" | "creature"
+    target_type: "enemy" | "creature" | "ally"
     amount: 1,
     exclude?: ["primary_target"]
 }
