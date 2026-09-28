@@ -28,7 +28,6 @@ const spear: IRPower = {
     },
 }
 
-// Only the 1-square shift is implemented; ally slide is not.
 const shift_and_slide: IRPower = {
     name: "Shift and Slide",
     type: {
@@ -37,14 +36,15 @@ const shift_and_slide: IRPower = {
         attack: false,
     },
     targeting: {
-        targeting_type: "movement",
-        distance: 1,
+        targeting_type: "adjacent",
+        target_type: "ally",
+        amount: 1,
     },
     effect: [
         {
-            type: INSTRUCTION_TYPE.SHIFT,
-            target: "owner",
-            destination: "primary_target",
+            type: INSTRUCTION_TYPE.SWAP_PLACES,
+            creature_a: "owner",
+            creature_b: "primary_target",
         },
     ],
 }
@@ -92,7 +92,6 @@ const kobold_slink: Monster = {
         thievery: 9,
     },
     // Combat Advantage: extra 1d6 damage on melee and ranged attacks — not implemented
-    // Shift and Slide: shift into ally's space; ally slides to original space — not implemented
     // Slink's Boon: cannot be targeted unless nearest enemy — not implemented
     // Equipment: hide armor, spear — not implemented
 }
