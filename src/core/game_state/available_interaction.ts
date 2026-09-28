@@ -1,10 +1,6 @@
 import type {GameEvents} from "core/events/GameEvents";
 import type {VMState} from "core/virtual_machine/VMState";
-import {
-    INTERACTION_NONE,
-    INTERACTION_TYPE,
-    type Interaction,
-} from "core/interactions/Interactions";
+import {type Interaction, INTERACTION_NONE, INTERACTION_TYPE,} from "core/interactions/Interactions";
 
 export const create_available_interaction = ({
                                                  game_events,

@@ -1,5 +1,5 @@
 import type {GameQueries} from "core/game_state/GameQueries";
-import type {Expr, ExprNumber} from "core/virtual_machine/expressions/types";
+import type {ExprNumber} from "core/virtual_machine/expressions/types";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {
     add_numbers,

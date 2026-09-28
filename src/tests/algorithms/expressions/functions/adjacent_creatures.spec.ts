@@ -1,8 +1,8 @@
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {
     ADJACENT_TO_ISOLATED_POSITION,
-    ISOLATED_POSITION,
     create_expression_test_context,
+    ISOLATED_POSITION,
 } from "tests/utils/create_expression_test_context";
 
 describe("$adjacent_creatures", () => {

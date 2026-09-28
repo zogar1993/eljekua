@@ -1,6 +1,6 @@
 import {create_game_events} from "core/events/GameEvents";
 import {create_game_state} from "core/game_state/GameState";
-import {create_game_queries, type GameQueries} from "core/game_state/GameQueries";
+import {create_game_queries} from "core/game_state/GameQueries";
 import {create_instruction_loop} from "core/instruction_loop";
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {create_start_battle} from "core/use_cases/start_battle";

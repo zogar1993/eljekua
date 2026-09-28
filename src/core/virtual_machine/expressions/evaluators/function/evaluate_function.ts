@@ -6,9 +6,7 @@ import {evaluate_function_add} from "core/virtual_machine/expressions/evaluators
 import {
     evaluate_function_equipped
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_equipped";
-import {
-    evaluate_function_not
-} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_not";
+import {evaluate_function_not} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_not";
 import {
     evaluate_function_not_equals
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_not_equals";
@@ -16,7 +14,6 @@ import {
     evaluate_function_has_valid_targeting
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_has_valid_targeting";
 import {evaluate_function_or} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_or";
-import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {evaluate_function_exists} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_exists";
 import {
     evaluate_function_is_greater_or_equal
@@ -64,9 +61,7 @@ import {
 import {
     evaluate_function_is_race
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_is_race";
-import {
-    evaluate_function_count
-} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_count";
+import {evaluate_function_count} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_count";
 import {
     evaluate_function_filter_creatures
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_filter_creatures";

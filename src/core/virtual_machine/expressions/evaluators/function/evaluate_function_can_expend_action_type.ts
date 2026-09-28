@@ -1,10 +1,9 @@
 import type {GameQueries} from "core/game_state/GameQueries";
 import {has_creature_action_available} from "core/battlegrid/creatures/Creature";
-import type {Expr, ExprBoolean} from "core/virtual_machine/expressions/types";
+import type {ExprBoolean} from "core/virtual_machine/expressions/types";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {assert_is_action_type} from "core/battlegrid/creatures/ActionType";
 
 export const evaluate_function_can_expend_action_type = ({node, game_queries}:

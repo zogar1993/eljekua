@@ -7,8 +7,6 @@ import {
     type StatusDuration,
     type StatusEffect
 } from "core/battlegrid/creatures/Creature";
-import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import type {Expr} from "core/virtual_machine/expressions/types";
 import type {InstructionApplyStatus} from "core/virtual_machine/instructions/instructions";
 
 export const interpret_apply_status = ({

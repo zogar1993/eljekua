@@ -3,6 +3,7 @@ import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import type {Position} from "core/battlegrid/Position";
 import type {AttackSuccessChance} from "core/virtual_machine/instructions/interpreters/interpret_select_target";
+
 export const INTERACTION_TYPE = {
     NONE: "none",
     HIT_STATUS_SELECT: "select_hit_status",

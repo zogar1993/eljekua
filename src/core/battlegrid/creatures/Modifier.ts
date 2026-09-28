@@ -1,7 +1,7 @@
 import type {GameQueries} from "core/game_state/GameQueries";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {Creature} from "core/battlegrid/creatures/Creature";
-import type {Expr, ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 
 export const MODIFIER_TYPE = {

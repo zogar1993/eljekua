@@ -1,8 +1,6 @@
 import type {GameQueries} from "core/game_state/GameQueries";
 import type {BattleGrid} from "core/battlegrid/BattleGrid";
 import {are_creatures_allied} from "core/battlegrid/creatures/are_creatures_allied";
-import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import type {Expr} from "core/virtual_machine/expressions/types";
 import {get_reach} from "core/battlegrid/position/get_reach";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {Position} from "core/battlegrid/Position";

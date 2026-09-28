@@ -1,6 +1,6 @@
 import {create_game_events} from "core/events/GameEvents";
 import {create_game_state} from "core/game_state/GameState";
-import {create_game_queries, type GameQueries} from "core/game_state/GameQueries";
+import {create_game_queries} from "core/game_state/GameQueries";
 import {to_ast} from "core/expressions/parser/to_ast";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import type {Creature} from "core/battlegrid/creatures/Creature";

@@ -1,13 +1,12 @@
 import type {GameQueries} from "core/game_state/GameQueries";
 import type {GameState} from "core/game_state/GameState";
-import {has_creature_action_available, type Creature} from "core/battlegrid/creatures/Creature";
-import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import {type Creature, has_creature_action_available} from "core/battlegrid/creatures/Creature";
 import type {Power, TriggerInterception} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {TRIGGER_INTERCEPTION} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import type {Expr} from "core/virtual_machine/expressions/types";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
-import {INSTRUCTION_TYPE, type Instruction} from "core/virtual_machine/instructions/instructions";
+import {type Instruction, INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE} from "core/battlegrid/creatures/ActionType";
 

@@ -5,7 +5,10 @@ import type {Position, PositionFootprintOne} from "core/battlegrid/Position";
 import {transform_position_to_f1} from "core/battlegrid/Position";
 import type {SquareHighlight} from "web/core/battle_grid/squares/SquareHighlight";
 import {SQUARE_HIGHLIGHT} from "web/core/battle_grid/squares/SquareHighlight";
-import {get_position_by_coordinate, nullable_positions_equal} from "web/core/battle_grid/coordinates/ClickableCoordinate";
+import {
+    get_position_by_coordinate,
+    nullable_positions_equal
+} from "web/core/battle_grid/coordinates/ClickableCoordinate";
 import type {GameEvents} from "core/events/GameEvents";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {CreatureVisual} from "web/core/creature/CreatureVisual";
@@ -13,9 +16,9 @@ import {create_visual_creature} from "web/core/creature/CreatureVisual";
 import {AnimationQueue} from "web/core/animation_queue/AnimationQueue";
 import type {InstructionLoop} from "core/instruction_loop";
 import {
+    type Interaction,
     INTERACTION_NONE,
     INTERACTION_TYPE,
-    type Interaction,
     type InteractionsSelectArea,
     type InteractionsSelectCreature,
     type InteractionsSelectPath,

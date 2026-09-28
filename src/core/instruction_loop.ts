@@ -13,7 +13,8 @@ import {
     Interaction,
     INTERACTION_NONE,
     INTERACTION_TYPE,
-    type InteractionSelection, InteractionType,
+    type InteractionSelection,
+    InteractionType,
 } from "core/interactions/Interactions";
 
 export const create_instruction_loop = ({

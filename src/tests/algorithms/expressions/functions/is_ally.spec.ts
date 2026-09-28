@@ -1,5 +1,5 @@
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {IRRELEVANT_POSITIONS, create_expression_test_context} from "tests/utils/create_expression_test_context";
+import {create_expression_test_context, IRRELEVANT_POSITIONS} from "tests/utils/create_expression_test_context";
 
 describe("$is_ally", () => {
     test("is true when both creatures share a non-null team", () => {

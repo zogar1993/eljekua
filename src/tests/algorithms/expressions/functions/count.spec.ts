@@ -1,5 +1,5 @@
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import {ISOLATED_POSITION, create_expression_test_context} from "tests/utils/create_expression_test_context";
+import {create_expression_test_context, ISOLATED_POSITION} from "tests/utils/create_expression_test_context";
 
 describe("$count", () => {
     test("returns zero for an empty creature list", () => {

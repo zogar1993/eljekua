@@ -1,10 +1,9 @@
 import type {GameQueries} from "core/game_state/GameQueries";
-import type {Expr, ExprBoolean} from "core/virtual_machine/expressions/types";
+import type {ExprBoolean} from "core/virtual_machine/expressions/types";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
 import {AST_NODE} from "core/virtual_machine/expressions/AST_NODE";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
-import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import type {GameState} from "core/game_state/GameState";

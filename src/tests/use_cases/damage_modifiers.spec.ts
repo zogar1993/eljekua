@@ -3,8 +3,8 @@ import {
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import type {ConstantEffect} from "core/battlegrid/creatures/Creature";
-import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 import {ATTACK_ROLL_RESOLUTION_MODE} from "core/settings/AttackRollResolutionMode";
 import {create_creature_test_helpers} from "tests/utils/creature_test_helpers";
 import {create_test_game} from "tests/utils/create_test_game";

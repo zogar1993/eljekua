@@ -1,4 +1,3 @@
-import type {ConstantEffect} from "core/battlegrid/creatures/Creature";
 import type {IRPower} from "core/types";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import type {Monster} from "data/monsters/Monster";
