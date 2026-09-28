@@ -1,6 +1,6 @@
 import {create_game_events} from "core/events/GameEvents";
 import {create_game_state} from "core/game_state/GameState";
-import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
+import {create_game_queries, type GameQueries} from "core/game_state/GameQueries";
 import {to_ast} from "core/expressions/parser/to_ast";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import type {Creature} from "core/battlegrid/creatures/Creature";
@@ -22,11 +22,11 @@ export const IRRELEVANT_POSITIONS = [
 export const create_expression_test_context = () => {
     const game_events = create_game_events()
     const game_state = create_game_state({game_events, battle_grid_size: {x: 10, y: 10}})
-    const evaluate_ast = build_evaluate_ast({game_state})
+    const game_queries = create_game_queries({game_state})
 
     game_state.vm_state.add_scoped_instruction_frame({instructions: [], variables: {}})
 
-    const evaluate_expression = (expression: string) => evaluate_ast(to_ast(expression))
+    const evaluate_expression = (expression: string) => game_queries.evaluate(to_ast(expression))
 
     const bind_creature = (keyword: string, creature: Creature) => {
         game_state.vm_state.set_variable(keyword, {type: "creatures", value: [creature]})
@@ -67,7 +67,7 @@ export const create_expression_test_context = () => {
 
     return {
         game_state,
-        evaluate_ast,
+        game_queries,
         evaluate_expression,
         create_test_creature,
         bind_creature,

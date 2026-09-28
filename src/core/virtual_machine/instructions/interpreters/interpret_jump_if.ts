@@ -5,10 +5,10 @@ import type {InstructionJumpIf} from "core/virtual_machine/instructions/instruct
 export const interpret_jump_if = ({
                                         instruction,
                                         game_state,
-                                        evaluate_ast
+                                        game_queries
                                     }: InterpretInstructionProps<InstructionJumpIf>) => {
     const {vm_state} = game_state
-    const result = EXPR.as_boolean(evaluate_ast(instruction.condition))
+    const result = EXPR.as_boolean(game_queries.evaluate(instruction.condition))
     if (result)
         vm_state.jump(instruction.offset)
     else

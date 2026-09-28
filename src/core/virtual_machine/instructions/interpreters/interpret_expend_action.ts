@@ -6,10 +6,10 @@ import type {InstructionExpendAction} from "core/virtual_machine/instructions/in
 
 export const interpret_expend_action = ({
                                             instruction,
-                                            evaluate_ast,
+                                            game_queries,
                                             game_events,
                                         }: InterpretInstructionProps<InstructionExpendAction>) => {
-    const owner = EXPR.as_creature(evaluate_ast(AST.OWNER))
+    const owner = EXPR.as_creature(game_queries.evaluate(AST.OWNER))
     expend_creature_action({creature: owner, action: instruction.action_type})
     game_events.on_creature_available_actions_changed.raise(owner)
 }

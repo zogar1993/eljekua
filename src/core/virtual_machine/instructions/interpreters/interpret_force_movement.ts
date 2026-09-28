@@ -4,13 +4,13 @@ import type {InstructionForceMovement} from "core/virtual_machine/instructions/i
 
 export const interpret_force_movement = ({
                                              instruction,
-                                             evaluate_ast,
+                                             game_queries,
                                              game_events,
                                          }: InterpretInstructionProps<InstructionForceMovement>) => {
-    const creature = EXPR.as_creature(evaluate_ast(instruction.target))
+    const creature = EXPR.as_creature(game_queries.evaluate(instruction.target))
     switch (instruction.movement_type) {
         case "push": {
-            const destination = EXPR.as_positions(evaluate_ast(instruction.destination))
+            const destination = EXPR.as_positions(game_queries.evaluate(instruction.destination))
             const position = destination[destination.length - 1]
             creature.data.position = position
             game_events.on_creature_moved.raise({creature, position, movement_type: "push"})

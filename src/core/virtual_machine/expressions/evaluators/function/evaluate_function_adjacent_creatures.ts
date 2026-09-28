@@ -1,3 +1,4 @@
+import type {GameQueries} from "core/game_state/GameQueries";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import type {Expr, ExprCreatures} from "core/virtual_machine/expressions/types";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
@@ -8,14 +9,14 @@ import type {BattleGrid} from "core/battlegrid/BattleGrid";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import {get_f1_positions_within_distance} from "core/battlegrid/position/get_f1_positions_within_distance";
 
-export const evaluate_function_adjacent_creatures = ({node, evaluate_ast, game_state}: {
+export const evaluate_function_adjacent_creatures = ({node, game_queries, game_state}: {
     node: AstNodeFunction
-    evaluate_ast: (node: AstNode) => Expr
+    game_queries: GameQueries
     game_state: GameState
 }): ExprCreatures => {
     assert_parameters_amount_equals(node, 1)
 
-    const creature = EXPR.as_creature(evaluate_ast(node.parameters[0]))
+    const creature = EXPR.as_creature(game_queries.evaluate(node.parameters[0]))
 
     return {
         type: "creatures",

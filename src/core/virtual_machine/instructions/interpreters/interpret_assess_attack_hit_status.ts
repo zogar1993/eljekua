@@ -11,7 +11,7 @@ import {get_creature_defense} from "core/character_sheet/get_creature_defense";
 import {get_attack_roll_modifier_parts} from "core/battlegrid/creatures/Modifier";
 
 export const interpret_assess_attack_hit_status = (props: InterpretInstructionProps<InstructionAssessAttackHitStatus>) => {
-    const {instruction, game_state, evaluate_ast, game_events} = props
+    const {instruction, game_state, game_queries, game_events} = props
     const {vm_state, battle_grid} = game_state
     const d20_rolls = EXPR.as_attack_d20_rolls(vm_state.get_variable(SYSTEM_KEYWORD.ATTACK_D20_ROLLS))
     const attacker = EXPR.as_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
@@ -22,7 +22,7 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
 
     defenders.forEach(defender => {
         const attack_parts: Array<ExprNumberResolved> = []
-        attack_parts.push(EXPR.as_number_resolved_expr(evaluate_ast(instruction.attack)))
+        attack_parts.push(EXPR.as_number_resolved_expr(game_queries.evaluate(instruction.attack)))
 
         const d20_value = d20_rolls.get(defender)
         if (d20_value === undefined) throw Error(`missing d20 roll for creature "${defender.data.name}"`)
@@ -44,7 +44,7 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
             defender.statuses.some(({effect}) => effect.type === "grant_combat_advantage" && (effect.against_creatures === null || effect.against_creatures.includes(attacker)))
         ) attack_parts.push(COMBAT_ADVANTAGE)
 
-        attack_parts.push(...get_attack_roll_modifier_parts({creature: attacker, evaluate_ast}))
+        attack_parts.push(...get_attack_roll_modifier_parts({creature: attacker, game_queries}))
 
         const attack = add_numbers_resolved(attack_parts)
         const defense = get_creature_defense({creature: defender, defense_code: instruction.defense})

@@ -1,3 +1,4 @@
+import type {GameQueries} from "core/game_state/GameQueries";
 import type {GameState} from "core/game_state/GameState";
 import {has_creature_action_available, type Creature} from "core/battlegrid/creatures/Creature";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
@@ -17,12 +18,12 @@ export const TRIGGER_VARIABLE = {
 
 export const get_potential_triggers = ({
                                            game_state,
-                                           evaluate_ast,
+                                           game_queries,
                                            activator,
                                            intercept,
                                        }: {
     game_state: GameState
-    evaluate_ast: (node: AstNode) => Expr
+    game_queries: GameQueries
     activator: Creature
     intercept: TriggerInterception
 }): Array<{ creature: Creature, powers: Array<Power> }> => {
@@ -47,7 +48,7 @@ export const get_potential_triggers = ({
                 if (!power.trigger.intercepts.includes(intercept)) return false
                 if (!can_use_power_on_own_turn(power) && creature === current_turn_creature) return false
                 if (!has_creature_action_available({creature, action: power.type.action})) return false
-                return power.trigger.conditions.every(condition => EXPR.as_boolean(evaluate_ast(condition)))
+                return power.trigger.conditions.every(condition => EXPR.as_boolean(game_queries.evaluate(condition)))
             })
             return {creature, powers}
         })

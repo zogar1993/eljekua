@@ -20,11 +20,11 @@ import {get_creature_defense} from "core/character_sheet/get_creature_defense";
 export const interpret_select_target = ({
                                             instruction,
                                             game_state,
-                                            evaluate_ast
+                                            game_queries
                                         }: InterpretInstructionProps<InstructionSelectTarget>) => {
     const {available_interaction} = game_state
     const {battle_grid, vm_state} = game_state
-    const clickable = get_valid_targets({instruction, battle_grid, evaluate_ast})
+    const clickable = get_valid_targets({instruction, battle_grid, game_queries})
 
     assert_is_not_empty(clickable)
 
@@ -65,7 +65,7 @@ export const interpret_select_target = ({
     const get_attack_hit_chance_against = (creature: Creature) => {
         if (!("attack_roll" in instruction) || instruction.attack_roll === null) return null
 
-        const attack = EXPR.as_number(evaluate_ast(instruction.attack_roll.attack))
+        const attack = EXPR.as_number(game_queries.evaluate(instruction.attack_roll.attack))
         const defense = get_creature_defense({creature, defense_code: instruction.attack_roll.defense}).value
         const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
 
@@ -75,7 +75,7 @@ export const interpret_select_target = ({
 
     if (is_path_selection_targeting_type(instruction)) {
         const moving_creature = instruction.targeting_type === "push"
-            ? EXPR.as_creature(evaluate_ast(instruction.defender))
+            ? EXPR.as_creature(game_queries.evaluate(instruction.defender))
             : owner
 
         const get_path_to_destination = (destination: Position) => {

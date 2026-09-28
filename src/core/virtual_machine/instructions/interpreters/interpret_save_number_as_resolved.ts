@@ -6,9 +6,9 @@ import type {InstructionSaveResolvedNumber} from "core/virtual_machine/instructi
 export const interpret_save_number_as_resolved = ({
                                                       instruction,
                                                       game_state,
-                                                      evaluate_ast
+                                                      game_queries
                                                   }: InterpretInstructionProps<InstructionSaveResolvedNumber>) => {
     const {vm_state} = game_state
-    const value = resolve_number(EXPR.as_number_expr(evaluate_ast(instruction.value)))
+    const value = resolve_number(EXPR.as_number_expr(game_queries.evaluate(instruction.value)))
     vm_state.set_variable(instruction.label, value)
 }

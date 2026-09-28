@@ -5,7 +5,7 @@ import type {InstructionOptions} from "core/virtual_machine/instructions/instruc
 
 export const interpret_options = ({
                                       instruction,
-                                      evaluate_ast,
+                                      game_queries,
                                       game_state
                                   }: InterpretInstructionProps<InstructionOptions>) => {
     const {vm_state, available_interaction} = game_state
@@ -14,7 +14,7 @@ export const interpret_options = ({
         available_options: instruction.options.map(({text, condition, instructions}) => ({
                 text,
                 on_click: () => vm_state.add_child_instruction_frame({instructions}),
-                disabled: condition ? !EXPR.as_boolean(evaluate_ast(condition)) : false
+                disabled: condition ? !EXPR.as_boolean(game_queries.evaluate(condition)) : false
             })
         )
     })

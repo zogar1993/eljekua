@@ -7,7 +7,7 @@ import {create_trigger_frame, get_potential_triggers} from "core/virtual_machine
 export const interpret_move = ({
                                    instruction,
                                    game_state,
-                                   evaluate_ast,
+                                   game_queries,
                                    game_events,
                                }: InterpretInstructionProps<InstructionMovement>) => {
     const {vm_state} = game_state
@@ -18,7 +18,7 @@ export const interpret_move = ({
     for (let i = 0; i < path.length - 1; i++) {
         const potential_reactors = get_potential_triggers({
             game_state,
-            evaluate_ast,
+            game_queries,
             activator: moving_creature,
             intercept: "movement"
         })

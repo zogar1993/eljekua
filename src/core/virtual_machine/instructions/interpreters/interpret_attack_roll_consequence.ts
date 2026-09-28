@@ -27,7 +27,7 @@ instruction.defender
 
         const potential_triggers = get_potential_triggers({
             game_state,
-            evaluate_ast,
+            game_queries,
             activator,
             intercept: TRIGGER_INTERCEPTION.CRITICAL_HIT,
         })

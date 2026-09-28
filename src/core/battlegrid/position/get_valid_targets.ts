@@ -1,3 +1,4 @@
+import type {GameQueries} from "core/game_state/GameQueries";
 import type {BattleGrid} from "core/battlegrid/BattleGrid";
 import {are_creatures_allied} from "core/battlegrid/creatures/are_creatures_allied";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
@@ -9,12 +10,12 @@ import {assert_are_footprint_one, positions_equal, positions_share_surface} from
 import {AST} from "core/virtual_machine/expressions/AST_NODE";
 import type {InstructionSelectTarget} from "core/virtual_machine/instructions/instructions";
 
-export const get_valid_targets = ({instruction, battle_grid, evaluate_ast}: {
+export const get_valid_targets = ({instruction, battle_grid, game_queries}: {
     instruction: InstructionSelectTarget,
     battle_grid: BattleGrid,
-    evaluate_ast: (node: AstNode) => Expr
+    game_queries: GameQueries
 }) => {
-    const in_range = get_reach({instruction, battle_grid, evaluate_ast})
+    const in_range = get_reach({instruction, battle_grid, game_queries})
 
     if (instruction.targeting_type === "area_burst")
         return in_range
@@ -23,13 +24,13 @@ export const get_valid_targets = ({instruction, battle_grid, evaluate_ast}: {
         return in_range
 
     if (instruction.targeting_type === "movement") {
-        const owner = EXPR.as_creature(evaluate_ast(AST.OWNER))
+        const owner = EXPR.as_creature(game_queries.evaluate(AST.OWNER))
         const valid_targets = in_range
             .filter(position => !positions_equal(position, owner.data.position))
             .filter(position => !battle_grid.is_terrain_occupied(position, {exclude: [owner]}))
 
         if (instruction.destination_requirement) {
-            const possibilities = EXPR.as_positions(evaluate_ast(instruction.destination_requirement))
+            const possibilities = EXPR.as_positions(game_queries.evaluate(instruction.destination_requirement))
 
             const restricted: Array<Position> = []
             for (const position of valid_targets)
@@ -46,7 +47,7 @@ export const get_valid_targets = ({instruction, battle_grid, evaluate_ast}: {
         valid_targets = in_range.filter(position => !battle_grid.is_terrain_occupied(position))
     } else if (instruction.target_type === "enemy" || instruction.target_type === "creature" || instruction.target_type === "ally") {
         assert_are_footprint_one(in_range)
-        const owner = EXPR.as_creature(evaluate_ast(AST.OWNER))
+        const owner = EXPR.as_creature(game_queries.evaluate(AST.OWNER))
         const creatures_in_range = battle_grid.get_creatures_in_positions(in_range)
         const creatures = instruction.target_type === "ally"
             ? creatures_in_range.filter(creature => creature !== owner && are_creatures_allied(owner, creature))
@@ -59,7 +60,7 @@ export const get_valid_targets = ({instruction, battle_grid, evaluate_ast}: {
     }
 
     const results: Array<Position> = []
-    const excluded_positions = instruction.exclude.flatMap(node => EXPR.as_positions(evaluate_ast(node)))
+    const excluded_positions = instruction.exclude.flatMap(node => EXPR.as_positions(game_queries.evaluate(node)))
     for (const position of valid_targets) {
         if (excluded_positions.some(excluded => positions_share_surface(excluded, position))) continue
         results.push(position)

@@ -13,21 +13,28 @@ import type {AstNodeKeyword} from "core/expressions/parser/nodes/AstNodeKeyword"
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import type {GameState} from "core/game_state/GameState";
 
+export type GameQueries = {
 /*
     This is called "evaluate" instead on "interpret" to distinguish the expressions that evaluate to a value from the
     interpreting of instructions that affect the game context.
  */
-export const build_evaluate_ast = ({game_state}: {
+    evaluate: (node: AstNode) => Expr
+}
+
+export const create_game_queries = ({game_state}: {
     game_state: GameState
-}): (node: AstNode) => Expr => {
-    const evaluate_ast = (node: AstNode) => {
-        const func = evaluator_internals[node.type]
-        if (!func) throw Error(`evaluator for type '${node.type}' does not exist`)
-        return evaluator_internals[node.type](node)
+}): GameQueries => {
+    const game_queries: GameQueries = {
+        evaluate: (node: AstNode) => {
+            const func = evaluator_internals[node.type]
+            if (!func) throw Error(`evaluator for type '${node.type}' does not exist`)
+            return func(node)
+        },
     }
 
     const evaluate_keyword = build_evaluate_keyword({game_state})
-    const evaluate_function = build_evaluate_function({evaluate_ast, game_state})
+    //TODO remove the circular dependency on evaluate functions
+    const evaluate_function = build_evaluate_function({game_queries, game_state})
 
     const evaluator_internals: Record<AstNode["type"], (node: AstNode) => Expr> = {
         "number": (node) => evaluate_number(node as AstNodeNumber),
@@ -35,8 +42,8 @@ export const build_evaluate_ast = ({game_state}: {
         "weapon": (node) => evaluate_weapon(node as AstNodeWeapon),
         "dice": (node) => evaluate_dice(node as AstNodeDice),
         "keyword": (node) => evaluate_keyword(node as AstNodeKeyword),
-        "function": (node) => evaluate_function(node as AstNodeFunction)
+        "function": (node) => evaluate_function(node as AstNodeFunction),
     }
 
-    return evaluate_ast
+    return game_queries
 }

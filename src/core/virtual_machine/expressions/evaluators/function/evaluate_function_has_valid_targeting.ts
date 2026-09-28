@@ -1,3 +1,4 @@
+import type {GameQueries} from "core/game_state/GameQueries";
 import type {Expr, ExprBoolean} from "core/virtual_machine/expressions/types";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
@@ -8,11 +9,11 @@ import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import type {GameState} from "core/game_state/GameState";
 
-export const evaluate_function_has_valid_targeting = ({node, evaluate_ast, game_state}:
+export const evaluate_function_has_valid_targeting = ({node, game_queries, game_state}:
                                                           {
                                                               node: AstNodeFunction,
                                                               game_state: GameState,
-                                                              evaluate_ast: (node: AstNode) => Expr
+                                                              game_queries: GameQueries
                                                           }): ExprBoolean => {
     assert_parameters_amount_equals(node, 1)
     const {vm_state, battle_grid} = game_state
@@ -25,7 +26,7 @@ export const evaluate_function_has_valid_targeting = ({node, evaluate_ast, game_
     let is_targeting_valid = true
 
     if (targeting_instruction) {
-        const valid_targets = get_valid_targets({instruction: targeting_instruction, battle_grid, evaluate_ast})
+        const valid_targets = get_valid_targets({instruction: targeting_instruction, battle_grid, game_queries})
         is_targeting_valid = valid_targets.length > 0
     }
 

@@ -15,7 +15,7 @@ import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 
 export const interpret_apply_damage = ({
                                            instruction,
-                                           evaluate_ast,
+                                           game_queries,
                                            game_state,
                                            game_events,
                                        }: InterpretInstructionProps<InstructionApplyDamage>) => {
@@ -32,7 +32,7 @@ export const interpret_apply_damage = ({
     //TODO reevaluate hit status. If an attack misses and does damage to adjacent units on miss, it shouldnt hit.
     if (hit_status_value === HIT_STATUS.MISS && target.data.archetypes.includes("minion")) return
 
-    let damage = resolve_number(EXPR.as_number_expr(evaluate_ast(instruction.value)))
+    let damage = resolve_number(EXPR.as_number_expr(game_queries.evaluate(instruction.value)))
 
     const modifier = get_damage_modifier({creature: target, damage_types: instruction.damage_types, attacker})
 

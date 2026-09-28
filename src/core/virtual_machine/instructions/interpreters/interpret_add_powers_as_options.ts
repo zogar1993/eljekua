@@ -16,10 +16,10 @@ import {FUNCTION_NAME} from "core/expressions/function_names";
 export const interpret_add_powers_as_options = ({
                                                     instruction,
                                                     game_state,
-                                                    evaluate_ast
+                                                    game_queries
                                                 }: InterpretInstructionProps<InstructionAddPowers>) => {
     const {vm_state} = game_state
-    const creature = EXPR.as_creature(evaluate_ast(instruction.creature))
+    const creature = EXPR.as_creature(game_queries.evaluate(instruction.creature))
     const filtered_powers = filter_powers({powers: creature.data.powers, filter: instruction.filter})
 
     const options: Array<InstructionOptionsItem> = []

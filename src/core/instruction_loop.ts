@@ -1,6 +1,5 @@
+import type {GameQueries} from "core/game_state/GameQueries";
 import {interpret_instruction} from "core/virtual_machine/instructions/interpret_instruction";
-import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import type {Expr} from "core/virtual_machine/expressions/types";
 import type {GameState} from "core/game_state/GameState";
 import type {GameEvents} from "core/events/GameEvents";
 import type {Position} from "core/battlegrid/Position";
@@ -19,11 +18,11 @@ import {
 
 export const create_instruction_loop = ({
                                             game_state,
-                                            evaluate_ast,
+                                            game_queries,
                                             game_events
                                         }: {
     game_state: GameState
-    evaluate_ast: (node: AstNode) => Expr
+    game_queries: GameQueries
     game_events: GameEvents
 }) => {
     const {available_interaction, vm_state, creatures} = game_state
@@ -127,7 +126,7 @@ export const create_instruction_loop = ({
             interpret_instruction({
                 instruction,
                 game_state,
-                evaluate_ast,
+                game_queries,
                 game_events,
             })
         }

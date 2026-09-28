@@ -16,7 +16,7 @@ import {create_initiative_order_ui} from "web/core/initiative_order/InitiativeOr
 import {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import {create_start_battle} from "core/use_cases/start_battle";
 import {create_instruction_loop} from "core/instruction_loop";
-import {build_evaluate_ast} from "core/virtual_machine/expressions/evaluate_ast";
+import {create_game_queries} from "core/game_state/GameQueries";
 import {create_instruction_visualizer} from "web/core/instruction_visualizer/instruction_visualizer";
 import {create_set_current_turn_to_creature} from "core/use_cases/gameplay/set_current_turn_to_creature";
 import {create_game_events} from "core/events/GameEvents";
@@ -27,9 +27,9 @@ import {create_option_buttons_ui} from "web/core/creature_option_buttons/Creatur
 const game_events = create_game_events()
 const game_state = create_game_state({game_events, battle_grid_size: {x: 10, y: 10}})
 
-const evaluate_ast = build_evaluate_ast({game_state})
+const game_queries = create_game_queries({game_state})
 
-const instruction_loop = create_instruction_loop({game_state, evaluate_ast, game_events})
+const instruction_loop = create_instruction_loop({game_state, game_queries, game_events})
 
 initialize_battle_grid_ui({game_state, game_events, game_input: instruction_loop})
 create_option_buttons_ui({game_events, game_input: instruction_loop})
