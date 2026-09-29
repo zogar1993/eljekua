@@ -2,7 +2,8 @@
 
 ## Application
 
-- Damage is subtracted from the target's hit points.
+- When the target has temporary hit points, subtract those first; any remaining damage reduces current hit points. See **Temporary Hit Points**.
+- Otherwise, damage is subtracted from the target's current hit points.
 - A missed attack cannot damage a minion.
 
 ## Types
