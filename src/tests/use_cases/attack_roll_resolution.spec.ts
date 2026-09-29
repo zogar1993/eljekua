@@ -28,6 +28,7 @@ describe("rigged d20 attack roll resolution", () => {
             vm_state: test_game.vm_state,
             add_creature_to_game: test_game.add_creature_to_game,
             set_current_turn_to_creature: test_game.set_current_turn_to_creature,
+            available_interaction: test_game.game_state.available_interaction,
             default_attribute_value: 10,
         })
 

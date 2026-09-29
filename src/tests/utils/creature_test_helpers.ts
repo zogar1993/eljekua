@@ -5,7 +5,8 @@ import type {Position} from "core/battlegrid/Position";
 import type {Creatures} from "core/creatures/Creatures";
 import type {InstructionLoop} from "core/instruction_loop";
 import type {VMState} from "core/virtual_machine/VMState";
-import {INTERACTION_TYPE} from "core/interactions/Interactions";
+import {INTERACTION_NONE, INTERACTION_TYPE} from "core/interactions/Interactions";
+import type {AvailableInteraction} from "core/game_state/available_interaction";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 import type {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
 import type {create_set_current_turn_to_creature} from "core/use_cases/gameplay/set_current_turn_to_creature";
@@ -18,6 +19,7 @@ export const create_creature_test_helpers = ({
     vm_state,
     add_creature_to_game,
     set_current_turn_to_creature,
+    available_interaction,
     attack_log,
     default_attribute_value = 14,
 }: {
@@ -26,6 +28,7 @@ export const create_creature_test_helpers = ({
     vm_state: VMState
     add_creature_to_game: ReturnType<typeof create_add_creature_to_game>
     set_current_turn_to_creature: ReturnType<typeof create_set_current_turn_to_creature>
+    available_interaction: AvailableInteraction
     attack_log?: Array<AttackLogEntry>
     default_attribute_value?: number
 }) => {
@@ -68,6 +71,7 @@ export const create_creature_test_helpers = ({
 
         return {
             is_in_its_turn: () => {
+                available_interaction.set_available_interactions(INTERACTION_NONE)
                 set_current_turn_to_creature({creature})
                 instruction_loop.run()
             },
@@ -113,6 +117,9 @@ export const create_creature_test_helpers = ({
             },
             has_hp: (hp_current: number) => {
                 expect(creature.data.hp_current).toEqual(hp_current)
+            },
+            has_temporary_hit_points: (temporary_hit_points: number) => {
+                expect(creature.temporary_hit_points).toEqual(temporary_hit_points)
             },
             has_performed_action: (action_name: string, options: { target: string }) => {
                 if (!attack_log) throw Error("attack_log is required for has_performed_action")
