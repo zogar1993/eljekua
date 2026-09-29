@@ -14,6 +14,7 @@ Guidelines for all tests — algorithm and use case alike.
 
 - Follow this skill when the user asks for tests.
 - **`create-spec` always requires tests** when you add or modify a spec — do not skip them.
+- Tests for spec work go in `src/tests/use_cases/` only. Do **not** add algorithm tests under `src/tests/algorithms/` for spec changes.
 
 ## @structure
 

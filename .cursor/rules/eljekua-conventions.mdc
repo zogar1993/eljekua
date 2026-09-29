@@ -124,5 +124,5 @@ New interaction: (1) type + union in `instruction_loop.ts`, (2) cleanup in `add_
 - [ ] Naming: SCREAMING_SNAKE constants, PascalCase types, snake_case values
 - [ ] Imports: `core/` / `stdlib/` paths, `import type` where appropriate
 - [ ] `Array<T>`, `as const`, layout matches neighbors
-- [ ] Specs: if `specs/` changed, implementation verified and tests added/updated per `create-spec` skill
+- [ ] Specs: if `specs/` changed, implementation verified and use case tests added/updated in `src/tests/use_cases/` per `create-spec` skill
 - [ ] Git: run `git status`. `git add` every new file you created. Confirm no untracked files remain from your work. Do not commit unless the user asked

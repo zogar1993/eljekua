@@ -81,7 +81,7 @@ State cross-cutting rules **once** in a dedicated section (e.g. `## Evaluation e
 2. List normal behavior, edges, and errors; check other spec files for overlap.
 3. Write rules — shared errors first, then per-feature bullets for what is unique.
 4. Implement so behavior matches the spec.
-5. Add or update tests per `create-test` — algorithm tests for isolated logic, use case tests for player-visible rules.
+5. Add or update **use case** tests in `src/tests/use_cases/` per `create-test`.
 6. Run `tsc --noEmit` and the affected test files.
 7. Run `@checklist` (`git add` new spec, source, and test files).
 
@@ -89,8 +89,8 @@ State cross-cutting rules **once** in a dedicated section (e.g. `## Evaluation e
 
 **Required** whenever you add or modify a spec. Follow `create-test`.
 
+- Add tests only under `src/tests/use_cases/`. Do **not** add algorithm tests for spec work.
 - Cover the same categories documented in the spec: normal behavior, edge cases, and errors.
-- Prefer use case tests for instructions and game rules; algorithm tests for pure helpers.
 
 ## @reference
 
