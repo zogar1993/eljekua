@@ -18,6 +18,11 @@ export type CreatureReceivedDamageEvent = {
     damage: ExprNumberResolved
 }
 
+export type CreatureTemporaryHitPointsChangedEvent = {
+    creature: Creature
+    temporary_hit_points: number
+}
+
 export type CreatureAttackedEvent = {
     creature: Creature
     attack: ExprNumberResolved
@@ -49,6 +54,7 @@ export const create_game_events = () => ({
 
     on_creature_moved: create_event_manager<CreatureMovedEvent>(),
     on_creature_received_damage: create_event_manager<CreatureReceivedDamageEvent>(),
+    on_creature_temporary_hit_points_changed: create_event_manager<CreatureTemporaryHitPointsChangedEvent>(),
     on_creature_missed: create_event_manager<Creature>(),
     on_creature_attacked: create_event_manager<CreatureAttackedEvent>(),
     on_creature_available_actions_changed: create_event_manager<Creature>(),

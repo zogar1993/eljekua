@@ -167,6 +167,12 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 damage_types: instruction.damage_types ?? [],
                 half_damage: instruction.half_damage ?? false
             }]
+        case INSTRUCTION_TYPE.ADD_TEMPORARY_HIT_POINTS:
+            return [{
+                type: INSTRUCTION_TYPE.ADD_TEMPORARY_HIT_POINTS,
+                value: to_ast(instruction.value),
+                target: instruction.target,
+            }]
         case INSTRUCTION_TYPE.SELECT_TARGET:
             return [transform_select_target_ir(instruction)]
         case INSTRUCTION_TYPE.WALK:

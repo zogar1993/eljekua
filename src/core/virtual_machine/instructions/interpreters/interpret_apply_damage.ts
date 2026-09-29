@@ -12,6 +12,7 @@ import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {InstructionApplyDamage} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
+import {subtract_damage_from_creature} from "core/battlegrid/creatures/temporary_hit_points";
 
 export const interpret_apply_damage = ({
                                            instruction,
@@ -41,7 +42,7 @@ export const interpret_apply_damage = ({
     if (instruction.half_damage)
         damage = apply_half_damage(damage)
 
-    target.data.hp_current -= damage.value
+    subtract_damage_from_creature({creature: target, damage: damage.value})
 
     game_events.on_creature_received_damage.raise({creature: target, damage})
 }

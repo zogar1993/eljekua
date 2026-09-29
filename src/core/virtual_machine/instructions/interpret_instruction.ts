@@ -10,6 +10,9 @@ import {
     interpret_select_attack_hit_status
 } from "core/virtual_machine/instructions/interpreters/interpret_select_attack_hit_status";
 import {interpret_apply_damage} from "core/virtual_machine/instructions/interpreters/interpret_apply_damage";
+import {
+    interpret_add_temporary_hit_points
+} from "core/virtual_machine/instructions/interpreters/interpret_add_temporary_hit_points";
 import {interpret_move} from "core/virtual_machine/instructions/interpreters/interpret_move";
 import {interpret_shift} from "core/virtual_machine/instructions/interpreters/interpret_shift";
 import {interpret_swap_places} from "core/virtual_machine/instructions/interpreters/interpret_swap_places";
@@ -56,6 +59,8 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             return interpret_attack_roll_consequence({...props, instruction})
         case INSTRUCTION_TYPE.APPLY_DAMAGE:
             return interpret_apply_damage({...props, instruction})
+        case INSTRUCTION_TYPE.ADD_TEMPORARY_HIT_POINTS:
+            return interpret_add_temporary_hit_points({...props, instruction})
         case INSTRUCTION_TYPE.WALK:
             return interpret_move({...props, instruction})
         case INSTRUCTION_TYPE.SHIFT:

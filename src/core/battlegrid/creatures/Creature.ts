@@ -71,7 +71,8 @@ export const create_creature = ({id, data}: { id: number, data: CreatureData }) 
         constant_effects: [...constant_effects],
         modifiers: [...modifiers],
         statuses: [] as Array<Status>,
-        available_actions: [] as Array<ActionType>
+        available_actions: [] as Array<ActionType>,
+        temporary_hit_points: 0,
     }
 }
 

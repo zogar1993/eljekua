@@ -11,6 +11,7 @@ export const INSTRUCTION_TYPE = {
     SELECT_ATTACK_HIT_STATUS: "select_attack_hit_status",
     ATTACK_ROLL_CONSEQUENCE: "attack_roll_consequence",
     APPLY_DAMAGE: "apply_damage",
+    ADD_TEMPORARY_HIT_POINTS: "add_temporary_hit_points",
     WALK: "walk",
     SHIFT: "shift",
     SWAP_PLACES: "swap_places",
@@ -83,6 +84,12 @@ export type InstructionApplyDamage = {
     target: string
     half_damage: boolean
     damage_types: Array<string>
+}
+
+export type InstructionAddTemporaryHitPoints = {
+    type: typeof INSTRUCTION_TYPE.ADD_TEMPORARY_HIT_POINTS
+    target: string
+    value: AstNode
 }
 
 export type InstructionMovement = {
@@ -172,6 +179,7 @@ export type Instruction =
     InstructionEndTurn |
     // Character
     InstructionApplyDamage |
+    InstructionAddTemporaryHitPoints |
     InstructionMovement |
     InstructionSwapPlaces |
     InstructionApplyStatus |

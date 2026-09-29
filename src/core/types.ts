@@ -49,6 +49,11 @@ export type IRInstruction =
         half_damage?: boolean
         damage_types?: Array<string>
     } |
+    {
+        type: typeof INSTRUCTION_TYPE.ADD_TEMPORARY_HIT_POINTS
+        value: string
+        target: string
+    } |
     IRInstructionSelectTarget |
     {
         type: typeof INSTRUCTION_TYPE.WALK | typeof INSTRUCTION_TYPE.SHIFT,
