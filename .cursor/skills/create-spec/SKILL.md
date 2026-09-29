@@ -1,16 +1,23 @@
 ---
 name: create-spec
 description: >-
-  Add or edit behavior specs in eljekua. Use when the user asks to create,
+  Add or edit behavior specs in eljekua. Use only when the user asks to create,
   update, or document game rules in specs/. Covers thoroughness, edge cases,
-  errors, and avoiding redundancy. Always implement the behavior in the same
-  pass — never stop at the markdown file. Do not add tests unless the user
-  explicitly asks.
+  errors, and avoiding redundancy. Always implement the behavior and add tests
+  in the same pass — never stop at the markdown file.
 ---
 
 # Create Spec
 
-Behavior specs live in `specs/`. Do **not** add or edit specs unless the user explicitly asks.
+Behavior specs live in `specs/`.
+
+## @when-to-use
+
+Use this skill **only** when the user explicitly asks you to add or modify a spec.
+
+Do **not** add or edit files in `specs/` for any other task — not when implementing an instruction, fixing a bug, or adding a feature unless the user asked for spec work in that request.
+
+When implementing behavior elsewhere, **read** the relevant spec if one exists; do not write one proactively.
 
 ## @mandatory
 
@@ -18,11 +25,10 @@ Behavior specs live in `specs/`. Do **not** add or edit specs unless the user ex
 
 1. Write or update the spec in `specs/`.
 2. Implement the behavior in `core/` (and `web/` when presentation is involved).
-3. Run `tsc --noEmit` (and existing tests if you touched runtime code).
+3. Add or update tests that cover the spec — follow `create-test`.
+4. Run `tsc --noEmit` and the affected tests.
 
-Do **not** stop after writing the markdown file. Do **not** tell the user the task is done until implementation matches the spec.
-
-Do **not** add tests unless the user explicitly asks.
+Do **not** stop after writing the markdown file. Do **not** tell the user the task is done until implementation and tests match the spec.
 
 ## @structure
 
@@ -75,16 +81,18 @@ State cross-cutting rules **once** in a dedicated section (e.g. `## Evaluation e
 2. List normal behavior, edges, and errors; check other spec files for overlap.
 3. Write rules — shared errors first, then per-feature bullets for what is unique.
 4. Implement so behavior matches the spec.
-5. Run `tsc --noEmit` when runtime code changed.
-6. Run `@checklist` (`git add` new spec and source files).
+5. Add or update tests per `create-test` — algorithm tests for isolated logic, use case tests for player-visible rules.
+6. Run `tsc --noEmit` and the affected test files.
+7. Run `@checklist` (`git add` new spec, source, and test files).
 
 ## @tests
 
-Do **not** add or update tests unless the user explicitly asks.
+**Required** whenever you add or modify a spec. Follow `create-test`.
 
-When the user does ask for tests with a spec change, follow `create-test`.
+- Cover the same categories documented in the spec: normal behavior, edge cases, and errors.
+- Prefer use case tests for instructions and game rules; algorithm tests for pure helpers.
 
 ## @reference
 
 - Example specs: `specs/damage.md`, `specs/expressions.md`
-- Example use case tests: `src/tests/use_cases/damage_modifiers.spec.ts`, `src/tests/use_cases/opportunity_attacks.spec.ts`
+- Example use case tests: `src/tests/use_cases/damage_modifiers.spec.ts`, `src/tests/use_cases/temporary_hit_points.spec.ts`

@@ -10,6 +10,11 @@ description: >-
 
 Guidelines for all tests — algorithm and use case alike.
 
+## @when-required
+
+- Follow this skill when the user asks for tests.
+- **`create-spec` always requires tests** when you add or modify a spec — do not skip them.
+
 ## @structure
 
 - One subject per file, named after what is under test.

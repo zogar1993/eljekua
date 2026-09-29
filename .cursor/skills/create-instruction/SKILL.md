@@ -22,6 +22,8 @@ Instructions are turn-state VM opcodes: definition, interpreter, switch case.
 
 **Outward signals:** raise `game_events.on_*` (available on `InterpretInstructionProps`) — never attach events to domain objects. See `@core-web`.
 
+**Specs:** do **not** add or edit `specs/` unless the user asked for spec work. If they did, follow `create-spec` (spec + implementation + tests in one pass).
+
 5. Run `@checklist` — required; includes `git add` for any new files.
 
 ## @reference

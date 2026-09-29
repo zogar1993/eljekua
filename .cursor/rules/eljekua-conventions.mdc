@@ -75,6 +75,7 @@ export const INSTRUCTION_TYPE = {
 
 - Behavior rules live in `specs/`. Read the relevant spec when implementing that area.
 - Do **not** add or edit specs unless the user explicitly asks — follow the `create-spec` skill when they do.
+- Never add a spec as part of another task (instruction, bug fix, feature, refactor). Spec changes are a separate, user-requested workflow.
 
 ## @skills
 
