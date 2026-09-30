@@ -49,25 +49,33 @@ describe("$min", () => {
         ))).toBe(0)
     })
 
+    test("returns a single resolved number parameter", () => {
+        const {evaluate_expression} = create_expression_test_context()
+
+        expect(EXPR.as_number(evaluate_expression("$min(5)"))).toBe(5)
+    })
+
+    test("returns the minimum across multiple parameters", () => {
+        const {evaluate_expression, game_state} = create_expression_test_context()
+        bind_numbers(game_state, [
+            {type: "number_resolved", value: 5, description: "five"},
+            {type: "number_resolved", value: 2, description: "two"},
+        ])
+
+        expect(EXPR.as_number(evaluate_expression("$min(numbers, 8)"))).toBe(2)
+    })
+
     test("throws when the number list is empty", () => {
         const {evaluate_expression, game_state} = create_expression_test_context()
         bind_numbers(game_state, [])
 
-        expect(() => evaluate_expression("$min(numbers)")).toThrow(/min requires at least one number/)
+        expect(() => evaluate_expression("$min(numbers)")).toThrow(/Expected array to not be empty/)
     })
 
-    test("throws when the parameter is not a number list", () => {
-        const {evaluate_expression} = create_expression_test_context()
+    test("throws when a parameter is not a number", () => {
+        const {evaluate_expression, create_test_creature, bind_owner} = create_expression_test_context()
+        bind_owner(create_test_creature({name: "owner"}))
 
-        expect(() => evaluate_expression("$min(5)")).toThrow()
-    })
-
-    test("throws with the wrong parameter count", () => {
-        const {evaluate_expression, game_state} = create_expression_test_context()
-        bind_numbers(game_state, [
-            {type: "number_resolved", value: 1, description: "one"},
-        ])
-
-        expect(() => evaluate_expression("$min(numbers, numbers)")).toThrow(/expected '1' parameters/)
+        expect(() => evaluate_expression("$min(owner)")).toThrow(/Could not cast expression/)
     })
 })
