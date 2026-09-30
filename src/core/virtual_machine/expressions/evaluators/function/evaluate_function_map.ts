@@ -33,7 +33,5 @@ export const evaluate_function_map = ({node, game_queries, game_state}: {
 const get_iteration_variable_name = (node: AstNode): string => {
     if (node.type === "keyword")
         return node.value
-    if (node.type === "string")
-        return node.value
-    throw Error(`expected keyword or string for map variable name, got "${node.type}"`)
+    throw Error(`expected keyword for map variable name, got "${node.type}"`)
 }

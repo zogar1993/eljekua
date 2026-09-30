@@ -10,7 +10,7 @@ import {
 const DISTANT_POSITION = {x: 6, y: 3, footprint: 1} as const satisfies Position
 
 const get_number_values = (expression: string, evaluate_expression: ReturnType<typeof create_expression_test_context>["evaluate_expression"]) =>
-    EXPR.as_numbers(evaluate_expression(expression)).map(number => number.value)
+    EXPR.as_numbers_resolved_expr(evaluate_expression(expression)).map(number => number.value)
 
 describe("$map", () => {
     test("evaluates the expression for each creature in the list", () => {

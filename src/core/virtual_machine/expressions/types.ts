@@ -9,6 +9,7 @@ export type Expr =
     | ExprBoolean
     | ExprCreatures
     | ExprPositions
+    | ExprNumbers
     | ExprPower
     | ExprAttackRolls
     | ExprAttackD20Rolls
@@ -51,6 +52,11 @@ export type ExprPositions = {
     type: "positions"
     value: Array<Position>
     params?: Array<Expr>
+}
+
+export type ExprNumbers = {
+    type: "numbers"
+    value: Array<ExprNumberResolved>
 }
 
 export type ExprPower = {

@@ -1,4 +1,4 @@
-import type {Expr, ExprNumber, ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import type {Expr, ExprNumber, ExprNumberResolved, ExprNumbers} from "core/virtual_machine/expressions/types";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {Position} from "core/battlegrid/Position";
 import type {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
@@ -30,6 +30,11 @@ export const EXPR = {
         if (expr.type === "positions") return expr.value
         else if (expr.type === "creatures") return expr.value.map(c => c.data.position)
         return throw_could_not_cast({expr, to: "positions"})
+    },
+    as_numbers_resolved_expr: (expr: Expr): Array<ExprNumberResolved> => {
+        if (expr.type === "numbers") return expr.value
+        if (expr.type === "number_resolved") return [expr]
+        return throw_could_not_cast({expr, to: "numbers"})
     },
     as_number: (expr: Expr): number => {
         if (expr.type === "number_resolved") return expr.value

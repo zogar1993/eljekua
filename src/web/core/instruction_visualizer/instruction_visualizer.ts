@@ -196,6 +196,10 @@ const create_variable_value_element = (expr: Expr): HTMLElement => {
                 format_positions_summary(expr.value),
                 () => create_positions_details(expr),
             )
+        case "numbers":
+            return create_flat_variable_value(
+                expr.value.map(number => String(number.value)).join(", "),
+            )
         case "number_unresolved":
             if (expr.params?.length)
                 return create_expandable_variable_value(
