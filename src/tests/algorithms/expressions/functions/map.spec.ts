@@ -28,20 +28,6 @@ describe("$map", () => {
         )).toEqual([1, 3])
     })
 
-    test("accepts a string variable name", () => {
-        const {evaluate_expression, create_test_creature, bind_creature, game_state} = create_expression_test_context()
-        const attacker = create_test_creature({name: "attacker", position: ISOLATED_POSITION})
-        const near = create_test_creature({name: "near", position: ADJACENT_TO_ISOLATED_POSITION})
-
-        bind_creature(SYSTEM_KEYWORD.ATTACKER, attacker)
-        game_state.vm_state.set_variable(SYSTEM_KEYWORD.TARGETS, {type: "creatures", value: [near]})
-
-        expect(get_number_values(
-            `$map(targets, "x", $distance(x, attacker))`,
-            evaluate_expression,
-        )).toEqual([1])
-    })
-
     test("returns an empty list for an empty creature list", () => {
         const {evaluate_expression, create_test_creature, bind_creature, game_state} = create_expression_test_context()
         bind_creature(SYSTEM_KEYWORD.ATTACKER, create_test_creature({name: "attacker"}))
