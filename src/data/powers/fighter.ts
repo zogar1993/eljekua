@@ -59,7 +59,7 @@ const cleave: IRPower = {
             },
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "$add({1W},owner.str_mod)",
+                value: '$add({1W},$attr_mod(owner, "str"))',
                 target: "primary_target"
             },
             {
@@ -68,7 +68,7 @@ const cleave: IRPower = {
                 instructions_true: [
                     {
                         type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                        value: "owner.str_mod",
+                        value: '$attr_mod(owner, "str")',
                         target: "secondary_target",
                     },
                 ]
@@ -96,7 +96,7 @@ const reaping_strike: IRPower = {
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "$add({1W},owner.str_mod)",
+                value: '$add({1W},$attr_mod(owner, "str"))',
                 target: "primary_target"
             },
         ],
@@ -107,14 +107,14 @@ const reaping_strike: IRPower = {
                 instructions_true: [
                     {
                         type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                        value: `owner.str_mod`,
+                        value: `$attr_mod(owner, "str")`,
                         target: "primary_target"
                     },
                 ],
                 instructions_false: [
                     {
                         type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                        value: `owner.str_mod`,
+                        value: `$attr_mod(owner, "str")`,
                         target: "primary_target",
                         half_damage: true
                     },
@@ -146,7 +146,7 @@ const tide_of_iron: IRPower = {
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "$add({1W},owner.str_mod)",
+                value: '$add({1W},$attr_mod(owner, "str"))',
                 target: "primary_target"
             },
             {
@@ -157,7 +157,7 @@ const tide_of_iron: IRPower = {
                         instructions: [
                             {
                                 type: INSTRUCTION_TYPE.SAVE_VARIABLE,
-                                value: "primary_target.position",
+                                value: "$position(primary_target)",
                                 label: "primary_target_original_position"
                             },
                             {
@@ -167,7 +167,7 @@ const tide_of_iron: IRPower = {
                             },
                             {
                                 type: IR_INSTRUCTION_TYPE.CONDITION,
-                                condition: "$not_equals(primary_target.position,primary_target_original_position)",
+                                condition: "$not_equals($position(primary_target),primary_target_original_position)",
                                 instructions_true: [
                                     {
                                         type: INSTRUCTION_TYPE.OPTIONS,
@@ -228,7 +228,7 @@ const brash_strike: IRPower = {
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "$add({1W},owner.str_mod)",
+                value: '$add({1W},$attr_mod(owner, "str"))',
                 target: "primary_target"
             },
             {
@@ -237,7 +237,7 @@ const brash_strike: IRPower = {
                 instructions_true: [
                     {
                         type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                        value: "owner.con_mod",
+                        value: '$attr_mod(owner, "con")',
                         target: "primary_target"
                     },//TODO P1 revisit that these damages are all dealt as one chunk instead of parts
                 ]
@@ -277,7 +277,7 @@ const crushing_surge: IRPower = {
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "$add({1W},owner.str_mod)",
+                value: '$add({1W},$attr_mod(owner, "str"))',
                 target: "primary_target"
             },
         ],
@@ -306,12 +306,12 @@ const tide_of_iron_true = {
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "$add({1W},owner.str_mod)",
+                value: '$add({1W},$attr_mod(owner, "str"))',
                 target: "primary_target"
             },
             {
                 type: IR_INSTRUCTION_TYPE.CONDITION,
-                condition: "is_greater_or_equal($add(owner.size,1),target.size)",
+                condition: '$is_greater_or_equal($add($size(owner),1),$size(target))',
                 instructions_true: [
                     {
                         type: "question_yes_no",
@@ -319,7 +319,7 @@ const tide_of_iron_true = {
                         instructions_true: [
                             {
                                 type: INSTRUCTION_TYPE.SAVE_VARIABLE,
-                                target: "primary_target.position",
+                                target: "$position(primary_target)",
                                 label: "primary_target_original_position"
                             },
                             {
@@ -329,7 +329,7 @@ const tide_of_iron_true = {
                             },
                             {
                                 type: IR_INSTRUCTION_TYPE.CONDITION,
-                                condition: "$and($not_equals(primary_target.position,primary_target_last_position),$equals($movement_distance(owner.position,primary_target_last_position),1))",
+                                condition: "$and($not_equals($position(primary_target),primary_target_last_position),$equals($movement_distance($position(owner),primary_target_last_position),1))",
                                 instructions_true: [
                                     {
                                         type: "question_yes_no",

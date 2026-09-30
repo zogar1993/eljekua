@@ -28,7 +28,7 @@ export const power_resolute_shield: IRPower = {
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "$add(primary_damage,owner.str_mod)",
+                value: '$add(primary_damage,$attr_mod(owner, "str"))',
                 target: "primary_target"
             },
             {
@@ -37,7 +37,7 @@ export const power_resolute_shield: IRPower = {
                 duration: "until_end_of_your_next_turn",
                 status: {
                     type: "gain_resistance",
-                    value: "owner.con_mod",
+                    value: '$attr_mod(owner, "con")',
                     against_creatures: "primary_target",
                 }
             }

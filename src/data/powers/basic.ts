@@ -33,7 +33,7 @@ const movement: IRPower = {
     },
     targeting: {
         targeting_type: "movement",
-        distance: "owner.movement",
+        distance: "$movement(owner)",
     },
     effect: [
         {
@@ -63,7 +63,7 @@ const melee_basic_attack: IRPower = {
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "$add({1W},owner.str_mod)",
+                value: '$add({1W},$attr_mod(owner, "str"))',
                 target: "primary_target"
             }
         ]

@@ -28,7 +28,7 @@ export const power_shield_faint: IRPower = {
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: `$add(primary_damage,owner.str_mod)`,
+                value: '$add(primary_damage,$attr_mod(owner, "str"))',
                 target: "primary_target"
             },
             {

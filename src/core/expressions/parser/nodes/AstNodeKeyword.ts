@@ -7,21 +7,10 @@ export const parse_keyword = (scanner: Scanner): AstNodeKeyword => {
 
     assert(is_plain_text(value), () => `expected plain text, found "${value}"`)
 
-    const keyword: AstNodeKeyword = {type: "keyword", value}
-    if (scanner.peek() === ".") {
-        scanner.consume(".")
-
-        const value = scanner.get_text_while(is_text_character)
-
-        assert(is_plain_text(value), () => `expected plain text, found "${value}"`)
-        keyword.property = value
-    }
-
-    return keyword
+    return {type: "keyword", value}
 }
 
 export type AstNodeKeyword = {
     type: "keyword"
     value: string
-    property?: string
 }

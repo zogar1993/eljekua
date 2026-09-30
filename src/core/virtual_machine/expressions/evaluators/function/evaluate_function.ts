@@ -71,6 +71,30 @@ import {
 import {
     evaluate_function_min
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_min";
+import {
+    evaluate_function_level
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_level";
+import {
+    evaluate_function_attr_mod
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_attr_mod";
+import {
+    evaluate_function_attr_mod_lvl
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_attr_mod_lvl";
+import {
+    evaluate_function_template_name
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_template_name";
+import {
+    evaluate_function_movement
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_movement";
+import {
+    evaluate_function_position
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_position";
+import {
+    evaluate_function_skill
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_skill";
+import {
+    evaluate_function_size
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_size";
 import type {GameState} from "core/game_state/GameState";
 
 export const build_evaluate_function = ({game_queries, game_state}: {
@@ -134,6 +158,22 @@ export const build_evaluate_function = ({game_queries, game_state}: {
                 return evaluate_function_map({node, game_state, game_queries})
             case FUNCTION_NAME.MIN:
                 return evaluate_function_min({node, game_queries})
+            case FUNCTION_NAME.LEVEL:
+                return evaluate_function_level({node, game_queries})
+            case FUNCTION_NAME.ATTR_MOD:
+                return evaluate_function_attr_mod({node, game_queries})
+            case FUNCTION_NAME.ATTR_MOD_LVL:
+                return evaluate_function_attr_mod_lvl({node, game_queries})
+            case FUNCTION_NAME.TEMPLATE_NAME:
+                return evaluate_function_template_name({node, game_queries})
+            case FUNCTION_NAME.MOVEMENT:
+                return evaluate_function_movement({node, game_queries})
+            case FUNCTION_NAME.POSITION:
+                return evaluate_function_position({node, game_queries})
+            case FUNCTION_NAME.SKILL:
+                return evaluate_function_skill({node, game_queries})
+            case FUNCTION_NAME.SIZE:
+                return evaluate_function_size({node, game_queries})
             default:
                 throw Error(`function name '${node.name}' not supported when evaluating node`)
         }

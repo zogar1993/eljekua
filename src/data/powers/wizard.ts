@@ -26,7 +26,7 @@ const magic_missile: IRPower = {
         },
         {
             type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-            value: "$add(2,owner.int_mod)",
+            value: '$add(2,$attr_mod(owner, "int"))',
             target: "primary_target",
             damage_types: ["force"]
         }
@@ -54,7 +54,7 @@ const scorching_burst: IRPower = {
         before_consequences: [
             {
                 type: INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED,
-                value: "$add({1d6},owner.int_mod)",
+                value: '$add({1d6},$attr_mod(owner, "int"))',
                 label: "primary_damage"
             }
         ],

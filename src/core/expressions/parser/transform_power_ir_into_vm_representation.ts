@@ -150,7 +150,7 @@ const is_attack_roll_resolution_mode = (resolution: AttackRollResolutionMode): A
 })
 
 const standardize_attack = (text: string) =>
-    ATTRIBUTE_CODES.reduce((text, attribute) => text.replaceAll(attribute, `owner.${attribute}_mod_lvl`), text)
+    ATTRIBUTE_CODES.reduce((text, attribute) => text.replaceAll(attribute, `$attr_mod_lvl(owner, "${attribute}")`), text)
 
 const transform_instructions = (instructions: Array<IRInstruction> | undefined): Array<Instruction> => {
     if (instructions === undefined) return []
@@ -231,7 +231,7 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                     type: INSTRUCTION_TYPE.SELECT_TARGET,
                     targeting_type: "push",
                     distance: to_ast(instruction.amount),
-                    anchor: to_ast("owner.position"),
+                    anchor: to_ast("$position(owner)"),
                     defender: to_ast(instruction.target),
                     target_label: "push_position"
                 },
@@ -269,7 +269,7 @@ const transform_primary_damage = (damage: NonNullable<IRPower["damage"]>): Array
     }];
 
     const up_to_lvl_11_block = damage.lvl_11 ? create_if_block({
-        condition: to_ast("$is_lower(owner.level,11)"),
+        condition: to_ast("$is_lower($level(owner),11)"),
         instructions_if_true: [
             {
                 type: INSTRUCTION_TYPE.SAVE_VARIABLE,
@@ -281,7 +281,7 @@ const transform_primary_damage = (damage: NonNullable<IRPower["damage"]>): Array
     }) : lvl_1_block;
 
     return damage.lvl_21 ? create_if_block({
-        condition: to_ast("$is_lower(owner.level,21)"),
+        condition: to_ast("$is_lower($level(owner),21)"),
         instructions_if_true: [
             {
                 type: INSTRUCTION_TYPE.SAVE_VARIABLE,

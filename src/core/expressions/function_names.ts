@@ -26,6 +26,14 @@ export const FUNCTION_NAME = {
     FILTER_CREATURES: "filter_creatures",
     MAP: "map",
     MIN: "min",
+    LEVEL: "level",
+    ATTR_MOD: "attr_mod",
+    ATTR_MOD_LVL: "attr_mod_lvl",
+    TEMPLATE_NAME: "template_name",
+    MOVEMENT: "movement",
+    POSITION: "position",
+    SKILL: "skill",
+    SIZE: "size",
 } as const
 
 export type FunctionName = typeof FUNCTION_NAME[keyof typeof FUNCTION_NAME]

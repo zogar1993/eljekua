@@ -22,7 +22,7 @@ const sly_flourish = {
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "$add({1W},owner.dex_mod,owner.cha_mod)",
+                value: '$add({1W},$attr_mod(owner, "dex"),$attr_mod(owner, "cha"))',
                 target: "primary_target"
             },
         ]
@@ -48,7 +48,7 @@ const piercing_strike: IRPower = {
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "$add({1W},owner.dex_mod)",
+                value: '$add({1W},$attr_mod(owner, "dex"))',
                 target: "primary_target"
             },
         ]
