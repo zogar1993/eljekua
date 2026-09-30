@@ -25,7 +25,7 @@ export const evaluate_function_has_valid_targeting = ({node, game_queries, game_
     let is_targeting_valid = true
 
     if (targeting_instruction) {
-        const valid_targets = get_valid_targets({instruction: targeting_instruction, battle_grid, game_queries})
+        const valid_targets = get_valid_targets({instruction: targeting_instruction, battle_grid, game_queries, game_state})
         is_targeting_valid = valid_targets.length > 0
     }
 

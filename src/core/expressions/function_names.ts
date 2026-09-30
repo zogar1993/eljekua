@@ -24,6 +24,8 @@ export const FUNCTION_NAME = {
     IS_RACE: "is_race",
     COUNT: "count",
     FILTER_CREATURES: "filter_creatures",
+    MAP: "map",
+    MIN: "min",
 } as const
 
 export type FunctionName = typeof FUNCTION_NAME[keyof typeof FUNCTION_NAME]

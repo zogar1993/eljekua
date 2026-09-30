@@ -65,6 +65,12 @@ import {evaluate_function_count} from "core/virtual_machine/expressions/evaluato
 import {
     evaluate_function_filter_creatures
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_filter_creatures";
+import {
+    evaluate_function_map
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_map";
+import {
+    evaluate_function_min
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_min";
 import type {GameState} from "core/game_state/GameState";
 
 export const build_evaluate_function = ({game_queries, game_state}: {
@@ -124,6 +130,10 @@ export const build_evaluate_function = ({game_queries, game_state}: {
                 return evaluate_function_count({node, game_queries})
             case FUNCTION_NAME.FILTER_CREATURES:
                 return evaluate_function_filter_creatures({node, game_state, game_queries})
+            case FUNCTION_NAME.MAP:
+                return evaluate_function_map({node, game_state, game_queries})
+            case FUNCTION_NAME.MIN:
+                return evaluate_function_min({node, game_queries})
             default:
                 throw Error(`function name '${node.name}' not supported when evaluating node`)
         }
