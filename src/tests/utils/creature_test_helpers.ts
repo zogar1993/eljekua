@@ -58,7 +58,7 @@ export const create_creature_test_helpers = ({
             skills: c.skills ?? {},
             powers: c.powers ?? [],
             archetypes: c.archetypes ?? [],
-            constant_effects: c.constant_effects ?? [],
+            constant_rules: c.constant_rules ?? [],
             modifiers: c.modifiers ?? [],
             languages: c.languages ?? [],
         }

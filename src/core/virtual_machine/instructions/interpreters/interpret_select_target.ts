@@ -24,7 +24,7 @@ export const interpret_select_target = ({
                                         }: InterpretInstructionProps<InstructionSelectTarget>) => {
     const {available_interaction} = game_state
     const {battle_grid, vm_state} = game_state
-    const clickable = get_valid_targets({instruction, battle_grid, game_queries})
+    const clickable = get_valid_targets({instruction, battle_grid, game_queries, game_state})
 
     assert_is_not_empty(clickable)
 

@@ -4,8 +4,8 @@ import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {
     add_creature_status,
     type Creature,
+    type CreatureRule,
     type StatusDuration,
-    type StatusEffect
 } from "core/battlegrid/creatures/Creature";
 import type {InstructionApplyStatus} from "core/virtual_machine/instructions/instructions";
 
@@ -30,7 +30,7 @@ const interpret_status_effect = ({instruction, game_queries, power_owner}: {
     power_owner: Creature,
     game_queries: GameQueries
 }) => ({
-    effect: interpret_status({status: instruction.status, game_queries}),
+    rule: interpret_creature_rule({status: instruction.status, game_queries}),
     durations: interpret_duration({duration: instruction.duration, power_owner})
 })
 
@@ -69,10 +69,10 @@ const interpret_duration = ({duration, power_owner}: {
     })
 }
 
-const interpret_status = ({status, game_queries}: {
+const interpret_creature_rule = ({status, game_queries}: {
     status: InstructionApplyStatus["status"],
     game_queries: GameQueries
-}): StatusEffect => {
+}): CreatureRule => {
     switch (status.type) {
         case "grant_combat_advantage":
             return {

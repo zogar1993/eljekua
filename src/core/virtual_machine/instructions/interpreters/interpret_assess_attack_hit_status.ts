@@ -29,9 +29,9 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
 
         attack_parts.push({type: "number_resolved", value: d20_value, description: "d20"})
 
-        for (const {effect} of attacker.statuses)
-            if (effect.type === "gain_attack_bonus" && (effect.against_creatures === null || effect.against_creatures.includes(defender)))
-                attack_parts.push(effect.value)
+        for (const {rule} of attacker.statuses)
+            if (rule.type === "gain_attack_bonus" && (rule.against_creatures === null || rule.against_creatures.includes(defender)))
+                attack_parts.push(rule.value)
 
         remove_creature_statuses({
             creature: attacker,
@@ -41,7 +41,7 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
 
         if (
             is_flanking({attacker, defender, battle_grid}) ||
-            defender.statuses.some(({effect}) => effect.type === "grant_combat_advantage" && (effect.against_creatures === null || effect.against_creatures.includes(attacker)))
+            defender.statuses.some(({rule}) => rule.type === "grant_combat_advantage" && (rule.against_creatures === null || rule.against_creatures.includes(attacker)))
         ) attack_parts.push(COMBAT_ADVANTAGE)
 
         attack_parts.push(...get_attack_roll_modifier_parts({creature: attacker, game_queries}))

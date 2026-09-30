@@ -111,7 +111,7 @@ const kobold_minion: Monster = {
         wis: 12,
         cha: 10,
     },
-    constant_effects: [],
+    constant_rules: [],
     skills: {
         stealth: 4,
         thievery: 4,

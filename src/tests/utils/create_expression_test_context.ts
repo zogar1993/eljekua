@@ -54,7 +54,7 @@ export const create_expression_test_context = () => {
             skills: overrides.skills ?? {},
             powers: overrides.powers ?? [],
             archetypes: overrides.archetypes ?? [],
-            constant_effects: overrides.constant_effects ?? [],
+            constant_rules: overrides.constant_rules ?? [],
             modifiers: overrides.modifiers ?? [],
             languages: overrides.languages ?? [],
         }

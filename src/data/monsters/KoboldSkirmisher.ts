@@ -92,7 +92,7 @@ const kobold_skirmisher: Monster = {
         wis: 10,
         cha: 15,
     },
-    constant_effects: [],
+    constant_rules: [],
     skills: {
         acrobatics: 7,
         stealth: 9,

@@ -1,6 +1,15 @@
 import type {IRPower} from "core/types";
+import type {CreatureRuleRestrictTargeting} from "core/battlegrid/creatures/Creature";
+import {to_ast} from "core/expressions/parser/to_ast";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import type {Monster} from "data/monsters/Monster";
+
+const SLINKS_BOON: CreatureRuleRestrictTargeting = {
+    type: "restrict_targeting",
+    targetable_when: to_ast(
+        "$is_lower_or_equal($distance(attacker, owner), $min($map(targets, x, $distance(x, attacker))))",
+    ),
+}
 
 const spear: IRPower = {
     name: "Spear",
@@ -85,14 +94,13 @@ const kobold_slink: Monster = {
         wis: 10,
         cha: 15,
     },
-    constant_effects: [],
+    constant_rules: [SLINKS_BOON],
     skills: {
         acrobatics: 7,
         stealth: 9,
         thievery: 9,
     },
     // Combat Advantage: extra 1d6 damage on melee and ranged attacks — not implemented
-    // Slink's Boon: cannot be targeted unless nearest enemy — not implemented
     // Equipment: hide armor, spear — not implemented
 }
 

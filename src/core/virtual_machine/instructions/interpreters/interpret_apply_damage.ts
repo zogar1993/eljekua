@@ -9,6 +9,10 @@ import {
     subtract_numbers_resolved,
 } from "core/virtual_machine/expressions/number_utils";
 import type {Creature} from "core/battlegrid/creatures/Creature";
+import {
+    creature_rule_applies_to_attacker,
+    creature_rule_applies_to_damage_type,
+} from "core/battlegrid/creatures/Creature";
 import type {InstructionApplyDamage} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
@@ -54,49 +58,15 @@ const apply_half_damage = (number: ExprNumberResolved): ExprNumberResolved => ({
     description: "half damage"
 })
 
-const effect_applies_to_damage_type = (
-    against_damage_types: Array<string> | null,
-    damage_type: string | null,
-): boolean => {
-    if (damage_type === null)
-        return against_damage_types === null
-    return against_damage_types === null || against_damage_types.includes(damage_type)
-}
-
-const constant_effect_to_number_resolved = (value: number): ExprNumberResolved => ({
-    type: "number_resolved",
-    value,
-    description: "constant effect",
-})
+const effect_applies_to_damage_type = creature_rule_applies_to_damage_type
 
 function get_modifier_for_damage_type({creature, attacker, damage_type}: {
     creature: Creature,
     attacker: Creature,
     damage_type: string | null
 }) {
-    const type_resistances: Array<ExprNumberResolved> = []
-    const type_vulnerabilities: Array<ExprNumberResolved> = []
-    for (const effect of creature.constant_effects) {
-        if (!effect_applies_to_damage_type(effect.against_damage_types, damage_type))
-            continue
-        if (effect.type === "gain_resistance")
-            type_resistances.push(constant_effect_to_number_resolved(effect.value))
-        if (effect.type === "gain_vulnerability")
-            type_vulnerabilities.push(constant_effect_to_number_resolved(effect.value))
-    }
-    for (const status of creature.statuses) {
-        const {effect} = status
-        if (effect.type === "gain_resistance") {
-            const includes_attacker = effect.against_creatures === null || effect.against_creatures.includes(attacker)
-            if (includes_attacker && effect_applies_to_damage_type(effect.against_damage_types, damage_type))
-                type_resistances.push(effect.value)
-        }
-        if (effect.type === "gain_vulnerability") {
-            const includes_attacker = effect.against_creatures === null || effect.against_creatures.includes(attacker)
-            if (includes_attacker && effect_applies_to_damage_type(effect.against_damage_types, damage_type))
-                type_vulnerabilities.push(effect.value)
-        }
-    }
+    const type_resistances = get_creature_resistances({defender: creature, attacker, damage_type})
+    const type_vulnerabilities = get_creature_vulnerabilities({defender: creature, attacker, damage_type})
 
     if (type_resistances.length === 0) {
         if (type_vulnerabilities.length === 0)
@@ -132,3 +102,40 @@ const get_damage_modifier = ({
 }
 
 export const BASE_RESISTANCE: ExprNumberResolved = {type: "number_resolved", description: "base resistance", value: 0}
+
+const get_creature_resistances = ({defender, attacker, damage_type}: {defender: Creature, attacker: Creature, damage_type: string | null}) => {
+    const type_resistances: Array<ExprNumberResolved> = []
+
+    for (const rule of defender.constant_rules) {
+        if (rule.type === "gain_resistance" && effect_applies_to_damage_type(rule, damage_type))
+            type_resistances.push(rule.value)
+    }
+
+    for (const {rule} of defender.statuses) {
+        if (rule.type === "gain_resistance") {
+            if (creature_rule_applies_to_attacker({rule, attacker}) && effect_applies_to_damage_type(rule, damage_type))
+                type_resistances.push(rule.value)
+        }
+    }
+
+    return type_resistances
+}
+
+const get_creature_vulnerabilities = ({defender, attacker, damage_type}: {defender: Creature, attacker: Creature, damage_type: string | null}) => {
+    const type_vulnerabilities: Array<ExprNumberResolved> = []
+
+    for (const rule of defender.constant_rules) {
+        if (rule.type === "gain_vulnerability" && effect_applies_to_damage_type(rule, damage_type))
+            type_vulnerabilities.push(rule.value)
+    }
+
+    for (const {rule} of defender.statuses) {
+        if (rule.type === "gain_vulnerability") {
+            if (creature_rule_applies_to_attacker({rule, attacker}) && effect_applies_to_damage_type(rule, damage_type))
+                type_vulnerabilities.push(rule.value)
+        }
+    }
+
+    return type_vulnerabilities
+}
+

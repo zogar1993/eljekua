@@ -1,74 +1,46 @@
 import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
-import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import type {CreatureRule} from "core/battlegrid/creatures/creature_rule";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE_EXPENDITURE_ORDER} from "core/battlegrid/creatures/ActionType";
 import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "data/powers/basic";
 
-export type Status = { durations: Array<StatusDuration> } & { effect: StatusEffect }
+export type {CreatureRule} from "core/battlegrid/creatures/creature_rule";
+export type {
+    CreatureRuleGrantCombatAdvantage,
+    CreatureRuleGainResistance,
+    CreatureRuleGainVulnerability,
+    CreatureRuleGainAttackBonus,
+    CreatureRuleRestrictTargeting,
+    CreatureRuleDamageModifier,
+} from "core/battlegrid/creatures/creature_rule";
+export {
+    create_gain_resistance_rule,
+    create_gain_vulnerability_rule,
+    creature_rule_applies_to_attacker,
+    creature_rule_applies_to_damage_type,
+} from "core/battlegrid/creatures/creature_rule";
+
+export type Status = {
+    durations: Array<StatusDuration>
+    rule: CreatureRule
+}
 
 export type StatusDuration = {
     until: "next_turn_end" | "turn_start" | "turn_end" | "next_attack_roll_against_target" | "encounter_end",
     creature?: Creature
 }
 
-export type StatusEffect =
-    StatusEffectGrantCombatAdvantage |
-    StatusEffectGainResistance |
-    StatusEffectGainVulnerability |
-    StatusEffectGainAttackBonus
-
-export type StatusEffectGrantCombatAdvantage = {
-    type: "grant_combat_advantage",
-    against_creatures: Array<Creature> | null,
-}
-
-export type StatusEffectGainResistance = {
-    type: "gain_resistance"
-    value: ExprNumberResolved
-    against_creatures: Array<Creature> | null,
-    against_damage_types: Array<string> | null,
-}
-
-export type StatusEffectGainVulnerability = {
-    type: "gain_vulnerability"
-    value: ExprNumberResolved
-    against_creatures: Array<Creature> | null,
-    against_damage_types: Array<string> | null,
-}
-
-export type StatusEffectGainAttackBonus = {
-    type: "gain_attack_bonus"
-    value: ExprNumberResolved
-    against_creatures: Array<Creature> | null,
-}
-
-export type ConstantEffect =
-    ConstantEffectGainResistance |
-    ConstantEffectGainVulnerability
-
-export type ConstantEffectGainResistance = {
-    type: "gain_resistance"
-    value: number
-    against_damage_types: Array<string> | null
-}
-
-export type ConstantEffectGainVulnerability = {
-    type: "gain_vulnerability"
-    value: number
-    against_damage_types: Array<string> | null
-}
-
 export const create_creature = ({id, data}: { id: number, data: CreatureData }) => {
     const basic_powers = data.template === null
         ? [...BASIC_MOVEMENT_ACTIONS, ...BASIC_ATTACK_ACTIONS]
         : [...BASIC_MOVEMENT_ACTIONS]
-    const {constant_effects, modifiers, powers, ...creature_data} = data
+    const {constant_rules, modifiers, powers, ...creature_data} = data
     const d = {...creature_data, powers: [...basic_powers, ...powers]}
     return {
         id,
         data: d,
-        constant_effects: [...constant_effects],
+        constant_rules: [...constant_rules],
         modifiers: [...modifiers],
         statuses: [] as Array<Status>,
         available_actions: [] as Array<ActionType>,

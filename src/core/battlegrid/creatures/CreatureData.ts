@@ -3,7 +3,7 @@ import type {Power} from "core/expressions/parser/transform_power_ir_into_vm_rep
 import type {AttributeCode} from "core/character_sheet/attributes";
 import type {SkillCode} from "core/character_sheet/skills";
 import type {Size} from "core/battlegrid/creatures/SIZES";
-import type {ConstantEffect} from "core/battlegrid/creatures/Creature";
+import type {CreatureRule} from "core/battlegrid/creatures/creature_rule";
 import type {Modifier} from "core/battlegrid/creatures/Modifier";
 
 export type CreatureData = {
@@ -22,7 +22,7 @@ export type CreatureData = {
     team: number | null
     race: string | null
     archetypes: Array<string>
-    constant_effects: Array<ConstantEffect>
+    constant_rules: Array<CreatureRule>
     modifiers: Array<Modifier>
     languages: Array<string>
     powers: Array<Power>

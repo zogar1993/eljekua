@@ -141,7 +141,7 @@ const kobold_slinger: Monster = {
         wis: 12,
         cha: 10,
     },
-    constant_effects: [],
+    constant_rules: [],
     skills: {
         stealth: 8,
     },

@@ -2,7 +2,8 @@ import {
     Power,
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
-import type {ConstantEffect} from "core/battlegrid/creatures/Creature";
+import type {CreatureRule} from "core/battlegrid/creatures/Creature";
+import {create_gain_resistance_rule, create_gain_vulnerability_rule} from "core/battlegrid/creatures/Creature";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 import {ATTACK_ROLL_RESOLUTION_MODE} from "core/settings/AttackRollResolutionMode";
@@ -37,7 +38,7 @@ beforeEach(() => {
 describe("damage resistance", () => {
     test("typed damage is reduced against resistant creatures", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
@@ -48,7 +49,7 @@ describe("damage resistance", () => {
 
     test("untyped damage is not reduced by typed resistances", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE()]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
@@ -62,7 +63,7 @@ describe("damage resistance", () => {
         given_a_creature_is_created({
             name: "ragoz",
             position: POSITION_RAGOZ,
-            constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_RESISTANCE_EFFECT(GREATER, COLD)],
+            constant_rules: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_RESISTANCE_EFFECT(GREATER, COLD)],
         })
         start_battle()
 
@@ -74,7 +75,7 @@ describe("damage resistance", () => {
 
     test("untyped resistance reduces typed damage", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: [GAIN_RESISTANCE_EFFECT(LESSER)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
@@ -85,7 +86,7 @@ describe("damage resistance", () => {
 
     test("untyped resistance reduces untyped damage", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE()]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: [GAIN_RESISTANCE_EFFECT(LESSER)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
@@ -99,7 +100,7 @@ describe("damage resistance", () => {
         given_a_creature_is_created({
             name: "ragoz",
             position: POSITION_RAGOZ,
-            constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_RESISTANCE_EFFECT(GREATER, FIRE)],
+            constant_rules: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_RESISTANCE_EFFECT(GREATER, FIRE)],
         })
         start_battle()
 
@@ -111,7 +112,7 @@ describe("damage resistance", () => {
 
     test("dual type damage with resistance to one type only deals full damage", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE, COLD)]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
@@ -124,7 +125,7 @@ describe("damage resistance", () => {
 describe("damage vulnerability", () => {
     test("typed damage is increased against vulnerable creatures", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_VULNERABILITY_EFFECT(LESSER, FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: [GAIN_VULNERABILITY_EFFECT(LESSER, FIRE)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
@@ -135,7 +136,7 @@ describe("damage vulnerability", () => {
 
     test("untyped damage is not increased by typed vulnerability", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE()]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_VULNERABILITY_EFFECT(LESSER, FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: [GAIN_VULNERABILITY_EFFECT(LESSER, FIRE)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
@@ -150,7 +151,7 @@ describe("damage vulnerability", () => {
         given_a_creature_is_created({
             name: "ragoz",
             position: POSITION_RAGOZ,
-            constant_effects: [GAIN_VULNERABILITY_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(GREATER, COLD)],
+            constant_rules: [GAIN_VULNERABILITY_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(GREATER, COLD)],
         })
         start_battle()
 
@@ -162,7 +163,7 @@ describe("damage vulnerability", () => {
 
     test("untyped vulnerability increases typed damage", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE(FIRE)]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_VULNERABILITY_EFFECT(LESSER)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: [GAIN_VULNERABILITY_EFFECT(LESSER)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
@@ -173,7 +174,7 @@ describe("damage vulnerability", () => {
 
     test("untyped vulnerability increases untyped damage", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_DAMAGE()]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_VULNERABILITY_EFFECT(LESSER)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: [GAIN_VULNERABILITY_EFFECT(LESSER)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
@@ -187,7 +188,7 @@ describe("damage vulnerability", () => {
         given_a_creature_is_created({
             name: "ragoz",
             position: POSITION_RAGOZ,
-            constant_effects: [GAIN_VULNERABILITY_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(GREATER, FIRE)],
+            constant_rules: [GAIN_VULNERABILITY_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(GREATER, FIRE)],
         })
         start_battle()
 
@@ -202,7 +203,7 @@ describe("damage vulnerability", () => {
         given_a_creature_is_created({
             name: "ragoz",
             position: POSITION_RAGOZ,
-            constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(GREATER, COLD)],
+            constant_rules: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(GREATER, COLD)],
         })
         start_battle()
 
@@ -216,12 +217,12 @@ describe("damage vulnerability", () => {
 describe("resistance and vulnerability cancel each other", () => {
     test("when resistance exceeds vulnerability, vulnerability is subtracted from resistance", () => {
         const linuar_powers: Array<Power> = [DEAL_DAMAGE(FIRE)]
-        const ragoz_constant_effects: Array<ConstantEffect> = [
+        const ragoz_constant_rules: Array<CreatureRule> = [
             GAIN_RESISTANCE_EFFECT(GREATER, FIRE),
             GAIN_VULNERABILITY_EFFECT(LESSER, FIRE),
         ]
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: linuar_powers})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: ragoz_constant_effects})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: ragoz_constant_rules})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Damage")
@@ -235,7 +236,7 @@ describe("resistance and vulnerability cancel each other", () => {
         given_a_creature_is_created({
             name: "ragoz",
             position: POSITION_RAGOZ,
-            constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(GREATER, FIRE)],
+            constant_rules: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(GREATER, FIRE)],
         })
         start_battle()
 
@@ -250,7 +251,7 @@ describe("resistance and vulnerability cancel each other", () => {
         given_a_creature_is_created({
             name: "ragoz",
             position: POSITION_RAGOZ,
-            constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(LESSER, FIRE)],
+            constant_rules: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE), GAIN_VULNERABILITY_EFFECT(LESSER, FIRE)],
         })
         start_battle()
 
@@ -275,7 +276,7 @@ describe("half damage", () => {
 
     test("half damage is applied after resistance", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_HALF_DAMAGE(FIRE)]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: [GAIN_RESISTANCE_EFFECT(LESSER, FIRE)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Half Damage")
@@ -286,7 +287,7 @@ describe("half damage", () => {
 
     test("half damage is applied after vulnerability", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_HALF_DAMAGE(FIRE)]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_VULNERABILITY_EFFECT(GREATER, FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: [GAIN_VULNERABILITY_EFFECT(GREATER, FIRE)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Half Damage")
@@ -297,7 +298,7 @@ describe("half damage", () => {
 
     test("half damage rounds down after modifiers", () => {
         given_a_creature_is_created({name: "linuar", position: POSITION_LINUAR, powers: [DEAL_HALF_DAMAGE(FIRE)]})
-        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_effects: [GAIN_RESISTANCE_EFFECT(GREATER, FIRE)]})
+        given_a_creature_is_created({name: "ragoz", position: POSITION_RAGOZ, constant_rules: [GAIN_RESISTANCE_EFFECT(GREATER, FIRE)]})
         start_battle()
 
         when_creature("linuar").selects_action("Deal Half Damage")
@@ -375,14 +376,5 @@ const DAMAGE = 4
 const LESSER = 2
 const GREATER = 3
 
-const GAIN_RESISTANCE_EFFECT = (amount: number, ...types: Array<string>): ConstantEffect => ({
-    type: "gain_resistance",
-    value: amount,
-    against_damage_types: types.length > 0 ? types : null,
-})
-
-const GAIN_VULNERABILITY_EFFECT = (amount: number, ...types: Array<string>): ConstantEffect => ({
-    type: "gain_vulnerability",
-    value: amount,
-    against_damage_types: types.length > 0 ? types : null,
-})
+const GAIN_RESISTANCE_EFFECT = create_gain_resistance_rule
+const GAIN_VULNERABILITY_EFFECT = create_gain_vulnerability_rule

@@ -89,7 +89,7 @@ const evil_ritualist: Monster = {
         wis: 10,
         cha: 10
     },
-    constant_effects: []
+    constant_rules: []
 }
 
 export {evil_ritualist}

@@ -1,5 +1,5 @@
 import type {Size} from "core/battlegrid/creatures/SIZES";
-import type {ConstantEffect} from "core/battlegrid/creatures/Creature";
+import type {CreatureRule} from "core/battlegrid/creatures/creature_rule";
 import type {Modifier} from "core/battlegrid/creatures/Modifier";
 import type {AttributeCode} from "core/character_sheet/attributes";
 import type {DefenseCode} from "core/character_sheet/get_creature_defense";
@@ -24,6 +24,6 @@ export type Monster = {
     powers: Array<IRPower>
     attributes: Record<AttributeCode, number>
     skills?: Partial<Record<SkillCode, number>>
-    constant_effects: Array<ConstantEffect>
+    constant_rules: Array<CreatureRule>
     modifiers?: Array<Modifier>
 }
