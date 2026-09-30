@@ -19,6 +19,7 @@ export const build_evaluate_keyword = ({game_state}: { game_state: GameState }) 
             if (node.property === "template")
                 return {type: "string", value: creature.data.template ?? "",}
 
+            //TODO clean keyword properties
             return {
                 type: "number_resolved",
                 ...get_creature_property({creature, property: node.property}),
