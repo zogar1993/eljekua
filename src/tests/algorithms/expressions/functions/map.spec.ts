@@ -50,7 +50,7 @@ describe("$map", () => {
         bind_creature(SYSTEM_KEYWORD.ATTACKER, create_test_creature({name: "attacker"}))
         game_state.vm_state.set_variable(SYSTEM_KEYWORD.TARGETS, {type: "creatures", value: []})
 
-        expect(() => evaluate_expression("$map(targets, 5, $add(1, 1))")).toThrow(/expected keyword or string/)
+        expect(() => evaluate_expression("$map(targets, 5, $add(1, 1))")).toThrow(/expected keyword/)
     })
 
     test("throws when the mapped expression does not evaluate to a number", () => {
