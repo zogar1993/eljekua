@@ -19,13 +19,14 @@ const sure_strike: IRPower = {
         target_type: "enemy",
         amount: 1
     },
+    damage: "{1W}",
     roll: {
         attack: "$add(str,2)",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "{1W}",
+                value: "primary_damage",
                 target: "primary_target"
             },
         ]
@@ -45,6 +46,7 @@ const cleave: IRPower = {
         target_type: "enemy",
         amount: 1
     },
+    damage: '$add({1W},$attr_mod(owner, "str"))',
     roll: {
         attack: "str",
         defense: "ac",
@@ -59,7 +61,7 @@ const cleave: IRPower = {
             },
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: '$add({1W},$attr_mod(owner, "str"))',
+                value: "primary_damage",
                 target: "primary_target"
             },
             {
@@ -90,13 +92,14 @@ const reaping_strike: IRPower = {
         target_type: "enemy",
         amount: 1
     },
+    damage: '$add({1W},$attr_mod(owner, "str"))',
     roll: {
         attack: "str",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: '$add({1W},$attr_mod(owner, "str"))',
+                value: "primary_damage",
                 target: "primary_target"
             },
         ],
@@ -140,13 +143,14 @@ const tide_of_iron: IRPower = {
         target_type: "enemy",
         amount: 1
     },
+    damage: '$add({1W},$attr_mod(owner, "str"))',
     roll: {
         attack: "str",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: '$add({1W},$attr_mod(owner, "str"))',
+                value: "primary_damage",
                 target: "primary_target"
             },
             {
@@ -222,13 +226,14 @@ const brash_strike: IRPower = {
         target_type: "creature",
         amount: 1
     },
+    damage: '$add({1W},$attr_mod(owner, "str"))',
     roll: {
         attack: "$add(str,2)",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: '$add({1W},$attr_mod(owner, "str"))',
+                value: "primary_damage",
                 target: "primary_target"
             },
             {
@@ -271,13 +276,14 @@ const crushing_surge: IRPower = {
         target_type: "creature",
         amount: 1
     },
+    damage: '$add({1W},$attr_mod(owner, "str"))',
     roll: {
         attack: "str",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: '$add({1W},$attr_mod(owner, "str"))',
+                value: "primary_damage",
                 target: "primary_target"
             },
         ],
@@ -300,13 +306,14 @@ const tide_of_iron_true = {
         target_type: "enemy",
         amount: 1
     },
+    damage: '$add({1W},$attr_mod(owner, "str"))',
     roll: {
         attack: "str",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: '$add({1W},$attr_mod(owner, "str"))',
+                value: "primary_damage",
                 target: "primary_target"
             },
             {

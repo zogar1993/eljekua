@@ -17,13 +17,14 @@ const spear: IRPower = {
         target_type: "enemy",
         amount: 1,
     },
+    damage: "{1d8}",
     roll: {
         attack: "6",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "{1d8}",
+                value: "primary_damage",
                 target: "primary_target",
             },
         ],

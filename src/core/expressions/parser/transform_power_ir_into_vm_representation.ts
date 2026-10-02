@@ -262,6 +262,14 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
 }
 
 const transform_primary_damage = (damage: NonNullable<IRPower["damage"]>): Array<Instruction> => {
+    if (typeof damage === "string") {
+        return [{
+            type: INSTRUCTION_TYPE.SAVE_VARIABLE,
+            value: to_ast(damage),
+            label: "primary_damage",
+        }]
+    }
+
     const lvl_1_block: Array<Instruction> = [{
         type: INSTRUCTION_TYPE.SAVE_VARIABLE,
         value: to_ast(damage.lvl_1),

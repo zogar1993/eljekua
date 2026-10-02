@@ -15,13 +15,14 @@ const sacrificial_dagger: IRPower = {
         target_type: "enemy",
         amount: 1
     },
+    damage: "4",
     roll: {
         attack: "6",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "4",
+                value: "primary_damage",
                 target: "primary_target"
             }
         ]

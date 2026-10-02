@@ -15,13 +15,14 @@ const dagger: IRPower = {
         target_type: "enemy",
         amount: 1,
     },
+    damage: "$add({1d4},3)",
     roll: {
         attack: "8",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "$add({1d4},3)",
+                value: "primary_damage",
                 target: "primary_target",
             },
         ],
@@ -42,13 +43,14 @@ const sling: IRPower = {
         amount: 1,
         distance: "20",
     },
+    damage: "$add({1d6},5)",
     roll: {
         attack: "8",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "$add({1d6},5)",
+                value: "primary_damage",
                 target: "primary_target",
             },
         ],

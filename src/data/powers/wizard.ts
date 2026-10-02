@@ -18,6 +18,7 @@ const magic_missile: IRPower = {
         amount: 1,
         distance: "20"
     },
+    damage: '$add(2,$attr_mod(owner, "int"))',
     effect: [
         {
             type: INSTRUCTION_TYPE.SET_HIT_STATUS,
@@ -26,7 +27,7 @@ const magic_missile: IRPower = {
         },
         {
             type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-            value: '$add(2,$attr_mod(owner, "int"))',
+            value: "primary_damage",
             target: "primary_target",
             damage_types: ["force"]
         }
@@ -48,16 +49,10 @@ const scorching_burst: IRPower = {
         distance: 10,
         radius: 1
     },
+    damage: '$add({1d6},$attr_mod(owner, "int"))',
     roll: {
         attack: "int",
         defense: "reflex",
-        before_consequences: [
-            {
-                type: INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED,
-                value: '$add({1d6},$attr_mod(owner, "int"))',
-                label: "primary_damage"
-            }
-        ],
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,

@@ -15,13 +15,14 @@ const javelin_melee: IRPower = {
         target_type: "enemy",
         amount: 1,
     },
+    damage: "4",
     roll: {
         attack: "5",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "4",
+                value: "primary_damage",
                 target: "primary_target",
             },
         ],
@@ -42,13 +43,14 @@ const javelin_ranged: IRPower = {
         amount: 1,
         distance: "10",
     },
+    damage: "4",
     roll: {
         attack: "5",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "4",
+                value: "primary_damage",
                 target: "primary_target",
             },
         ],

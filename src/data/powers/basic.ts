@@ -57,13 +57,14 @@ const melee_basic_attack: IRPower = {
         target_type: "enemy",
         amount: 1
     },
+    damage: '$add({1W},$attr_mod(owner, "str"))',
     roll: {
         attack: "str",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: '$add({1W},$attr_mod(owner, "str"))',
+                value: "primary_damage",
                 target: "primary_target"
             }
         ]

@@ -16,13 +16,14 @@ const sly_flourish = {
         target_type: "creature",
         amount: 1
     },
+    damage: '$add({1W},$attr_mod(owner, "dex"),$attr_mod(owner, "cha"))',
     roll: {
         attack: "dex",
         defense: "ac",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: '$add({1W},$attr_mod(owner, "dex"),$attr_mod(owner, "cha"))',
+                value: "primary_damage",
                 target: "primary_target"
             },
         ]
@@ -42,13 +43,14 @@ const piercing_strike: IRPower = {
         target_type: "creature",
         amount: 1
     },
+    damage: '$add({1W},$attr_mod(owner, "dex"))',
     roll: {
         attack: "dex",
         defense: "reflex",
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: '$add({1W},$attr_mod(owner, "dex"))',
+                value: "primary_damage",
                 target: "primary_target"
             },
         ]

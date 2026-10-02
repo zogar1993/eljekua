@@ -19,8 +19,8 @@ export const power_resolute_shield: IRPower = {
         amount: 1
     },
     damage: {
-        lvl_1: "{1W}",
-        lvl_21: "{2W}"
+        lvl_1: '$add({1W},$attr_mod(owner, "str"))',
+        lvl_21: '$add({2W},$attr_mod(owner, "str"))',
     },
     roll: {
         attack: "str",
@@ -28,7 +28,7 @@ export const power_resolute_shield: IRPower = {
         hit: [
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: '$add(primary_damage,$attr_mod(owner, "str"))',
+                value: "primary_damage",
                 target: "primary_target"
             },
             {

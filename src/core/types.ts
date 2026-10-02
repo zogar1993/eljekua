@@ -7,6 +7,14 @@ export const IR_INSTRUCTION_TYPE = {
     CONDITION: "condition",
 } as const
 
+export type IRPowerDamage =
+    | string
+    | {
+        lvl_1: string,
+        lvl_11?: string,
+        lvl_21?: string
+    }
+
 export type IRPower = {
     name: string
     description?: string
@@ -18,11 +26,7 @@ export type IRPower = {
         traits?: Array<"melee_basic_attack">
     }
     prerequisites?: Array<string>,
-    damage?: {
-        lvl_1: string,
-        lvl_11?: string,
-        lvl_21?: string
-    }
+    damage?: IRPowerDamage
     targeting?: Targeting,
     trigger?: IRTrigger,
     roll?: {
