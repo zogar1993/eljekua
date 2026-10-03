@@ -9,6 +9,7 @@ import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 
+//TODO this should change to not ad more frames and instead work as a plain bytecode
 export const interpret_attack_roll_consequence = ({
                                                       game_state,
                                                       instruction,
