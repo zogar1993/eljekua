@@ -44,6 +44,12 @@ These apply to every expression unless a section below states otherwise:
 - Parameters: two creature expressions.
 - Result: `true` when `$is_ally` would be `false`; otherwise `false`.
 
+## `$has_combat_advantage`
+
+- Parameters: attacker and defender creature expressions.
+- Result: `true` when the attacker has combat advantage against the defender; otherwise `false`.
+- Uses the same sources as attack rolls: flanking and defender statuses that grant combat advantage against the attacker (see Combat advantage).
+
 ## `$is_race`
 
 - Parameters: a creature expression and a race string.

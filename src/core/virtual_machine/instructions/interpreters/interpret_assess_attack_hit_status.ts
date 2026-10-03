@@ -5,7 +5,7 @@ import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {Creature, remove_creature_statuses} from "core/battlegrid/creatures/Creature";
 import {HIT_STATUS, HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
-import {is_flanking} from "core/battlegrid/queries/is_flanking";
+import {has_combat_advantage} from "core/battlegrid/queries/has_combat_advantage";
 import {add_numbers_resolved} from "core/virtual_machine/expressions/number_utils";
 import {get_creature_defense} from "core/character_sheet/get_creature_defense";
 import {get_attack_roll_modifier_parts} from "core/battlegrid/creatures/Modifier";
@@ -39,10 +39,8 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
             until_creature: defender
         })
 
-        if (
-            is_flanking({attacker, defender, battle_grid}) ||
-            defender.statuses.some(({rule}) => rule.type === "grant_combat_advantage" && (rule.against_creatures === null || rule.against_creatures.includes(attacker)))
-        ) attack_parts.push(COMBAT_ADVANTAGE)
+        if (has_combat_advantage({attacker, defender, battle_grid}))
+            attack_parts.push(COMBAT_ADVANTAGE)
 
         attack_parts.push(...get_attack_roll_modifier_parts({creature: attacker, game_queries}))
 

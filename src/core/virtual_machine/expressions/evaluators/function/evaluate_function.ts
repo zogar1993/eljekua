@@ -35,6 +35,9 @@ import {
     evaluate_function_are_enemies
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_are_enemies";
 import {
+    evaluate_function_has_combat_advantage
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_has_combat_advantage";
+import {
     evaluate_function_is_ally
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_is_ally";
 import {
@@ -120,6 +123,8 @@ export const build_evaluate_function = ({game_queries, game_state}: {
                 return evaluate_function_has_valid_targeting({node, game_state, game_queries})
             case FUNCTION_NAME.ARE_ENEMIES:
                 return evaluate_function_are_enemies({node, game_queries})
+            case FUNCTION_NAME.HAS_COMBAT_ADVANTAGE:
+                return evaluate_function_has_combat_advantage({node, game_queries, game_state})
             case FUNCTION_NAME.IS_ALLY:
                 return evaluate_function_is_ally({node, game_queries})
             case FUNCTION_NAME.IS_MONSTER_TEMPLATE:

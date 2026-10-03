@@ -5,6 +5,7 @@ export const FUNCTION_NAME = {
     ADD: "add",
     DISTANCE: "distance",
     ARE_ENEMIES: "are_enemies",
+    HAS_COMBAT_ADVANTAGE: "has_combat_advantage",
     IS_ALLY: "is_ally",
     IS_MONSTER_TEMPLATE: "is_monster_template",
     HAS_ACTION_TYPE_AVAILABLE: "has_action_type_available",
