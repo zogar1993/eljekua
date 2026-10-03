@@ -46,6 +46,8 @@ export const transform_power_ir_into_vm_representation = (power: IRPower): Power
         //TODO P4 check that no owner can be set on conditions so that we avoid confusing the trigger owner with the triggering power owner
     }
 
+    mark_primary_attack_damage(instructions)
+
     return {
         name: power.name,
         description: power.description,
@@ -165,7 +167,8 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 value: to_ast(instruction.value),
                 target: instruction.target,
                 damage_types: instruction.damage_types ?? [],
-                half_damage: instruction.half_damage ?? false
+                half_damage: instruction.half_damage ?? false,
+                is_primary_attack_damage: false,
             }]
         case INSTRUCTION_TYPE.ADD_TEMPORARY_HIT_POINTS:
             return [{
@@ -455,3 +458,25 @@ const create_not_ast = (operand: AstNode): AstNodeFunction => ({
     name: FUNCTION_NAME.NOT,
     parameters: [operand]
 })
+
+const mark_primary_attack_damage = (instructions: Array<Instruction>): boolean => {
+    for (const instruction of instructions) {
+        if (instruction.type === INSTRUCTION_TYPE.APPLY_DAMAGE && instruction.target === PRIMARY_TARGET_LABEL) {
+            instruction.is_primary_attack_damage = true
+            return true
+        }
+
+        if (instruction.type === INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE) {
+            if (mark_primary_attack_damage(instruction.hit)) return true
+            if (mark_primary_attack_damage(instruction.miss)) return true
+        }
+
+        if (instruction.type === INSTRUCTION_TYPE.OPTIONS) {
+            for (const option of instruction.options) {
+                if (mark_primary_attack_damage(option.instructions)) return true
+            }
+        }
+    }
+
+    return false
+}

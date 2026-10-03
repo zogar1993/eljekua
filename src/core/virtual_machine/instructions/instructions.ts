@@ -84,6 +84,7 @@ export type InstructionApplyDamage = {
     target: string
     half_damage: boolean
     damage_types: Array<string>
+    is_primary_attack_damage: boolean
 }
 
 export type InstructionAddTemporaryHitPoints = {
