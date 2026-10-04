@@ -3,6 +3,7 @@ import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {InstructionMovement} from "core/virtual_machine/instructions/instructions";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {create_trigger_frame, get_potential_triggers} from "core/virtual_machine/instructions/trigger_reactions";
+import {TRIGGER_INTERCEPTION, TRIGGER_TIMING} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 
 export const interpret_move = ({
                                    instruction,
@@ -20,7 +21,8 @@ export const interpret_move = ({
             game_state,
             game_queries,
             activator: moving_creature,
-            intercept: "movement"
+            intercept: TRIGGER_INTERCEPTION.MOVEMENT,
+            timing: TRIGGER_TIMING.REACTION,
         })
 
 

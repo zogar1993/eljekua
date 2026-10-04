@@ -40,6 +40,9 @@ import {
     interpret_add_current_turn_base_options
 } from "core/virtual_machine/instructions/interpreters/interpret_add_current_turn_base_options";
 import {interpret_jump} from "core/virtual_machine/instructions/interpreters/interpret_jump";
+import {
+    interpret_trigger_immediate_actions
+} from "core/virtual_machine/instructions/interpreters/interpret_trigger_immediate_actions";
 import {interpret_set_hit_status} from "core/virtual_machine/instructions/interpreters/interpret_set_hit_status";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>): void => {
@@ -57,6 +60,8 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             return interpret_select_attack_hit_status({...props, instruction})
         case INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE:
             return interpret_attack_roll_consequence({...props, instruction})
+        case INSTRUCTION_TYPE.TRIGGER_IMMEDIATE_ACTIONS:
+            return interpret_trigger_immediate_actions({...props, instruction})
         case INSTRUCTION_TYPE.APPLY_DAMAGE:
             return interpret_apply_damage({...props, instruction})
         case INSTRUCTION_TYPE.ADD_TEMPORARY_HIT_POINTS:

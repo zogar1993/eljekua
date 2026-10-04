@@ -16,29 +16,9 @@ export const interpret_attack_roll_consequence = ({
                                                       game_events,
                                                   }: InterpretInstructionProps<InstructionAttackRollConsequence>) => {
     const {vm_state} = game_state
-instruction.defender
     const attack_rolls = EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
     const entries = [...attack_rolls.entries()]
 
-    const has_crit = entries.some(([_, hit_status]) => hit_status === HIT_STATUS.CRIT)
-
-/* TODO fix how crit triggers work
-    if (has_crit) {
-        const activator = EXPR.as_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
-
-        const potential_triggers = get_potential_triggers({
-            game_state,
-            game_queries,
-            activator,
-            intercept: TRIGGER_INTERCEPTION.CRITICAL_HIT,
-        })
-
-        for (const {creature: trigger_owner, powers} of potential_triggers) {
-            const frame = create_trigger_frame({activator, trigger_owner, powers})
-            vm_state.add_scoped_instruction_frame(frame)
-        }
-    }
-*/
     const new_instructions: Array<Instruction> = []
 
     entries.forEach(([defender, hit_status]) => {

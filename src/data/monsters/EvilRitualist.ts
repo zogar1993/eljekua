@@ -29,7 +29,6 @@ const sacrificial_dagger: IRPower = {
     },
 }
 
-//TODO add reaction placement in the instruction queue
 //TODO ignored dont work properly as the immediate and oportunity defer
 const unholy_vigor: IRPower = {
     name: "Unholy Vigor",

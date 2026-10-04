@@ -2,6 +2,10 @@ import type {DefenseCode} from "core/character_sheet/get_creature_defense";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
+import {
+    TriggerInterception,
+    TriggerTiming
+} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 
 export const IR_INSTRUCTION_TYPE = {
     CONDITION: "condition",
@@ -173,7 +177,7 @@ type IRInstructionSelectTargetAreaBurst = {
 }
 
 type IRTrigger = {
-    type: "interruption" | "reaction"
-    intercepts: Array<"movement" | "critical_hit">
+    type: TriggerTiming
+    intercepts: Array<TriggerInterception>
     conditions: Array<string>
 }

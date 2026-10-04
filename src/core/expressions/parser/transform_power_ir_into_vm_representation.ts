@@ -75,10 +75,17 @@ export type Power = {
 }
 
 export type Trigger = {
-    type: "interruption" | "reaction"
+    type: TriggerTiming
     intercepts: Array<TriggerInterception>
     conditions: Array<AstNode>
 }
+
+export const TRIGGER_TIMING = {
+  INTERRUPTION: "interruption",
+  REACTION: "reaction",
+} as const
+
+export type TriggerTiming = typeof TRIGGER_TIMING[keyof typeof TRIGGER_TIMING]
 
 export const TRIGGER_INTERCEPTION = {
     MOVEMENT: "movement",
@@ -142,7 +149,14 @@ const transform_primary_roll = (roll: Required<IRPower>["roll"]): Array<Instruct
         hit_status_select,
         ...before_attack_roll_consequences,
         attack_roll_consequences,
+        INSTRUCTION_CRITICAL_HIT_REACTION,
     ]
+}
+
+const INSTRUCTION_CRITICAL_HIT_REACTION = {
+    type: INSTRUCTION_TYPE.TRIGGER_IMMEDIATE_ACTIONS,
+    interception: TRIGGER_INTERCEPTION.CRITICAL_HIT,
+    timing: TRIGGER_TIMING.REACTION
 }
 
 const is_attack_roll_resolution_mode = (resolution: AttackRollResolutionMode): AstNodeFunction => ({

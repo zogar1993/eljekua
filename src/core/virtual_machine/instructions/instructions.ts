@@ -3,6 +3,7 @@ import type {DefenseCode} from "core/character_sheet/get_creature_defense";
 import type {StatusDurationValue} from "core/types";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
+import {TriggerInterception, TriggerTiming} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 
 export const INSTRUCTION_TYPE = {
     ATTACK_D20_ROLL: "attack_d20_roll",
@@ -10,6 +11,7 @@ export const INSTRUCTION_TYPE = {
     ASSESS_ATTACK_HIT_STATUS: "assess_attack_hit_status",
     SELECT_ATTACK_HIT_STATUS: "select_attack_hit_status",
     ATTACK_ROLL_CONSEQUENCE: "attack_roll_consequence",
+    TRIGGER_IMMEDIATE_ACTIONS: "trigger_immediate_actions",
     APPLY_DAMAGE: "apply_damage",
     ADD_TEMPORARY_HIT_POINTS: "add_temporary_hit_points",
     WALK: "walk",
@@ -65,6 +67,12 @@ export type InstructionAttackRollConsequence = {
     type: typeof INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE
     hit: Array<Instruction>
     miss: Array<Instruction>
+}
+
+export type InstructionTriggerImmediateActions = {
+    type: typeof INSTRUCTION_TYPE.TRIGGER_IMMEDIATE_ACTIONS
+    interception: TriggerInterception
+    timing: TriggerTiming
 }
 
 export type InstructionJump = {
@@ -204,7 +212,8 @@ export type Instruction =
     InstructionSelectAttackD20Roll |
     InstructionAssessAttackHitStatus |
     InstructionSelectAttackHitStatus |
-    InstructionAttackRollConsequence
+    InstructionAttackRollConsequence |
+    InstructionTriggerImmediateActions
 
 
 export type InstructionSelectTarget =
