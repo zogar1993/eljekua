@@ -11,6 +11,7 @@ export const INSTRUCTION_TYPE = {
     ASSESS_ATTACK_HIT_STATUS: "assess_attack_hit_status",
     SELECT_ATTACK_HIT_STATUS: "select_attack_hit_status",
     ATTACK_ROLL_CONSEQUENCE: "attack_roll_consequence",
+    //TODO immediate is not quite right as it also catches opportunity
     TRIGGER_IMMEDIATE_ACTIONS: "trigger_immediate_actions",
     APPLY_DAMAGE: "apply_damage",
     ADD_TEMPORARY_HIT_POINTS: "add_temporary_hit_points",
