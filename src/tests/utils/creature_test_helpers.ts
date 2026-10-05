@@ -100,6 +100,11 @@ export const create_creature_test_helpers = ({
                 const attack_rolls = [{creature_id: target.id, hit_status: HIT_STATUS.MISS}]
                 instruction_loop.select({type: INTERACTION_TYPE.HIT_STATUS_SELECT, attack_rolls})
             },
+            rolls_a_crit_against: (target_creature_name: string) => {
+                const target = get_creature_by_name(target_creature_name)
+                const attack_rolls = [{creature_id: target.id, hit_status: HIT_STATUS.CRIT}]
+                instruction_loop.select({type: INTERACTION_TYPE.HIT_STATUS_SELECT, attack_rolls})
+            },
             rolls_d20_against: (target_creature_name: string, value: number) => {
                 const target = get_creature_by_name(target_creature_name)
                 const d20_rolls = [{creature_id: target.id, value}]
