@@ -43,6 +43,7 @@ export const transform_power_ir_into_vm_representation = (power: IRPower): Power
     if (power.trigger) {
         if (!TRIGGER_ACTION_TYPES.includes(power.type.action))
             throw Error(`Power '${power.name}' with trigger needs to be one of ${JSON.stringify(TRIGGER_ACTION_TYPES)} but is '${power.type.action}'.`)
+        validate_trigger_ir(power)
         //TODO P4 check that no owner can be set on conditions so that we avoid confusing the trigger owner with the triggering power owner
     }
 
@@ -415,6 +416,19 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
 }
 
 const TRIGGER_ACTION_TYPES = [ACTION_TYPE.IMMEDIATE, ACTION_TYPE.OPPORTUNITY, ACTION_TYPE.FREE_ATTACK] as Array<ActionType>
+
+const validate_trigger_ir = (power: IRPower) => {
+    const trigger = power.trigger
+    if (trigger === undefined) return
+
+    for (const intercept of trigger.intercepts) {
+        if (intercept === TRIGGER_INTERCEPTION.MOVEMENT && trigger.type !== TRIGGER_TIMING.INTERRUPTION)
+            throw Error(`Power '${power.name}' movement trigger must use timing '${TRIGGER_TIMING.INTERRUPTION}', got '${trigger.type}'`)
+
+        if (intercept === TRIGGER_INTERCEPTION.CRITICAL_HIT && trigger.type !== TRIGGER_TIMING.REACTION)
+            throw Error(`Power '${power.name}' critical hit trigger must use timing '${TRIGGER_TIMING.REACTION}', got '${trigger.type}'`)
+    }
+}
 
 const create_if_block = ({
                              condition,

@@ -22,7 +22,7 @@ export const interpret_move = ({
             game_queries,
             activator: moving_creature,
             intercept: TRIGGER_INTERCEPTION.MOVEMENT,
-            timing: TRIGGER_TIMING.REACTION,
+            timing: TRIGGER_TIMING.INTERRUPTION,
         })
 
 
