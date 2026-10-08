@@ -1,11 +1,9 @@
 import {
     Power,
     transform_power_ir_into_vm_representation,
-    TRIGGER_INTERCEPTION,
-    TRIGGER_TIMING,
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
-import {INTERACTION_TYPE, type InteractionsSelectOption} from "core/interactions/Interactions";
+import {INTERACTION_TYPE} from "core/interactions/Interactions";
 import {ATTACK_ROLL_RESOLUTION_MODE} from "core/settings/AttackRollResolutionMode";
 import {create_creature_test_helpers} from "tests/utils/creature_test_helpers";
 import {create_test_game} from "tests/utils/create_test_game";
@@ -88,15 +86,13 @@ describe("trigger transform validation", () => {
             instruction => instruction.type === INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE,
         )
         const trigger_index = attack.instructions.findIndex(
-            instruction => instruction.type === INSTRUCTION_TYPE.TRIGGER_IMMEDIATE_ACTIONS,
+            instruction => instruction.type === INSTRUCTION_TYPE.TRIGGER_CRITICAL_ROLL_REACTION,
         )
 
         expect(consequence_index).toBeGreaterThanOrEqual(0)
         expect(trigger_index).toBe(consequence_index + 1)
         expect(attack.instructions[trigger_index]).toEqual({
-            type: INSTRUCTION_TYPE.TRIGGER_IMMEDIATE_ACTIONS,
-            interception: TRIGGER_INTERCEPTION.CRITICAL_HIT,
-            timing: TRIGGER_TIMING.REACTION,
+            type: INSTRUCTION_TYPE.TRIGGER_CRITICAL_ROLL_REACTION,
         })
     })
 })
@@ -180,7 +176,8 @@ describe("critical hit reaction triggers", () => {
 
         const interaction = available_interaction.get_current()
         expect(interaction.type).toBe(INTERACTION_TYPE.OPTION_SELECT)
-        expect((interaction as InteractionsSelectOption).available_options.some(option => option.text === "Critical Hit Reaction")).toBe(true)
+        if (interaction.type !== INTERACTION_TYPE.OPTION_SELECT) throw new Error("expected option select")
+        expect(interaction.available_options.some((option) => option.text === "Critical Hit Reaction")).toBe(true)
     })
 
     test("does not offer a critical hit reaction on a non-critical hit", () => {
@@ -207,7 +204,7 @@ describe("critical hit reaction triggers", () => {
         expect(test_game.vm_state.get_acting_creature().data.name).toBe("linuar")
         const interaction = available_interaction.get_current()
         if (interaction.type === INTERACTION_TYPE.OPTION_SELECT) {
-            expect((interaction as InteractionsSelectOption).available_options.every(option => option.text !== "Critical Hit Reaction")).toBe(true)
+            expect(interaction.available_options.every((option) => option.text !== "Critical Hit Reaction")).toBe(true)
         }
     })
 })

@@ -261,8 +261,9 @@
 .instruction--type-assess_attack_hit_status .instruction__type-badge,
 .instruction--type-select_attack_hit_status .instruction__type-badge,
 .instruction--type-attack_roll_consequence .instruction__type-badge,
-.instruction--type-trigger_immediate_actions .instruction__type-badge,
-.instruction--type-react_to_critical_hit .instruction__type-badge,
+.instruction--type-walk_step .instruction__type-badge,
+.instruction--type-trigger_critical_roll_reaction .instruction__type-badge,
+.instruction--type-trigger_movement_interruption .instruction__type-badge,
 .instruction--type-apply_damage .instruction__type-badge,
 .instruction--type-apply_status .instruction__type-badge {
     background: #ffcdd2;
@@ -283,7 +284,8 @@
 }
 
 .instruction--type-jump_if .instruction__type-badge,
-.instruction--type-jump .instruction__type-badge {
+.instruction--type-jump .instruction__type-badge,
+.instruction--type-assert .instruction__type-badge {
     background: #fff9c4;
     color: #f57f17;
 }
