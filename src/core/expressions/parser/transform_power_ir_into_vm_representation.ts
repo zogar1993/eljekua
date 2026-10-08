@@ -18,7 +18,7 @@ import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE, TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
+import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import {assert_is_not_empty, assert_is_true} from "stdlib/assert";
 import {FUNCTION_NAME} from "core/expressions/function_names";
 import {ATTACK_ROLL_RESOLUTION_MODE, type AttackRollResolutionMode} from "core/settings/AttackRollResolutionMode";
@@ -150,14 +150,12 @@ const transform_primary_roll = (roll: Required<IRPower>["roll"]): Array<Instruct
         hit_status_select,
         ...before_attack_roll_consequences,
         attack_roll_consequences,
-        INSTRUCTION_CRITICAL_HIT_REACTION,
+        INSTRUCTION_TRIGGER_CRITICAL_ROLL_REACTION,
     ]
 }
 
-const INSTRUCTION_CRITICAL_HIT_REACTION = {
-    type: INSTRUCTION_TYPE.TRIGGER_IMMEDIATE_ACTIONS,
-    interception: TRIGGER_INTERCEPTION.CRITICAL_HIT,
-    timing: TRIGGER_TIMING.REACTION
+const INSTRUCTION_TRIGGER_CRITICAL_ROLL_REACTION = {
+    type: INSTRUCTION_TYPE.TRIGGER_CRITICAL_ROLL_REACTION,
 }
 
 const is_attack_roll_resolution_mode = (resolution: AttackRollResolutionMode): AstNodeFunction => ({
@@ -194,11 +192,10 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
         case INSTRUCTION_TYPE.SELECT_TARGET:
             return [transform_select_target_ir(instruction)]
         case INSTRUCTION_TYPE.WALK:
-            return [{
-                type: INSTRUCTION_TYPE.WALK,
+            return transform_walk({
                 target: instruction.target,
-                destination: instruction.destination
-            }]
+                destination: instruction.destination,
+            })
         case INSTRUCTION_TYPE.SHIFT:
             return [{
                 type: INSTRUCTION_TYPE.SHIFT,
@@ -428,6 +425,47 @@ const validate_trigger_ir = (power: IRPower) => {
         if (intercept === TRIGGER_INTERCEPTION.CRITICAL_HIT && trigger.type !== TRIGGER_TIMING.REACTION)
             throw Error(`Power '${power.name}' critical hit trigger must use timing '${TRIGGER_TIMING.REACTION}', got '${trigger.type}'`)
     }
+}
+
+const WALK_STEP_LOOP_BODY_LENGTH = 3
+
+const create_walk_index_label = (destination: string) => `${destination}_walk_index`
+
+const transform_walk = ({target, destination}: { target: string, destination: string }): Array<Instruction> => {
+    const index_label = create_walk_index_label(destination)
+
+    return [
+        {
+            type: INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED,
+            label: index_label,
+            value: to_ast("1"),
+        },
+        {
+            type: INSTRUCTION_TYPE.ASSERT,
+            condition: to_ast(`$is_greater($count(${destination}), 1)`),
+        },
+        {
+            type: INSTRUCTION_TYPE.TRIGGER_MOVEMENT_INTERRUPTION,
+            target,
+            destination,
+        },
+        {
+            type: INSTRUCTION_TYPE.WALK_STEP,
+            target,
+            destination,
+            index: index_label,
+        },
+        {
+            type: INSTRUCTION_TYPE.SAVE_VARIABLE,
+            label: index_label,
+            value: to_ast(`$add(${index_label}, 1)`),
+        },
+        {
+            type: INSTRUCTION_TYPE.JUMP_IF,
+            condition: to_ast(`$is_lower(${index_label}, $count(${destination}))`),
+            offset: -WALK_STEP_LOOP_BODY_LENGTH,
+        },
+    ]
 }
 
 const create_if_block = ({

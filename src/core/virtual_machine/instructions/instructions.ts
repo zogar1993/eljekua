@@ -3,16 +3,15 @@ import type {DefenseCode} from "core/character_sheet/get_creature_defense";
 import type {StatusDurationValue} from "core/types";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
-import {TriggerInterception, TriggerTiming} from "core/expressions/parser/transform_power_ir_into_vm_representation";
-
 export const INSTRUCTION_TYPE = {
     ATTACK_D20_ROLL: "attack_d20_roll",
     SELECT_ATTACK_D20_ROLL: "select_attack_d20_roll",
     ASSESS_ATTACK_HIT_STATUS: "assess_attack_hit_status",
     SELECT_ATTACK_HIT_STATUS: "select_attack_hit_status",
     ATTACK_ROLL_CONSEQUENCE: "attack_roll_consequence",
-    //TODO immediate is not quite right as it also catches opportunity
-    TRIGGER_IMMEDIATE_ACTIONS: "trigger_immediate_actions",
+    TRIGGER_CRITICAL_ROLL_REACTION: "trigger_critical_roll_reaction",
+    TRIGGER_MOVEMENT_INTERRUPTION: "trigger_movement_interruption",
+    WALK_STEP: "walk_step",
     APPLY_DAMAGE: "apply_damage",
     ADD_TEMPORARY_HIT_POINTS: "add_temporary_hit_points",
     WALK: "walk",
@@ -32,6 +31,7 @@ export const INSTRUCTION_TYPE = {
     ADD_CURRENT_TURN_BASE_OPTIONS: "add_current_turn_base_options",
     JUMP: "jump",
     JUMP_IF: "jump_if",
+    ASSERT: "assert",
 } as const
 
 export type InstructionType = typeof INSTRUCTION_TYPE[keyof typeof INSTRUCTION_TYPE];
@@ -70,10 +70,21 @@ export type InstructionAttackRollConsequence = {
     miss: Array<Instruction>
 }
 
-export type InstructionTriggerImmediateActions = {
-    type: typeof INSTRUCTION_TYPE.TRIGGER_IMMEDIATE_ACTIONS
-    interception: TriggerInterception
-    timing: TriggerTiming
+export type InstructionTriggerCriticalRollReaction = {
+    type: typeof INSTRUCTION_TYPE.TRIGGER_CRITICAL_ROLL_REACTION
+}
+
+export type InstructionTriggerMovementInterruption = {
+    type: typeof INSTRUCTION_TYPE.TRIGGER_MOVEMENT_INTERRUPTION
+    target: string
+    destination: string
+}
+
+export type InstructionWalkStep = {
+    type: typeof INSTRUCTION_TYPE.WALK_STEP
+    target: string
+    destination: string
+    index: string
 }
 
 export type InstructionJump = {
@@ -85,6 +96,11 @@ export type InstructionJumpIf = {
     type: typeof INSTRUCTION_TYPE.JUMP_IF,
     condition: AstNode,
     offset: number,
+}
+
+export type InstructionAssert = {
+    type: typeof INSTRUCTION_TYPE.ASSERT,
+    condition: AstNode,
 }
 
 export type InstructionApplyDamage = {
@@ -191,6 +207,7 @@ export type Instruction =
     InstructionApplyDamage |
     InstructionAddTemporaryHitPoints |
     InstructionMovement |
+    InstructionWalkStep |
     InstructionSwapPlaces |
     InstructionApplyStatus |
     InstructionForceMovement |
@@ -208,13 +225,15 @@ export type Instruction =
     // Branching
     InstructionJumpIf |
     InstructionJump |
+    InstructionAssert |
     // Misc
     InstructionAttackD20Roll |
     InstructionSelectAttackD20Roll |
     InstructionAssessAttackHitStatus |
     InstructionSelectAttackHitStatus |
     InstructionAttackRollConsequence |
-    InstructionTriggerImmediateActions
+    InstructionTriggerCriticalRollReaction |
+    InstructionTriggerMovementInterruption
 
 
 export type InstructionSelectTarget =

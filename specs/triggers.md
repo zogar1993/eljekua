@@ -13,7 +13,8 @@ Transforming a power whose trigger pairs an interception with the wrong timing t
 
 ## Movement interruption
 
-- Fires while a creature walks, before each step that would leave a square where a valid trigger applies.
+- Each walk step runs as: offer movement interruption triggers, then move one square, then continue the walk if the path is not finished.
+- Fires before each step that would leave a square where a valid trigger applies.
 - When triggers are offered, the walk pauses until every offered trigger is resolved or ignored; the walk then resumes from the interrupted square.
 
 ## Critical hit reaction

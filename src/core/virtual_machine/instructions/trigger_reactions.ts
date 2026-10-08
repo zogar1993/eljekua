@@ -61,6 +61,39 @@ export const get_potential_triggers = ({
     return trigger_owners
 }
 
+export const offer_trigger_reactions = ({
+                                            game_state,
+                                            game_queries,
+                                            activator,
+                                            intercept,
+                                            timing,
+                                            before_offering_triggers,
+                                        }: {
+    game_state: GameState
+    game_queries: GameQueries
+    activator: Creature
+    intercept: TriggerInterception
+    timing: TriggerTiming
+    before_offering_triggers?: () => void
+}): void => {
+    const potential_triggers = get_potential_triggers({
+        game_state,
+        game_queries,
+        activator,
+        intercept,
+        timing,
+    })
+
+    if (potential_triggers.length === 0) return
+
+    before_offering_triggers?.()
+
+    for (const {creature: trigger_owner, powers} of potential_triggers) {
+        const frame = create_trigger_frame({activator, trigger_owner, powers})
+        game_state.vm_state.add_scoped_instruction_frame(frame)
+    }
+}
+
 export const create_trigger_frame = ({activator, trigger_owner: creature, powers}: {
     activator: Creature
     trigger_owner: Creature

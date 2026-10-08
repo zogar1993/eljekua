@@ -13,13 +13,14 @@ import {interpret_apply_damage} from "core/virtual_machine/instructions/interpre
 import {
     interpret_add_temporary_hit_points
 } from "core/virtual_machine/instructions/interpreters/interpret_add_temporary_hit_points";
-import {interpret_move} from "core/virtual_machine/instructions/interpreters/interpret_move";
+import {interpret_walk_step} from "core/virtual_machine/instructions/interpreters/interpret_walk_step";
 import {interpret_shift} from "core/virtual_machine/instructions/interpreters/interpret_shift";
 import {interpret_swap_places} from "core/virtual_machine/instructions/interpreters/interpret_swap_places";
 import {interpret_force_movement} from "core/virtual_machine/instructions/interpreters/interpret_force_movement";
 import {interpret_save_variable} from "core/virtual_machine/instructions/interpreters/interpret_save_variable";
 import {interpret_options} from "core/virtual_machine/instructions/interpreters/interpret_options";
 import {interpret_jump_if} from "core/virtual_machine/instructions/interpreters/interpret_jump_if";
+import {interpret_assert} from "core/virtual_machine/instructions/interpreters/interpret_assert";
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import {
     interpret_save_number_as_resolved
@@ -41,8 +42,11 @@ import {
 } from "core/virtual_machine/instructions/interpreters/interpret_add_current_turn_base_options";
 import {interpret_jump} from "core/virtual_machine/instructions/interpreters/interpret_jump";
 import {
-    interpret_trigger_immediate_actions
-} from "core/virtual_machine/instructions/interpreters/interpret_trigger_immediate_actions";
+    interpret_trigger_critical_roll_reaction
+} from "core/virtual_machine/instructions/interpreters/interpret_trigger_critical_roll_reaction";
+import {
+    interpret_trigger_movement_interruption
+} from "core/virtual_machine/instructions/interpreters/interpret_trigger_movement_interruption";
 import {interpret_set_hit_status} from "core/virtual_machine/instructions/interpreters/interpret_set_hit_status";
 
 export const interpret_instruction = (props: InterpretInstructionProps<Instruction>): void => {
@@ -60,14 +64,16 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             return interpret_select_attack_hit_status({...props, instruction})
         case INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE:
             return interpret_attack_roll_consequence({...props, instruction})
-        case INSTRUCTION_TYPE.TRIGGER_IMMEDIATE_ACTIONS:
-            return interpret_trigger_immediate_actions({...props, instruction})
+        case INSTRUCTION_TYPE.TRIGGER_CRITICAL_ROLL_REACTION:
+            return interpret_trigger_critical_roll_reaction({...props, instruction})
+        case INSTRUCTION_TYPE.TRIGGER_MOVEMENT_INTERRUPTION:
+            return interpret_trigger_movement_interruption({...props, instruction})
         case INSTRUCTION_TYPE.APPLY_DAMAGE:
             return interpret_apply_damage({...props, instruction})
         case INSTRUCTION_TYPE.ADD_TEMPORARY_HIT_POINTS:
             return interpret_add_temporary_hit_points({...props, instruction})
-        case INSTRUCTION_TYPE.WALK:
-            return interpret_move({...props, instruction})
+        case INSTRUCTION_TYPE.WALK_STEP:
+            return interpret_walk_step({...props, instruction})
         case INSTRUCTION_TYPE.SHIFT:
             return interpret_shift({...props, instruction})
         case INSTRUCTION_TYPE.SWAP_PLACES:
@@ -86,6 +92,8 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
             return interpret_jump({...props, instruction})
         case INSTRUCTION_TYPE.JUMP_IF:
             return interpret_jump_if({...props, instruction})
+        case INSTRUCTION_TYPE.ASSERT:
+            return interpret_assert({...props, instruction})
         case INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS:
             return interpret_add_powers_as_options({...props, instruction})
         case INSTRUCTION_TYPE.EXECUTE_POWER:
