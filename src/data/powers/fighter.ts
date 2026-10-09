@@ -232,20 +232,20 @@ const brash_strike: IRPower = {
         defense: "ac",
         hit: [
             {
-                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                value: "primary_damage",
-                target: "primary_target"
-            },
-            {
                 type: IR_INSTRUCTION_TYPE.CONDITION,
                 condition: `$or($equipped(owner, "hammer"), $equipped(owner, "axe"), $equipped(owner, "mace"))`,
                 instructions_true: [
                     {
-                        type: INSTRUCTION_TYPE.APPLY_DAMAGE,
-                        value: '$attr_mod(owner, "con")',
-                        target: "primary_target"
-                    },//TODO P1 revisit that these damages are all dealt as one chunk instead of parts
+                        type: INSTRUCTION_TYPE.SAVE_VARIABLE,
+                        value: '$add($attr_mod(owner, "con"), primary_target)',
+                        label: "primary_target"
+                    },
                 ]
+            },
+            {
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
+                value: "primary_damage",
+                target: "primary_target"
             }
         ],
     },
