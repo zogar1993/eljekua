@@ -7,6 +7,10 @@ import type {Monster} from "data/monsters/Monster";
 import {evil_ritualist} from "data/monsters/EvilRitualist";
 import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import {
+    transform_creature_rule,
+    transform_modifier,
+} from "core/expressions/parser/transform_creature_ir";
+import {
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import {create_hit_status_buttons_ui} from "web/core/hit_status_buttons/HitStatusButtonsUI";
@@ -174,8 +178,8 @@ const build_monster = (
         trained_skills: overrides.trained_skills ?? [],
         skills: overrides.skills ?? monster.skills ?? {},
         archetypes: overrides.archetypes ?? monster.archetypes,
-        constant_rules: overrides.constant_rules ?? monster.constant_rules ?? [],
-        modifiers: overrides.modifiers ?? monster.modifiers ?? [],
+        constant_rules: overrides.constant_rules ?? monster.constant_rules.map(transform_creature_rule),
+        modifiers: overrides.modifiers ?? monster.modifiers?.map(transform_modifier) ?? [],
         languages: overrides.languages ?? monster.languages,
         powers: overrides.powers ?? monster.powers.map(transform_power_ir_into_vm_representation),
     }

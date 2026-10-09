@@ -1,7 +1,6 @@
-import type {IRPower} from "core/types";
+import type {IRModifierAttackRoll, IRPower} from "core/types";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {MODIFIER_TYPE} from "core/battlegrid/creatures/Modifier";
-import {to_ast} from "core/expressions/parser/to_ast";
 import type {Monster} from "data/monsters/Monster";
 
 const spear: IRPower = {
@@ -51,10 +50,10 @@ const shifty: IRPower = {
     ],
 }
 
-const mob_attack = {
+const mob_attack: IRModifierAttackRoll = {
     name: "Mob Attack",
     type: MODIFIER_TYPE.ATTACK_ROLL,
-    value: to_ast(`$count($filter_creatures($adjacent_creatures(owner), $and($is_ally(owner, filter_creature), $is_race(filter_creature, "kobold"))))`),
+    value: "$count($filter_creatures($adjacent_creatures(owner), $and($is_ally(owner, filter_creature), $is_race(filter_creature, \"kobold\"))))",
 }
 
 const kobold_skirmisher: Monster = {

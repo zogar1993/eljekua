@@ -1,14 +1,10 @@
-import type {IRPower} from "core/types";
-import type {CreatureRuleRestrictTargeting} from "core/battlegrid/creatures/Creature";
-import {to_ast} from "core/expressions/parser/to_ast";
+import type {IRCreatureRuleRestrictTargeting, IRPower} from "core/types";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import type {Monster} from "data/monsters/Monster";
 
-const SLINKS_BOON: CreatureRuleRestrictTargeting = {
+const SLINKS_BOON: IRCreatureRuleRestrictTargeting = {
     type: "restrict_targeting",
-    targetable_when: to_ast(
-        "$is_lower_or_equal($distance(attacker, owner), $min($map(targets, x, $distance(x, attacker))))",
-    ),
+    targetable_when: "$is_lower_or_equal($distance(attacker, owner), $min($map(targets, x, $distance(x, attacker))))",
 }
 
 const spear: IRPower = {

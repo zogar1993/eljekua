@@ -1,5 +1,12 @@
 import type {DefenseCode} from "core/character_sheet/get_creature_defense";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
+import type {
+    CreatureRuleGainAttackBonus,
+    CreatureRuleGainResistance,
+    CreatureRuleGainVulnerability,
+    CreatureRuleGrantCombatAdvantage,
+} from "core/battlegrid/creatures/creature_rule";
+import {MODIFIER_TYPE} from "core/battlegrid/creatures/Modifier";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {
@@ -181,3 +188,23 @@ type IRTrigger = {
     intercepts: Array<TriggerInterception>
     conditions: Array<string>
 }
+
+export type IRCreatureRuleRestrictTargeting = {
+    type: "restrict_targeting"
+    targetable_when: string
+}
+
+export type IRCreatureRule =
+    CreatureRuleGrantCombatAdvantage |
+    CreatureRuleGainResistance |
+    CreatureRuleGainVulnerability |
+    CreatureRuleGainAttackBonus |
+    IRCreatureRuleRestrictTargeting
+
+export type IRModifierAttackRoll = {
+    name: string
+    type: typeof MODIFIER_TYPE.ATTACK_ROLL
+    value: string
+}
+
+export type IRModifier = IRModifierAttackRoll
