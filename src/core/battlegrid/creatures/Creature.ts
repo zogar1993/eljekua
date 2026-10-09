@@ -50,7 +50,7 @@ export const create_creature = ({id, data}: { id: number, data: CreatureData }) 
 
 export type Creature = ReturnType<typeof create_creature>
 
-//P1 add weapon types
+//TODO P1 add weapon types
 export const has_creature_equipped = ({creature, weapon_type}: { creature: Creature, weapon_type: string }) => false
 
 export const get_creature_half_level = ({creature}: { creature: Creature }) =>
