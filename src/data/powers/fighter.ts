@@ -244,7 +244,7 @@ const brash_strike: IRPower = {
                         type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                         value: '$attr_mod(owner, "con")',
                         target: "primary_target"
-                    },//TODO P1 revisit that these damages are all dealt as one chunk instead of parts
+                    },
                 ]
             }
         ],
