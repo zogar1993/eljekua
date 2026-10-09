@@ -23,12 +23,12 @@ export const SYSTEM_KEYWORD = {
     OWNER: "owner",
     POWER_NAME: "power_name",
     PRIMARY_TARGET: "primary_target",
-    TRIGGERER: "triggerer",
+    TRIGGER_ACTIVATOR: "trigger_activator",
+    TRIGGER_OWNER: "trigger_owner",
+    TARGETS: "targets",
     HIT_STATUS: "hit_status",
     ATTACK_D20_ROLLS: "attack_d20_rolls",
     FILTER_CREATURE: "filter_creature",
-    ATTACKER: "attacker",
-    TARGETS: "targets",
 } as const
 
 export const AST = {

@@ -29,7 +29,7 @@ export const interpret_add_powers_as_options = ({
         const is_opportunity_attack = instruction.cost === "opportunity"
         const action_type_cost = instruction.cost === "normal" ? power.type.action : instruction.cost
         const initialization = is_opportunity_attack ? [{
-            from: SYSTEM_KEYWORD.TRIGGERER,
+            from: SYSTEM_KEYWORD.TRIGGER_ACTIVATOR,
             to: SYSTEM_KEYWORD.PRIMARY_TARGET
         }] : []
         const instructions: Array<Instruction> = [

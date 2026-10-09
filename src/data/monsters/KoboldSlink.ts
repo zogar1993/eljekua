@@ -4,7 +4,7 @@ import type {Monster} from "data/monsters/Monster";
 
 const SLINKS_BOON: IRCreatureRuleRestrictTargeting = {
     type: "restrict_targeting",
-    targetable_when: "$is_lower_or_equal($distance(attacker, owner), $min($map(targets, x, $distance(x, attacker))))",
+    targetable_when: "$is_lower_or_equal($distance(trigger_activator, trigger_owner), $min($map(targets, x, $distance(x, trigger_activator))))",
 }
 
 const spear: IRPower = {

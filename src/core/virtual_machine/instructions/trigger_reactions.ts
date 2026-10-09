@@ -9,11 +9,6 @@ import {type Instruction, INSTRUCTION_TYPE} from "core/virtual_machine/instructi
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE} from "core/battlegrid/creatures/ActionType";
 
-export const TRIGGER_VARIABLE = {
-    ACTIVATOR: "trigger_activator",
-    OWNER: "trigger_owner",
-} as const
-
 export const get_potential_triggers = ({
                                            game_state,
                                            game_queries,
@@ -35,14 +30,14 @@ export const get_potential_triggers = ({
     const already_triggered = vm_state.has_variable(already_triggered_key) ?
         EXPR.as_creatures(vm_state.get_variable(already_triggered_key)) : []
 
-    vm_state.set_variable(TRIGGER_VARIABLE.ACTIVATOR, {type: "creatures", value: [activator]})
+    vm_state.set_variable(SYSTEM_KEYWORD.TRIGGER_ACTIVATOR, {type: "creatures", value: [activator]})
 
     const current_turn_creature = initiative_order.get_current_creature()
     const trigger_owners = creatures.get_all()
         .filter(creature => !already_triggered.includes(creature))
         .map(creature => {
             // TODO this is ugly since it mutates inside of a query
-            vm_state.set_variable(TRIGGER_VARIABLE.OWNER, {type: "creatures", value: [creature]})
+            vm_state.set_variable(SYSTEM_KEYWORD.TRIGGER_OWNER, {type: "creatures", value: [creature]})
             const powers = creature.data.powers.filter(power => {
                 if (!power.trigger) return false
                 if (!power.trigger.intercepts.includes(intercept)) return false
@@ -114,7 +109,7 @@ export const create_trigger_frame = ({activator, trigger_owner: creature, powers
     }],
     variables: {
         [SYSTEM_KEYWORD.OWNER]: {type: "creatures", value: [creature]},
-        [SYSTEM_KEYWORD.TRIGGERER]: {type: "creatures", value: [activator]}
+        [SYSTEM_KEYWORD.TRIGGER_ACTIVATOR]: {type: "creatures", value: [activator]},
     }
 })
 

@@ -41,11 +41,11 @@ describe("$min", () => {
         const near = create_test_creature({name: "near", position: ADJACENT_TO_ISOLATED_POSITION})
         const far = create_test_creature({name: "far", position: DISTANT_POSITION})
 
-        bind_creature(SYSTEM_KEYWORD.ATTACKER, attacker)
+        bind_creature(SYSTEM_KEYWORD.TRIGGER_ACTIVATOR, attacker)
         game_state.vm_state.set_variable(SYSTEM_KEYWORD.TARGETS, {type: "creatures", value: [near, far, attacker]})
 
         expect(EXPR.as_number(evaluate_expression(
-            "$min($map(targets, x, $distance(x, attacker)))",
+            "$min($map(targets, x, $distance(x, trigger_activator)))",
         ))).toBe(0)
     })
 
