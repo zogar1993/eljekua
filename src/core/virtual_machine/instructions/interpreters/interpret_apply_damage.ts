@@ -27,8 +27,6 @@ export const interpret_apply_damage = ({
     const {vm_state} = game_state
     const attacker = vm_state.get_acting_creature()
 
-    //TODO P3 we probably want to apply damage to a bunch of enemies at the same time
-
     const target = EXPR.as_creature(vm_state.get_variable(instruction.target))
 
     const hit_status = EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
