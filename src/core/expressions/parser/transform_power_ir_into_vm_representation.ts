@@ -178,7 +178,7 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
             return [{
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: to_ast(instruction.value),
-                target: instruction.target,
+                target_label: instruction.target_label,
                 damage_types: instruction.damage_types ?? [],
                 half_damage: instruction.half_damage ?? false,
                 is_primary_attack_damage: false,
@@ -187,26 +187,26 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
             return [{
                 type: INSTRUCTION_TYPE.ADD_TEMPORARY_HIT_POINTS,
                 value: to_ast(instruction.value),
-                target: instruction.target,
+                target_label: instruction.target_label,
             }]
         case INSTRUCTION_TYPE.SELECT_TARGET:
             return [transform_select_target_ir(instruction)]
         case INSTRUCTION_TYPE.WALK:
             return transform_walk({
-                target: instruction.target,
-                destination: instruction.destination,
+                target_label: instruction.target_label,
+                destination_label: instruction.destination_label,
             })
         case INSTRUCTION_TYPE.SHIFT:
             return [{
                 type: INSTRUCTION_TYPE.SHIFT,
-                target: instruction.target,
-                destination: instruction.destination
+                target_label: instruction.target_label,
+                destination_label: instruction.destination_label
             }]
         case INSTRUCTION_TYPE.SWAP_PLACES:
             return [{
                 type: INSTRUCTION_TYPE.SWAP_PLACES,
-                creature_a: instruction.creature_a,
-                creature_b: instruction.creature_b,
+                creature_a_label: instruction.creature_a_label,
+                creature_b_label: instruction.creature_b_label,
             }]
         case IR_INSTRUCTION_TYPE.CONDITION:
             return create_if_block({
@@ -237,7 +237,7 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
         case INSTRUCTION_TYPE.SET_HIT_STATUS:
             return [{
                 type: INSTRUCTION_TYPE.SET_HIT_STATUS,
-                target: instruction.target,
+                target_label: instruction.target_label,
                 status: instruction.status,
             }]
         case "push":
@@ -247,20 +247,20 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                     targeting_type: "push",
                     distance: to_ast(instruction.amount),
                     anchor: to_ast("$position(owner)"),
-                    defender: to_ast(instruction.target),
+                    defender: to_ast(instruction.target_label),
                     target_label: "push_position"
                 },
                 {
                     type: INSTRUCTION_TYPE.FORCE_MOVEMENT,
                     movement_type: "push",
-                    target: to_ast(instruction.target),
+                    target: to_ast(instruction.target_label),
                     destination: to_ast("push_position")
                 }
             ]
         case INSTRUCTION_TYPE.APPLY_STATUS:
             return [{
                 type: INSTRUCTION_TYPE.APPLY_STATUS,
-                target: to_ast(instruction.target),
+                target: to_ast(instruction.target_label),
                 duration: typeof instruction.duration === "string" ? [instruction.duration] : instruction.duration,
                 status: transform_apply_status_ir(instruction)
             }]
@@ -429,10 +429,10 @@ const validate_trigger_ir = (power: IRPower) => {
 
 const WALK_STEP_LOOP_BODY_LENGTH = 3
 
-const create_walk_index_label = (destination: string) => `${destination}_walk_index`
+const create_walk_index_label = (destination_label: string) => `${destination_label}_walk_index`
 
-const transform_walk = ({target, destination}: { target: string, destination: string }): Array<Instruction> => {
-    const index_label = create_walk_index_label(destination)
+const transform_walk = ({target_label, destination_label}: { target_label: string, destination_label: string }): Array<Instruction> => {
+    const index_label = create_walk_index_label(destination_label)
 
     return [
         {
@@ -442,18 +442,18 @@ const transform_walk = ({target, destination}: { target: string, destination: st
         },
         {
             type: INSTRUCTION_TYPE.ASSERT,
-            condition: to_ast(`$is_greater($count(${destination}), 1)`),
+            condition: to_ast(`$is_greater($count(${destination_label}), 1)`),
         },
         {
             type: INSTRUCTION_TYPE.TRIGGER_MOVEMENT_INTERRUPTION,
-            target,
-            destination,
+            target_label,
+            destination_label,
         },
         {
             type: INSTRUCTION_TYPE.WALK_STEP,
-            target,
-            destination,
-            index: index_label,
+            target_label,
+            destination_label,
+            index_label,
         },
         {
             type: INSTRUCTION_TYPE.SAVE_VARIABLE,
@@ -462,7 +462,7 @@ const transform_walk = ({target, destination}: { target: string, destination: st
         },
         {
             type: INSTRUCTION_TYPE.JUMP_IF,
-            condition: to_ast(`$is_lower(${index_label}, $count(${destination}))`),
+            condition: to_ast(`$is_lower(${index_label}, $count(${destination_label}))`),
             offset: -WALK_STEP_LOOP_BODY_LENGTH,
         },
     ]
@@ -527,7 +527,7 @@ const create_not_ast = (operand: AstNode): AstNodeFunction => ({
 
 const mark_primary_attack_damage = (instructions: Array<Instruction>): boolean => {
     for (const instruction of instructions) {
-        if (instruction.type === INSTRUCTION_TYPE.APPLY_DAMAGE && instruction.target === PRIMARY_TARGET_LABEL) {
+        if (instruction.type === INSTRUCTION_TYPE.APPLY_DAMAGE && instruction.target_label === PRIMARY_TARGET_LABEL) {
             instruction.is_primary_attack_damage = true
             return true
         }

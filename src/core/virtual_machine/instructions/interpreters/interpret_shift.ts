@@ -8,8 +8,8 @@ export const interpret_shift = ({
                                     game_events,
                                 }: InterpretInstructionProps<InstructionMovement>) => {
     const {vm_state} = game_state
-    const creature = EXPR.as_creature(vm_state.get_variable(instruction.target))
-    const path = EXPR.as_positions(vm_state.get_variable(instruction.destination))
+    const creature = EXPR.as_creature(vm_state.get_variable(instruction.target_label))
+    const path = EXPR.as_positions(vm_state.get_variable(instruction.destination_label))
     for (const position of path) {
         creature.data.position = position
         game_events.on_creature_moved.raise({creature, position, movement_type: "move"})

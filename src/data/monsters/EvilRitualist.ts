@@ -23,7 +23,7 @@ const sacrificial_dagger: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target"
+                target_label: "primary_target"
             }
         ]
     },

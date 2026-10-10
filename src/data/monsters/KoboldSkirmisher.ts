@@ -24,7 +24,7 @@ const spear: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target",
+                target_label: "primary_target",
             },
         ],
     },
@@ -44,8 +44,8 @@ const shifty: IRPower = {
     effect: [
         {
             type: INSTRUCTION_TYPE.SHIFT,
-            target: "owner",
-            destination: "primary_target",
+            target_label: "owner",
+            destination_label: "primary_target",
         },
     ],
 }

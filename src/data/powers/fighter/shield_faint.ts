@@ -29,11 +29,11 @@ export const power_shield_faint: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target"
+                target_label: "primary_target"
             },
             {
                 type: INSTRUCTION_TYPE.APPLY_STATUS,
-                target: "owner",
+                target_label: "owner",
                 duration: ["until_end_of_your_next_turn", "until_your_next_attack_roll_against_target"],
                 status: {
                     type: "gain_attack_bonus",

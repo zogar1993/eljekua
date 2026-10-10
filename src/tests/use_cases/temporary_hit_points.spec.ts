@@ -171,7 +171,7 @@ const GRANT_TEMP_HP = (
     targeting: {targeting_type: "melee_weapon", target_type: "ally", amount: 1},
     effect: [{
         type: "add_temporary_hit_points",
-        target: "primary_target",
+        target_label: "primary_target",
         value: `${amount}`,
     }],
 })
@@ -183,11 +183,11 @@ const DEAL_DAMAGE = (): Power => transform_power_ir_into_vm_representation({
     type: {action: "standard", cooldown: "at-will", attack: true},
     targeting: {targeting_type: "melee_weapon", target_type: "enemy", amount: 1},
     effect: [
-        {type: "set_hit_status", target: "primary_target", status: HIT_STATUS.HIT},
+        {type: "set_hit_status", target_label: "primary_target", status: HIT_STATUS.HIT},
         {
             type: "apply_damage",
             value: `${DAMAGE}`,
-            target: "primary_target",
+            target_label: "primary_target",
             damage_types: [],
         },
     ],

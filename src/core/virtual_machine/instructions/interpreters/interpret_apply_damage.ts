@@ -27,7 +27,7 @@ export const interpret_apply_damage = ({
     const {vm_state} = game_state
     const attacker = vm_state.get_acting_creature()
 
-    const target = EXPR.as_creature(vm_state.get_variable(instruction.target))
+    const target = EXPR.as_creature(vm_state.get_variable(instruction.target_label))
 
     const hit_status = EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
     const hit_status_value = hit_status.get(target)

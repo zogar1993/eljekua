@@ -29,11 +29,11 @@ export const power_resolute_shield: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target"
+                target_label: "primary_target"
             },
             {
                 type: INSTRUCTION_TYPE.APPLY_STATUS,
-                target: "owner",
+                target_label: "owner",
                 duration: "until_end_of_your_next_turn",
                 status: {
                     type: "gain_resistance",

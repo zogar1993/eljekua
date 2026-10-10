@@ -22,13 +22,13 @@ const magic_missile: IRPower = {
     effect: [
         {
             type: INSTRUCTION_TYPE.SET_HIT_STATUS,
-            target: "primary_target",
+            target_label: "primary_target",
             status: HIT_STATUS.HIT,
         },
         {
             type: INSTRUCTION_TYPE.APPLY_DAMAGE,
             value: "primary_damage",
-            target: "primary_target",
+            target_label: "primary_target",
             damage_types: ["force"]
         }
     ]
@@ -57,7 +57,7 @@ const scorching_burst: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target",
+                target_label: "primary_target",
                 damage_types: ["fire"]
             },
         ]

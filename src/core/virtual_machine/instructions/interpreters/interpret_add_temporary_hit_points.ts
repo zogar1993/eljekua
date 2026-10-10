@@ -11,7 +11,7 @@ export const interpret_add_temporary_hit_points = ({
                                                        game_events,
                                                    }: InterpretInstructionProps<InstructionAddTemporaryHitPoints>) => {
     const {vm_state} = game_state
-    const target = EXPR.as_creature(vm_state.get_variable(instruction.target))
+    const target = EXPR.as_creature(vm_state.get_variable(instruction.target_label))
     const amount = resolve_number(EXPR.as_number_expr(game_queries.evaluate(instruction.value)))
 
     grant_creature_temporary_hit_points({creature: target, amount: amount.value})

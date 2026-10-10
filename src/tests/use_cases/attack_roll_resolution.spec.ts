@@ -66,7 +66,7 @@ const ATTACK_WITH_ZERO_BONUS: Power = transform_power_ir_into_vm_representation(
             {
                 type: "apply_damage",
                 value: "1",
-                target: "primary_target",
+                target_label: "primary_target",
             },
         ],
     },

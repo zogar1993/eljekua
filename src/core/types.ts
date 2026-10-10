@@ -60,24 +60,24 @@ export type IRInstruction =
     {
         type: typeof INSTRUCTION_TYPE.APPLY_DAMAGE
         value: string
-        target: string
+        target_label: string
         half_damage?: boolean
         damage_types?: Array<string>
     } |
     {
         type: typeof INSTRUCTION_TYPE.ADD_TEMPORARY_HIT_POINTS
         value: string
-        target: string
+        target_label: string
     } |
     IRInstructionSelectTarget |
     {
         type: typeof INSTRUCTION_TYPE.WALK | typeof INSTRUCTION_TYPE.SHIFT,
-        target: "owner",
-        destination: string
+        target_label: "owner",
+        destination_label: string
     } | {
         type: typeof INSTRUCTION_TYPE.SWAP_PLACES,
-        creature_a: string,
-        creature_b: string,
+        creature_a_label: string,
+        creature_b_label: string,
     } | {
     type: typeof IR_INSTRUCTION_TYPE.CONDITION,
     condition: string,
@@ -93,14 +93,14 @@ export type IRInstruction =
 } | {
     type: "push",
     amount: number,
-    target: string
+    target_label: string
 } | {
     type: typeof INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED
     value: string
     label: string
 } | {
     type: typeof INSTRUCTION_TYPE.SET_HIT_STATUS
-    target: string
+    target_label: string
     status: HitStatus
 } | IRInstructionApplyStatus
  | {
@@ -112,7 +112,7 @@ export type IRInstruction =
 
 export type IRInstructionApplyStatus = {
     type: typeof INSTRUCTION_TYPE.APPLY_STATUS,
-    target: string,
+    target_label: string,
     duration: IRStatusDuration
     status: {
         type: "grant_combat_advantage",

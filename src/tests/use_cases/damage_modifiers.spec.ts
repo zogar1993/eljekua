@@ -347,11 +347,11 @@ const create_deal_damage_power = ({
     type: {action: "standard", cooldown: "at-will", attack: true},
     targeting: {targeting_type: "melee_weapon", target_type: "enemy", amount: 1},
     effect: [
-        {type: "set_hit_status", target: "primary_target", status: hit_status},
+        {type: "set_hit_status", target_label: "primary_target", status: hit_status},
         {
             type: "apply_damage",
             value: `${DAMAGE}`,
-            target: "primary_target",
+            target_label: "primary_target",
             damage_types: types,
             half_damage,
         },

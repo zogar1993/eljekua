@@ -34,7 +34,7 @@ const MELEE_ATTACK: Power = transform_power_ir_into_vm_representation({
         hit: [{
             type: INSTRUCTION_TYPE.APPLY_DAMAGE,
             value: "1",
-            target: "primary_target",
+            target_label: "primary_target",
         }],
     },
 })
@@ -77,7 +77,7 @@ describe("trigger transform validation", () => {
                 hit: [{
                     type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                     value: "1",
-                    target: "primary_target",
+                    target_label: "primary_target",
                 }],
             },
         })

@@ -8,8 +8,8 @@ export const interpret_swap_places = ({
                                            game_events,
                                        }: InterpretInstructionProps<InstructionSwapPlaces>) => {
     const {vm_state} = game_state
-    const creature_a = EXPR.as_creature(vm_state.get_variable(instruction.creature_a))
-    const creature_b = EXPR.as_creature(vm_state.get_variable(instruction.creature_b))
+    const creature_a = EXPR.as_creature(vm_state.get_variable(instruction.creature_a_label))
+    const creature_b = EXPR.as_creature(vm_state.get_variable(instruction.creature_b_label))
     const position_a = creature_a.data.position
     const position_b = creature_b.data.position
 

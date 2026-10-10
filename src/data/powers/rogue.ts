@@ -24,7 +24,7 @@ const sly_flourish = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target"
+                target_label: "primary_target"
             },
         ]
     },
@@ -51,7 +51,7 @@ const piercing_strike: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target"
+                target_label: "primary_target"
             },
         ]
     },

@@ -75,15 +75,15 @@ export type InstructionTriggerCriticalRollReaction = {
 
 export type InstructionTriggerMovementInterruption = {
     type: typeof INSTRUCTION_TYPE.TRIGGER_MOVEMENT_INTERRUPTION
-    target: string
-    destination: string
+    target_label: string
+    destination_label: string
 }
 
 export type InstructionWalkStep = {
     type: typeof INSTRUCTION_TYPE.WALK_STEP
-    target: string
-    destination: string
-    index: string
+    target_label: string
+    destination_label: string
+    index_label: string
 }
 
 export type InstructionJump = {
@@ -105,7 +105,7 @@ export type InstructionAssert = {
 export type InstructionApplyDamage = {
     type: typeof INSTRUCTION_TYPE.APPLY_DAMAGE
     value: AstNode
-    target: string
+    target_label: string
     half_damage: boolean
     damage_types: Array<string>
     is_primary_attack_damage: boolean
@@ -113,20 +113,20 @@ export type InstructionApplyDamage = {
 
 export type InstructionAddTemporaryHitPoints = {
     type: typeof INSTRUCTION_TYPE.ADD_TEMPORARY_HIT_POINTS
-    target: string
+    target_label: string
     value: AstNode
 }
 
 export type InstructionMovement = {
     type: typeof INSTRUCTION_TYPE.WALK | typeof INSTRUCTION_TYPE.SHIFT
-    target: string
-    destination: string
+    target_label: string
+    destination_label: string
 }
 
 export type InstructionSwapPlaces = {
     type: typeof INSTRUCTION_TYPE.SWAP_PLACES
-    creature_a: string
-    creature_b: string
+    creature_a_label: string
+    creature_b_label: string
 }
 
 export type InstructionOptions = {
@@ -150,7 +150,7 @@ export type InstructionSaveResolvedNumber = {
 
 export type InstructionSetHitStatus = {
     type: typeof INSTRUCTION_TYPE.SET_HIT_STATUS,
-    target: string,
+    target_label: string,
     status: HitStatus,
 }
 
@@ -164,8 +164,8 @@ export type InstructionAddPowers = {
 
 export type InstructionExecutePower = {
     type: typeof INSTRUCTION_TYPE.EXECUTE_POWER,
-    power: string,
-    initialization?: Array<{ from: string, to: string }>,
+    power_label: string,
+    initialization?: Array<{ from_label: string, to_label: string }>,
 }
 
 export type InstructionForceMovement = {

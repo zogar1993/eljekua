@@ -8,9 +8,9 @@ export const interpret_walk_step = ({
                                         game_events,
                                     }: InterpretInstructionProps<InstructionWalkStep>) => {
     const {vm_state} = game_state
-    const creature = EXPR.as_creature(vm_state.get_variable(instruction.target))
-    const path = EXPR.as_positions(vm_state.get_variable(instruction.destination))
-    const index = EXPR.as_number(vm_state.get_variable(instruction.index))
+    const creature = EXPR.as_creature(vm_state.get_variable(instruction.target_label))
+    const path = EXPR.as_positions(vm_state.get_variable(instruction.destination_label))
+    const index = EXPR.as_number(vm_state.get_variable(instruction.index_label))
 
     if (index >= path.length) return
 

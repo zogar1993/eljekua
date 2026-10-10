@@ -27,7 +27,7 @@ const sure_strike: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target"
+                target_label: "primary_target"
             },
         ]
     },
@@ -62,7 +62,7 @@ const cleave: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target"
+                target_label: "primary_target"
             },
             {
                 type: IR_INSTRUCTION_TYPE.CONDITION,
@@ -71,7 +71,7 @@ const cleave: IRPower = {
                     {
                         type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                         value: '$attr_mod(owner, "str")',
-                        target: "secondary_target",
+                        target_label: "secondary_target",
                     },
                 ]
             }
@@ -100,7 +100,7 @@ const reaping_strike: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target"
+                target_label: "primary_target"
             },
         ],
         miss: [
@@ -111,14 +111,14 @@ const reaping_strike: IRPower = {
                     {
                         type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                         value: `$attr_mod(owner, "str")`,
-                        target: "primary_target"
+                        target_label: "primary_target"
                     },
                 ],
                 instructions_false: [
                     {
                         type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                         value: `$attr_mod(owner, "str")`,
-                        target: "primary_target",
+                        target_label: "primary_target",
                         half_damage: true
                     },
                 ]
@@ -151,7 +151,7 @@ const tide_of_iron: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target"
+                target_label: "primary_target"
             },
             {
                 type: INSTRUCTION_TYPE.OPTIONS,
@@ -167,7 +167,7 @@ const tide_of_iron: IRPower = {
                             {
                                 type: "push",
                                 amount: 1,
-                                target: "primary_target"
+                                target_label: "primary_target"
                             },
                             {
                                 type: IR_INSTRUCTION_TYPE.CONDITION,
@@ -188,8 +188,8 @@ const tide_of_iron: IRPower = {
                                                     },
                                                     {
                                                         type: INSTRUCTION_TYPE.SHIFT,
-                                                        target: "owner",
-                                                        destination: "path_to_follow"
+                                                        target_label: "owner",
+                                                        destination_label: "path_to_follow"
                                                     }
                                                 ]
                                             },
@@ -245,14 +245,14 @@ const brash_strike: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target"
+                target_label: "primary_target"
             }
         ],
     },
     effect: [
         {
             type: INSTRUCTION_TYPE.APPLY_STATUS,
-            target: "owner",
+            target_label: "owner",
             duration: "until_start_of_your_next_turn",
             status: {
                 type: "grant_combat_advantage",
@@ -284,7 +284,7 @@ const crushing_surge: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target"
+                target_label: "primary_target"
             },
         ],
     },
@@ -314,7 +314,7 @@ const tide_of_iron_true = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target"
+                target_label: "primary_target"
             },
             {
                 type: IR_INSTRUCTION_TYPE.CONDITION,
@@ -326,13 +326,13 @@ const tide_of_iron_true = {
                         instructions_true: [
                             {
                                 type: INSTRUCTION_TYPE.SAVE_VARIABLE,
-                                target: "$position(primary_target)",
+                                value: "$position(primary_target)",
                                 label: "primary_target_original_position"
                             },
                             {
                                 type: "push",
                                 amount: 1,
-                                target: "primary_target"
+                                target_label: "primary_target"
                             },
                             {
                                 type: IR_INSTRUCTION_TYPE.CONDITION,
@@ -344,8 +344,8 @@ const tide_of_iron_true = {
                                         instructions_true: [
                                             {
                                                 type: INSTRUCTION_TYPE.SHIFT,
-                                                target: "owner",
-                                                destination: "primary_target_last_position"
+                                                target_label: "owner",
+                                                destination_label: "primary_target_last_position"
                                             }
                                         ]
                                     },

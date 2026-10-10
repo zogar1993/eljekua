@@ -10,7 +10,7 @@ export const interpret_set_hit_status = ({
                                              game_state,
                                          }: InterpretInstructionProps<InstructionSetHitStatus>) => {
     const {vm_state} = game_state
-    const target = EXPR.as_creature(vm_state.get_variable(instruction.target))
+    const target = EXPR.as_creature(vm_state.get_variable(instruction.target_label))
 
     const attack_rolls: Map<Creature, HitStatus> = vm_state.has_variable(SYSTEM_KEYWORD.HIT_STATUS) ?
          EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS)) :

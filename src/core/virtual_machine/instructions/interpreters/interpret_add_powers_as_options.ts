@@ -25,16 +25,16 @@ export const interpret_add_powers_as_options = ({
     const options: Array<InstructionOptionsItem> = []
 
     for (const power of filtered_powers) {
-        const power_name = `power_${power.name.replaceAll(" ", "_").toLowerCase()}`
+        const power_label = `power_${power.name.replaceAll(" ", "_").toLowerCase()}`
         const is_opportunity_attack = instruction.cost === "opportunity"
         const action_type_cost = instruction.cost === "normal" ? power.type.action : instruction.cost
         const initialization = is_opportunity_attack ? [{
-            from: SYSTEM_KEYWORD.TRIGGER_ACTIVATOR,
-            to: SYSTEM_KEYWORD.PRIMARY_TARGET
+            from_label: SYSTEM_KEYWORD.TRIGGER_ACTIVATOR,
+            to_label: SYSTEM_KEYWORD.PRIMARY_TARGET
         }] : []
         const instructions: Array<Instruction> = [
             {type: INSTRUCTION_TYPE.EXPEND_ACTION, action_type: action_type_cost},
-            {type: INSTRUCTION_TYPE.EXECUTE_POWER, power: power_name, initialization}
+            {type: INSTRUCTION_TYPE.EXECUTE_POWER, power_label, initialization}
         ]
         const condition: AstNode = {
             type: "function",
@@ -43,7 +43,7 @@ export const interpret_add_powers_as_options = ({
                 {
                     type: "function",
                     name: FUNCTION_NAME.HAS_VALID_TARGETING,
-                    parameters: [{type: "keyword", value: power_name}]
+                    parameters: [{type: "keyword", value: power_label}]
                 },
                 {
                     type: "function",
@@ -55,9 +55,9 @@ export const interpret_add_powers_as_options = ({
 
         if (is_opportunity_attack) {
             const modified_power = {...power, instructions: remove_default_targeting_instruction(power.instructions)}
-            vm_state.set_variable(power_name, {type: "power", value: modified_power})
+            vm_state.set_variable(power_label, {type: "power", value: modified_power})
         } else {
-            vm_state.set_variable(power_name, {type: "power", value: power})
+            vm_state.set_variable(power_label, {type: "power", value: power})
         }
 
         options.push({text: power.name, instructions, condition})

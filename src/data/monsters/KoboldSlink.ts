@@ -28,7 +28,7 @@ const spear: IRPower = {
             {
                 type: INSTRUCTION_TYPE.APPLY_DAMAGE,
                 value: "primary_damage",
-                target: "primary_target",
+                target_label: "primary_target",
             },
         ],
     },
@@ -49,8 +49,8 @@ const shift_and_slide: IRPower = {
     effect: [
         {
             type: INSTRUCTION_TYPE.SWAP_PLACES,
-            creature_a: "owner",
-            creature_b: "primary_target",
+            creature_a_label: "owner",
+            creature_b_label: "primary_target",
         },
     ],
 }

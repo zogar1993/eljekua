@@ -283,7 +283,7 @@ const MELEE_ATTACK: Power = transform_power_ir_into_vm_representation({
             {
                 type: "apply_damage",
                 value: "1",
-                target: "primary_target",
+                target_label: "primary_target",
             },
         ],
     },
@@ -300,7 +300,7 @@ const MELEE_ATTACK_ANY_CREATURE: Power = transform_power_ir_into_vm_representati
             {
                 type: "apply_damage",
                 value: "1",
-                target: "primary_target",
+                target_label: "primary_target",
             },
         ],
     },
@@ -313,7 +313,7 @@ const GRANT_COMBAT_ADVANTAGE_UNTIL_NEXT_TURN: Power = transform_power_ir_into_vm
     effect: [
         {
             type: INSTRUCTION_TYPE.APPLY_STATUS,
-            target: "primary_target",
+            target_label: "primary_target",
             duration: "until_start_of_next_turn",
             status: {type: "grant_combat_advantage"},
         },

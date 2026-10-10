@@ -15,7 +15,7 @@ export const interpret_trigger_movement_interruption = ({
                                                             game_state,
                                                             game_queries,
                                                         }: InterpretInstructionProps<InstructionTriggerMovementInterruption>) => {
-    const moving_creature = EXPR.as_creature(game_state.vm_state.get_variable(instruction.target))
+    const moving_creature = EXPR.as_creature(game_state.vm_state.get_variable(instruction.target_label))
     game_state.vm_state.set_variable(
         SYSTEM_KEYWORD.TRIGGER_ACTIVATOR,
         {type: "creatures", value: [moving_creature]},
