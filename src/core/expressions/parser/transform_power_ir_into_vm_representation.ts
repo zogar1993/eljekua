@@ -98,7 +98,7 @@ export type TriggerInterception = typeof TRIGGER_INTERCEPTION[keyof typeof TRIGG
 const create_attack_roll_params = (roll: Required<IRPower>["roll"]): InstructionAttackRollParams => ({
     attack: to_ast(standardize_attack(roll.attack)),
     defense: roll.defense,
-    defender: PRIMARY_TARGET_LABEL,
+    defender_label: PRIMARY_TARGET_LABEL,
 })
 
 const transform_primary_roll = (roll: Required<IRPower>["roll"]): Array<Instruction> => {
@@ -106,14 +106,14 @@ const transform_primary_roll = (roll: Required<IRPower>["roll"]): Array<Instruct
     const before_attack_roll_consequences = transform_instructions(roll.before_consequences)
     const attack_roll_consequences: Instruction = {
         type: INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE,
-        defender: PRIMARY_TARGET_LABEL,
+        defender_label: PRIMARY_TARGET_LABEL,
         hit: transform_instructions(roll.hit),
         miss: transform_instructions(roll.miss),
     }
 
     const hit_status_select: Instruction = {
         type: INSTRUCTION_TYPE.SELECT_ATTACK_HIT_STATUS,
-        defender: PRIMARY_TARGET_LABEL,
+        defender_label: PRIMARY_TARGET_LABEL,
     }
     const assess_hit_status: Instruction = {
         type: INSTRUCTION_TYPE.ASSESS_ATTACK_HIT_STATUS,

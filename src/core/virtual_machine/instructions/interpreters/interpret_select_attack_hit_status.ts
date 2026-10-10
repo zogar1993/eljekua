@@ -8,7 +8,7 @@ export const interpret_select_attack_hit_status = ({
                                                        instruction,
                                                    }: InterpretInstructionProps<InstructionSelectAttackHitStatus>) => {
     const {vm_state, available_interaction} = game_state
-    const defenders = EXPR.as_creatures(vm_state.get_variable(instruction.defender))
+    const defenders = EXPR.as_creatures(vm_state.get_variable(instruction.defender_label))
 
     available_interaction.set_available_interactions({
         type: INTERACTION_TYPE.HIT_STATUS_SELECT,

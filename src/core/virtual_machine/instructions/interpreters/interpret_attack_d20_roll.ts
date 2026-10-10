@@ -10,7 +10,7 @@ export const interpret_attack_d20_roll = ({
                                               instruction,
                                           }: InterpretInstructionProps<InstructionAttackD20Roll>) => {
     const {vm_state} = game_state
-    const defenders = EXPR.as_creatures(vm_state.get_variable(instruction.defender))
+    const defenders = EXPR.as_creatures(vm_state.get_variable(instruction.defender_label))
 
     const d20_rolls = new Map<Creature, number>()
     defenders.forEach(defender => d20_rolls.set(defender, roll_d(20).value))

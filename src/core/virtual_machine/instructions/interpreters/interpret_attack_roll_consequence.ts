@@ -22,7 +22,7 @@ export const interpret_attack_roll_consequence = ({
     const new_instructions: Array<Instruction> = []
 
     entries.forEach(([defender, hit_status]) => {
-        new_instructions.push(save_variable_instruction(defender.id, instruction.defender))
+        new_instructions.push(save_variable_instruction(defender.id, instruction.defender_label))
 
         const is_hit = hit_status >= HIT_STATUS.HIT
         if (is_hit) {

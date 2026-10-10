@@ -42,7 +42,7 @@ export const is_branching_instruction = (instruction: Instruction) =>
 export type InstructionAttackRollParams = {
     attack: AstNode
     defense: DefenseCode
-    defender: string
+    defender_label: string
 }
 
 export type InstructionAttackD20Roll = {
@@ -59,12 +59,11 @@ export type InstructionAssessAttackHitStatus = {
 
 export type InstructionSelectAttackHitStatus = {
     type: typeof INSTRUCTION_TYPE.SELECT_ATTACK_HIT_STATUS
-    defender: string
+    defender_label: string
 }
 
 export type InstructionAttackRollConsequence = {
-//TODO strings that are meant to be variable names should be named appropriately as "labels"
-    defender: string
+    defender_label: string
     type: typeof INSTRUCTION_TYPE.ATTACK_ROLL_CONSEQUENCE
     hit: Array<Instruction>
     miss: Array<Instruction>
