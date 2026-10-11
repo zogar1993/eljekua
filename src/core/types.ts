@@ -28,8 +28,10 @@ export type IRPowerDamage =
 
 export type IRPower = {
     name: string
+    class?: string
+    level?: number
     description?: string
-    keywords?: Array<"Invigorating" | "Martial" | "Weapon">
+    keywords?: Array<"Divine" | "Fear" | "Implement" | "Invigorating" | "Martial" | "Weapon">
     type: {
         action: ActionType
         cooldown: "at-will" | "encounter" | "daily"
@@ -92,7 +94,7 @@ export type IRInstruction =
     label: string
 } | {
     type: "push",
-    amount: number,
+    amount: number | string,
     target_label: string
 } | {
     type: typeof INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED
