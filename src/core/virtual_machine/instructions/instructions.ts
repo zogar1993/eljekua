@@ -1,4 +1,5 @@
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
+import type {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import type {DefenseCode} from "core/character_sheet/get_creature_defense";
 import type {StatusDurationValue} from "core/types";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
@@ -138,9 +139,10 @@ export type InstructionOptionsItem = { text: string, instructions: Array<Instruc
 
 export type InstructionSaveVariable = {
     type: typeof INSTRUCTION_TYPE.SAVE_VARIABLE,
-    value: AstNode,
-    label: string
-}
+    label: string,
+} & (
+    { value: AstNode } | { power: Power }
+)
 
 export type InstructionSaveResolvedNumber = {
     type: typeof INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED,

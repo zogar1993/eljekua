@@ -7,6 +7,9 @@ export const interpret_save_variable = ({
                                             game_queries
                                         }: InterpretInstructionProps<InstructionSaveVariable>) => {
     const {vm_state} = game_state
-    const expression = game_queries.evaluate(instruction.value)
-    vm_state.set_variable(instruction.label, expression)
+//TODO the distinctio between power and other variables is odd
+    if ("power" in instruction)
+        vm_state.set_variable(instruction.label, {type: "power", value: instruction.power})
+    else
+        vm_state.set_variable(instruction.label, game_queries.evaluate(instruction.value))
 }

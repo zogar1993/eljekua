@@ -88,14 +88,19 @@ export type IRInstruction =
 } | {
     type: typeof INSTRUCTION_TYPE.OPTIONS,
     options: Array<{ text: string, instructions: Array<IRInstruction> }>
-} | {
+} | ({
     type: typeof INSTRUCTION_TYPE.SAVE_VARIABLE,
-    value: string,
-    label: string
-} | {
+    label: string,
+} & (
+    { value: string } | { power: IRPower }
+)) | {
     type: "push",
     amount: number | string,
     target_label: string
+} | {
+    type: typeof INSTRUCTION_TYPE.EXECUTE_POWER,
+    power_label: string,
+    initialization?: Array<{ from_label: string, to_label: string }>,
 } | {
     type: typeof INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED
     value: string

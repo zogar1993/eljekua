@@ -223,10 +223,16 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 }))
             }]
         case INSTRUCTION_TYPE.SAVE_VARIABLE:
+            if ("power" in instruction)
+                return [{
+                    type: INSTRUCTION_TYPE.SAVE_VARIABLE,
+                    label: instruction.label,
+                    power: transform_power_ir_into_vm_representation(instruction.power),
+                }]
             return [{
                 type: INSTRUCTION_TYPE.SAVE_VARIABLE,
+                label: instruction.label,
                 value: to_ast(instruction.value),
-                label: instruction.label
             }]
         case INSTRUCTION_TYPE.SAVE_NUMBER_AS_RESOLVED:
             return [{
@@ -239,6 +245,12 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 type: INSTRUCTION_TYPE.SET_HIT_STATUS,
                 target_label: instruction.target_label,
                 status: instruction.status,
+            }]
+        case INSTRUCTION_TYPE.EXECUTE_POWER:
+            return [{
+                type: INSTRUCTION_TYPE.EXECUTE_POWER,
+                power_label: instruction.power_label,
+                initialization: instruction.initialization,
             }]
         case "push":
             return [

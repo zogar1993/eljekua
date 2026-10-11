@@ -449,7 +449,7 @@ const is_instruction = (value: unknown): value is Instruction =>
 
 const is_ast_node = (value: unknown): value is AstNode =>
     typeof value === "object" && value !== null && "type" in value &&
-    ["number", "keyword", "dice", "weapon", "function", "string"].includes((value as AstNode).type)
+    ["number", "keyword", "dice", "weapon", "function", "string", "power"].includes((value as AstNode).type)
 
 const format_ast_node = (node: AstNode): string => {
     switch (node.type) {

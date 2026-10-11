@@ -2,6 +2,7 @@ import type {IRPower} from "core/types";
 import {
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
+import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
 const cause_fear: IRPower = {
     name: "Cause Fear",
@@ -25,10 +26,39 @@ const cause_fear: IRPower = {
         defense: "will",
         hit: [
             {
-                type: "push",
-                amount: '$add($movement(primary_target), $attr_mod(owner, "cha"))',
-                target_label: "primary_target",
+                type: INSTRUCTION_TYPE.SAVE_VARIABLE,
+                label: "cause_fear__forced_movement",
+                power: {
+                    name: "Flee",
+                    type: {
+                        action: "free",
+                        //TODO this can be removed and set as "at-will" by default
+                        cooldown: "at-will",
+                        //TODO this can be removed and set as false by default
+                        attack: false,
+                    },
+                    targeting: {
+                        targeting_type: "movement",
+                        distance: '$add($movement(owner), $attr_mod(attacker, "cha"))',
+                        destination_requirement: "$positions_farther_from($position(attacker))",
+                    },
+                    effect: [
+                        {
+                            type: INSTRUCTION_TYPE.WALK,
+                            target_label: "owner",
+                            destination_label: "primary_target",
+                        }
+                    ],
+                },
             },
+            {
+                type: INSTRUCTION_TYPE.EXECUTE_POWER,
+                power_label: "cause_fear__forced_movement",
+                initialization: [
+                    {from_label: "primary_target", to_label: "owner"},
+                    {from_label: "owner", to_label: "attacker"},
+                ],
+            }
         ],
     },
 }

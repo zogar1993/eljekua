@@ -93,6 +93,9 @@ import {
     evaluate_function_position
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_position";
 import {
+    evaluate_function_positions_farther_from
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_positions_farther_from";
+import {
     evaluate_function_skill
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_skill";
 import {
@@ -175,6 +178,8 @@ export const build_evaluate_function = ({game_queries, game_state}: {
                 return evaluate_function_movement({node, game_queries})
             case FUNCTION_NAME.POSITION:
                 return evaluate_function_position({node, game_queries})
+            case FUNCTION_NAME.POSITIONS_FARTHER_FROM:
+                return evaluate_function_positions_farther_from({node, game_queries, game_state})
             case FUNCTION_NAME.SKILL:
                 return evaluate_function_skill({node, game_queries})
             case FUNCTION_NAME.SIZE:

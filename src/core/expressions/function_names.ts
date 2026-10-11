@@ -33,6 +33,7 @@ export const FUNCTION_NAME = {
     TEMPLATE_NAME: "template_name",
     MOVEMENT: "movement",
     POSITION: "position",
+    POSITIONS_FARTHER_FROM: "positions_farther_from",
     SKILL: "skill",
     SIZE: "size",
 } as const
