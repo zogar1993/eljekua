@@ -1,15 +1,15 @@
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {InstructionSwapPlaces} from "core/virtual_machine/instructions/instructions";
 
 export const interpret_swap_places = ({
                                            instruction,
                                            game_state,
                                            game_events,
+                                           game_queries,
                                        }: InterpretInstructionProps<InstructionSwapPlaces>) => {
     const {vm_state} = game_state
-    const creature_a = EXPR.as_creature(vm_state.get_variable(instruction.creature_a_label))
-    const creature_b = EXPR.as_creature(vm_state.get_variable(instruction.creature_b_label))
+    const creature_a = game_queries.evaluate_creature(vm_state.get_variable(instruction.creature_a_label))
+    const creature_b = game_queries.evaluate_creature(vm_state.get_variable(instruction.creature_b_label))
     const position_a = creature_a.data.position
     const position_b = creature_b.data.position
 

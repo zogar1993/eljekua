@@ -2,7 +2,6 @@ import type {GameQueries} from "core/game_state/GameQueries";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 
 export const MODIFIER_TYPE = {
     ATTACK_ROLL: "attack_roll",
@@ -29,7 +28,7 @@ export const get_attack_roll_modifier_parts = ({
 
     for (const modifier of creature.modifiers) {
         if (modifier.type !== MODIFIER_TYPE.ATTACK_ROLL) continue
-        const part = EXPR.as_number_resolved_expr(game_queries.evaluate(modifier.value))
+        const part = game_queries.evaluate_number_resolved_expr(modifier.value)
         parts.push({...part, description: modifier.name})
     }
 

@@ -1,4 +1,3 @@
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import type {Position} from "core/battlegrid/Position";
 import {
@@ -9,12 +8,15 @@ import {
 
 const DISTANT_POSITION = {x: 6, y: 3, footprint: 1} as const satisfies Position
 
-const get_number_values = (expression: string, evaluate_expression: ReturnType<typeof create_expression_test_context>["evaluate_expression"]) =>
-    EXPR.as_numbers_resolved_expr(evaluate_expression(expression)).map(number => number.value)
+const get_number_values = (
+    expression: string,
+    evaluate_expression: ReturnType<typeof create_expression_test_context>["evaluate_expression"],
+    game_queries: ReturnType<typeof create_expression_test_context>["game_queries"],
+) => game_queries.evaluate_numbers_resolved(evaluate_expression(expression)).map(number => number.value)
 
 describe("$map", () => {
     test("evaluates the expression for each creature in the list", () => {
-        const {evaluate_expression, create_test_creature, bind_creature, game_state} = create_expression_test_context()
+        const {evaluate_expression, create_test_creature, bind_creature, game_state, game_queries} = create_expression_test_context()
         const attacker = create_test_creature({name: "attacker", position: ISOLATED_POSITION})
         const near = create_test_creature({name: "near", position: ADJACENT_TO_ISOLATED_POSITION})
         const far = create_test_creature({name: "far", position: DISTANT_POSITION})
@@ -25,28 +27,30 @@ describe("$map", () => {
         expect(get_number_values(
             "$map(targets, x, $distance(x, trigger_activator))",
             evaluate_expression,
+            game_queries,
         )).toEqual([1, 3])
     })
 
     test("returns an empty list for an empty creature list", () => {
-        const {evaluate_expression, create_test_creature, bind_creature, game_state} = create_expression_test_context()
+        const {evaluate_expression, create_test_creature, bind_creature, game_state, game_queries} = create_expression_test_context()
         bind_creature(SYSTEM_KEYWORD.TRIGGER_ACTIVATOR, create_test_creature({name: "attacker"}))
         game_state.vm_state.set_variable(SYSTEM_KEYWORD.TARGETS, {type: "creatures", value: []})
 
         expect(get_number_values(
             "$map(targets, x, $distance(x, trigger_activator))",
             evaluate_expression,
+            game_queries,
         )).toEqual([])
     })
 
     test("throws when the creature list parameter is not a creature list", () => {
-        const {evaluate_expression} = create_expression_test_context()
+        const {evaluate_expression, game_queries} = create_expression_test_context()
 
         expect(() => evaluate_expression("$map(5, x, $add(1, 1))")).toThrow()
     })
 
     test("throws when the variable name is not a keyword or string", () => {
-        const {evaluate_expression, create_test_creature, bind_creature, game_state} = create_expression_test_context()
+        const {evaluate_expression, create_test_creature, bind_creature, game_state, game_queries} = create_expression_test_context()
         bind_creature(SYSTEM_KEYWORD.TRIGGER_ACTIVATOR, create_test_creature({name: "attacker"}))
         game_state.vm_state.set_variable(SYSTEM_KEYWORD.TARGETS, {type: "creatures", value: []})
 
@@ -54,7 +58,7 @@ describe("$map", () => {
     })
 
     test("throws when the mapped expression does not evaluate to a number", () => {
-        const {evaluate_expression, create_test_creature, bind_creature, game_state} = create_expression_test_context()
+        const {evaluate_expression, create_test_creature, bind_creature, game_state, game_queries} = create_expression_test_context()
         const attacker = create_test_creature({name: "attacker", team: 1})
         const enemy = create_test_creature({name: "enemy", team: 2})
 
@@ -65,7 +69,7 @@ describe("$map", () => {
     })
 
     test("throws with the wrong parameter count", () => {
-        const {evaluate_expression, create_test_creature, bind_creature, game_state} = create_expression_test_context()
+        const {evaluate_expression, create_test_creature, bind_creature, game_state, game_queries} = create_expression_test_context()
         bind_creature(SYSTEM_KEYWORD.TRIGGER_ACTIVATOR, create_test_creature({name: "attacker"}))
         game_state.vm_state.set_variable(SYSTEM_KEYWORD.TARGETS, {type: "creatures", value: []})
 

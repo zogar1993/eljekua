@@ -3,7 +3,6 @@ import type {GameState} from "core/game_state/GameState";
 import {type Creature, has_creature_action_available} from "core/battlegrid/creatures/Creature";
 import type {Power, TriggerInterception, TriggerTiming} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import type {Expr} from "core/virtual_machine/expressions/types";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {type Instruction, INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
@@ -28,7 +27,7 @@ export const get_potential_triggers = ({
     // disregard those who ignored the chance to use the trigger.
     const already_triggered_key = `already_triggered_${intercept}`
     const already_triggered = vm_state.has_variable(already_triggered_key) ?
-        EXPR.as_creatures(vm_state.get_variable(already_triggered_key)) : []
+        game_queries.evaluate_creatures(vm_state.get_variable(already_triggered_key)) : []
 
     vm_state.set_variable(SYSTEM_KEYWORD.TRIGGER_ACTIVATOR, {type: "creatures", value: [activator]})
 
@@ -44,7 +43,7 @@ export const get_potential_triggers = ({
                 if (power.trigger.type !== timing) return false
                 if (!can_use_power_on_own_turn(power) && creature === current_turn_creature) return false
                 if (!has_creature_action_available({creature, action: power.type.action})) return false
-                return power.trigger.conditions.every(condition => EXPR.as_boolean(game_queries.evaluate(condition)))
+                return power.trigger.conditions.every(condition => game_queries.evaluate_boolean(condition))
             })
             return {creature, powers}
         })

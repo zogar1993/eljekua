@@ -3,7 +3,6 @@ import type {GameState} from "core/game_state/GameState";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import {are_creatures_allied} from "core/battlegrid/creatures/are_creatures_allied";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 
 export const is_creature_targetable = ({creature, attacker, game_queries, game_state}: {
     creature: Creature
@@ -25,7 +24,7 @@ export const is_creature_targetable = ({creature, attacker, game_queries, game_s
         vm_state.set_variable(SYSTEM_KEYWORD.TRIGGER_OWNER, {type: "creatures", value: [creature]})
         vm_state.set_variable(SYSTEM_KEYWORD.TARGETS, {type: "creatures", value: targets})
 
-        const targetable = EXPR.as_boolean(game_queries.evaluate(rule.targetable_when))
+        const targetable = game_queries.evaluate_boolean(rule.targetable_when)
 
         if (!targetable)
             return false

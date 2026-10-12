@@ -1,6 +1,5 @@
 import type {Expr} from "core/virtual_machine/expressions/types";
 import type {Instruction} from "core/virtual_machine/instructions/instructions";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import type {GameEvents} from "core/events/GameEvents";
 import {assert_are_equal, assert_is_not_empty, assert_is_not_null} from "stdlib/assert";
@@ -99,7 +98,12 @@ export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
         throw Error("no instructions left")
     }
 
-    const get_acting_creature = () => EXPR.as_creature(get_variable(SYSTEM_KEYWORD.OWNER))
+    const get_acting_creature = () => {
+        const expr = get_variable(SYSTEM_KEYWORD.OWNER)
+        if (expr.type !== "creatures" || expr.value.length !== 1)
+            throw Error("expected only one creature in expression")
+        return expr.value[0]
+    }
 
     const jump = (offset: number) => {
         const frame = get_current_frame()

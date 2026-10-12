@@ -10,7 +10,6 @@ import type {
     InstructionSelectTargetPush
 } from "core/virtual_machine/instructions/instructions";
 import {INTERACTION_TYPE} from "core/interactions/Interactions";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";
 import {assert_is_not_empty, assert_is_true} from "stdlib/assert";
@@ -28,7 +27,7 @@ export const interpret_select_target = ({
 
     assert_is_not_empty(clickable)
 
-    const owner = EXPR.as_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
+    const owner = game_queries.evaluate_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
     const target_label = instruction.target_label
 
     if (clickable.length === 1 && instruction.target_label !== SYSTEM_KEYWORD.PRIMARY_TARGET) {
@@ -65,7 +64,7 @@ export const interpret_select_target = ({
     const get_attack_hit_chance_against = (creature: Creature) => {
         if (!("attack_roll" in instruction) || instruction.attack_roll === null) return null
 
-        const attack = EXPR.as_number(game_queries.evaluate(instruction.attack_roll.attack))
+        const attack = game_queries.evaluate_number(instruction.attack_roll.attack)
         const defense = get_creature_defense({creature, defense_code: instruction.attack_roll.defense}).value
         const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
 
@@ -75,7 +74,7 @@ export const interpret_select_target = ({
 
     if (is_path_selection_targeting_type(instruction)) {
         const moving_creature = instruction.targeting_type === "push"
-            ? EXPR.as_creature(game_queries.evaluate(instruction.defender))
+            ? game_queries.evaluate_creature(instruction.defender)
             : owner
 
         const get_path_to_destination = (destination: Position) => {

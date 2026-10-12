@@ -1,5 +1,4 @@
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {InstructionAssessAttackHitStatus} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {Creature, remove_creature_statuses} from "core/battlegrid/creatures/Creature";
@@ -13,16 +12,16 @@ import {get_attack_roll_modifier_parts} from "core/battlegrid/creatures/Modifier
 export const interpret_assess_attack_hit_status = (props: InterpretInstructionProps<InstructionAssessAttackHitStatus>) => {
     const {instruction, game_state, game_queries, game_events} = props
     const {vm_state, battle_grid} = game_state
-    const d20_rolls = EXPR.as_attack_d20_rolls(vm_state.get_variable(SYSTEM_KEYWORD.ATTACK_D20_ROLLS))
-    const attacker = EXPR.as_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
-    const defenders = EXPR.as_creatures(vm_state.get_variable(instruction.defender_label))
-    const power_name = EXPR.as_string(vm_state.get_variable(SYSTEM_KEYWORD.POWER_NAME))
+    const d20_rolls = game_queries.evaluate_attack_d20_rolls(vm_state.get_variable(SYSTEM_KEYWORD.ATTACK_D20_ROLLS))
+    const attacker = game_queries.evaluate_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
+    const defenders = game_queries.evaluate_creatures(vm_state.get_variable(instruction.defender_label))
+    const power_name = game_queries.evaluate_string(vm_state.get_variable(SYSTEM_KEYWORD.POWER_NAME))
 
     const roll_results = new Map<Creature, HitStatus>()
 
     defenders.forEach(defender => {
         const attack_parts: Array<ExprNumberResolved> = []
-        attack_parts.push(EXPR.as_number_resolved_expr(game_queries.evaluate(instruction.attack)))
+        attack_parts.push(game_queries.evaluate_number_resolved_expr(instruction.attack))
 
         const d20_value = d20_rolls.get(defender)
         if (d20_value === undefined) throw Error(`missing d20 roll for creature "${defender.data.name}"`)

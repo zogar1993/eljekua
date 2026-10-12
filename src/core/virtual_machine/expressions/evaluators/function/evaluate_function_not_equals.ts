@@ -1,14 +1,13 @@
 import type {ExprBoolean} from "core/virtual_machine/expressions/types";
 import type {EvaluateFunctionProps} from "core/virtual_machine/expressions/evaluators/EvaluateAstProps";
-import {evaluate_ast} from "core/virtual_machine/expressions/evaluators/evaluate_ast";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
 import {positions_equal} from "core/battlegrid/Position";
 
-export const evaluate_function_not_equals = ({node, game_state}: EvaluateFunctionProps): ExprBoolean => {
+export const evaluate_function_not_equals = ({node, game_state, game_queries}: EvaluateFunctionProps): ExprBoolean => {
     assert_parameters_amount_equals(node, 2)
 
-    const parameter1 = evaluate_ast({node: node.parameters[0], game_state})
-    const parameter2 = evaluate_ast({node: node.parameters[1], game_state})
+    const parameter1 = game_queries.evaluate(node.parameters[0])
+    const parameter2 = game_queries.evaluate(node.parameters[1])
 
     if (parameter1.type === "positions" && parameter2.type === "positions") {
 

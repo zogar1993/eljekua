@@ -1,6 +1,5 @@
 import type {GameQueries} from "core/game_state/GameQueries";
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {
     add_creature_status,
     type Creature,
@@ -15,7 +14,7 @@ export const interpret_apply_status = ({
                                            game_queries,
                                        }: InterpretInstructionProps<InstructionApplyStatus>) => {
     const {vm_state} = game_state
-    const targets = EXPR.as_creatures(game_queries.evaluate(instruction.target))
+    const targets = game_queries.evaluate_creatures(instruction.target)
     const power_owner = vm_state.get_acting_creature()
 
     for (const target of targets)
@@ -77,27 +76,27 @@ const interpret_creature_rule = ({status, game_queries}: {
         case "grant_combat_advantage":
             return {
                 type: "grant_combat_advantage",
-                against_creatures: status.against_creatures ? EXPR.as_creatures(game_queries.evaluate(status.against_creatures)) : null,
+                against_creatures: status.against_creatures ? game_queries.evaluate_creatures(status.against_creatures) : null,
             }
         case "gain_attack_bonus":
             return {
                 type: "gain_attack_bonus",
-                against_creatures: status.against_creatures ? EXPR.as_creatures(game_queries.evaluate(status.against_creatures)) : null,
-                value: EXPR.as_number_resolved_expr(game_queries.evaluate(status.value))
+                against_creatures: status.against_creatures ? game_queries.evaluate_creatures(status.against_creatures) : null,
+                value: game_queries.evaluate_number_resolved_expr(status.value)
             }
         case "gain_resistance":
             return {
                 type: "gain_resistance",
-                against_creatures: status.against_creatures ? EXPR.as_creatures(game_queries.evaluate(status.against_creatures)) : null,
+                against_creatures: status.against_creatures ? game_queries.evaluate_creatures(status.against_creatures) : null,
                 against_damage_types: status.against_damage_types,
-                value: EXPR.as_number_resolved_expr(game_queries.evaluate(status.value))
+                value: game_queries.evaluate_number_resolved_expr(status.value)
             }
         case "gain_vulnerability":
             return {
                 type: "gain_vulnerability",
-                against_creatures: status.against_creatures ? EXPR.as_creatures(game_queries.evaluate(status.against_creatures)) : null,
+                against_creatures: status.against_creatures ? game_queries.evaluate_creatures(status.against_creatures) : null,
                 against_damage_types: status.against_damage_types,
-                value: EXPR.as_number_resolved_expr(game_queries.evaluate(status.value))
+                value: game_queries.evaluate_number_resolved_expr(status.value)
             }
         default:
             throw Error(`could not interpret status '${JSON.stringify(status)}'`)

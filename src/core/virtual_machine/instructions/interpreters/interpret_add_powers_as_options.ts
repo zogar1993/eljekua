@@ -1,5 +1,4 @@
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {
     Instruction,
     InstructionAddPowers,
@@ -19,7 +18,7 @@ export const interpret_add_powers_as_options = ({
                                                     game_queries
                                                 }: InterpretInstructionProps<InstructionAddPowers>) => {
     const {vm_state} = game_state
-    const creature = EXPR.as_creature(game_queries.evaluate(instruction.creature))
+    const creature = game_queries.evaluate_creature(instruction.creature)
     const filtered_powers = filter_powers({powers: creature.data.powers, filter: instruction.filter})
 
     const options: Array<InstructionOptionsItem> = []

@@ -6,7 +6,6 @@ import type {
 } from "core/virtual_machine/instructions/instructions";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
 
 //TODO this should change to not ad more frames and instead work as a plain bytecode
@@ -14,9 +13,10 @@ export const interpret_attack_roll_consequence = ({
                                                       game_state,
                                                       instruction,
                                                       game_events,
+                                                      game_queries,
                                                   }: InterpretInstructionProps<InstructionAttackRollConsequence>) => {
     const {vm_state} = game_state
-    const attack_rolls = EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
+    const attack_rolls = game_queries.evaluate_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
     const entries = [...attack_rolls.entries()]
 
     const new_instructions: Array<Instruction> = []

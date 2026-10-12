@@ -1,5 +1,4 @@
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {
     add_numbers_resolved,
@@ -27,15 +26,15 @@ export const interpret_apply_damage = ({
     const {vm_state} = game_state
     const attacker = vm_state.get_acting_creature()
 
-    const target = EXPR.as_creature(vm_state.get_variable(instruction.target_label))
+    const target = game_queries.evaluate_creature(vm_state.get_variable(instruction.target_label))
 
-    const hit_status = EXPR.as_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
+    const hit_status = game_queries.evaluate_attack_rolls(vm_state.get_variable(SYSTEM_KEYWORD.HIT_STATUS))
     const hit_status_value = hit_status.get(target)
 
     //TODO reevaluate hit status. If an attack misses and does damage to adjacent units on miss, it shouldnt hit.
     if (hit_status_value === HIT_STATUS.MISS && target.data.archetypes.includes("minion")) return
 
-    let damage = resolve_number(EXPR.as_number_expr(game_queries.evaluate(instruction.value)))
+    let damage = resolve_number(game_queries.evaluate_number_expr(instruction.value))
 
     const modifier = get_damage_modifier({creature: target, damage_types: instruction.damage_types, attacker})
 

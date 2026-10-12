@@ -3,7 +3,7 @@ import type {EvaluateFunctionProps} from "core/virtual_machine/expressions/evalu
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
 import {AST_NODE} from "core/virtual_machine/expressions/AST_NODE";
 
-export const evaluate_function_exists = ({node, game_state}: EvaluateFunctionProps): ExprBoolean => {
+export const evaluate_function_exists = ({node, game_state, game_queries}: EvaluateFunctionProps): ExprBoolean => {
     assert_parameters_amount_equals(node, 1)
     const parameter = AST_NODE.as_keyword(node.parameters[0])
     const {vm_state} = game_state

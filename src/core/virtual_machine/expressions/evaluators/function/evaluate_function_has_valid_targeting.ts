@@ -1,17 +1,15 @@
 import type {EvaluateFunctionProps} from "core/virtual_machine/expressions/evaluators/EvaluateAstProps";
-import {evaluate_ast} from "core/virtual_machine/expressions/evaluators/evaluate_ast";
 import type {ExprBoolean} from "core/virtual_machine/expressions/types";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
 import {AST_NODE} from "core/virtual_machine/expressions/AST_NODE";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {get_valid_targets} from "core/battlegrid/position/get_valid_targets";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
 
-export const evaluate_function_has_valid_targeting = ({node, game_state}: EvaluateFunctionProps): ExprBoolean => {
+export const evaluate_function_has_valid_targeting = ({node, game_state, game_queries}: EvaluateFunctionProps): ExprBoolean => {
     assert_parameters_amount_equals(node, 1)
     const {vm_state, battle_grid} = game_state
     const power_name = AST_NODE.as_keyword(node.parameters[0]).value
-    const power = EXPR.as_power(vm_state.get_variable(power_name))
+    const power = game_queries.evaluate_power(vm_state.get_variable(power_name))
 
     const targeting_instruction = power.instructions.find(instruction => instruction.type === INSTRUCTION_TYPE.SELECT_TARGET)
 
@@ -22,7 +20,7 @@ export const evaluate_function_has_valid_targeting = ({node, game_state}: Evalua
         const valid_targets = get_valid_targets({
             instruction: targeting_instruction,
             battle_grid,
-            game_queries: {evaluate: (node) => evaluate_ast({node, game_state})},
+            game_queries,
             game_state,
         })
         is_targeting_valid = valid_targets.length > 0

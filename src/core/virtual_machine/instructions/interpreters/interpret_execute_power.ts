@@ -1,5 +1,4 @@
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
-import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {InstructionExecutePower} from "core/virtual_machine/instructions/instructions";
 import type {Expr} from "core/virtual_machine/expressions/types";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
@@ -7,9 +6,10 @@ import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 export const interpret_execute_power = ({
                                             instruction,
                                             game_state,
+                                            game_queries,
                                         }: InterpretInstructionProps<InstructionExecutePower>) => {
     const {vm_state} = game_state
-    const {name, instructions} = EXPR.as_power(vm_state.get_variable(instruction.power_label))
+    const {name, instructions} = game_queries.evaluate_power(vm_state.get_variable(instruction.power_label))
 
     const initialization = instruction.initialization ?? []
     const variables: Record<string, Expr> = {}
