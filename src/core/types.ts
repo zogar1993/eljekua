@@ -35,7 +35,7 @@ export type IRPower = {
     type: {
         action: ActionType
         cooldown: "at-will" | "encounter" | "daily"
-        attack: boolean
+        attack?: boolean
         traits?: Array<"melee_basic_attack">
     }
     prerequisites?: Array<string>,

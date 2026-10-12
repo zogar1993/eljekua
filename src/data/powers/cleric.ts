@@ -34,8 +34,6 @@ const cause_fear: IRPower = {
                         action: "free",
                         //TODO this can be removed and set as "at-will" by default
                         cooldown: "at-will",
-                        //TODO this can be removed and set as false by default
-                        attack: false,
                     },
                     targeting: {
                         targeting_type: "movement",
