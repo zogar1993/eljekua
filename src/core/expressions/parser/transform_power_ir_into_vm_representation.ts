@@ -56,6 +56,7 @@ export const transform_power_ir_into_vm_representation = (power: IRPower): Power
         trigger: power.trigger ? transform_trigger(power.trigger) : null,
         type: {
             ...power.type,
+            cooldown: power.type.cooldown ?? "at-will",
             attack: power.type.attack ?? false,
             traits: power.type.traits || []
         },

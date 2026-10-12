@@ -34,7 +34,7 @@ export type IRPower = {
     keywords?: Array<"Divine" | "Fear" | "Implement" | "Invigorating" | "Martial" | "Weapon">
     type: {
         action: ActionType
-        cooldown: "at-will" | "encounter" | "daily"
+        cooldown?: "at-will" | "encounter" | "daily"
         attack?: boolean
         traits?: Array<"melee_basic_attack">
     }

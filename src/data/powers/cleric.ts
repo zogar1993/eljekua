@@ -32,8 +32,6 @@ const cause_fear: IRPower = {
                     name: "Flee",
                     type: {
                         action: "free",
-                        //TODO this can be removed and set as "at-will" by default
-                        cooldown: "at-will",
                     },
                     targeting: {
                         targeting_type: "movement",
