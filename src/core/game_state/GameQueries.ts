@@ -1,49 +1,15 @@
-import type {AstNode} from "core/expressions/parser/nodes/AstNode";
-import type {Expr} from "core/virtual_machine/expressions/types";
-import {build_evaluate_keyword} from "core/virtual_machine/expressions/evaluators/evaluate_keyword";
-import {evaluate_string} from "core/virtual_machine/expressions/evaluators/evaluate_string";
-import {evaluate_number} from "core/virtual_machine/expressions/evaluators/evaluate_number";
-import {evaluate_weapon} from "core/virtual_machine/expressions/evaluators/evaluate_weapon";
-import {evaluate_dice} from "core/virtual_machine/expressions/evaluators/evaluate_dice";
-import {build_evaluate_function} from "core/virtual_machine/expressions/evaluators/function/evaluate_function";
-import type {AstNodeNumber} from "core/expressions/parser/nodes/AstNodeNumber";
-import type {AstNodeString} from "core/expressions/parser/nodes/AstNodeString";
-import type {AstNodeDice, AstNodeWeapon} from "core/expressions/parser/nodes/AstNodeRoll";
-import type {AstNodeKeyword} from "core/expressions/parser/nodes/AstNodeKeyword";
-import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import type {GameState} from "core/game_state/GameState";
+import {evaluate_ast} from "core/virtual_machine/expressions/evaluators/evaluate_ast";
+import {AstNode} from "core/expressions/parser/nodes/AstNode";
 
-export type GameQueries = {
-/*
-    This is called "evaluate" instead on "interpret" to distinguish the expressions that evaluate to a value from the
-    interpreting of instructions that affect the game context.
- */
-    evaluate: (node: AstNode) => Expr
-}
 
 export const create_game_queries = ({game_state}: {
     game_state: GameState
-}): GameQueries => {
-    const game_queries: GameQueries = {
-        evaluate: (node: AstNode) => {
-            const func = evaluator_internals[node.type]
-            if (!func) throw Error(`evaluator for type '${node.type}' does not exist`)
-            return func(node)
-        },
-    }
+}) => ({
+    // This is called "evaluate" instead of "interpret"
+    // to distinguish the expressions that evaluate to a value
+    // from the interpreting of instructions that affect the game context.
+    evaluate: (node: AstNode) => evaluate_ast({node, game_state}),
+})
 
-    const evaluate_keyword = build_evaluate_keyword({game_state})
-    //TODO remove the circular dependency on evaluate functions
-    const evaluate_function = build_evaluate_function({game_queries, game_state})
-
-    const evaluator_internals: Record<AstNode["type"], (node: AstNode) => Expr> = {
-        "number": (node) => evaluate_number(node as AstNodeNumber),
-        "string": (node) => evaluate_string(node as AstNodeString),
-        "weapon": (node) => evaluate_weapon(node as AstNodeWeapon),
-        "dice": (node) => evaluate_dice(node as AstNodeDice),
-        "keyword": (node) => evaluate_keyword(node as AstNodeKeyword),
-        "function": (node) => evaluate_function(node as AstNodeFunction),
-    }
-
-    return game_queries
-}
+export type GameQueries = ReturnType<typeof create_game_queries>

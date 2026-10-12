@@ -1,17 +1,14 @@
-import type {GameQueries} from "core/game_state/GameQueries";
-import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import type {EvaluateFunctionProps} from "core/virtual_machine/expressions/evaluators/EvaluateAstProps";
+import {evaluate_ast} from "core/virtual_machine/expressions/evaluators/evaluate_ast";
 import {assert_parameters_amount_is_at_least} from "core/virtual_machine/expressions/asserts";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import {assert_is_not_empty} from "stdlib/assert";
 
-export const evaluate_function_min = ({node, game_queries}: {
-    node: AstNodeFunction
-    game_queries: GameQueries
-}): ExprNumberResolved => {
+export const evaluate_function_min = ({node, game_state}: EvaluateFunctionProps): ExprNumberResolved => {
     assert_parameters_amount_is_at_least(node, 1)
 
-    const values = node.parameters.map(parameter => game_queries.evaluate(parameter))
+    const values = node.parameters.map(parameter => evaluate_ast({node: parameter, game_state}))
 
     const results: Array<ExprNumberResolved> = []
     for (const value of values)

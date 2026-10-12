@@ -1,6 +1,6 @@
-import type {GameQueries} from "core/game_state/GameQueries";
 import type {ExprNumber} from "core/virtual_machine/expressions/types";
-import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
+import type {EvaluateFunctionProps} from "core/virtual_machine/expressions/evaluators/EvaluateAstProps";
+import {evaluate_ast} from "core/virtual_machine/expressions/evaluators/evaluate_ast";
 import {
     add_numbers,
     add_numbers_resolved,
@@ -8,12 +8,8 @@ import {
     is_number_resolved
 } from "core/virtual_machine/expressions/number_utils";
 
-export const evaluate_function_add = ({node, game_queries}:
-                                          {
-                                              node: AstNodeFunction,
-                                              game_queries: GameQueries,
-                                          }): ExprNumber => {
-    const params = node.parameters.map(parameter => game_queries.evaluate(parameter))
+export const evaluate_function_add = ({node, game_state}: EvaluateFunctionProps): ExprNumber => {
+    const params = node.parameters.map(parameter => evaluate_ast({node: parameter, game_state}))
 
     if (params.every(is_number_resolved))
         return add_numbers_resolved(params)
