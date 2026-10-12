@@ -1,3 +1,4 @@
+import {assert_ast_does_not_contain_keywords} from "core/expressions/parser/assert_ast_does_not_contain_keywords";
 import {to_ast} from "core/expressions/parser/to_ast";
 import {
     IR_INSTRUCTION_TYPE,
@@ -22,6 +23,7 @@ import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunctio
 import {assert_is_not_empty, assert_is_true} from "stdlib/assert";
 import {FUNCTION_NAME} from "core/expressions/function_names";
 import {ATTACK_ROLL_RESOLUTION_MODE, type AttackRollResolutionMode} from "core/settings/AttackRollResolutionMode";
+import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
 
@@ -44,7 +46,6 @@ export const transform_power_ir_into_vm_representation = (power: IRPower): Power
         if (!TRIGGER_ACTION_TYPES.includes(power.type.action))
             throw Error(`Power '${power.name}' with trigger needs to be one of ${JSON.stringify(TRIGGER_ACTION_TYPES)} but is '${power.type.action}'.`)
         validate_trigger_ir(power)
-        //TODO P4 check that no owner can be set on conditions so that we avoid confusing the trigger owner with the triggering power owner
     }
 
     mark_primary_attack_damage(instructions)
@@ -331,10 +332,15 @@ const transform_primary_damage = (damage: NonNullable<IRPower["damage"]>): Array
 }
 
 const transform_trigger = (trigger: NonNullable<IRPower["trigger"]>): Trigger => {
+    const conditions = trigger.conditions.map(x => to_ast(x))
+
+    for (const condition of conditions)
+        assert_ast_does_not_contain_keywords(condition, [SYSTEM_KEYWORD.OWNER])
+
     return {
         type: trigger.type,
         intercepts: trigger.intercepts,
-        conditions: trigger.conditions.map(x => to_ast(x))
+        conditions
     }
 }
 
