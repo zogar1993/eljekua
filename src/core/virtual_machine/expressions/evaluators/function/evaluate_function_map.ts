@@ -13,14 +13,13 @@ export const evaluate_function_map = ({node, game_queries, game_state}: {
 }): ExprNumbers => {
     assert_parameters_amount_equals(node, 3)
 
-    const creatures = EXPR.as_creatures(game_queries.evaluate(node.parameters[0]))
     const variable_name = get_iteration_variable_name(node.parameters[1])
     const expression = node.parameters[2]
     const {vm_state} = game_state
     const results = []
 
-    for (const creature of creatures) {
-        vm_state.set_variable(variable_name, {type: "creatures", value: [creature]})
+    for (const collection of EXPR.as_collection(game_queries.evaluate(node.parameters[0]))) {
+        vm_state.set_variable(variable_name, collection)
         results.push(EXPR.as_number_resolved_expr(game_queries.evaluate(expression)))
     }
 
@@ -30,7 +29,7 @@ export const evaluate_function_map = ({node, game_queries, game_state}: {
     }
 }
 
-const get_iteration_variable_name = (node: AstNode): string => {
+export const get_iteration_variable_name = (node: AstNode): string => {
     if (node.type === "keyword")
         return node.value
     throw Error(`expected keyword for map variable name, got "${node.type}"`)
