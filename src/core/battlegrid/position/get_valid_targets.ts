@@ -7,7 +7,7 @@ import {get_reach} from "core/battlegrid/position/get_reach";
 import {EXPR} from "core/virtual_machine/expressions/EXPR";
 import type {Position} from "core/battlegrid/Position";
 import {assert_are_footprint_one, positions_equal, positions_share_surface} from "core/battlegrid/Position";
-import {AST} from "core/virtual_machine/expressions/AST_NODE";
+import {AST, SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import type {InstructionSelectTarget} from "core/virtual_machine/instructions/instructions";
 
 export const get_valid_targets = ({instruction, battle_grid, game_queries, game_state}: {
@@ -31,6 +31,8 @@ export const get_valid_targets = ({instruction, battle_grid, game_queries, game_
             .filter(position => !battle_grid.is_terrain_occupied(position, {exclude: [owner]}))
 
         if (instruction.destination_requirement) {
+        //TODO this is a bit fishy, check later
+            game_state.vm_state.set_variable(SYSTEM_KEYWORD.TARGETS, {type: "positions", value: valid_targets})
             const possibilities = EXPR.as_positions(game_queries.evaluate(instruction.destination_requirement))
 
             const restricted: Array<Position> = []

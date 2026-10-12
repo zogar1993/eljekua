@@ -11,6 +11,9 @@ import {
     evaluate_function_not_equals
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_not_equals";
 import {
+    evaluate_function_equals
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_equals";
+import {
     evaluate_function_has_valid_targeting
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_has_valid_targeting";
 import {evaluate_function_or} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_or";
@@ -69,11 +72,20 @@ import {
     evaluate_function_filter_creatures
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_filter_creatures";
 import {
+    evaluate_function_filter
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_filter";
+import {
+    evaluate_function_let
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_let";
+import {
     evaluate_function_map
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_map";
 import {
     evaluate_function_min
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_min";
+import {
+    evaluate_function_max
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_max";
 import {
     evaluate_function_level
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_level";
@@ -92,9 +104,6 @@ import {
 import {
     evaluate_function_position
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_position";
-import {
-    evaluate_function_positions_farther_from
-} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_positions_farther_from";
 import {
     evaluate_function_skill
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_skill";
@@ -122,6 +131,8 @@ export const build_evaluate_function = ({game_queries, game_state}: {
                 return evaluate_function_not({node, game_queries})
             case FUNCTION_NAME.NOT_EQUALS:
                 return evaluate_function_not_equals({node, game_queries})
+            case FUNCTION_NAME.EQUALS:
+                return evaluate_function_equals({node, game_queries})
             case FUNCTION_NAME.HAS_VALID_TARGETING:
                 return evaluate_function_has_valid_targeting({node, game_state, game_queries})
             case FUNCTION_NAME.ARE_ENEMIES:
@@ -162,10 +173,16 @@ export const build_evaluate_function = ({game_queries, game_state}: {
                 return evaluate_function_count({node, game_queries})
             case FUNCTION_NAME.FILTER_CREATURES:
                 return evaluate_function_filter_creatures({node, game_state, game_queries})
+            case FUNCTION_NAME.FILTER:
+                return evaluate_function_filter({node, game_state, game_queries})
+            case FUNCTION_NAME.LET:
+                return evaluate_function_let({node, game_state, game_queries})
             case FUNCTION_NAME.MAP:
                 return evaluate_function_map({node, game_state, game_queries})
             case FUNCTION_NAME.MIN:
                 return evaluate_function_min({node, game_queries})
+            case FUNCTION_NAME.MAX:
+                return evaluate_function_max({node, game_queries})
             case FUNCTION_NAME.LEVEL:
                 return evaluate_function_level({node, game_queries})
             case FUNCTION_NAME.ATTR_MOD:
@@ -178,8 +195,6 @@ export const build_evaluate_function = ({game_queries, game_state}: {
                 return evaluate_function_movement({node, game_queries})
             case FUNCTION_NAME.POSITION:
                 return evaluate_function_position({node, game_queries})
-            case FUNCTION_NAME.POSITIONS_FARTHER_FROM:
-                return evaluate_function_positions_farther_from({node, game_queries, game_state})
             case FUNCTION_NAME.SKILL:
                 return evaluate_function_skill({node, game_queries})
             case FUNCTION_NAME.SIZE:
