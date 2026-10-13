@@ -27,7 +27,7 @@ export const get_valid_targets = ({instruction, battle_grid, game_queries, game_
         const owner = game_queries.evaluate_creature(AST.OWNER)
         const valid_targets = in_range
             .filter(position => !positions_equal(position, owner.data.position))
-            .filter(position => !battle_grid.is_terrain_occupied(position, {exclude: [owner]}))
+            .filter(position => !battle_grid.blocks_movement(position, {exclude: [owner]}))
 
         if (instruction.destination_requirement) {
         //TODO this is a bit fishy, check later

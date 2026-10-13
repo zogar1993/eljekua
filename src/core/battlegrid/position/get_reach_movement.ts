@@ -21,7 +21,7 @@ export const get_reach_movement = ({creature, distance, battle_grid}: {
             const new_ring_candidates = get_reach_adjacent({origin: anchor, battle_grid})
 
             for (const new_ring_candidate of new_ring_candidates) {
-                if (battle_grid.is_terrain_occupied(new_ring_candidate, {exclude: [creature]})) continue
+                if (battle_grid.blocks_movement(new_ring_candidate, {exclude: [creature]})) continue
                 if (visited.some(position => positions_of_same_footprint_equal(position, new_ring_candidate))) continue
                 if (new_ring.some(position => positions_of_same_footprint_equal(position, new_ring_candidate))) continue
                 new_ring.push(new_ring_candidate)

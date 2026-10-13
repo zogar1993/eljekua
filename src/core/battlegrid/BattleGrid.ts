@@ -10,38 +10,34 @@ import type {Creatures} from "core/creatures/Creatures";
 export const create_battle_grid = ({size, creatures}: {
     size: { x: number, y: number }
     creatures: Creatures
-}): BattleGrid => {
-    const board: Array<Array<Square>> = []
+}) => {
+    const board: Array<Array<BoardPosition>> = []
     for (let y = 0; y < size.y; y++) {
-        const line: Array<Square> = []
+        const line: Array<BoardPosition> = []
 
         for (let x = 0; x < size.x; x++)
-            line[x] = {}
+            line[x] = {structure: null}
 
         board[y] = line
     }
 
-    const separators_horizontal: Array<Array<Position>> = []
-    const separators_vertical: Array<Array<Position>> = []
+    const separators_horizontal: Array<Array<BoardPosition>> = []
+    const separators_vertical: Array<Array<BoardPosition>> = []
 
     for (let y = 0; y < size.y - 1; y++) {
-        const line_h: Array<Position> = []
-        const line_v: Array<Position> = []
+        const line_h: Array<BoardPosition> = []
+        const line_v: Array<BoardPosition> = []
 
         for (let x = 0; x < size.x - 1; x++) {
-            line_h[x] = {x, y, footprint: 1}
-            line_v[x] = {x, y, footprint: 1}
+            line_h[x] = {structure: null}
+            line_v[x] = {structure: null}
         }
 
         separators_horizontal[y] = line_h
         separators_vertical[y] = line_v
     }
 
-
-
-
-
-    const get_board = (): ReadonlyArray<ReadonlyArray<Square>> => board
+    const get_board = (): ReadonlyArray<ReadonlyArray<BoardPosition>> => board
 
     const get_square = ({x, y}: PositionFootprintOne) => {
         if (x < 0 || x >= size.x || y < 0 || y >= size.y)
@@ -62,6 +58,18 @@ export const create_battle_grid = ({size, creatures}: {
         return false
     }
 
+    const is_blocked_by_structure = (position: Position): boolean => {
+        for (const p of transform_position_to_f1(position)) {
+            const structure = get_square(p).structure
+            if (structure?.blocks_movement) return true
+        }
+        return false
+    }
+
+    const blocks_movement = (position: Position, {exclude}: { exclude?: Array<Creature> } = {}): boolean => {
+        return is_terrain_occupied(position, {exclude}) || is_blocked_by_structure(position)
+    }
+
     const get_creature_by_position = (position: Position): Creature => {
         const creature = creatures.get_all().find(creature => positions_share_surface(creature.data.position, position))
         if (!creature) throw Error(`creature not found for cell ${position}`)
@@ -73,7 +81,6 @@ export const create_battle_grid = ({size, creatures}: {
         return [...new Set(creatures)]
     }
 
-
     return {
         size,
 
@@ -81,22 +88,20 @@ export const create_battle_grid = ({size, creatures}: {
         get_square,
         get_squares,
         is_terrain_occupied,
+        blocks_movement,
         get_creature_by_position,
         get_creatures_in_positions,
     }
 }
 
-export type BattleGrid = {
-    size: { x: number, y: number }
+export type BattleGrid = ReturnType<typeof create_battle_grid>
 
-    get_board: () => ReadonlyArray<ReadonlyArray<Square>>
-    get_square: (position: PositionFootprintOne) => Square
-    get_squares: (position: Position) => Array<Square>
-
-    is_terrain_occupied: (position: Position, options?: { exclude?: Array<Creature> }) => boolean
-    get_creature_by_position: (position: Position) => Creature
-    get_creatures_in_positions: (positions: Array<PositionFootprintOne>) => Array<Creature>
+export type BoardPosition = {
+    structure: Structure | null
 }
 
-export type Square = {}
-
+type Structure = {
+    blocks_movement: boolean
+    blocks_line_of_sight: boolean
+    blocks_line_of_effect: boolean
+}

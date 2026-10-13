@@ -57,7 +57,7 @@ export const get_shortest_path = ({creature, destination, battle_grid}: {
         const head = current_path.path[current_path.path.length - 1]
         const alternatives = get_reach_adjacent({origin: head, battle_grid})
             .filter(a => visited.every(b => !positions_of_same_footprint_equal(a, b)))
-            .filter(a => !battle_grid.is_terrain_occupied(a, {exclude: [creature]}))
+            .filter(a => !battle_grid.blocks_movement(a, {exclude: [creature]}))
 
         const ending_position = alternatives.find(alternative => positions_of_same_footprint_equal(alternative, destination))
         if (ending_position) return [...current_path.path, ending_position]
