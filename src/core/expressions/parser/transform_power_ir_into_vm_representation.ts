@@ -373,17 +373,21 @@ const transform_select_target_ir = (
             target_label: ir.target_label,
             destination_requirement: ir.destination_requirement ? to_ast(ir.destination_requirement) : null,
         }
-    if (ir.targeting_type === "ranged")
+    if (ir.targeting_type === "ranged") {
+        assert_ranged_select_target_ir_is_valid(ir)
+
         return {
             type: INSTRUCTION_TYPE.SELECT_TARGET,
             targeting_type: ir.targeting_type,
             target_type: ir.target_type,
             amount: ir.amount,
             target_label: ir.target_label,
-            distance: to_ast(ir.distance),
+            distance: ir.distance === undefined ? null : to_ast(ir.distance),
+            requires_line_of_sight: ir.requires_line_of_sight ?? false,
             exclude: ir.exclude ? ir.exclude.map(x => to_ast(x)) : [],
             attack_roll,
         }
+    }
     if (ir.targeting_type === "adjacent" || ir.targeting_type === "melee_weapon")
         return {
             type: INSTRUCTION_TYPE.SELECT_TARGET,
@@ -433,6 +437,14 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
 }
 
 const TRIGGER_ACTION_TYPES = [ACTION_TYPE.IMMEDIATE, ACTION_TYPE.OPPORTUNITY, ACTION_TYPE.FREE_ATTACK] as Array<ActionType>
+
+const assert_ranged_select_target_ir_is_valid = (ir: {
+    distance?: string | number
+    requires_line_of_sight?: boolean
+}) => {
+    if (ir.distance === undefined && !ir.requires_line_of_sight)
+        throw Error("ranged select_target requires distance or requires_line_of_sight")
+}
 
 const validate_trigger_ir = (power: IRPower) => {
     const trigger = power.trigger

@@ -31,7 +31,7 @@ export type IRPower = {
     class?: string
     level?: number
     description?: string
-    keywords?: Array<"Divine" | "Fear" | "Implement" | "Invigorating" | "Martial" | "Weapon">
+    keywords?: Array<"Divine" | "Fear" | "Implement" | "Invigorating" | "Martial" | "Radiant" | "Weapon">
     type: {
         action: ActionType
         cooldown?: "at-will" | "encounter" | "daily"
@@ -175,10 +175,11 @@ type IRInstructionSelectTargetMovement = {
 
 type IRInstructionSelectTargetRanged = {
     targeting_type: "ranged"
-    target_type: "terrain" | "enemy" | "creature"
+    target_type: "terrain" | "enemy" | "creature" | "ally"
     terrain_prerequisite?: "unoccupied"
     amount: 1
-    distance: string | number
+    distance?: string | number
+    requires_line_of_sight?: boolean
     exclude?: ["primary_target"]
 }
 

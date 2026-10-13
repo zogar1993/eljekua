@@ -3,6 +3,7 @@ import {assert_is_footprint_one} from "core/battlegrid/Position";
 import {get_reach_movement} from "core/battlegrid/position/get_reach_movement";
 import {get_reach_melee} from "core/battlegrid/position/get_reach_melee";
 import {get_reach_adjacent} from "core/battlegrid/position/get_reach_adjacent";
+import {get_all_f1_positions} from "core/battlegrid/position/get_all_f1_positions";
 import {get_reach_ranged} from "core/battlegrid/position/get_reach_ranged";
 import {get_reach_area_burst} from "core/battlegrid/position/get_reach_area_burst";
 import {get_reach_push} from "core/battlegrid/position/get_reach_push";
@@ -32,6 +33,11 @@ export const get_reach = ({instruction, battle_grid, game_queries}: {
         }
         case "ranged": {
             const origin = game_queries.evaluate_creature(AST.OWNER).data.position
+
+            if (instruction.distance === null)
+                //TODO this is a rather obtuse implementation. it will be in place until obstacles block line of sight.
+                return get_all_f1_positions({battle_grid})
+
             const distance = game_queries.evaluate_number(instruction.distance)
             return get_reach_ranged({origin, distance, battle_grid})
         }

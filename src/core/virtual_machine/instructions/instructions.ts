@@ -247,10 +247,11 @@ export type InstructionSelectTarget =
 export type InstructionSelectTargetRanged = {
     type: typeof INSTRUCTION_TYPE.SELECT_TARGET,
     targeting_type: "ranged"
-    target_type: "terrain" | "enemy" | "creature"
+    target_type: "terrain" | "enemy" | "creature" | "ally"
     terrain_prerequisite?: "unoccupied"
     amount: 1
-    distance: AstNode
+    distance: AstNode | null
+    requires_line_of_sight: boolean
     target_label: string
     exclude: Array<AstNode>
     attack_roll: InstructionAttackRollParams | null
