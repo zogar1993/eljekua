@@ -11,12 +11,35 @@ export const create_battle_grid = ({size, creatures}: {
     size: { x: number, y: number }
     creatures: Creatures
 }): BattleGrid => {
-    const board: Array<Array<Square>> = Array.from({length: size.y}, (_, y) => {
-            return Array.from({length: size.x}, (_, x) => {
-                return {position: {x, y, footprint: 1}}
-            })
+    const board: Array<Array<Square>> = []
+    for (let y = 0; y < size.y; y++) {
+        const line: Array<Square> = []
+
+        for (let x = 0; x < size.x; x++)
+            line[x] = {position: {x, y, footprint: 1}}
+
+        board[y] = line
+    }
+
+    const separators_horizontal: Array<Array<Position>> = []
+    const separators_vertical: Array<Array<Position>> = []
+
+    for (let y = 0; y < size.y - 1; y++) {
+        const line_h: Array<Position> = []
+        const line_v: Array<Position> = []
+
+        for (let x = 0; x < size.x - 1; x++) {
+            line_h[x] = {x, y, footprint: 1}
+            line_v[x] = {x, y, footprint: 1}
         }
-    )
+
+        separators_horizontal[y] = line_h
+        separators_vertical[y] = line_v
+    }
+
+
+
+
 
     const get_square = ({x, y}: PositionFootprintOne) => {
         if (x < 0 || x >= size.x || y < 0 || y >= size.y)
