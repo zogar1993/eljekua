@@ -16,7 +16,7 @@ export const create_battle_grid = ({size, creatures}: {
         const line: Array<Square> = []
 
         for (let x = 0; x < size.x; x++)
-            line[x] = {position: {x, y, footprint: 1}}
+            line[x] = {}
 
         board[y] = line
     }
@@ -96,7 +96,5 @@ export type BattleGrid = {
     get_creatures_in_positions: (positions: Array<PositionFootprintOne>) => Array<Creature>
 }
 
-export type Square = {
-    position: PositionFootprintOne
-}
+export type Square = {}
 
