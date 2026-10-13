@@ -40,7 +40,7 @@ export const initialize_battle_grid_ui = ({
     const {size} = battle_grid
     const creature_visuals = new Map<Creature, CreatureVisual>()
     const click_overlay = create_battle_grid_visual({width: size.x, height: size.y})
-    const board = battle_grid.board.map((row, y) => row.map((_, x) => create_visual_square({x, y})))
+    const board = battle_grid.get_board().map((row, y) => row.map((_, x) => create_visual_square({x, y})))
 
     const highlighted: Record<SquareHighlight, Set<SquareVisual>> = {
         [SQUARE_HIGHLIGHT.SELECTED]: new Set<SquareVisual>(),

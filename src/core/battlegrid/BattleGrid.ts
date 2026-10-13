@@ -41,6 +41,8 @@ export const create_battle_grid = ({size, creatures}: {
 
 
 
+    const get_board = (): ReadonlyArray<ReadonlyArray<Square>> => board
+
     const get_square = ({x, y}: PositionFootprintOne) => {
         if (x < 0 || x >= size.x || y < 0 || y >= size.y)
             throw (`position {x:${x}, y:${y}} is out of the battle grid dimensions (width:${size.x}, height:${size.y})`)
@@ -74,8 +76,8 @@ export const create_battle_grid = ({size, creatures}: {
 
     return {
         size,
-        board,
 
+        get_board,
         get_square,
         get_squares,
         is_terrain_occupied,
@@ -86,8 +88,8 @@ export const create_battle_grid = ({size, creatures}: {
 
 export type BattleGrid = {
     size: { x: number, y: number }
-    board: Array<Array<Square>>
 
+    get_board: () => ReadonlyArray<ReadonlyArray<Square>>
     get_square: (position: PositionFootprintOne) => Square
     get_squares: (position: Position) => Array<Square>
 
