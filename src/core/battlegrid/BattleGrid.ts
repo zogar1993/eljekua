@@ -22,20 +22,20 @@ export const create_battle_grid = ({size, creatures}: {
         board[y] = line
     }
 
-    const separators_horizontal: Array<Array<BoardPosition>> = []
-    const separators_vertical: Array<Array<BoardPosition>> = []
+    const separators_x_axis: Array<Array<BoardPosition>> = []
+    const separators_y_axis: Array<Array<BoardPosition>> = []
 
     for (let y = 0; y < size.y - 1; y++) {
-        const line_h: Array<BoardPosition> = []
-        const line_v: Array<BoardPosition> = []
+        const line: Array<BoardPosition> = []
+        const column: Array<BoardPosition> = []
 
         for (let x = 0; x < size.x - 1; x++) {
-            line_h[x] = {structure: null}
-            line_v[x] = {structure: null}
+            line[x] = {structure: null}
+            column[x] = {structure: null}
         }
 
-        separators_horizontal[y] = line_h
-        separators_vertical[y] = line_v
+        separators_x_axis[y] = line
+        separators_y_axis[y] = column
     }
 
     const get_board = (): ReadonlyArray<ReadonlyArray<BoardPosition>> => board
