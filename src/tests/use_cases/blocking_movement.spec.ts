@@ -1,28 +1,14 @@
 import type {BattleGrid} from "core/battlegrid/BattleGrid";
 import type {PositionFootprintOne} from "core/battlegrid/Position";
+import {OPAQUE_SOLID_WALL, OPAQUE_TRANSVERSABLE_WALL} from "core/battlegrid/Structure";
+import type {Structure} from "core/battlegrid/Structure";
 import {get_reach_push} from "core/battlegrid/position/get_reach_push";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";
 import {INTERACTION_TYPE} from "core/interactions/Interactions";
 import {create_creature_test_helpers} from "tests/utils/creature_test_helpers";
 import {create_test_game} from "tests/utils/create_test_game";
 
-const BLOCKING_STRUCTURE = {
-    blocks_movement: true,
-    blocks_line_of_sight: false,
-    blocks_line_of_effect: false,
-}
-
-const NON_BLOCKING_STRUCTURE = {
-    blocks_movement: false,
-    blocks_line_of_sight: true,
-    blocks_line_of_effect: false,
-}
-
-const set_structure_at = (battle_grid: BattleGrid, position: PositionFootprintOne, structure: {
-    blocks_movement: boolean
-    blocks_line_of_sight: boolean
-    blocks_line_of_effect: boolean
-}) => {
+const set_structure_at = (battle_grid: BattleGrid, position: PositionFootprintOne, structure: Structure) => {
     battle_grid.get_square(position).structure = structure
 }
 
@@ -52,7 +38,7 @@ describe("blocking movement", () => {
 
     test("shift does not offer a square blocked by a structure", () => {
         given_a_creature_is_created({name: "mover", team: 1, position: CREATURE_START})
-        set_structure_at(test_game.battle_grid, BLOCKED_SQUARE, BLOCKING_STRUCTURE)
+        set_structure_at(test_game.battle_grid, BLOCKED_SQUARE, OPAQUE_SOLID_WALL)
         given_creature("mover").is_in_its_turn()
 
         test_game.instruction_loop.select({type: INTERACTION_TYPE.OPTION_SELECT, option: "Shift"})
@@ -68,7 +54,7 @@ describe("blocking movement", () => {
 
     test("walk does not offer a square blocked by a structure", () => {
         given_a_creature_is_created({name: "mover", team: 1, position: CREATURE_START})
-        set_structure_at(test_game.battle_grid, BLOCKED_SQUARE, BLOCKING_STRUCTURE)
+        set_structure_at(test_game.battle_grid, BLOCKED_SQUARE, OPAQUE_SOLID_WALL)
         given_creature("mover").is_in_its_turn()
 
         test_game.instruction_loop.select({type: INTERACTION_TYPE.OPTION_SELECT, option: "Walk"})
@@ -84,7 +70,7 @@ describe("blocking movement", () => {
 
     test("walk paths around a square blocked by a structure", () => {
         given_a_creature_is_created({name: "mover", team: 1, position: CREATURE_START})
-        set_structure_at(test_game.battle_grid, BLOCKED_SQUARE, BLOCKING_STRUCTURE)
+        set_structure_at(test_game.battle_grid, BLOCKED_SQUARE, OPAQUE_SOLID_WALL)
         given_creature("mover").is_in_its_turn()
 
         const mover = test_game.creatures.get_all().find(creature => creature.data.name === "mover")!
@@ -100,7 +86,7 @@ describe("blocking movement", () => {
 
     test("push does not offer a square blocked by a structure", () => {
         given_a_creature_is_created({name: "defender", team: 2, position: BLOCKED_SQUARE})
-        set_structure_at(test_game.battle_grid, DESTINATION_BEYOND_BLOCK, BLOCKING_STRUCTURE)
+        set_structure_at(test_game.battle_grid, DESTINATION_BEYOND_BLOCK, OPAQUE_SOLID_WALL)
 
         const defender = test_game.creatures.get_all().find(creature => creature.data.name === "defender")!
         const destinations = get_reach_push({
@@ -117,7 +103,7 @@ describe("blocking movement", () => {
 
     test("does not block movement when structure blocks_movement is false", () => {
         given_a_creature_is_created({name: "mover", team: 1, position: CREATURE_START})
-        set_structure_at(test_game.battle_grid, BLOCKED_SQUARE, NON_BLOCKING_STRUCTURE)
+        set_structure_at(test_game.battle_grid, BLOCKED_SQUARE, OPAQUE_TRANSVERSABLE_WALL)
         given_creature("mover").is_in_its_turn()
 
         test_game.instruction_loop.select({type: INTERACTION_TYPE.OPTION_SELECT, option: "Shift"})

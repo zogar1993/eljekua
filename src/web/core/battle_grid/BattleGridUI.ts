@@ -42,6 +42,13 @@ export const initialize_battle_grid_ui = ({
     const click_overlay = create_battle_grid_visual({width: size.x, height: size.y})
     const board = battle_grid.get_board().map((row, y) => row.map((_, x) => create_visual_square({x, y})))
 
+    const sync_structures = () => {
+        battle_grid.get_board().forEach((row, y) =>
+            row.forEach((cell, x) => board[y][x].set_structure(cell.structure)),
+        )
+    }
+    sync_structures()
+
     const highlighted: Record<SquareHighlight, Set<SquareVisual>> = {
         [SQUARE_HIGHLIGHT.SELECTED]: new Set<SquareVisual>(),
         [SQUARE_HIGHLIGHT.AREA]: new Set<SquareVisual>(),
@@ -243,6 +250,7 @@ export const initialize_battle_grid_ui = ({
     return {
         click_overlay,
         board,
+        sync_structures,
     }
 }
 

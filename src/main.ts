@@ -26,6 +26,9 @@ import {create_instruction_visualizer} from "web/core/instruction_visualizer/ins
 import {create_set_current_turn_to_creature} from "core/use_cases/gameplay/set_current_turn_to_creature";
 import {create_game_events} from "core/events/GameEvents";
 import {create_game_state} from "core/game_state/GameState";
+import type {PositionFootprintOne} from "core/battlegrid/Position";
+import {OPAQUE_SOLID_WALL, OPAQUE_TRANSVERSABLE_WALL} from "core/battlegrid/Structure";
+import type {Structure} from "core/battlegrid/Structure";
 import {initialize_battle_grid_ui} from "web/core/battle_grid/BattleGridUI";
 import {create_option_buttons_ui} from "web/core/creature_option_buttons/CreatureOptionButtons";
 
@@ -36,7 +39,7 @@ const game_queries = create_game_queries({game_state})
 
 const instruction_loop = create_instruction_loop({game_state, game_queries, game_events})
 
-initialize_battle_grid_ui({game_state, game_events, game_input: instruction_loop})
+const battle_grid_ui = initialize_battle_grid_ui({game_state, game_events, game_input: instruction_loop})
 create_option_buttons_ui({game_events, game_input: instruction_loop})
 create_hit_status_buttons_ui({game_events, game_inputs: instruction_loop})
 create_d20_roll_buttons_ui({game_events, game_inputs: instruction_loop})
@@ -81,6 +84,11 @@ const start_battle = create_start_battle({game_state, instruction_loop, game_eve
         team: 2,
     })
 
+    place_structure({x: 2, y: 2, footprint: 1}, OPAQUE_SOLID_WALL)
+    place_structure({x: 2, y: 3, footprint: 1}, OPAQUE_SOLID_WALL)
+    place_structure({x: 4, y: 3, footprint: 1}, OPAQUE_TRANSVERSABLE_WALL)
+    battle_grid_ui.sync_structures()
+
     add_creature({data: bob})
     add_creature({data: maik})
     add_creature({data: ritualist})
@@ -103,6 +111,10 @@ const start_battle = create_start_battle({game_state, instruction_loop, game_eve
         return
     }
     set_current_turn_to_creature({creature})
+}
+
+const place_structure = (position: PositionFootprintOne, structure: Structure) => {
+    game_state.battle_grid.get_square(position).structure = structure
 }
 
 const build_character = (

@@ -6,6 +6,7 @@ import {
     transform_position_to_f1
 } from "core/battlegrid/Position";
 import type {Creatures} from "core/creatures/Creatures";
+import type {Structure} from "core/battlegrid/Structure";
 
 export const create_battle_grid = ({size, creatures}: {
     size: { x: number, y: number }
@@ -98,10 +99,4 @@ export type BattleGrid = ReturnType<typeof create_battle_grid>
 
 export type BoardPosition = {
     structure: Structure | null
-}
-
-type Structure = {
-    blocks_movement: boolean
-    blocks_line_of_sight: boolean
-    blocks_line_of_effect: boolean
 }

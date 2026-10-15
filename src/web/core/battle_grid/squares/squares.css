@@ -68,3 +68,35 @@
     background-color: mediumpurple;
 }
 
+.board__square[data-structure]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.board__square[data-blocks_movement=true][data-structure]::before {
+    background-color: black;
+}
+
+.board__square[data-blocks_movement=false][data-structure]::before {
+    background-color: white;
+}
+
+.board__square[data-blocks_line_of_sight=true][data-structure]::before {
+    opacity: 1;
+}
+
+.board__square[data-blocks_line_of_sight=false][data-structure]::before {
+    opacity: 0.5;
+}
+
+.board__square[data-blocks_line_of_effect=false][data-structure]::before {
+    border-radius: 12px;
+}
+
+.board__square[data-blocks_line_of_effect=true][data-structure]::before {
+    border-radius: 0;
+}
+
