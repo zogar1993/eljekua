@@ -74,37 +74,6 @@ const start_battle = create_start_battle({game_state, instruction_loop, game_eve
         powers: WIZARD_POWERS,
         team: 1
     })
-    const yeims = build_character({
-        name: "crossbow",
-        position: {x: 1, y: 0, footprint: 1},
-        image: `url("/public/crossbow.svg")`,
-        movement: 10,
-        hp_current: 10,
-        hp_max: 10,
-        level: 1,
-        team: null,
-        attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
-        powers: ROGUE_POWERS
-    })
-    const cleric = build_character({
-        name: "mace",
-        position: {x: 2, y: 2, footprint: 1},
-        image: `url("/public/wizard-staff.svg")`,
-        movement: 5,
-        hp_current: 10,
-        hp_max: 10,
-        level: 1,
-        team: 1,
-        attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
-        powers: CLERIC_POWERS,
-    })
-
-    const jenri = build_character({
-        name: "pirate",
-        position: {x: 7, y: 7, footprint: 2},
-        size: "large",
-        image: `url("/public/saber-and-pistol.svg")`,
-    })
 
     const ritualist = build_monster(evil_ritualist, {
         position: {x: 3, y: 3, footprint: 1},
@@ -112,19 +81,9 @@ const start_battle = create_start_battle({game_state, instruction_loop, game_eve
         team: 2,
     })
 
-    const ritualist2 = build_monster(evil_ritualist, {
-        position: {x: 3, y: 4, footprint: 1},
-        image: `url("/public/wizard-staff.svg")`,
-        team: 2,
-    })
-
     add_creature({data: bob})
     add_creature({data: maik})
-    add_creature({data: yeims})
-    add_creature({data: cleric})
-    add_creature({data: jenri})
     add_creature({data: ritualist})
-    add_creature({data: ritualist2})
 
     start_battle()
 }
