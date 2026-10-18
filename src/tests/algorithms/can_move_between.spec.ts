@@ -10,16 +10,36 @@ const SOUTH = {x: 1, y: 2, footprint: 1} as const
 const SOUTH_EAST = {x: 2, y: 2, footprint: 1} as const
 
 
-const VALID_DIAGONAL_CASES_WITH_ONE_WALL = `
+const VALID_DIAGONALS__ONE_WALL = `
      |O| |O  |O  |O  | |O|  O|  O|  O|D  |D| |D  |D  |  D| |D|  D|  D|
      |   |   |-  |  -|   |   |  -|-  |   |   |  -|-  |   |   |-  |  -|
      |  D| |D|  D|  D|D  |D| |D  |D  | |O|  O|  O|  O|O| |O  |O  |O  |
     `
-const VALID_DIAGONAL_CASES_WITH_TWO_WALLS = `
+
+const VALID_DIAGONALS__AROUND_THE_CORNER = `
      |O| |O  | |O|  O|D| |D  | |D|  D|
      |  -|-  |-  |  -|  -|-  |-  |  -| 
      |  D| |D|D  |D| |  O| |O|O  |O| |
     `
+
+const INVALID_DIAGONALS__HEMISPHERES_SEPARATED = `
+     |O| |O  | |O|  O|D| |D  | |D|  D|
+     |   |- -|   |- -|   |- -|   |- -| 
+     | |D|  D|D| |D  | |O|  O|O| |O  |
+    `
+
+const INVALID_DIAGONALS__CORNERED = `
+     |O| |O  | |O|  O|D  |D| |  D| |D|
+     |-  |  -|  -|-  |  -|-  |-  |  -| 
+     |  D| |D|D  |D| | |O|  O|O| |O  |
+    `
+
+const INVALID_DIAGONALS__EXTRA_WALLS = `
+     |O| |O  |O| |O| |O| |
+     |- -|- -|-  |- -|  -|
+     | |D| |D| |D|  D| |D|
+    `
+
 const parse_cases = (cases: string) => {
     const lines = cases.trim().split("\n").map(x => x.trim())
 
@@ -114,8 +134,8 @@ describe("can_move_between", () => {
         expect(can_move_between(battle_grid, ORIGIN, EAST)).toBe(true)
     })
 
-    parse_cases(VALID_DIAGONAL_CASES_WITH_ONE_WALL).forEach(({orig, dest, x_separators, y_separators}) => {
-        test(`diagonal movement with one wall from ${JSON.stringify(orig)} to ${JSON.stringify(dest)} with x separators ${JSON.stringify(x_separators)} and y separators ${JSON.stringify(y_separators)}`, () => {
+    parse_cases(VALID_DIAGONALS__ONE_WALL).forEach(({orig, dest, x_separators, y_separators}) => {
+        test(`diagonal movement - one wall - from ${JSON.stringify(orig)} to ${JSON.stringify(dest)} with x separators ${JSON.stringify(x_separators)} and y separators ${JSON.stringify(y_separators)}`, () => {
             const {battle_grid} = create_test_game({battle_grid_size: {x: 2, y: 2}})
             x_separators.forEach((pos) => set_x_separator(battle_grid, {...pos, footprint: 1}))
             y_separators.forEach((pos) => set_y_separator(battle_grid, {...pos, footprint: 1}))
@@ -126,8 +146,8 @@ describe("can_move_between", () => {
         })
     })
 
-    parse_cases(VALID_DIAGONAL_CASES_WITH_TWO_WALLS).forEach(({orig, dest, x_separators, y_separators}) => {
-        test(`diagonal movement with two walls from ${JSON.stringify(orig)} to ${JSON.stringify(dest)} with x separators ${JSON.stringify(x_separators)} and y separators ${JSON.stringify(y_separators)}`, () => {
+    parse_cases(VALID_DIAGONALS__AROUND_THE_CORNER).forEach(({orig, dest, x_separators, y_separators}) => {
+        test(`diagonal movement - around the corner - from ${JSON.stringify(orig)} to ${JSON.stringify(dest)} with x separators ${JSON.stringify(x_separators)} and y separators ${JSON.stringify(y_separators)}`, () => {
             const {battle_grid} = create_test_game({battle_grid_size: {x: 2, y: 2}})
             x_separators.forEach((pos) => set_x_separator(battle_grid, {...pos, footprint: 1}))
             y_separators.forEach((pos) => set_y_separator(battle_grid, {...pos, footprint: 1}))
@@ -135,6 +155,42 @@ describe("can_move_between", () => {
             const result = can_move_between(battle_grid, {...orig, footprint: 1}, {...dest, footprint: 1})
 
             expect(result).toBe(true)
+        })
+    })
+
+    parse_cases(INVALID_DIAGONALS__HEMISPHERES_SEPARATED).forEach(({orig, dest, x_separators, y_separators}) => {
+        test(`diagonal movement - hemispheres separated - from ${JSON.stringify(orig)} to ${JSON.stringify(dest)} with x separators ${JSON.stringify(x_separators)} and y separators ${JSON.stringify(y_separators)}`, () => {
+            const {battle_grid} = create_test_game({battle_grid_size: {x: 2, y: 2}})
+            x_separators.forEach((pos) => set_x_separator(battle_grid, {...pos, footprint: 1}))
+            y_separators.forEach((pos) => set_y_separator(battle_grid, {...pos, footprint: 1}))
+
+            const result = can_move_between(battle_grid, {...orig, footprint: 1}, {...dest, footprint: 1})
+
+            expect(result).toBe(false)
+        })
+    })
+
+    parse_cases(INVALID_DIAGONALS__CORNERED).forEach(({orig, dest, x_separators, y_separators}) => {
+        test(`diagonal movement - cornered - from ${JSON.stringify(orig)} to ${JSON.stringify(dest)} with x separators ${JSON.stringify(x_separators)} and y separators ${JSON.stringify(y_separators)}`, () => {
+            const {battle_grid} = create_test_game({battle_grid_size: {x: 2, y: 2}})
+            x_separators.forEach((pos) => set_x_separator(battle_grid, {...pos, footprint: 1}))
+            y_separators.forEach((pos) => set_y_separator(battle_grid, {...pos, footprint: 1}))
+
+            const result = can_move_between(battle_grid, {...orig, footprint: 1}, {...dest, footprint: 1})
+
+            expect(result).toBe(false)
+        })
+    })
+
+    parse_cases(INVALID_DIAGONALS__EXTRA_WALLS).forEach(({orig, dest, x_separators, y_separators}) => {
+        test(`diagonal movement - extra walls - from ${JSON.stringify(orig)} to ${JSON.stringify(dest)} with x separators ${JSON.stringify(x_separators)} and y separators ${JSON.stringify(y_separators)}`, () => {
+            const {battle_grid} = create_test_game({battle_grid_size: {x: 2, y: 2}})
+            x_separators.forEach((pos) => set_x_separator(battle_grid, {...pos, footprint: 1}))
+            y_separators.forEach((pos) => set_y_separator(battle_grid, {...pos, footprint: 1}))
+
+            const result = can_move_between(battle_grid, {...orig, footprint: 1}, {...dest, footprint: 1})
+
+            expect(result).toBe(false)
         })
     })
 })

@@ -39,8 +39,6 @@ export const can_move_between = (
 
     // checks for diagonal movement
     // for it to be valid we check the "+" that forms between the positions
-    // if one of the positions is cornered, then it can't move
-    // otherwise, it can
     const min_x = Math.min(orig.x, dest.x)
     const min_y = Math.min(orig.y, dest.y)
 
@@ -49,12 +47,12 @@ export const can_move_between = (
     const separates_s = separator_blocks_movement(battle_grid.get_separator_x_axis({x: min_x, y: min_y + 1}).structure)
     const separates_w = separator_blocks_movement(battle_grid.get_separator_y_axis({x: min_x, y: min_y}).structure)
 
-    // if both hemispheres are separate, it can't move through a diagonal
+    // if both hemispheres are separate, it can't move
     if (separates_n && separates_s) return false
     if (separates_e && separates_w) return false
 
+    // if one of the positions is cornered, then it can't move
     const is_nw_to_se_diagonal = dx + dy !== 0
-
     if (is_nw_to_se_diagonal) {
         if (separates_n && separates_w) return false
         if (separates_s && separates_e) return false
