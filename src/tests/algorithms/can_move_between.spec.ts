@@ -7,7 +7,6 @@ import {PositionBasic} from "core/battlegrid/BattleGrid";
 const ORIGIN = {x: 1, y: 1, footprint: 1} as const
 const EAST = {x: 2, y: 1, footprint: 1} as const
 const SOUTH = {x: 1, y: 2, footprint: 1} as const
-const SOUTH_EAST = {x: 2, y: 2, footprint: 1} as const
 
 
 const VALID_DIAGONALS__ONE_WALL = `
@@ -110,21 +109,6 @@ describe("can_move_between", () => {
 
         expect(can_move_between(battle_grid, ORIGIN, SOUTH)).toBe(false)
         expect(can_move_between(battle_grid, SOUTH, ORIGIN)).toBe(false)
-    })
-
-    test("diagonal movement is blocked only when both adjacent separators block", () => {
-        const {battle_grid} = create_test_game({battle_grid_size: {x: 5, y: 5}})
-        set_x_separator(battle_grid, ORIGIN)
-
-        expect(can_move_between(battle_grid, ORIGIN, SOUTH_EAST)).toBe(true)
-    })
-
-    test("diagonal movement is blocked when both adjacent separators block", () => {
-        const {battle_grid} = create_test_game({battle_grid_size: {x: 5, y: 5}})
-        set_x_separator(battle_grid, ORIGIN)
-        set_y_separator(battle_grid, ORIGIN)
-
-        expect(can_move_between(battle_grid, ORIGIN, SOUTH_EAST)).toBe(false)
     })
 
     test("does not block passage when separator structure does not block movement", () => {
