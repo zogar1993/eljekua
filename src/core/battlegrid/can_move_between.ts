@@ -42,13 +42,14 @@ export const can_move_between = (
     const min_x = Math.min(orig.x, dest.x)
     const min_y = Math.min(orig.y, dest.y)
 
-    const separates_n = separator_blocks_movement(battle_grid.get_separator_x_axis({x: min_x, y: min_y}).structure)
-    const separates_e = separator_blocks_movement(battle_grid.get_separator_y_axis({x: min_x + 1, y: min_y}).structure)
-    const separates_s = separator_blocks_movement(battle_grid.get_separator_x_axis({x: min_x, y: min_y + 1}).structure)
-    const separates_w = separator_blocks_movement(battle_grid.get_separator_y_axis({x: min_x, y: min_y}).structure)
 
     // if both hemispheres are separate, it can't move
+    const separates_n = separator_blocks_movement(battle_grid.get_separator_x_axis({x: min_x, y: min_y}).structure)
+    const separates_s = separator_blocks_movement(battle_grid.get_separator_x_axis({x: min_x, y: min_y + 1}).structure)
     if (separates_n && separates_s) return false
+
+    const separates_e = separator_blocks_movement(battle_grid.get_separator_y_axis({x: min_x + 1, y: min_y}).structure)
+    const separates_w = separator_blocks_movement(battle_grid.get_separator_y_axis({x: min_x, y: min_y}).structure)
     if (separates_e && separates_w) return false
 
     // if one of the positions is cornered, then it can't move
