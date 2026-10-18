@@ -87,6 +87,8 @@ const start_battle = create_start_battle({game_state, instruction_loop, game_eve
     place_structure({x: 2, y: 2, footprint: 1}, OPAQUE_SOLID_WALL)
     place_structure({x: 2, y: 3, footprint: 1}, OPAQUE_SOLID_WALL)
     place_structure({x: 4, y: 3, footprint: 1}, OPAQUE_TRANSVERSABLE_WALL)
+    place_x_separator({x: 1, y: 2, footprint: 1}, OPAQUE_SOLID_WALL)
+    place_y_separator({x: 3, y: 2, footprint: 1}, OPAQUE_SOLID_WALL)
     battle_grid_ui.sync_structures()
 
     add_creature({data: bob})
@@ -115,6 +117,14 @@ const start_battle = create_start_battle({game_state, instruction_loop, game_eve
 
 const place_structure = (position: PositionFootprintOne, structure: Structure) => {
     game_state.battle_grid.get_square(position).structure = structure
+}
+
+const place_x_separator = (position: PositionFootprintOne, structure: Structure) => {
+    game_state.battle_grid.get_separator_x_axis(position).structure = structure
+}
+
+const place_y_separator = (position: PositionFootprintOne, structure: Structure) => {
+    game_state.battle_grid.get_separator_y_axis(position).structure = structure
 }
 
 const build_character = (

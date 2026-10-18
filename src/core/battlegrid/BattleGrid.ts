@@ -25,17 +25,18 @@ export const create_battle_grid = ({size, creatures}: {
     const separators_x_axis: Array<Array<BoardPosition>> = []
     const separators_y_axis: Array<Array<BoardPosition>> = []
 
+    for (let y = 0; y < size.y; y++) {
+        const line: Array<BoardPosition> = []
+        for (let x = 0; x < size.x - 1; x++)
+            line[x] = {structure: null}
+        separators_x_axis[y] = line
+    }
+
     for (let y = 0; y < size.y - 1; y++) {
         const line: Array<BoardPosition> = []
-        const column: Array<BoardPosition> = []
-
-        for (let x = 0; x < size.x - 1; x++) {
+        for (let x = 0; x < size.x; x++)
             line[x] = {structure: null}
-            column[x] = {structure: null}
-        }
-
-        separators_x_axis[y] = line
-        separators_y_axis[y] = column
+        separators_y_axis[y] = line
     }
 
     const get_board = (): ReadonlyArray<ReadonlyArray<BoardPosition>> => board
@@ -48,6 +49,18 @@ export const create_battle_grid = ({size, creatures}: {
 
     const get_squares = (position: Position) => {
         return transform_position_to_f1(position).map(p => get_square(p))
+    }
+
+    const get_separator_x_axis = ({x, y}: PositionBasic) => {
+        if (x < 0 || x >= size.x - 1 || y < 0 || y >= size.y)
+            throw (`x-axis separator {x:${x}, y:${y}} is out of bounds (width:${size.x}, height:${size.y})`)
+        return separators_x_axis[y][x]
+    }
+
+    const get_separator_y_axis = ({x, y}: PositionBasic) => {
+        if (x < 0 || x >= size.x || y < 0 || y >= size.y - 1)
+            throw (`y-axis separator {x:${x}, y:${y}} is out of bounds (width:${size.x}, height:${size.y})`)
+        return separators_y_axis[y][x]
     }
 
 
@@ -88,6 +101,8 @@ export const create_battle_grid = ({size, creatures}: {
         get_board,
         get_square,
         get_squares,
+        get_separator_x_axis,
+        get_separator_y_axis,
         is_terrain_occupied,
         blocks_movement,
         get_creature_by_position,
@@ -100,3 +115,5 @@ export type BattleGrid = ReturnType<typeof create_battle_grid>
 export type BoardPosition = {
     structure: Structure | null
 }
+
+export type PositionBasic = {x: number, y: number}

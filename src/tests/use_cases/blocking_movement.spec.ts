@@ -12,6 +12,10 @@ const set_structure_at = (battle_grid: BattleGrid, position: PositionFootprintOn
     battle_grid.get_square(position).structure = structure
 }
 
+const set_x_separator_at = (battle_grid: BattleGrid, position: PositionFootprintOne, structure: Structure) => {
+    battle_grid.get_separator_x_axis(position).structure = structure
+}
+
 const CREATURE_START = {x: 0, y: 0, footprint: 1} as const
 const BLOCKED_SQUARE = {x: 1, y: 0, footprint: 1} as const
 const DESTINATION_BEYOND_BLOCK = {x: 2, y: 0, footprint: 1} as const
@@ -99,6 +103,38 @@ describe("blocking movement", () => {
         expect(destinations.some(position =>
             position.x === DESTINATION_BEYOND_BLOCK.x && position.y === DESTINATION_BEYOND_BLOCK.y,
         )).toBe(false)
+    })
+
+    test("shift does not offer a square separated by a blocking x-axis separator", () => {
+        given_a_creature_is_created({name: "mover", team: 1, position: CREATURE_START})
+        set_x_separator_at(test_game.battle_grid, CREATURE_START, OPAQUE_SOLID_WALL)
+        given_creature("mover").is_in_its_turn()
+
+        test_game.instruction_loop.select({type: INTERACTION_TYPE.OPTION_SELECT, option: "Shift"})
+
+        const interaction = test_game.game_state.available_interaction.get_current()
+        expect(interaction.type).toBe(INTERACTION_TYPE.SELECT_PATH)
+        if (interaction.type !== INTERACTION_TYPE.SELECT_PATH) return
+
+        expect(interaction.clickable.some(position =>
+            position.x === BLOCKED_SQUARE.x && position.y === BLOCKED_SQUARE.y,
+        )).toBe(false)
+    })
+
+    test("walk allows diagonal movement when only one adjacent separator blocks", () => {
+        given_a_creature_is_created({name: "mover", team: 1, position: {x: 0, y: 0, footprint: 1}})
+        set_x_separator_at(test_game.battle_grid, {x: 0, y: 0, footprint: 1}, OPAQUE_SOLID_WALL)
+        given_creature("mover").is_in_its_turn()
+
+        test_game.instruction_loop.select({type: INTERACTION_TYPE.OPTION_SELECT, option: "Walk"})
+
+        const interaction = test_game.game_state.available_interaction.get_current()
+        expect(interaction.type).toBe(INTERACTION_TYPE.SELECT_PATH)
+        if (interaction.type !== INTERACTION_TYPE.SELECT_PATH) return
+
+        expect(interaction.clickable.some(position =>
+            position.x === 1 && position.y === 1,
+        )).toBe(true)
     })
 
     test("does not block movement when structure blocks_movement is false", () => {
