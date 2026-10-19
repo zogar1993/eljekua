@@ -9,6 +9,7 @@ const separator_blocks_movement = (structure: Structure | null): boolean =>
 
 //TODO probably can move footprint out of the positions and just have it live on the algorithms
 
+//TODO make work for footprint > 1
 export const can_move_between = (
     battle_grid: BattleGrid,
     orig: Position,
