@@ -63,7 +63,6 @@ export const create_battle_grid = ({size, creatures}: {
         return separators_y_axis[y][x]
     }
 
-
     const is_terrain_occupied = (position: Position, {exclude}: { exclude?: Array<Creature> } = {}): boolean => {
         for (const p1 of transform_position_to_f1(position))
             for (const creature of creatures.get_all().filter(c => exclude ? !exclude.includes(c) : true))
