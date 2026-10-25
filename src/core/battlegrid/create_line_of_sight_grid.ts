@@ -31,7 +31,7 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
     //orthogonal sight leftwards
     for (let x = orig.x; x > 0; x--) {
         const next_x = x - 1
-        const separator = battle_grid.get_separator_y_axis({x: next_x, y: orig.y})
+        const separator = battle_grid.get_separator_x_axis({x: next_x, y: orig.y})
 
         if (separator.structure?.blocks_line_of_sight) break
 
@@ -41,7 +41,7 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
     //orthogonal sight rightwards
     for (let x = orig.x; x < battle_grid.size.x - 1; x++) {
         const next_x = x + 1
-        const separator = battle_grid.get_separator_y_axis({x, y: orig.y})
+        const separator = battle_grid.get_separator_x_axis({x, y: orig.y})
 
         if (separator.structure?.blocks_line_of_sight) break
 
