@@ -159,6 +159,19 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
                     }
                     i++
                 }
+
+                if (x_prio.active) {
+                    const next_x = next_x_move_for(x_prio.current)
+                    if (has_x_los_between(x_prio.current, next_x))
+                        sight_grid[next_x.y][next_x.x] = true
+                }
+
+                if (y_prio.active) {
+                    const next_y = next_y_move_for(y_prio.current)
+                    if (has_y_los_between(y_prio.current, next_y))
+                        sight_grid[next_y.y][next_y.x] = true
+                }
+
             }
         }
     }
