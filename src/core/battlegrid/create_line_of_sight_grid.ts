@@ -142,20 +142,40 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
                             } else
                                 y_prio.active = false
                         }
-                    } else if (move_x && x_prio.active) {
-                        const next_move = next_x_move_for(x_prio.current)
-                        if (has_x_los_between(x_prio.current, next_move)) {
-                            sight_grid[next_move.y][next_move.x] = true
-                            x_prio.current = next_move
-                        } else
-                            x_prio.active = false
-                    } else if (move_y && y_prio.active) {
-                        const next_move = next_y_move_for(y_prio.current)
-                        if (has_y_los_between(y_prio.current, next_move)) {
-                            sight_grid[next_move.y][next_move.x] = true
-                            y_prio.current = next_move
-                        } else
-                            y_prio.active = false
+                    } else if (move_x) {
+                        if (x_prio.active) {
+                            const next_move = next_x_move_for(x_prio.current)
+                            if (has_x_los_between(x_prio.current, next_move)) {
+                                sight_grid[next_move.y][next_move.x] = true
+                                x_prio.current = next_move
+                            } else
+                                x_prio.active = false
+                        }
+                        if (y_prio.active) {
+                            const next_move = next_x_move_for(y_prio.current)
+                            if (has_x_los_between(y_prio.current, next_move)) {
+                                sight_grid[next_move.y][next_move.x] = true
+                                y_prio.current = next_move
+                            } else
+                                y_prio.active = false
+                        }
+                    } else if (move_y) {
+                        if (x_prio.active) {
+                            const next_move = next_y_move_for(x_prio.current)
+                            if (has_y_los_between(x_prio.current, next_move)) {
+                                sight_grid[next_move.y][next_move.x] = true
+                                x_prio.current = next_move
+                            } else
+                                x_prio.active = false
+                        }
+                        if (y_prio.active) {
+                            const next_move = next_y_move_for(y_prio.current)
+                            if (has_y_los_between(y_prio.current, next_move)) {
+                                sight_grid[next_move.y][next_move.x] = true
+                                y_prio.current = next_move
+                            } else
+                                y_prio.active = false
+                        }
                     }
                     i++
                 }
