@@ -74,8 +74,8 @@ const set_y_separator = (
 
 describe("line of sight", () => {
     test(`on an empty 5x5 battle grid, a creature at xuxa can see the whole map`, () => {
-        const x = 0
-        const y = 0
+        const x = 1
+        const y = 1
         const {battle_grid} = create_test_game({battle_grid_size: {x: 5, y: 5}})
 
         const los_grid = create_line_of_sight_grid({battle_grid, orig: {x, y}})

@@ -182,10 +182,10 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
 const PRIME_FACTORS = [2, 3, 5, 7] as const
 
 const simplify_interval = ({dx, dy}: { dx: number, dy: number }) => {
-    const x_sign = Math.sign(dx)
-    const y_sign = Math.sign(dy)
-    const x_abs = Math.abs(dx)
-    const y_abs = Math.abs(dy)
+    // the values are reversed for intervals and distances
+    // the greater the distance, the less frequent the intervals
+    const y_abs = Math.abs(dx)
+    const x_abs = Math.abs(dy)
 
     const intervals_abs = {x: x_abs, y: y_abs}
 
@@ -203,7 +203,7 @@ const simplify_interval = ({dx, dy}: { dx: number, dy: number }) => {
         }
     }
 
-    return {interval: {x: intervals_abs.x * x_sign, y: intervals_abs.y * y_sign}, simplification_factor}
+    return {interval: {x: intervals_abs.x, y: intervals_abs.y}, simplification_factor}
 }
 
 const separator_blocks_line_of_sight = (structure: Structure | null): boolean =>
