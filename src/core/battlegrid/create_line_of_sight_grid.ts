@@ -2,6 +2,7 @@ import {initialize_matrix} from "stdlib/initialize_matrix";
 import {BattleGrid, PositionBasic} from "core/battlegrid/BattleGrid";
 import {assert_are_equal} from "stdlib/assert";
 import type {Structure} from "core/battlegrid/Structure";
+import {positions_basic_equal} from "core/battlegrid/Position";
 
 
 function get_quadrants_for_position({position, battle_grid}: { position: PositionBasic, battle_grid: BattleGrid }) {
@@ -21,6 +22,8 @@ function get_quadrants_for_position({position, battle_grid}: { position: Positio
     return quadrants;
 }
 
+
+//TODO Need to contemplate obstacles that occupy a position
 export const create_line_of_sight_grid = ({battle_grid, orig}: {
     battle_grid: BattleGrid,
     orig: PositionBasic,
@@ -72,6 +75,7 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
 
     // We go from the origin to each of the border pixels,
     // each entry in border_loop_data represents a border
+    // TODO check borders of quadrants first
     for (const {x_range, y_range} of quadrants) {
         for (let x = x_range.first; x <= x_range.last; x++) {
             for (let y = y_range.first; y <= y_range.last; y++) {
@@ -83,120 +87,104 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
 
                 const {interval, simplification_factor} = simplify_interval({dx, dy})
 
+
                 const x_sign = Math.sign(dx)
                 const y_sign = Math.sign(dy)
 
-                const next_x_move_for = (position: PositionBasic) => ({x: position.x + x_sign, y: position.y})
-                const next_y_move_for = (position: PositionBasic) => ({x: position.x, y: position.y + y_sign})
-                const has_y_los_between = (a: PositionBasic, b: PositionBasic) => {
-                    assert_are_equal(a.x, b.x)
-                    assert_are_equal(Math.abs(a.y - b.y), 1)
-                    const separator = battle_grid.get_separator_y_axis({x: a.x, y: Math.min(a.y, b.y)})
+                const movement_kit: Record<"x" | "y", {
+                    next_move_for: (position: PositionBasic) => PositionBasic,
+                    prev_move_for: (position: PositionBasic) => PositionBasic,
+                    has_los_between: (a: PositionBasic, b: PositionBasic) => boolean
+                }> = {
+                    x: {
+                        next_move_for: (position: PositionBasic) => ({x: position.x + x_sign, y: position.y}),
+                        prev_move_for: (position: PositionBasic) => ({x: position.x - x_sign, y: position.y}),
+                        has_los_between: (a: PositionBasic, b: PositionBasic) => {
+                            assert_are_equal(a.y, b.y)
+                            assert_are_equal(Math.abs(a.x - b.x), 1)
+                            const separator = battle_grid.get_separator_x_axis({x: Math.min(a.x, b.x), y: a.y})
 
-                    return !separator_blocks_line_of_sight(separator.structure)
-                }
-                const has_x_los_between = (a: PositionBasic, b: PositionBasic) => {
-                    assert_are_equal(a.y, b.y)
-                    assert_are_equal(Math.abs(a.x - b.x), 1)
-                    const separator = battle_grid.get_separator_x_axis({x: Math.min(a.x, b.x), y: a.y})
-
-                    return !separator_blocks_line_of_sight(separator.structure)
-                }
-
-                const first_x_prio = next_y_move_for(orig)
-                const first_y_prio = next_x_move_for(orig)
-                let x_prio = {current: first_x_prio, active: has_y_los_between(orig, first_x_prio)}
-                let y_prio = {current: first_y_prio, active: has_x_los_between(orig, first_y_prio)}
-
-                let i = Math.min(interval.x, interval.y)
-                const end = interval.x * interval.y * simplification_factor - i
-                while ((x_prio.active || y_prio.active) && i <= end) {
-                    const move_x = i % interval.x === 0
-                    const move_y = i % interval.y === 0
-
-                    if (move_x && move_y) {
-                        if (x_prio.active) {
-                            const next_x_move = next_x_move_for(x_prio.current)
-                            if (has_x_los_between(x_prio.current, next_x_move)) {
-                                sight_grid[next_x_move.y][next_x_move.x] = true
-                                const next_y_move = next_y_move_for(next_x_move)
-                                if (has_y_los_between(next_x_move, next_y_move)) {
-                                    sight_grid[next_y_move.y][next_y_move.x] = true
-                                    x_prio.current = next_y_move
-                                } else
-                                    x_prio.active = false
-                            } else
-                                x_prio.active = false
+                            return !separator_blocks_line_of_sight(separator.structure)
                         }
+                    },
+                    y: {
+                        next_move_for: (position: PositionBasic) => ({x: position.x, y: position.y + y_sign}),
+                        prev_move_for: (position: PositionBasic) => ({x: position.x, y: position.y - y_sign}),
+                        has_los_between: (a: PositionBasic, b: PositionBasic) => {
+                            assert_are_equal(a.x, b.x)
+                            assert_are_equal(Math.abs(a.y - b.y), 1)
+                            const separator = battle_grid.get_separator_y_axis({x: a.x, y: Math.min(a.y, b.y)})
 
-                        if (y_prio.active) {
-                            const next_y_move = next_y_move_for(y_prio.current)
-                            if (has_y_los_between(y_prio.current, next_y_move)) {
-                                sight_grid[next_y_move.y][next_y_move.x] = true
-                                const next_x_move = next_x_move_for(next_y_move)
-                                if (has_x_los_between(next_y_move, next_x_move)) {
-                                    sight_grid[next_x_move.y][next_x_move.x] = true
-                                    y_prio.current = next_x_move
-                                } else
-                                    y_prio.active = false
-                            } else
-                                y_prio.active = false
-                        }
-                    } else if (move_x) {
-                        if (x_prio.active) {
-                            const next_move = next_x_move_for(x_prio.current)
-                            if (has_x_los_between(x_prio.current, next_move)) {
-                                sight_grid[next_move.y][next_move.x] = true
-                                x_prio.current = next_move
-                            } else
-                                x_prio.active = false
-                        }
-                        if (y_prio.active) {
-                            const next_move = next_x_move_for(y_prio.current)
-                            if (has_x_los_between(y_prio.current, next_move)) {
-                                sight_grid[next_move.y][next_move.x] = true
-                                y_prio.current = next_move
-                            } else
-                                y_prio.active = false
-                        }
-                    } else if (move_y) {
-                        if (x_prio.active) {
-                            const next_move = next_y_move_for(x_prio.current)
-                            if (has_y_los_between(x_prio.current, next_move)) {
-                                sight_grid[next_move.y][next_move.x] = true
-                                x_prio.current = next_move
-                            } else
-                                x_prio.active = false
-                        }
-                        if (y_prio.active) {
-                            const next_move = next_y_move_for(y_prio.current)
-                            if (has_y_los_between(y_prio.current, next_move)) {
-                                sight_grid[next_move.y][next_move.x] = true
-                                y_prio.current = next_move
-                            } else
-                                y_prio.active = false
+                            return !separator_blocks_line_of_sight(separator.structure)
                         }
                     }
-                    i++
                 }
 
-                if (x_prio.active) {
-                    const next_x = next_x_move_for(x_prio.current)
-                    if (has_x_los_between(x_prio.current, next_x))
-                        sight_grid[next_x.y][next_x.x] = true
-                }
 
-                if (y_prio.active) {
-                    const next_y = next_y_move_for(y_prio.current)
-                    if (has_y_los_between(y_prio.current, next_y))
-                        sight_grid[next_y.y][next_y.x] = true
-                }
+                const sight_paths: Array<{
+                    start_move: "x" | "y",
+                    move_priority: Array<"x" | "y">,
+                    end_move: "x" | "y"
+                }> = [
+                    {start_move: "x", move_priority: ["y", "x"], end_move: "y"},
+                    {start_move: "y", move_priority: ["x", "y"], end_move: "x"},
+                    //{start_move: "x", move_priority: "any", end_move: "x"},
+                    //{start_move: "y", move_priority: "any", end_move: "y"}
+                ]
 
+                for (const sight_path of sight_paths) {
+                    if (check_sight_path({sight_path, movement_kit, orig, interval, sight_grid, dest})) {
+                        sight_grid[y][x] = true
+                        break
+                    }
+                }
             }
         }
     }
 
     return sight_grid
+}
+
+const check_sight_path = ({movement_kit, sight_path, orig, interval, sight_grid, dest}: {
+    movement_kit: Record<"x" | "y", {
+                    next_move_for: (position: PositionBasic) => PositionBasic,
+                    prev_move_for: (position: PositionBasic) => PositionBasic,
+                    has_los_between: (a: PositionBasic, b: PositionBasic) => boolean
+                }>,
+    sight_path: {
+                    start_move: "x" | "y",
+                    move_priority: Array<"x" | "y">,
+                    end_move: "x" | "y"
+                },
+    interval: { x: number, y: number },
+    sight_grid: Array<Array<boolean>>,
+    orig: PositionBasic,
+    dest: PositionBasic
+}) => {
+    let curr = movement_kit[sight_path.start_move].next_move_for(orig)
+    if (!movement_kit[sight_path.start_move].has_los_between(orig, curr)) return false
+    sight_grid[curr.y][curr.x] = true
+
+    const last = movement_kit[sight_path.end_move].prev_move_for(dest)
+
+    let i = Math.min(interval.x, interval.y)
+
+    while (!positions_basic_equal(curr, last)) {
+        for (const incoming_move of sight_path.move_priority) {
+            if (i % interval[incoming_move] === 0) {
+                const next = movement_kit[incoming_move].next_move_for(curr)
+                if (movement_kit[incoming_move].has_los_between(curr, next)) {
+                    sight_grid[next.y][next.x] = true
+                    curr = next
+                } else
+                    return false
+            }
+        }
+        i++
+    }
+
+    return movement_kit[sight_path.end_move].has_los_between(last, dest)
+
 }
 
 const PRIME_FACTORS = [2, 3, 5, 7] as const

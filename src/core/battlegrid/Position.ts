@@ -1,3 +1,5 @@
+import {PositionBasic} from "core/battlegrid/BattleGrid";
+
 export type Position = { x: number, y: number, footprint: number }
 export type PositionFootprintOne = { x: number, y: number, footprint: 1 }
 
@@ -8,6 +10,9 @@ export const assert_positions_have_same_footprint = (a: Position, b: Position) =
 
 export const positions_equal = (a: Position, b: Position) =>
     a.x === b.x && a.y === b.y && a.footprint === b.footprint
+
+export const positions_basic_equal = (a: PositionBasic, b: PositionBasic) =>
+    a.x === b.x && a.y === b.y
 
 export const positions_of_same_footprint_equal = (a: Position, b: Position) => {
     assert_positions_have_same_footprint(a, b)
