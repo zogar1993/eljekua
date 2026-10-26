@@ -36,4 +36,8 @@ export function assert_are_equal<T = number | string>(a: T, b: T) {
     if (a !== b) throw Error(`Expected ${to_json(a)} to equal ${to_json(b)}.`)
 }
 
+export function assert_are_not_equal<T = number | string>(a: T, b: T) {
+    if (a === b) throw Error(`Expected '${to_json(a)}' to not equal '${to_json(b)}'.`)
+}
+
 const to_json = (value: unknown) => JSON.stringify(value, null, 2)
