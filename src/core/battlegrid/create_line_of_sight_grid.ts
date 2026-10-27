@@ -1,6 +1,6 @@
 import {initialize_matrix} from "stdlib/initialize_matrix";
 import {BattleGrid, PositionBasic} from "core/battlegrid/BattleGrid";
-import {assert_are_equal, assert_is_lower_than, assert_is_not_empty} from "stdlib/assert";
+import {assert_are_equal, assert_is_included, assert_is_lower_than, assert_is_not_empty} from "stdlib/assert";
 import type {Structure} from "core/battlegrid/Structure";
 import {positions_basic_equal} from "core/battlegrid/Position";
 
@@ -84,15 +84,9 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
                 if (orig.x === x && orig.y === y) continue
 
                 const dest = {x, y}
-                const dx = dest.x - orig.x
-                const dy = dest.y - orig.y
-
-                const slope = {sign: {x: Math.sign(dx), y: Math.sign(dy)}}
 
                 const movement_kit: Record<"x" | "y", MovementKit> = {
                     x: {
-                        next_move_for: (position: PositionBasic) => ({x: position.x + slope.sign.x, y: position.y}),
-                        prev_move_for: (position: PositionBasic) => ({x: position.x - slope.sign.x, y: position.y}),
                         has_los_between: (a: PositionBasic, b: PositionBasic) => {
                             assert_are_equal(a.y, b.y)
                             assert_are_equal(Math.abs(a.x - b.x), 1)
@@ -102,8 +96,6 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
                         }
                     },
                     y: {
-                        next_move_for: (position: PositionBasic) => ({x: position.x, y: position.y + slope.sign.y}),
-                        prev_move_for: (position: PositionBasic) => ({x: position.x, y: position.y - slope.sign.y}),
                         has_los_between: (a: PositionBasic, b: PositionBasic) => {
                             assert_are_equal(a.x, b.x)
                             assert_are_equal(Math.abs(a.y - b.y), 1)
@@ -126,8 +118,6 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
 }
 
 type MovementKit = {
-    next_move_for: (position: PositionBasic) => PositionBasic,
-    prev_move_for: (position: PositionBasic) => PositionBasic,
     has_los_between: (a: PositionBasic, b: PositionBasic) => boolean
 }
 
@@ -155,14 +145,16 @@ const check_sight_path = ({movement_kit, sight_path, orig, sight_grid, dest}: {
     orig: PositionBasic,
     dest: PositionBasic
 }) => {
-    let first = movement_kit[sight_path.start_move].next_move_for(orig)
+    const full_path_distance = {x: dest.x - orig.x, y: dest.y - orig.y}
 
+    const first_move_direction = Math.sign(full_path_distance[sight_path.start_move])
+    let first = next_position({position: orig, axis: sight_path.start_move, direction: first_move_direction})
     if (!movement_kit[sight_path.start_move].has_los_between(orig, first)) return false
     sight_grid[first.y][first.x] = true
     if (positions_basic_equal(first, dest)) return true
 
-
-    const last = movement_kit[sight_path.end_move].prev_move_for(dest)
+    const last_move_direction = Math.sign(full_path_distance[sight_path.end_move])
+    let last = next_position({position: dest, axis: sight_path.end_move, direction: -last_move_direction})
 
     const perform_last_move = () => {
         if (movement_kit[sight_path.end_move].has_los_between(last, dest)) {
@@ -176,7 +168,6 @@ const check_sight_path = ({movement_kit, sight_path, orig, sight_grid, dest}: {
         return perform_last_move()
 
     const sub_path_distance = {x: last.x - first.x, y: last.y - first.y}
-    const full_path_distance = {x: dest.x - orig.x, y: dest.y - orig.y}
 
     if (sub_path_distance.x + full_path_distance.x === 0 || sub_path_distance.y + full_path_distance.y === 0)
         return false
@@ -186,14 +177,7 @@ const check_sight_path = ({movement_kit, sight_path, orig, sight_grid, dest}: {
         axis_priority: sight_path.move_priority
     })
 
-    const result = recur_check_sight_path({
-        movement_kit,
-        curr: first,
-        movement_pattern,
-        sight_grid,
-        dest: last,
-        i: 0
-    })
+    const result = recur_check_sight_path({movement_kit, curr: first, movement_pattern, sight_grid, dest: last, i: 0})
 
     if (!result) return false
 
@@ -214,9 +198,10 @@ const recur_check_sight_path = ({i, ...props}: {
 
     const {movement_kit, sight_grid, curr, movement_pattern} = props
 
-    const axis = movement_pattern[i % movement_pattern.length]
+    const axis = movement_pattern.axes[i % movement_pattern.axes.length]
+    const direction = movement_pattern.directions[axis]
 
-    const next = movement_kit[axis].next_move_for(curr)
+    const next = next_position({position: curr, axis, direction})
     if (movement_kit[axis].has_los_between(curr, next)) {
         sight_grid[next.y][next.x] = true
         return recur_check_sight_path({...props, curr: next, i: i + 1})
@@ -232,9 +217,11 @@ const PRIME_FACTORS = [2, 3, 5, 7] as const
 const create_movement_pattern = ({distance, axis_priority}: {
     distance: { x: number, y: number },
     axis_priority: "x" | "y"
-}): Array<"x" | "y"> => {
-    if (distance.x === 0) return ["y"]
-    if (distance.y === 0) return ["x"]
+}): { axes: Array<"x" | "y">, directions: { x: number, y: number } } => {
+    const directions = {x: Math.sign(distance.x), y: Math.sign(distance.y)}
+
+    if (distance.x === 0) return {axes: ["y"], directions}
+    if (distance.y === 0) return {axes: ["x"], directions}
 
     // the values are reversed for intervals and distances
     // the greater the distance, the less frequent the intervals
@@ -264,10 +251,23 @@ const create_movement_pattern = ({distance, axis_priority}: {
 
     assert_is_not_empty(movement_pattern)
 
-    return movement_pattern
+    return {axes: movement_pattern, directions}
 }
 
 const separator_blocks_line_of_sight = (structure: Structure | null): boolean =>
     structure?.blocks_line_of_sight ?? false
 
 const MAXIMUM_STACK_LENGTH = 30
+
+const next_position = ({position, axis, direction}: {
+    position: PositionBasic,
+    axis: "x" | "y",
+    direction: number
+}) => {
+    assert_is_included(direction, [-1, 1])
+
+    const x = axis === "x" ? position.x + direction : position.x
+    const y = axis === "y" ? position.y + direction : position.y
+
+    return {x, y}
+}
