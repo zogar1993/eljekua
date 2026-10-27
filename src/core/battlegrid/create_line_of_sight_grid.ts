@@ -1,6 +1,6 @@
 import {initialize_matrix} from "stdlib/initialize_matrix";
 import {BattleGrid, PositionBasic} from "core/battlegrid/BattleGrid";
-import {assert_are_equal, assert_are_not_equal, assert_is_lower_than, assert_is_not_empty} from "stdlib/assert";
+import {assert_are_equal, assert_is_lower_than, assert_is_not_empty} from "stdlib/assert";
 import type {Structure} from "core/battlegrid/Structure";
 import {positions_basic_equal} from "core/battlegrid/Position";
 
@@ -30,6 +30,8 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
 }) => {
     const sight_grid = initialize_matrix({width: battle_grid.size.x, height: battle_grid.size.y, value: false})
     sight_grid[orig.y][orig.x] = true
+
+    //TODO clean up orthogonals and the movement kit
 
     //orthogonal sight leftwards
     for (let x = orig.x; x > 0; x--) {
@@ -113,14 +115,7 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
                 }
 
                 for (const sight_path of SIGHT_PATHS) {
-                    if (check_sight_path({
-                        sight_path,
-                        movement_kit,
-                        orig,
-                        sight_grid,
-                        dest,
-                        battle_grid
-                    }))
+                    if (check_sight_path({orig, dest, sight_path, movement_kit, sight_grid}))
                         break
                 }
             }
@@ -153,8 +148,7 @@ const SIGHT_PATHS: Array<SightPath> = [
     {start_move: "y", move_priority: "y", end_move: "y"}
 ]
 
-const check_sight_path = ({movement_kit, sight_path, orig, sight_grid, dest, battle_grid}: {
-    battle_grid: BattleGrid,
+const check_sight_path = ({movement_kit, sight_path, orig, sight_grid, dest}: {
     movement_kit: Record<"x" | "y", MovementKit>,
     sight_path: SightPath,
     sight_grid: Array<Array<boolean>>,
@@ -225,8 +219,7 @@ const recur_check_sight_path = ({i, ...props}: {
     const next = movement_kit[axis].next_move_for(curr)
     if (movement_kit[axis].has_los_between(curr, next)) {
         sight_grid[next.y][next.x] = true
-        if (recur_check_sight_path({...props, curr: next, i: i + 1}))
-            return true
+        return recur_check_sight_path({...props, curr: next, i: i + 1})
     }
 
     return false
@@ -260,7 +253,6 @@ const create_movement_pattern = ({distance, axis_priority}: {
             interval.y = interval.y / prime
         }
     }
-
 
     const movement_pattern: Array<"x" | "y"> = []
     const axis_secondary = axis_priority === "x" ? "y" : "x"
