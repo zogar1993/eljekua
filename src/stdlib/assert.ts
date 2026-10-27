@@ -40,4 +40,8 @@ export function assert_are_not_equal<T = number | string>(a: T, b: T) {
     if (a === b) throw Error(`Expected '${to_json(a)}' to not equal '${to_json(b)}'.`)
 }
 
+export function assert_is_lower_than(a: number, b: number) {
+    if (a >= b) throw Error(`Expected ${a} to be lower than ${b}.`)
+}
+
 const to_json = (value: unknown) => JSON.stringify(value, null, 2)

@@ -1,6 +1,6 @@
 import {initialize_matrix} from "stdlib/initialize_matrix";
 import {BattleGrid, PositionBasic} from "core/battlegrid/BattleGrid";
-import {assert_are_equal, assert_are_not_equal, assert_is_not_empty} from "stdlib/assert";
+import {assert_are_equal, assert_are_not_equal, assert_is_lower_than, assert_is_not_empty} from "stdlib/assert";
 import type {Structure} from "core/battlegrid/Structure";
 import {positions_basic_equal} from "core/battlegrid/Position";
 
@@ -112,17 +112,13 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
                     }
                 }
 
-                const movement_pattern = create_movement_pattern({dx, dy})
-
                 for (const sight_path of SIGHT_PATHS) {
                     if (check_sight_path({
                         sight_path,
                         movement_kit,
                         orig,
-                        movement_pattern,
                         sight_grid,
                         dest,
-                        slope,
                         battle_grid
                     }))
                         break
@@ -157,13 +153,11 @@ const SIGHT_PATHS: Array<SightPath> = [
     {start_move: "y", move_priority: "y", end_move: "y"}
 ]
 
-const check_sight_path = ({movement_kit, sight_path, orig, movement_pattern, sight_grid, dest, slope, battle_grid}: {
+const check_sight_path = ({movement_kit, sight_path, orig, sight_grid, dest, battle_grid}: {
     battle_grid: BattleGrid,
     movement_kit: Record<"x" | "y", MovementKit>,
     sight_path: SightPath,
-    movement_pattern: ReturnType<typeof create_movement_pattern>,
     sight_grid: Array<Array<boolean>>,
-    slope: { sign: { x: number, y: number } },
     orig: PositionBasic,
     dest: PositionBasic
 }) => {
@@ -173,8 +167,8 @@ const check_sight_path = ({movement_kit, sight_path, orig, movement_pattern, sig
     sight_grid[first.y][first.x] = true
     if (positions_basic_equal(first, dest)) return true
 
+
     const last = movement_kit[sight_path.end_move].prev_move_for(dest)
-    const sub_slope = {x: last.x - first.x, y: last.y - first.y}
 
     const perform_last_move = () => {
         if (movement_kit[sight_path.end_move].has_los_between(last, dest)) {
@@ -187,58 +181,24 @@ const check_sight_path = ({movement_kit, sight_path, orig, movement_pattern, sig
     if (positions_basic_equal(last, first))
         return perform_last_move()
 
-    if (sub_slope.x === 0) {
-        assert_are_not_equal(sub_slope.y, 0)
+    const sub_path_distance = {x: last.x - first.x, y: last.y - first.y}
+    const full_path_distance = {x: dest.x - orig.x, y: dest.y - orig.y}
 
-        const sign_y = Math.sign(sub_slope.y)
-        const x = first.x
-        let y = first.y + sign_y
-        while (positions_basic_equal({y, x}, dest)) {
-            const next_y = y + sign_y
-            const separator = battle_grid.get_separator_y_axis({x, y: Math.min(next_y, y)})
+    if (sub_path_distance.x + full_path_distance.x === 0 || sub_path_distance.y + full_path_distance.y === 0)
+        return false
 
-            if (separator.structure?.blocks_line_of_sight) return false
-
-            sight_grid[next_y][x] = true
-
-            y = next_y
-        }
-
-        return perform_last_move()
-    }
-
-    if (sub_slope.y === 0) {
-        assert_are_not_equal(sub_slope.x, 0)
-
-        const sign_x = Math.sign(sub_slope.x)
-        const y = first.y
-        let x = first.x + sign_x
-
-        while (!positions_basic_equal({y, x}, last)) {
-            const next_x = x + sign_x
-            const separator = battle_grid.get_separator_x_axis({x: Math.min(next_x, x), y})
-
-            if (separator.structure?.blocks_line_of_sight) return false
-
-            sight_grid[y][next_x] = true
-
-            x = next_x
-        }
-
-        return perform_last_move()
-    }
-
-    if (slope.sign.x !== Math.sign(sub_slope.x) || slope.sign.y !== Math.sign(sub_slope.y)) return false
+    const movement_pattern = create_movement_pattern({
+        distance: sub_path_distance,
+        axis_priority: sight_path.move_priority
+    })
 
     const result = recur_check_sight_path({
         movement_kit,
-        sight_path,
         curr: first,
         movement_pattern,
         sight_grid,
         dest: last,
-        i: 0,
-        leftover_movement: null
+        i: 0
     })
 
     if (!result) return false
@@ -249,37 +209,23 @@ const check_sight_path = ({movement_kit, sight_path, orig, movement_pattern, sig
 const recur_check_sight_path = ({i, ...props}: {
     i: number
     movement_kit: Record<"x" | "y", MovementKit>,
-    sight_path: SightPath,
     movement_pattern: ReturnType<typeof create_movement_pattern>,
     sight_grid: Array<Array<boolean>>,
     curr: PositionBasic,
     dest: PositionBasic,
-    leftover_movement: "x" | "y" | null
 }) => {
     if (positions_basic_equal(props.curr, props.dest)) return true
 
-    const {movement_kit, sight_grid, curr, movement_pattern, sight_path} = props
+    assert_is_lower_than(i, MAXIMUM_STACK_LENGTH)
 
-    if (props.leftover_movement) {
-        const {leftover_movement} = props
-        const next = movement_kit[leftover_movement].next_move_for(curr)
-        if (movement_kit[leftover_movement].has_los_between(curr, next)) {
-            sight_grid[next.y][next.x] = true
-            if (recur_check_sight_path({...props, i: i + 1, leftover_movement: props.leftover_movement}))
-                return true
-        }
-    }
+    const {movement_kit, sight_grid, curr, movement_pattern} = props
 
-    //TODO this could be a very hacky mask once its working properly
-    const next_movements = movement_pattern[i % movement_pattern.length]
+    const axis = movement_pattern[i % movement_pattern.length]
 
-    const move_axis = next_movements.length === 1 ? next_movements[0] : sight_path.move_priority ?? "x"
-    const leftover_movement = next_movements.length === 1 ? null : move_axis === "x" ? "y" : "x"
-
-    const next = movement_kit[move_axis].next_move_for(curr)
-    if (movement_kit[move_axis].has_los_between(curr, next)) {
+    const next = movement_kit[axis].next_move_for(curr)
+    if (movement_kit[axis].has_los_between(curr, next)) {
         sight_grid[next.y][next.x] = true
-        if (recur_check_sight_path({...props, i: i + 1, leftover_movement}))
+        if (recur_check_sight_path({...props, curr: next, i: i + 1}))
             return true
     }
 
@@ -290,11 +236,17 @@ const recur_check_sight_path = ({i, ...props}: {
 //TODO generate this based on map size
 const PRIME_FACTORS = [2, 3, 5, 7] as const
 
-const create_movement_pattern = ({dx, dy}: { dx: number, dy: number }) => {
+const create_movement_pattern = ({distance, axis_priority}: {
+    distance: { x: number, y: number },
+    axis_priority: "x" | "y"
+}): Array<"x" | "y"> => {
+    if (distance.x === 0) return ["y"]
+    if (distance.y === 0) return ["x"]
+
     // the values are reversed for intervals and distances
     // the greater the distance, the less frequent the intervals
-    const y_abs = Math.abs(dx)
-    const x_abs = Math.abs(dy)
+    const y_abs = Math.abs(distance.x)
+    const x_abs = Math.abs(distance.y)
 
     const interval = {x: x_abs, y: y_abs}
 
@@ -309,24 +261,21 @@ const create_movement_pattern = ({dx, dy}: { dx: number, dy: number }) => {
         }
     }
 
-    const movement_pattern: Array<Array<"x" | "y">> = []
+
+    const movement_pattern: Array<"x" | "y"> = []
+    const axis_secondary = axis_priority === "x" ? "y" : "x"
 
     for (let i = Math.min(interval.x, interval.y); i <= interval.x * interval.y; i++) {
-        const result: Array<"x" | "y"> = []
-        if (i % interval.x === 0) result.push("x")
-        if (i % interval.y === 0) result.push("y")
-        if (result.length === 0) continue
-        movement_pattern.push(result)
+        if (i % interval[axis_priority] === 0) movement_pattern.push(axis_priority)
+        if (i % interval[axis_secondary] === 0) movement_pattern.push(axis_secondary)
     }
 
     assert_is_not_empty(movement_pattern)
-    if (movement_pattern.length > 1)
-        assert_are_equal(movement_pattern[0].length, 1)
-    else
-        assert_are_equal(movement_pattern[0].length, 2)
 
     return movement_pattern
 }
 
 const separator_blocks_line_of_sight = (structure: Structure | null): boolean =>
     structure?.blocks_line_of_sight ?? false
+
+const MAXIMUM_STACK_LENGTH = 30
