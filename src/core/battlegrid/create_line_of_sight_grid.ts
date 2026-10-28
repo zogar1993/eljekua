@@ -1,7 +1,6 @@
 import {initialize_matrix} from "stdlib/initialize_matrix";
 import {BattleGrid, LINE_TYPE, PositionBasic} from "core/battlegrid/BattleGrid";
 import {assert_is_included, assert_is_lower_than, assert_is_not_empty} from "stdlib/assert";
-import type {Structure} from "core/battlegrid/Structure";
 import {positions_basic_equal} from "core/battlegrid/Position";
 
 
@@ -22,7 +21,6 @@ function get_quadrants_for_position({position, battle_grid}: { position: Positio
     return quadrants;
 }
 
-
 //TODO Need to contemplate obstacles that occupy a position
 export const create_line_of_sight_grid = ({battle_grid, orig}: {
     battle_grid: BattleGrid,
@@ -31,47 +29,15 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
     const sight_grid = initialize_matrix({width: battle_grid.size.x, height: battle_grid.size.y, value: false})
     sight_grid[orig.y][orig.x] = true
 
-    //TODO clean up orthogonals and the movement kit
+    const orthogonal_paths: Array<{ movement_pattern: MovementPattern, dest: PositionBasic }> = [
+        {movement_pattern: {axes: ["x"], directions: {x: -1, y: 0}}, dest: {...orig, x: 0}},
+        {movement_pattern: {axes: ["x"], directions: {x: 1, y: 0}}, dest: {...orig, x: battle_grid.size.x - 1}},
+        {movement_pattern: {axes: ["y"], directions: {x: 0, y: -1}}, dest: {...orig, y: 0}},
+        {movement_pattern: {axes: ["y"], directions: {x: 0, y: 1}}, dest: {...orig, y: battle_grid.size.y - 1}},
+    ]
 
-    //orthogonal sight leftwards
-    for (let x = orig.x; x > 0; x--) {
-        const next_x = x - 1
-        const separator = battle_grid.get_separator_x_axis({x: next_x, y: orig.y})
-
-        if (separator.structure?.blocks_line_of_sight) break
-
-        sight_grid[orig.y][next_x] = true
-    }
-
-    //orthogonal sight rightwards
-    for (let x = orig.x; x < battle_grid.size.x - 1; x++) {
-        const next_x = x + 1
-        const separator = battle_grid.get_separator_x_axis({x, y: orig.y})
-
-        if (separator.structure?.blocks_line_of_sight) break
-
-        sight_grid[orig.y][next_x] = true
-    }
-
-    //orthogonal sight upwards
-    for (let y = orig.y; y > 0; y--) {
-        const next_y = y - 1
-        const separator = battle_grid.get_separator_y_axis({x: orig.x, y: next_y})
-
-        if (separator.structure?.blocks_line_of_sight) break
-
-        sight_grid[next_y][orig.x] = true
-    }
-
-    //orthogonal sight downwards
-    for (let y = orig.y; y < battle_grid.size.y - 1; y++) {
-        const next_y = y + 1
-        const separator = battle_grid.get_separator_y_axis({x: orig.x, y})
-
-        if (separator.structure?.blocks_line_of_sight) break
-
-        sight_grid[next_y][orig.x] = true
-    }
+    for (const orthogonal_path of orthogonal_paths)
+        check_sight({battle_grid, sight_grid, i: 0, curr: orig, ...orthogonal_path})
 
     const quadrants = get_quadrants_for_position({position: orig, battle_grid});
 
@@ -86,7 +52,7 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
                 const dest = {x, y}
 
                 for (const sight_path of SIGHT_PATHS) {
-                    if (check_sight_path({orig, dest, sight_path, battle_grid, sight_grid}))
+                    if (check_sight_from_orig_to_dest_diagonal({orig, dest, sight_path, battle_grid, sight_grid}))
                         break
                 }
             }
@@ -97,23 +63,23 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
 }
 
 type SightPath = {
-    start_move: "x" | "y",
-    move_priority: "x" | "y",
-    end_move: "x" | "y"
+    first_move_axis: "x" | "y",
+    move_priority_axis: "x" | "y",
+    last_move_axis: "x" | "y"
 }
 
 const SIGHT_PATHS: Array<SightPath> = [
     // These are the outer lines of the sight
-    {start_move: "x", move_priority: "y", end_move: "y"},
-    {start_move: "y", move_priority: "x", end_move: "x"},
+    {first_move_axis: "x", move_priority_axis: "y", last_move_axis: "y"},
+    {first_move_axis: "y", move_priority_axis: "x", last_move_axis: "x"},
     // These are the inner lines of sight
-    {start_move: "x", move_priority: "x", end_move: "x"},
-    {start_move: "x", move_priority: "y", end_move: "x"},
-    {start_move: "y", move_priority: "x", end_move: "y"},
-    {start_move: "y", move_priority: "y", end_move: "y"}
+    {first_move_axis: "x", move_priority_axis: "x", last_move_axis: "x"},
+    {first_move_axis: "x", move_priority_axis: "y", last_move_axis: "x"},
+    {first_move_axis: "y", move_priority_axis: "x", last_move_axis: "y"},
+    {first_move_axis: "y", move_priority_axis: "y", last_move_axis: "y"}
 ]
 
-const check_sight_path = ({battle_grid, sight_path, orig, sight_grid, dest}: {
+const check_sight_from_orig_to_dest_diagonal = ({battle_grid, sight_path, orig, sight_grid, dest}: {
     battle_grid: BattleGrid,
     sight_path: SightPath,
     sight_grid: Array<Array<boolean>>,
@@ -121,48 +87,41 @@ const check_sight_path = ({battle_grid, sight_path, orig, sight_grid, dest}: {
     dest: PositionBasic
 }) => {
     const full_path_distance = {x: dest.x - orig.x, y: dest.y - orig.y}
+    const {first_move_axis, move_priority_axis, last_move_axis} = sight_path
 
-    const first_move_direction = Math.sign(full_path_distance[sight_path.start_move])
-    const first_move_axis = sight_path.start_move
-    let first = next_position({position: orig, axis: first_move_axis, direction: first_move_direction})
-    if (!battle_grid.can_trace_line_towards({axis: first_move_axis, direction: first_move_direction, orig, type: LINE_TYPE.SIGHT})) return false
+    const first_move_direction = Math.sign(full_path_distance[first_move_axis])
+    const first_move_params = {position: orig, axis: first_move_axis, direction: first_move_direction}
+    const first = next_position(first_move_params)
+    if (!battle_grid.can_trace_line_towards({...first_move_params, type: LINE_TYPE.SIGHT}))
+        return false
     sight_grid[first.y][first.x] = true
+
     if (positions_basic_equal(first, dest)) return true
 
-    const last_move_direction = Math.sign(full_path_distance[sight_path.end_move])
-    let last = next_position({position: dest, axis: sight_path.end_move, direction: -last_move_direction})
-
-    const perform_last_move = () => {
-        const direction = last_move_direction
-        const axis = sight_path.end_move
-        if (battle_grid.can_trace_line_towards({orig: last, axis, direction, type: LINE_TYPE.SIGHT})) {
-            sight_grid[dest.y][dest.x] = true
-            return true
-        } else
-            return false
-    }
-
-    if (positions_basic_equal(last, first))
-        return perform_last_move()
+    const last_move_direction = Math.sign(full_path_distance[last_move_axis])
+    const last = next_position({position: dest, axis: last_move_axis, direction: -last_move_direction})
 
     const sub_path_distance = {x: last.x - first.x, y: last.y - first.y}
 
     if (sub_path_distance.x + full_path_distance.x === 0 || sub_path_distance.y + full_path_distance.y === 0)
         return false
 
-    const movement_pattern = create_movement_pattern({
-        distance: sub_path_distance,
-        axis_priority: sight_path.move_priority
-    })
+    const movement_pattern = create_movement_pattern({distance: sub_path_distance, axis_priority: move_priority_axis})
 
-    const result = recur_check_sight_path({battle_grid, curr: first, movement_pattern, sight_grid, dest: last, i: 0})
+    const result = check_sight({battle_grid, curr: first, movement_pattern, sight_grid, dest: last, i: 0})
 
     if (!result) return false
 
-    return perform_last_move()
+    const last_move_params = {position: last, axis: last_move_axis, direction: last_move_direction}
+    if (battle_grid.can_trace_line_towards({...last_move_params, type: LINE_TYPE.SIGHT})) {
+        sight_grid[dest.y][dest.x] = true
+        return true
+    }
+
+    return false
 }
 
-const recur_check_sight_path = ({i, ...props}: {
+const check_sight = ({i, ...props}: {
     i: number
     battle_grid: BattleGrid,
     movement_pattern: ReturnType<typeof create_movement_pattern>,
@@ -180,9 +139,9 @@ const recur_check_sight_path = ({i, ...props}: {
     const direction = movement_pattern.directions[axis]
 
     const next = next_position({position: curr, axis, direction})
-    if (battle_grid.can_trace_line_towards({orig: curr, axis, direction, type: LINE_TYPE.SIGHT})) {
+    if (battle_grid.can_trace_line_towards({position: curr, axis, direction, type: LINE_TYPE.SIGHT})) {
         sight_grid[next.y][next.x] = true
-        return recur_check_sight_path({...props, curr: next, i: i + 1})
+        return check_sight({...props, curr: next, i: i + 1})
     }
 
     return false
@@ -194,7 +153,7 @@ const PRIME_FACTORS = [2, 3, 5, 7] as const
 const create_movement_pattern = ({distance, axis_priority}: {
     distance: { x: number, y: number },
     axis_priority: "x" | "y"
-}): { axes: Array<"x" | "y">, directions: { x: number, y: number } } => {
+}): MovementPattern => {
     const directions = {x: Math.sign(distance.x), y: Math.sign(distance.y)}
 
     if (distance.x === 0) return {axes: ["y"], directions}
@@ -229,6 +188,11 @@ const create_movement_pattern = ({distance, axis_priority}: {
     assert_is_not_empty(movement_pattern)
 
     return {axes: movement_pattern, directions}
+}
+
+type MovementPattern = {
+    axes: Array<"x" | "y">,
+    directions: { x: number, y: number }
 }
 
 const MAXIMUM_STACK_LENGTH = 30

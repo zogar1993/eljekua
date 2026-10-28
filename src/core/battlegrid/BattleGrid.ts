@@ -69,14 +69,14 @@ export const create_battle_grid = ({size, creatures}: {
         else return get_separator_y_axis(position)
     }
 
-    const can_trace_line_towards = ({orig, direction, axis, type}: {
-        orig: PositionBasic,
+    const can_trace_line_towards = ({position, direction, axis, type}: {
+        position: PositionBasic,
         direction: number,
         axis: "x" | "y",
         type: LineType
     }): boolean => {
         assert_is_included(direction, [-1, 1])
-        const separator_position = direction === 1 ? orig : {...orig, [axis]: orig[axis] + direction}
+        const separator_position = direction === 1 ? position : {...position, [axis]: position[axis] + direction}
         const separator = get_separator({axis, position: separator_position})
 
         //TODO needs to check on blockers that occupy a position
