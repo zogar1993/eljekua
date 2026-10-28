@@ -1,6 +1,6 @@
 import {initialize_matrix} from "stdlib/initialize_matrix";
-import {BattleGrid, PositionBasic} from "core/battlegrid/BattleGrid";
-import {assert_are_equal, assert_is_included, assert_is_lower_than, assert_is_not_empty} from "stdlib/assert";
+import {BattleGrid, LINE_TYPE, PositionBasic} from "core/battlegrid/BattleGrid";
+import {assert_is_included, assert_is_lower_than, assert_is_not_empty} from "stdlib/assert";
 import type {Structure} from "core/battlegrid/Structure";
 import {positions_basic_equal} from "core/battlegrid/Position";
 
@@ -85,29 +85,8 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
 
                 const dest = {x, y}
 
-                const movement_kit: Record<"x" | "y", MovementKit> = {
-                    x: {
-                        has_los_between: (a: PositionBasic, b: PositionBasic) => {
-                            assert_are_equal(a.y, b.y)
-                            assert_are_equal(Math.abs(a.x - b.x), 1)
-                            const separator = battle_grid.get_separator_x_axis({x: Math.min(a.x, b.x), y: a.y})
-
-                            return !separator_blocks_line_of_sight(separator.structure)
-                        }
-                    },
-                    y: {
-                        has_los_between: (a: PositionBasic, b: PositionBasic) => {
-                            assert_are_equal(a.x, b.x)
-                            assert_are_equal(Math.abs(a.y - b.y), 1)
-                            const separator = battle_grid.get_separator_y_axis({x: a.x, y: Math.min(a.y, b.y)})
-
-                            return !separator_blocks_line_of_sight(separator.structure)
-                        }
-                    }
-                }
-
                 for (const sight_path of SIGHT_PATHS) {
-                    if (check_sight_path({orig, dest, sight_path, movement_kit, sight_grid}))
+                    if (check_sight_path({orig, dest, sight_path, battle_grid, sight_grid}))
                         break
                 }
             }
@@ -115,10 +94,6 @@ export const create_line_of_sight_grid = ({battle_grid, orig}: {
     }
 
     return sight_grid
-}
-
-type MovementKit = {
-    has_los_between: (a: PositionBasic, b: PositionBasic) => boolean
 }
 
 type SightPath = {
@@ -138,8 +113,8 @@ const SIGHT_PATHS: Array<SightPath> = [
     {start_move: "y", move_priority: "y", end_move: "y"}
 ]
 
-const check_sight_path = ({movement_kit, sight_path, orig, sight_grid, dest}: {
-    movement_kit: Record<"x" | "y", MovementKit>,
+const check_sight_path = ({battle_grid, sight_path, orig, sight_grid, dest}: {
+    battle_grid: BattleGrid,
     sight_path: SightPath,
     sight_grid: Array<Array<boolean>>,
     orig: PositionBasic,
@@ -148,8 +123,9 @@ const check_sight_path = ({movement_kit, sight_path, orig, sight_grid, dest}: {
     const full_path_distance = {x: dest.x - orig.x, y: dest.y - orig.y}
 
     const first_move_direction = Math.sign(full_path_distance[sight_path.start_move])
-    let first = next_position({position: orig, axis: sight_path.start_move, direction: first_move_direction})
-    if (!movement_kit[sight_path.start_move].has_los_between(orig, first)) return false
+    const first_move_axis = sight_path.start_move
+    let first = next_position({position: orig, axis: first_move_axis, direction: first_move_direction})
+    if (!battle_grid.can_trace_line_towards({axis: first_move_axis, direction: first_move_direction, orig, type: LINE_TYPE.SIGHT})) return false
     sight_grid[first.y][first.x] = true
     if (positions_basic_equal(first, dest)) return true
 
@@ -157,7 +133,9 @@ const check_sight_path = ({movement_kit, sight_path, orig, sight_grid, dest}: {
     let last = next_position({position: dest, axis: sight_path.end_move, direction: -last_move_direction})
 
     const perform_last_move = () => {
-        if (movement_kit[sight_path.end_move].has_los_between(last, dest)) {
+        const direction = last_move_direction
+        const axis = sight_path.end_move
+        if (battle_grid.can_trace_line_towards({orig: last, axis, direction, type: LINE_TYPE.SIGHT})) {
             sight_grid[dest.y][dest.x] = true
             return true
         } else
@@ -177,7 +155,7 @@ const check_sight_path = ({movement_kit, sight_path, orig, sight_grid, dest}: {
         axis_priority: sight_path.move_priority
     })
 
-    const result = recur_check_sight_path({movement_kit, curr: first, movement_pattern, sight_grid, dest: last, i: 0})
+    const result = recur_check_sight_path({battle_grid, curr: first, movement_pattern, sight_grid, dest: last, i: 0})
 
     if (!result) return false
 
@@ -186,7 +164,7 @@ const check_sight_path = ({movement_kit, sight_path, orig, sight_grid, dest}: {
 
 const recur_check_sight_path = ({i, ...props}: {
     i: number
-    movement_kit: Record<"x" | "y", MovementKit>,
+    battle_grid: BattleGrid,
     movement_pattern: ReturnType<typeof create_movement_pattern>,
     sight_grid: Array<Array<boolean>>,
     curr: PositionBasic,
@@ -196,20 +174,19 @@ const recur_check_sight_path = ({i, ...props}: {
 
     assert_is_lower_than(i, MAXIMUM_STACK_LENGTH)
 
-    const {movement_kit, sight_grid, curr, movement_pattern} = props
+    const {battle_grid, sight_grid, curr, movement_pattern} = props
 
     const axis = movement_pattern.axes[i % movement_pattern.axes.length]
     const direction = movement_pattern.directions[axis]
 
     const next = next_position({position: curr, axis, direction})
-    if (movement_kit[axis].has_los_between(curr, next)) {
+    if (battle_grid.can_trace_line_towards({orig: curr, axis, direction, type: LINE_TYPE.SIGHT})) {
         sight_grid[next.y][next.x] = true
         return recur_check_sight_path({...props, curr: next, i: i + 1})
     }
 
     return false
 }
-
 
 //TODO generate this based on map size
 const PRIME_FACTORS = [2, 3, 5, 7] as const
@@ -253,9 +230,6 @@ const create_movement_pattern = ({distance, axis_priority}: {
 
     return {axes: movement_pattern, directions}
 }
-
-const separator_blocks_line_of_sight = (structure: Structure | null): boolean =>
-    structure?.blocks_line_of_sight ?? false
 
 const MAXIMUM_STACK_LENGTH = 30
 

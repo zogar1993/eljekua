@@ -7,6 +7,7 @@ import {
 } from "core/battlegrid/Position";
 import type {Creatures} from "core/creatures/Creatures";
 import type {Structure} from "core/battlegrid/Structure";
+import {assert_are_equal, assert_is_included} from "stdlib/assert";
 
 export const create_battle_grid = ({size, creatures}: {
     size: { x: number, y: number }
@@ -63,6 +64,30 @@ export const create_battle_grid = ({size, creatures}: {
         return separators_y_axis[y][x]
     }
 
+    const get_separator = ({position, axis}: { position: PositionBasic, axis: "x" | "y" }) => {
+        if (axis === "x") return get_separator_x_axis(position)
+        else return get_separator_y_axis(position)
+    }
+
+    const can_trace_line_towards = ({orig, direction, axis, type}: {
+        orig: PositionBasic,
+        direction: number,
+        axis: "x" | "y",
+        type: LineType
+    }): boolean => {
+        assert_is_included(direction, [-1, 1])
+        const separator_position = direction === 1 ? orig : {...orig, [axis]: orig[axis] + direction}
+        const separator = get_separator({axis, position: separator_position})
+
+        //TODO needs to check on blockers that occupy a position
+        if (type === LINE_TYPE.SIGHT)
+            if (separator.structure?.blocks_line_of_sight) return false
+        if (type === LINE_TYPE.EFFECT)
+            if (separator.structure?.blocks_line_of_effect) return false
+
+        return true
+    }
+
     const is_terrain_occupied = (position: Position, {exclude}: { exclude?: Array<Creature> } = {}): boolean => {
         for (const p1 of transform_position_to_f1(position))
             for (const creature of creatures.get_all().filter(c => exclude ? !exclude.includes(c) : true))
@@ -106,6 +131,8 @@ export const create_battle_grid = ({size, creatures}: {
         blocks_movement,
         get_creature_by_position,
         get_creatures_in_positions,
+
+        can_trace_line_towards
     }
 }
 
@@ -115,4 +142,11 @@ export type BoardPosition = {
     structure: Structure | null
 }
 
-export type PositionBasic = {x: number, y: number}
+export type PositionBasic = { x: number, y: number }
+
+export const LINE_TYPE = {
+    SIGHT: "line_of_sight" as const,
+    EFFECT: "line_of_effect" as const,
+}
+
+export type LineType = typeof LINE_TYPE[keyof typeof LINE_TYPE]
