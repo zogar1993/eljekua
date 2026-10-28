@@ -74,7 +74,7 @@ const start_battle = create_start_battle({game_state, instruction_loop, game_eve
         hp_max: 10,
         level: 1,
         attributes: Object.fromEntries(Object.values(ATTRIBUTES).map(attr => [attr, 14])) as Creature["data"]["attributes"],
-        powers: WIZARD_POWERS,
+        powers: CLERIC_POWERS,
         team: 1
     })
 

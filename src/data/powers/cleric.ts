@@ -92,10 +92,9 @@ const lance_of_faith: IRPower = {
             },
             {
                 type: INSTRUCTION_TYPE.SELECT_TARGET,
-                targeting_type: "ranged",
+                targeting_type: "line_of_sight",
                 target_type: "ally",
                 amount: 1,
-                requires_line_of_sight: true,
                 target_label: "buffed_ally",
             },
             {

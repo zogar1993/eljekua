@@ -239,6 +239,7 @@ export type Instruction =
 
 export type InstructionSelectTarget =
     InstructionSelectTargetRanged |
+    InstructionSelectTargetLineOfSight |
     InstructionSelectTargetMelee |
     InstructionSelectTargetAreaBurst |
     InstructionSelectTargetMovement |
@@ -250,10 +251,18 @@ export type InstructionSelectTargetRanged = {
     target_type: "terrain" | "enemy" | "creature" | "ally"
     terrain_prerequisite?: "unoccupied"
     amount: 1
-    distance: AstNode | null
-    requires_line_of_sight: boolean
+    distance: AstNode
     target_label: string
     exclude: Array<AstNode>
+    attack_roll: InstructionAttackRollParams | null
+}
+
+export type InstructionSelectTargetLineOfSight = {
+    type: typeof INSTRUCTION_TYPE.SELECT_TARGET,
+    targeting_type: "line_of_sight"
+    target_type: "terrain" | "enemy" | "creature" | "ally"
+    amount: 1
+    target_label: string
     attack_roll: InstructionAttackRollParams | null
 }
 

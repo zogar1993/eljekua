@@ -56,7 +56,8 @@ type Targeting =
     Omit<IRInstructionSelectTargetMelee, "type" | "target_label"> |
     Omit<IRInstructionSelectTargetMovement, "type" | "target_label"> |
     Omit<IRInstructionSelectTargetAreaBurst, "type" | "target_label"> |
-    Omit<IRInstructionSelectTargetRanged, "type" | "target_label">
+    Omit<IRInstructionSelectTargetRanged, "type" | "target_label"> |
+    Omit<IRInstructionSelectTargetLineOfSight, "type" | "target_label">
 
 export type IRInstruction =
     {
@@ -158,6 +159,7 @@ export type IRInstructionSelectTarget =
     (IRInstructionSelectTargetMelee |
         IRInstructionSelectTargetMovement |
         IRInstructionSelectTargetRanged |
+        IRInstructionSelectTargetLineOfSight |
         IRInstructionSelectTargetAreaBurst)
 
 type IRInstructionSelectTargetMelee = {
@@ -178,9 +180,14 @@ type IRInstructionSelectTargetRanged = {
     target_type: "terrain" | "enemy" | "creature" | "ally"
     terrain_prerequisite?: "unoccupied"
     amount: 1
-    distance?: string | number
-    requires_line_of_sight?: boolean
+    distance: string | number
     exclude?: ["primary_target"]
+}
+
+type IRInstructionSelectTargetLineOfSight = {
+    targeting_type: "line_of_sight"
+    target_type: "terrain" | "enemy" | "creature" | "ally"
+    amount: 1
 }
 
 type IRInstructionSelectTargetAreaBurst = {
