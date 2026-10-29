@@ -2,6 +2,7 @@ import type {DefenseCode} from "core/character_sheet/get_creature_defense";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import type {
     CreatureRuleGainAttackBonus,
+    CreatureRuleGainDefenseBonus,
     CreatureRuleGainResistance,
     CreatureRuleGainVulnerability,
     CreatureRuleGrantCombatAdvantage,
@@ -139,6 +140,11 @@ export type IRInstructionApplyStatus = {
         type: "gain_attack_bonus"
         value: number | string
         against_creatures?: string,
+    } | {
+        type: "gain_defense_bonus"
+        value: number | string
+        defense: DefenseCode
+        against_creatures?: string,
     }
 }
 
@@ -214,6 +220,7 @@ export type IRCreatureRule =
     CreatureRuleGainResistance |
     CreatureRuleGainVulnerability |
     CreatureRuleGainAttackBonus |
+    CreatureRuleGainDefenseBonus |
     IRCreatureRuleRestrictTargeting
 
 export type IRModifierAttackRoll = {

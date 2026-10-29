@@ -1,3 +1,4 @@
+import type {DefenseCode} from "core/character_sheet/get_creature_defense";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
@@ -7,6 +8,7 @@ export type CreatureRule =
     CreatureRuleGainResistance |
     CreatureRuleGainVulnerability |
     CreatureRuleGainAttackBonus |
+    CreatureRuleGainDefenseBonus |
     CreatureRuleRestrictTargeting
 
 export type CreatureRuleGrantCombatAdvantage = {
@@ -31,6 +33,13 @@ export type CreatureRuleGainVulnerability = {
 export type CreatureRuleGainAttackBonus = {
     type: "gain_attack_bonus"
     value: ExprNumberResolved
+    against_creatures: Array<Creature> | null
+}
+
+export type CreatureRuleGainDefenseBonus = {
+    type: "gain_defense_bonus"
+    value: ExprNumberResolved
+    defense: DefenseCode
     against_creatures: Array<Creature> | null
 }
 
@@ -65,7 +74,7 @@ export const creature_rule_applies_to_damage_type = (
 }
 
 export const creature_rule_applies_to_attacker = ({rule, attacker}: {
-    rule: CreatureRuleGrantCombatAdvantage | CreatureRuleGainResistance | CreatureRuleGainVulnerability | CreatureRuleGainAttackBonus
+    rule: CreatureRuleGrantCombatAdvantage | CreatureRuleGainResistance | CreatureRuleGainVulnerability | CreatureRuleGainAttackBonus | CreatureRuleGainDefenseBonus
     attacker: Creature
 }): boolean =>
     rule.against_creatures === null || rule.against_creatures.includes(attacker)

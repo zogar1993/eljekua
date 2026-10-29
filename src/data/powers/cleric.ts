@@ -1,4 +1,4 @@
-import type {IRPower} from "core/types";
+import {IR_INSTRUCTION_TYPE, IRPower} from "core/types";
 import {
     transform_power_ir_into_vm_representation
 } from "core/expressions/parser/transform_power_ir_into_vm_representation";
@@ -111,4 +111,70 @@ const lance_of_faith: IRPower = {
     },
 }
 
-export const CLERIC_POWERS = [cause_fear, lance_of_faith].map(transform_power_ir_into_vm_representation)
+const priests_shield: IRPower = {
+    name: "Priest's Shield",
+    class: "Cleric",
+    level: 1,
+    description: "You utter a minor defensive prayer to protect a comrade as you attack with your weapon.",
+    keywords: ["Divine", "Weapon"],
+    type: {
+        action: "standard",
+        cooldown: "at-will",
+        attack: true,
+    },
+    targeting: {
+        targeting_type: "melee_weapon",
+        target_type: "creature",
+        amount: 1,
+    },
+    damage: {
+        lvl_1: '$add({1W},$attr_mod(owner, "str"))',
+        lvl_21: '$add({2W},$attr_mod(owner, "str"))',
+    },
+    roll: {
+        attack: "str",
+        defense: "ac",
+        hit: [
+            {
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
+                value: "primary_damage",
+                target_label: "primary_target",
+            },
+            {
+                type: INSTRUCTION_TYPE.SELECT_TARGET,
+                targeting_type: "adjacent",
+                target_type: "ally",
+                amount: 1,
+                target_label: "shielded_ally",
+            },
+            {
+                type: IR_INSTRUCTION_TYPE.CONDITION,
+                condition: "$exists(shielded_ally)",
+                instructions_true: [
+                    {
+                        type: INSTRUCTION_TYPE.APPLY_STATUS,
+                        target_label: "shielded_ally",
+                        duration: "until_end_of_your_next_turn",
+                        status: {
+                            type: "gain_defense_bonus",
+                            value: 1,
+                            defense: "ac",
+                        },
+                    },
+                ]
+            },
+            {
+                type: INSTRUCTION_TYPE.APPLY_STATUS,
+                target_label: "owner",
+                duration: "until_end_of_your_next_turn",
+                status: {
+                    type: "gain_defense_bonus",
+                    value: 1,
+                    defense: "ac",
+                },
+            },
+        ],
+    },
+}
+
+export const CLERIC_POWERS = [cause_fear, lance_of_faith, priests_shield].map(transform_power_ir_into_vm_representation)
