@@ -437,6 +437,13 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
                 against_creatures: status.against_creatures ? to_ast(status.against_creatures) : null,
                 value: to_ast(status.value)
             }
+        case "gain_defense_bonus":
+            return {
+                type: "gain_defense_bonus",
+                against_creatures: status.against_creatures ? to_ast(status.against_creatures) : null,
+                defense: status.defense,
+                value: to_ast(status.value)
+            }
         default:
             throw Error(`"${ir.status.type}" is not a valid "apply_status" type`)
     }

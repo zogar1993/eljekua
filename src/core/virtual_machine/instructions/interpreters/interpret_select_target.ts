@@ -14,7 +14,7 @@ import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";
 import {assert_is_not_empty, assert_is_true} from "stdlib/assert";
 import {bound_minmax} from "stdlib/bound_minmax";
-import {get_creature_defense} from "core/character_sheet/get_creature_defense";
+import {get_creature_defense_for_attack} from "core/character_sheet/get_creature_defense";
 
 export const interpret_select_target = ({
                                             instruction,
@@ -65,7 +65,13 @@ export const interpret_select_target = ({
         if (!("attack_roll" in instruction) || instruction.attack_roll === null) return null
 
         const attack = game_queries.evaluate_number(instruction.attack_roll.attack)
-        const defense = get_creature_defense({creature, defense_code: instruction.attack_roll.defense}).value
+
+        // TODO clean this up and make it one line
+        const defense = get_creature_defense_for_attack({
+            creature,
+            defense_code: instruction.attack_roll.defense,
+            attacker: owner,
+        }).value
         const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
 
         return {attack, defense, chance}

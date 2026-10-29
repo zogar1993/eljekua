@@ -6,7 +6,7 @@ import {HIT_STATUS, HitStatus} from "core/virtual_machine/expressions/constants/
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {has_combat_advantage} from "core/battlegrid/queries/has_combat_advantage";
 import {add_numbers_resolved} from "core/virtual_machine/expressions/number_utils";
-import {get_creature_defense} from "core/character_sheet/get_creature_defense";
+import {get_creature_defense_for_attack} from "core/character_sheet/get_creature_defense";
 import {get_attack_roll_modifier_parts} from "core/battlegrid/creatures/Modifier";
 
 export const interpret_assess_attack_hit_status = (props: InterpretInstructionProps<InstructionAssessAttackHitStatus>) => {
@@ -44,7 +44,7 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
         attack_parts.push(...get_attack_roll_modifier_parts({creature: attacker, game_queries}))
 
         const attack = add_numbers_resolved(attack_parts)
-        const defense = get_creature_defense({creature: defender, defense_code: instruction.defense})
+        const defense = get_creature_defense_for_attack({creature: defender, defense_code: instruction.defense, attacker})
         const hit_status = get_hit_status({attack, defense, d20_value})
 
         roll_results.set(defender, hit_status)

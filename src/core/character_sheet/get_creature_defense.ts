@@ -1,5 +1,7 @@
 import type {Creature} from "core/battlegrid/creatures/Creature";
+import {creature_rule_applies_to_attacker} from "core/battlegrid/creatures/creature_rule";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import {add_numbers_resolved} from "core/virtual_machine/expressions/number_utils";
 import {get_creature_half_level} from "core/character_sheet/get_creature_half_level";
 import {get_creature_attribute_mod} from "core/character_sheet/get_creature_attribute_mod";
 
@@ -22,6 +24,23 @@ export const get_creature_defense = ({creature, defense_code}: {
     }
 
     throw Error(`Invalid defense ${defense_code}`)
+}
+
+export const get_creature_defense_for_attack = ({creature, defense_code, attacker}: {
+    creature: Creature,
+    defense_code: DefenseCode,
+    attacker: Creature,
+}): ExprNumberResolved => {
+    const parts: Array<ExprNumberResolved> = [get_creature_defense({creature, defense_code})]
+
+    // TODO see if we can make this "creature_rule_applies_to_attacker" simpler
+    for (const {rule} of creature.statuses)
+        if (rule.type === "gain_defense_bonus"
+            && rule.defense === defense_code
+            && creature_rule_applies_to_attacker({rule, attacker}))
+            parts.push(rule.value)
+
+    return add_numbers_resolved(parts)
 }
 const get_attribute_bonus_from_defense = ({creature, defense_code}: {
     creature: Creature,
