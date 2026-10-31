@@ -1,8 +1,8 @@
 import type {PositionFootprintOne} from "core/battlegrid/Position";
 import {OPAQUE_SOLID_WALL} from "core/battlegrid/Structure";
 import {create_test_game} from "tests/utils/create_test_game";
-import {PositionBasic} from "core/battlegrid/BattleGrid";
-import {create_line_of_sight_grid} from "core/battlegrid/create_line_of_sight_grid";
+import {LINE_TYPE, PositionBasic} from "core/battlegrid/BattleGrid";
+import {create_line_trace_grid} from "core/battlegrid/create_line_trace_grid";
 
 
 const SCENARIO__CORRIDOR_WITH_ENTRANCES = `
@@ -93,8 +93,8 @@ test(`corridor with entrances`, () => {
     data.x_separators.forEach((pos) => set_x_separator(battle_grid, {...pos, footprint: 1}))
     data.y_separators.forEach((pos) => set_y_separator(battle_grid, {...pos, footprint: 1}))
 
-    const los_grid = create_line_of_sight_grid({battle_grid, orig: data.orig})
-    expect(los_grid).toEqual(data.expectation)
+    const trace_grid = create_line_trace_grid({battle_grid, orig: data.orig, line_type: LINE_TYPE.SIGHT})
+    expect(trace_grid).toEqual(data.expectation)
 })
 
 describe("line of sight", () => {
@@ -103,8 +103,8 @@ describe("line of sight", () => {
             test(`on an empty 5x5 battle grid, a creature at x${x} y${y} can see the whole map`, () => {
                 const {battle_grid} = create_test_game({battle_grid_size: {x: 5, y: 5}})
 
-                const los_grid = create_line_of_sight_grid({battle_grid, orig: {x, y}})
-                expect(los_grid).toEqual([
+                const trace_grid = create_line_trace_grid({battle_grid, orig: {x, y}, line_type: LINE_TYPE.SIGHT})
+                expect(trace_grid).toEqual([
                     [true, true, true, true, true],
                     [true, true, true, true, true],
                     [true, true, true, true, true],
@@ -115,4 +115,3 @@ describe("line of sight", () => {
         )
     )
 })
-
