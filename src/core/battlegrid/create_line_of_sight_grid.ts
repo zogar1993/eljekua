@@ -4,13 +4,22 @@ import {assert_is_included, assert_is_lower_than, assert_is_not_empty} from "std
 import {positions_basic_equal} from "core/battlegrid/Position";
 
 
-function get_quadrants_for_position({position, battle_grid}: { position: PositionBasic, battle_grid: BattleGrid }) {
-    const w = {first: 0, last: position.x - 1}
-    const e = {first: position.x + 1, last: battle_grid.size.x - 1}
+function get_quadrants_for_position({position, map_border, max_distance}: {
+    position: PositionBasic,
+    map_border: Record<"n" | "e" | "s" | "w", number>,
+    max_distance?: number
+}) {
+    const area_border_w = max_distance ? Math.max(map_border.w, position.x - max_distance) : map_border.w
+    const area_border_e = max_distance ? Math.min(map_border.e, position.x + max_distance) : map_border.e
+    const area_border_n = max_distance ? Math.max(map_border.n, position.y - max_distance) : map_border.n
+    const area_border_s = max_distance ? Math.min(map_border.s, position.y + max_distance) : map_border.s
+
+    const w = {first: area_border_w, last: position.x - 1}
+    const e = {first: position.x + 1, last: area_border_e}
     const horizontal_hemisphere = [w, e]
 
-    const n = {first: 0, last: position.y - 1}
-    const s = {first: position.y + 1, last: battle_grid.size.y - 1}
+    const n = {first: area_border_n, last: position.y - 1}
+    const s = {first: position.y + 1, last: area_border_s}
     const vertical_hemispheres = [n, s]
 
     // Each quadrant is a part of the grid that is on the same diagonal from the origin
@@ -22,24 +31,27 @@ function get_quadrants_for_position({position, battle_grid}: { position: Positio
 }
 
 //TODO Need to contemplate obstacles that occupy a position
-export const create_line_of_sight_grid = ({battle_grid, orig}: {
+export const create_line_of_sight_grid = ({battle_grid, orig, max_distance}: {
     battle_grid: BattleGrid,
     orig: PositionBasic,
+    max_distance?: number
 }) => {
     const sight_grid = initialize_matrix({width: battle_grid.size.x, height: battle_grid.size.y, value: false})
     sight_grid[orig.y][orig.x] = true
 
+    const map_border = {n: 0, e: battle_grid.size.x - 1, s: battle_grid.size.y - 1, w: 0}
+
     const orthogonal_paths: Array<{ movement_pattern: MovementPattern, dest: PositionBasic }> = [
-        {movement_pattern: {axes: ["x"], directions: {x: -1, y: 0}}, dest: {...orig, x: 0}},
-        {movement_pattern: {axes: ["x"], directions: {x: 1, y: 0}}, dest: {...orig, x: battle_grid.size.x - 1}},
-        {movement_pattern: {axes: ["y"], directions: {x: 0, y: -1}}, dest: {...orig, y: 0}},
-        {movement_pattern: {axes: ["y"], directions: {x: 0, y: 1}}, dest: {...orig, y: battle_grid.size.y - 1}},
+        {dest: {...orig, x: map_border.w}, movement_pattern: {axes: ["x"], directions: {x: -1, y: 0}}},
+        {dest: {...orig, x: map_border.e}, movement_pattern: {axes: ["x"], directions: {x: 1, y: 0}}},
+        {dest: {...orig, y: map_border.n}, movement_pattern: {axes: ["y"], directions: {x: 0, y: -1}}},
+        {dest: {...orig, y: map_border.s}, movement_pattern: {axes: ["y"], directions: {x: 0, y: 1}}},
     ]
 
     for (const orthogonal_path of orthogonal_paths)
         check_sight({battle_grid, sight_grid, i: 0, curr: orig, ...orthogonal_path})
 
-    const quadrants = get_quadrants_for_position({position: orig, battle_grid});
+    const quadrants = get_quadrants_for_position({position: orig, map_border, max_distance});
 
     // We go from the origin to each of the border pixels,
     // each entry in border_loop_data represents a border
