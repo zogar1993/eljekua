@@ -61,5 +61,7 @@ export const can_move_between = (
         if (separates_s && separates_w) return false
     }
 
+    //TODO add cosnideration for blockers and creatures
+
     return true
 }
