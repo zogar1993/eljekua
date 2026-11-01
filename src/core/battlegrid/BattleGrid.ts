@@ -79,11 +79,18 @@ export const create_battle_grid = ({size, creatures}: {
         const separator_position = direction === 1 ? position : {...position, [axis]: position[axis] + direction}
         const separator = get_separator({axis, position: separator_position})
 
-        //TODO needs to check on blockers that occupy a position
         if (type === LINE_TYPE.SIGHT)
             if (separator.structure?.blocks_line_of_sight) return false
         if (type === LINE_TYPE.EFFECT)
             if (separator.structure?.blocks_line_of_effect) return false
+
+        const dest = {...position, [axis]: position[axis] + direction}
+        const dest_square = get_square({...dest, footprint: 1})
+
+        if (type === LINE_TYPE.SIGHT)
+            if (dest_square.structure?.blocks_line_of_sight) return false
+        if (type === LINE_TYPE.EFFECT)
+            if (dest_square.structure?.blocks_line_of_effect) return false
 
         return true
     }
