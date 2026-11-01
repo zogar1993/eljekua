@@ -159,8 +159,25 @@ const check_trace = ({i, ...props}: {
     return false
 }
 
-//TODO generate this based on map size
-const PRIME_FACTORS = [2, 3, 5, 7] as const
+const MAX_PRIME_FACTOR = 100
+
+const get_primes_up_to = (max: number): Array<number> => {
+    const primes: Array<number> = []
+    for (let candidate = 2; candidate <= max; candidate++) {
+        let is_prime = true
+        for (const prime of primes) {
+            if (prime * prime > candidate) break
+            if (candidate % prime === 0) {
+                is_prime = false
+                break
+            }
+        }
+        if (is_prime) primes.push(candidate)
+    }
+    return primes
+}
+
+const PRIME_FACTORS = get_primes_up_to(MAX_PRIME_FACTOR)
 
 const create_movement_pattern = ({distance, axis_priority}: {
     distance: { x: number, y: number },
