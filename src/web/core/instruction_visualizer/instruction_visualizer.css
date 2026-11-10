@@ -13,6 +13,7 @@
 }
 
 .instruction-panel__header {
+    flex-shrink: 0;
     padding: 8px 12px;
     background: lightpink;
     border-bottom: 2px solid gray;
@@ -23,11 +24,16 @@
 
 .instruction-panel__content {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     padding: 8px;
     display: flex;
     flex-direction: column;
     gap: 6px;
+}
+
+.instruction-panel__content > * {
+    flex-shrink: 0;
 }
 
 .instruction__frame-separator {
