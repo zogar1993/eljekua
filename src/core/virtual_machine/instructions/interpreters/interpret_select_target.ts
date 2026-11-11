@@ -61,17 +61,14 @@ export const interpret_select_target = ({
         return
     }
 
-    const get_attack_hit_chance_against = (creature: Creature) => {
+    const get_attack_hit_chance_against = (defender: Creature) => {
         if (!("attack_roll" in instruction) || instruction.attack_roll === null) return null
 
         const attack = game_queries.evaluate_number(instruction.attack_roll.attack)
 
-        // TODO clean this up and make it one line
-        const defense = get_creature_defense_for_attack({
-            creature,
-            defense_code: instruction.attack_roll.defense,
-            attacker: owner,
-        }).value
+        const defense_code = instruction.attack_roll.defense
+        const defense = get_creature_defense_for_attack({defender, defense_code, attacker: owner}).value
+
         const chance = bound_minmax(0, (attack + 20 - defense + 1) * 5, 100)
 
         return {attack, defense, chance}

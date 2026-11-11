@@ -44,7 +44,7 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
         attack_parts.push(...get_attack_roll_modifier_parts({creature: attacker, game_queries}))
 
         const attack = add_numbers_resolved(attack_parts)
-        const defense = get_creature_defense_for_attack({creature: defender, defense_code: instruction.defense, attacker})
+        const defense = get_creature_defense_for_attack({defender: defender, defense_code: instruction.defense, attacker})
         const hit_status = get_hit_status({attack, defense, d20_value})
 
         roll_results.set(defender, hit_status)

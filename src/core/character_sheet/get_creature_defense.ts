@@ -26,15 +26,15 @@ export const get_creature_defense = ({creature, defense_code}: {
     throw Error(`Invalid defense ${defense_code}`)
 }
 
-export const get_creature_defense_for_attack = ({creature, defense_code, attacker}: {
-    creature: Creature,
+export const get_creature_defense_for_attack = ({defender, defense_code, attacker}: {
+    defender: Creature,
     defense_code: DefenseCode,
     attacker: Creature,
 }): ExprNumberResolved => {
-    const parts: Array<ExprNumberResolved> = [get_creature_defense({creature, defense_code})]
+    const parts: Array<ExprNumberResolved> = [get_creature_defense({creature: defender, defense_code})]
 
     // TODO see if we can make this "creature_rule_applies_to_attacker" simpler
-    for (const {rule} of creature.statuses)
+    for (const {rule} of defender.statuses)
         if (rule.type === "gain_defense_bonus"
             && rule.defense === defense_code
             && creature_rule_applies_to_attacker({rule, attacker}))
