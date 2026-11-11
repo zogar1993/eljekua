@@ -464,6 +464,6 @@ const format_ast_node = (node: AstNode): string => {
         case "weapon":
             return `{${node.amount}W}`
         case "function":
-            return `${node.name}(...)`
+            return `${node.name}(${node.parameters.map(format_ast_node).join(", ")})`
     }
 }
