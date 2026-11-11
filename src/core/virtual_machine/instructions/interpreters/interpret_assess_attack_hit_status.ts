@@ -8,6 +8,7 @@ import {has_combat_advantage} from "core/battlegrid/queries/has_combat_advantage
 import {add_numbers_resolved} from "core/virtual_machine/expressions/number_utils";
 import {get_creature_defense_for_attack} from "core/character_sheet/get_creature_defense";
 import {get_attack_roll_modifier_parts} from "core/battlegrid/creatures/Modifier";
+import {assert_is_not_undefined} from "stdlib/assert";
 
 export const interpret_assess_attack_hit_status = (props: InterpretInstructionProps<InstructionAssessAttackHitStatus>) => {
     const {instruction, game_state, game_queries, game_events} = props
@@ -24,7 +25,7 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
         attack_parts.push(game_queries.evaluate_number_resolved_expr(instruction.attack))
 
         const d20_value = d20_rolls.get(defender)
-        if (d20_value === undefined) throw Error(`missing d20 roll for creature "${defender.data.name}"`)
+        assert_is_not_undefined(d20_value)
 
         attack_parts.push({type: "number_resolved", value: d20_value, description: "d20"})
 

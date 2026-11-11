@@ -2,7 +2,14 @@ import type {Expr} from "core/virtual_machine/expressions/types";
 import type {Instruction} from "core/virtual_machine/instructions/instructions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import type {GameEvents} from "core/events/GameEvents";
-import {assert_are_equal, assert_is_not_empty, assert_is_not_null} from "stdlib/assert";
+import {
+    assert_are_equal,
+    assert_has_length_one,
+    assert_is_not_empty,
+    assert_is_not_null,
+    assert_is_type,
+    assert_unreachable,
+} from "stdlib/assert";
 
 export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
     const instruction_frames: Array<InstructionFrame> = []
@@ -24,7 +31,6 @@ export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
         const variable = get_variable_or_null(name)
         assert_is_not_null(variable)
         return variable
-        //TODO P3 make error handling smoother everywhere
     }
 
     const has_variable = (name: string): boolean => get_current_scope().has(name)
@@ -68,7 +74,7 @@ export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
     }
 
     const get_current_frame = () => {
-        if (instruction_frames.length === 0) throw Error("No frames available")
+        assert_is_not_empty(instruction_frames)
         return instruction_frames[instruction_frames.length - 1]
     }
 
@@ -95,13 +101,13 @@ export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
 
             game_events.on_instruction_frame_popped.raise()
         }
-        throw Error("no instructions left")
+        return assert_unreachable("no instructions left")
     }
 
     const get_acting_creature = () => {
         const expr = get_variable(SYSTEM_KEYWORD.OWNER)
-        if (expr.type !== "creatures" || expr.value.length !== 1)
-            throw Error("expected only one creature in expression")
+        assert_is_type(expr, "creatures")
+        assert_has_length_one(expr.value)
         return expr.value[0]
     }
 

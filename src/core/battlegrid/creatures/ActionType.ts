@@ -1,3 +1,5 @@
+import {assert_is_included} from "stdlib/assert";
+
 export const ACTION_TYPE = {
     STANDARD: "standard",
     MOVEMENT: "movement",
@@ -20,10 +22,10 @@ export const ACTION_TYPE_EXPENDITURE_ORDER = {
 
 export type ActionType = typeof ACTION_TYPE[keyof typeof ACTION_TYPE]
 
+const ACTION_TYPES: Array<ActionType> = Object.values(ACTION_TYPE)
+
 export function assert_is_action_type(value: string): asserts value is ActionType {
-    for (const action_type of Object.values(ACTION_TYPE))
-        if (action_type === value) return
-    throw Error(`"${value}" is not an action type`)
+    assert_is_included(value, ACTION_TYPES)
 }
 
 export const TURN_ACTION_TYPES: Array<ActionType> = [

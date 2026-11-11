@@ -5,7 +5,7 @@ export class Scanner {
     private index = 0
 
     constructor(text: string) {
-        if (text === "") throw Error("can't scan empty string")
+        assert(text !== "", () => "can't scan empty string")
         this.text = text.replaceAll(" ", "")
     }
 

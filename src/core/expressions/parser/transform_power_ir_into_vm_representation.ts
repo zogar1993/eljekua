@@ -20,7 +20,14 @@ import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE, TURN_ACTION_TYPES} from "core/battlegrid/creatures/ActionType";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunction";
-import {assert_is_not_empty, assert_is_true} from "stdlib/assert";
+import {
+    assert,
+    assert_is_included,
+    assert_is_not_empty,
+    assert_is_true,
+    assert_is_type,
+    assert_unreachable
+} from "stdlib/assert";
 import {FUNCTION_NAME} from "core/expressions/function_names";
 import {ATTACK_ROLL_RESOLUTION_MODE, type AttackRollResolutionMode} from "core/settings/AttackRollResolutionMode";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
@@ -36,15 +43,12 @@ export const transform_power_ir_into_vm_representation = (power: IRPower): Power
         ...transform_instructions(power.effect)
     ]
 
-    if (TURN_ACTION_TYPES.includes(power.type.action) && power.targeting === undefined)
-        throw Error(`Power '${power.name}' does not have a targeting defined despite being a turn action`)
+    assert(!(TURN_ACTION_TYPES.includes(power.type.action) && power.targeting === undefined), () => `Power '${power.name}' does not have a targeting defined despite being a turn action`)
 
-    if (power.type.action === "opportunity" && power.trigger === undefined)
-        throw Error(`Power '${power.name}' does not have a trigger defined despite being an opportunity action`)
+    assert(!(power.type.action === "opportunity" && power.trigger === undefined), () => `Power '${power.name}' does not have a trigger defined despite being an opportunity action`)
 
     if (power.trigger) {
-        if (!TRIGGER_ACTION_TYPES.includes(power.type.action))
-            throw Error(`Power '${power.name}' with trigger needs to be one of ${JSON.stringify(TRIGGER_ACTION_TYPES)} but is '${power.type.action}'.`)
+        assert_is_included(power.type.action, TRIGGER_ACTION_TYPES)
         validate_trigger_ir(power)
     }
 
@@ -287,7 +291,7 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 creature: to_ast(instruction.creature)
             }]
         default:
-            throw Error(`instruction invalid ${JSON.stringify(instruction)}`)
+            assert_unreachable(`instruction invalid ${JSON.stringify(instruction)}`)
     }
 }
 
@@ -404,7 +408,7 @@ const transform_select_target_ir = (
             exclude: ir.exclude ? ir.exclude.map(x => to_ast(x)) : [],
             attack_roll,
         }
-    throw Error(`"${ir.targeting_type}" is not a valid "select_target" targeting_type`)
+    assert_unreachable(`"${ir.targeting_type}" is not a valid "select_target" targeting_type`)
 }
 
 const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApplyStatus["status"] => {
@@ -445,7 +449,7 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
                 value: to_ast(status.value)
             }
         default:
-            throw Error(`"${ir.status.type}" is not a valid "apply_status" type`)
+            assert_unreachable(`"${ir.status.type}" is not a valid "apply_status" type`)
     }
 }
 
@@ -456,11 +460,14 @@ const validate_trigger_ir = (power: IRPower) => {
     if (trigger === undefined) return
 
     for (const intercept of trigger.intercepts) {
-        if (intercept === TRIGGER_INTERCEPTION.MOVEMENT && trigger.type !== TRIGGER_TIMING.INTERRUPTION)
-            throw Error(`Power '${power.name}' movement trigger must use timing '${TRIGGER_TIMING.INTERRUPTION}', got '${trigger.type}'`)
-
-        if (intercept === TRIGGER_INTERCEPTION.CRITICAL_HIT && trigger.type !== TRIGGER_TIMING.REACTION)
-            throw Error(`Power '${power.name}' critical hit trigger must use timing '${TRIGGER_TIMING.REACTION}', got '${trigger.type}'`)
+        switch (intercept) {
+            case TRIGGER_INTERCEPTION.MOVEMENT:
+                assert_is_type(trigger, TRIGGER_TIMING.INTERRUPTION)
+                break
+            case TRIGGER_INTERCEPTION.CRITICAL_HIT:
+                assert_is_type(trigger, TRIGGER_TIMING.REACTION)
+                break
+        }
     }
 }
 
