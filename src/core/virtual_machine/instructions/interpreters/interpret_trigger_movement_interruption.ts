@@ -7,18 +7,13 @@ import {
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {offer_trigger_reactions} from "core/virtual_machine/instructions/trigger_reactions";
 
-const MOVEMENT_STEP_INSTRUCTIONS_TO_SKIP = 2
-
 export const interpret_trigger_movement_interruption = ({
                                                             instruction,
                                                             game_state,
                                                             game_queries,
                                                         }: InterpretInstructionProps<InstructionTriggerMovementInterruption>) => {
     const moving_creature = game_queries.evaluate_creature(game_state.vm_state.get_variable(instruction.target_label))
-    game_state.vm_state.set_variable(
-        SYSTEM_KEYWORD.TRIGGER_ACTIVATOR,
-        {type: "creatures", value: [moving_creature]},
-    )
+    game_state.vm_state.set_variable(SYSTEM_KEYWORD.TRIGGER_ACTIVATOR, {type: "creatures", value: [moving_creature]})
 
     offer_trigger_reactions({
         game_state,
@@ -26,9 +21,5 @@ export const interpret_trigger_movement_interruption = ({
         activator: moving_creature,
         intercept: TRIGGER_INTERCEPTION.MOVEMENT,
         timing: TRIGGER_TIMING.INTERRUPTION,
-        //TODO I dont like passing this function
-        before_offering_triggers: () => {
-            game_state.vm_state.jump(MOVEMENT_STEP_INSTRUCTIONS_TO_SKIP)
-        },
     })
 }
