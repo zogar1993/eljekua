@@ -50,7 +50,7 @@ describe("trigger transform validation", () => {
                 conditions: [],
             },
             effect: [],
-        })).toThrow(/movement trigger must use timing 'interruption'/)
+        })).toThrow(/Expected type 'interruption', got 'reaction'/)
     })
 
     test("throws when a critical hit trigger uses interruption timing", () => {
@@ -63,7 +63,7 @@ describe("trigger transform validation", () => {
                 conditions: [],
             },
             effect: [],
-        })).toThrow(/critical hit trigger must use timing 'reaction'/)
+        })).toThrow(/Expected type 'reaction', got 'interruption'/)
     })
 
     test("places critical hit reaction triggers after attack roll consequences", () => {

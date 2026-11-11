@@ -24,8 +24,7 @@ import {
     assert,
     assert_is_included,
     assert_is_not_empty,
-    assert_is_true,
-    assert_is_type,
+    assert_is_true, assert_is_type,
     assert_unreachable
 } from "stdlib/assert";
 import {FUNCTION_NAME} from "core/expressions/function_names";

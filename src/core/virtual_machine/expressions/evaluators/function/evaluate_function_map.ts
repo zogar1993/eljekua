@@ -2,12 +2,12 @@ import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {EvaluateFunctionProps} from "core/virtual_machine/expressions/evaluators/EvaluateAstProps";
 import type {ExprNumbers} from "core/virtual_machine/expressions/types";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
-import {AST_NODE} from "core/virtual_machine/expressions/AST_NODE";
+import {AST_NODE} from "../../AST_NODE";
 
 export const evaluate_function_map = ({node, game_state, game_queries}: EvaluateFunctionProps): ExprNumbers => {
     assert_parameters_amount_equals(node, 3)
 
-    const variable_name = get_iteration_variable_name(node.parameters[1])
+    const variable_name = AST_NODE.as_keyword(node.parameters[1]).value
     const expression = node.parameters[2]
     const {vm_state} = game_state
     const results = []
@@ -21,8 +21,4 @@ export const evaluate_function_map = ({node, game_state, game_queries}: Evaluate
         type: "numbers",
         value: results,
     }
-}
-
-export const get_iteration_variable_name = (node: AstNode): string => {
-    return AST_NODE.as_keyword(node).value
 }
