@@ -1,5 +1,5 @@
 import type {Scanner} from "core/expressions/parser/scanner";
-import {assert} from "stdlib/assert";
+import {assert, assert_unreachable} from "stdlib/assert";
 import {is_numeric_character} from "core/expressions/parser/regexes";
 
 export const parse_roll = (scanner: Scanner): AstNodeDice | AstNodeWeapon => {
@@ -31,7 +31,7 @@ export const parse_roll = (scanner: Scanner): AstNodeDice | AstNodeWeapon => {
             amount: Number(amount)
         }
     } else {
-        throw Error(`type ${type} not permitted when parsing dice`)
+        assert_unreachable(`type ${type} not permitted when parsing dice`)
     }
 }
 

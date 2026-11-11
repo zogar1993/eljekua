@@ -1,11 +1,11 @@
 import {PositionBasic} from "core/battlegrid/BattleGrid";
+import {assert, assert_is_true} from "stdlib/assert";
 
 export type Position = { x: number, y: number, footprint: number }
 export type PositionFootprintOne = { x: number, y: number, footprint: 1 }
 
 export const assert_positions_have_same_footprint = (a: Position, b: Position) => {
-    if (a.footprint !== b.footprint)
-        throw Error(`expected positions to have the same footprint: '${JSON.stringify(a)}' - '${JSON.stringify(b)}'`)
+    assert(a.footprint === b.footprint, () => `expected positions to have the same footprint: '${JSON.stringify(a)}' - '${JSON.stringify(b)}'`)
 }
 
 export const positions_equal = (a: Position, b: Position) =>
@@ -20,13 +20,11 @@ export const positions_of_same_footprint_equal = (a: Position, b: Position) => {
 }
 
 export function assert_is_footprint_one(p: Position): asserts p is PositionFootprintOne {
-    if (!position_is_footprint_one(p))
-        throw Error(`Expected position to be f1: ${JSON.stringify(p)}`)
+    assert_is_true(position_is_footprint_one(p))
 }
 
 export function assert_are_footprint_one(positions: Array<Position>): asserts positions is Array<PositionFootprintOne> {
-    if (positions.every(position => position_is_footprint_one(position))) return
-    throw Error(`Expected positions to be f1: ${JSON.stringify(positions)}`)
+    assert(positions.every(position => position_is_footprint_one(position)), () => `Expected positions to be f1: ${JSON.stringify(positions)}`)
 }
 
 const position_is_footprint_one = (position: Position): position is PositionFootprintOne =>

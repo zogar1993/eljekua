@@ -3,19 +3,20 @@ import type {AstNodeKeyword} from "core/expressions/parser/nodes/AstNodeKeyword"
 import type {AstNodeString} from "core/expressions/parser/nodes/AstNodeString";
 import {to_ast} from "core/expressions/parser/to_ast";
 import type {AstNodeNumber} from "core/expressions/parser/nodes/AstNodeNumber";
+import {assert_is_type} from "stdlib/assert";
 
 export const AST_NODE = {
     as_keyword: (node: AstNode): AstNodeKeyword => {
-        if (node.type === "keyword") return node
-        throw Error(`Cannot cast ast node ${JSON.stringify(node)} to "keyword"`)
+        assert_is_type(node, "keyword")
+        return node
     },
     as_string: (node: AstNode): AstNodeString => {
-        if (node.type === "string") return node
-        throw Error(`Cannot cast ast node ${JSON.stringify(node)} to "string"`)
+        assert_is_type(node, "string")
+        return node
     },
     as_number: (node: AstNode): AstNodeNumber => {
-        if (node.type === "number") return node
-        throw Error(`Cannot cast ast node ${JSON.stringify(node)} to "number"`)
+        assert_is_type(node, "number")
+        return node
     }
 }
 

@@ -1,5 +1,6 @@
 import type {InterpretInstructionProps} from "core/virtual_machine/instructions/InterpretInstructionProps";
 import type {InstructionForceMovement} from "core/virtual_machine/instructions/instructions";
+import {assert_unreachable} from "stdlib/assert";
 
 export const interpret_force_movement = ({
                                              instruction,
@@ -16,6 +17,6 @@ export const interpret_force_movement = ({
             break
         }
         default:
-            throw Error(`forced movement type '${instruction.movement_type}' not supported`)
+            assert_unreachable(`forced movement type '${instruction.movement_type}' not supported`)
     }
 }

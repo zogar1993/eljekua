@@ -33,6 +33,7 @@ import {interpret_apply_status} from "core/virtual_machine/instructions/interpre
 import {interpret_expend_action} from "core/virtual_machine/instructions/interpreters/interpret_expend_action";
 import type {Instruction} from "core/virtual_machine/instructions/instructions";
 import {INSTRUCTION_TYPE} from "core/virtual_machine/instructions/instructions";
+import {assert_unreachable} from "stdlib/assert";
 import {interpret_end_turn} from "core/virtual_machine/instructions/interpreters/interpret_end_turn";
 import {
     interpret_attack_roll_consequence
@@ -107,6 +108,6 @@ export const interpret_instruction = (props: InterpretInstructionProps<Instructi
         case INSTRUCTION_TYPE.ADD_CURRENT_TURN_BASE_OPTIONS:
             return interpret_add_current_turn_base_options({...props, instruction})
         default:
-            throw Error("instruction not implemented " + JSON.stringify(instruction))
+            assert_unreachable("instruction not implemented " + JSON.stringify(instruction))
     }
 }

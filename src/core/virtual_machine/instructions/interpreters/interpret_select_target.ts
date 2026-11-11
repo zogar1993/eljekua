@@ -12,7 +12,7 @@ import type {
 import {INTERACTION_TYPE} from "core/interactions/Interactions";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {get_shortest_path} from "core/battlegrid/queries/get_shortest_path";
-import {assert_is_not_empty, assert_is_true} from "stdlib/assert";
+import {assert_is_not_empty, assert_is_true, assert_unreachable} from "stdlib/assert";
 import {bound_minmax} from "stdlib/bound_minmax";
 import {get_creature_defense_for_attack} from "core/character_sheet/get_creature_defense";
 
@@ -54,7 +54,7 @@ export const interpret_select_target = ({
                 const creature = battle_grid.get_creature_by_position(position)
                 vm_state.set_variable(target_label, {type: "creatures", value: [creature]})
             } else {
-                throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
+                assert_unreachable(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
             }
         }
 
@@ -137,7 +137,7 @@ export const interpret_select_target = ({
             get_attack_hit_chance_against,
         })
     } else {
-        throw Error(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
+        assert_unreachable(`instruction not valid: targeting_type '${instruction.targeting_type}' target_type '${instruction.target_type}'`)
     }
 }
 

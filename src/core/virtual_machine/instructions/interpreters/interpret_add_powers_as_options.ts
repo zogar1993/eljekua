@@ -11,6 +11,7 @@ import type {Power} from "core/expressions/parser/transform_power_ir_into_vm_rep
 import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
 import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
 import {FUNCTION_NAME} from "core/expressions/function_names";
+import {assert_unreachable} from "stdlib/assert";
 
 export const interpret_add_powers_as_options = ({
                                                     instruction,
@@ -87,7 +88,7 @@ const filter_powers = ({powers, filter}: { powers: Array<Power>, filter: Instruc
         case "melee_basic_attack":
             return powers.filter(power => power.type.traits.includes("melee_basic_attack"))
         default:
-            throw Error(`Can't filter but trait '${filter}'`)
+            assert_unreachable(`Can't filter but trait '${filter}'`)
     }
 }
 

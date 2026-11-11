@@ -4,26 +4,24 @@ import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {add_numbers_resolved} from "core/virtual_machine/expressions/number_utils";
 import {get_creature_half_level} from "core/character_sheet/get_creature_half_level";
 import {get_creature_attribute_mod} from "core/character_sheet/get_creature_attribute_mod";
+import {assert_is_included, assert_unreachable} from "stdlib/assert";
 
 export const get_creature_defense = ({creature, defense_code}: {
     creature: Creature,
     defense_code: DefenseCode
 }): ExprNumberResolved => {
-    if (DEFENSES.includes(defense_code)) {
-        const parts: Array<ExprNumberResolved> = [
-            RESOLVED_BASE_10,
-            get_creature_half_level(creature),
-            get_creature_attribute_mod(creature, get_attribute_bonus_from_defense({creature, defense_code}))
-        ]
-        return {
-            type: "number_resolved",
-            value: parts.reduce((result, param) => param.value + result, 0),
-            params: parts,
-            description: defense_code
-        }
+    assert_is_included(defense_code, DEFENSES)
+    const parts: Array<ExprNumberResolved> = [
+        RESOLVED_BASE_10,
+        get_creature_half_level(creature),
+        get_creature_attribute_mod(creature, get_attribute_bonus_from_defense({creature, defense_code}))
+    ]
+    return {
+        type: "number_resolved",
+        value: parts.reduce((result, param) => param.value + result, 0),
+        params: parts,
+        description: defense_code
     }
-
-    throw Error(`Invalid defense ${defense_code}`)
 }
 
 export const get_creature_defense_for_attack = ({defender, defense_code, attacker}: {
@@ -56,7 +54,7 @@ const get_attribute_bonus_from_defense = ({creature, defense_code}: {
         case "ac" :
             return creature.data.attributes["int"] > creature.data.attributes["dex"] ? "int" : "dex"
         default:
-            throw Error(`defense_code '${defense_code}' is not valid`)
+            return assert_unreachable(`defense_code '${defense_code}' is not valid`)
     }
 }
 

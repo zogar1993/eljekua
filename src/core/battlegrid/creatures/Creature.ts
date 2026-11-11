@@ -3,6 +3,7 @@ import type {CreatureRule} from "core/battlegrid/creatures/creature_rule";
 import type {ActionType} from "core/battlegrid/creatures/ActionType";
 import {ACTION_TYPE_EXPENDITURE_ORDER} from "core/battlegrid/creatures/ActionType";
 import {remove_from_array_by_index} from "stdlib/remove_from_array_by_index";
+import {assert_unreachable} from "stdlib/assert";
 import {BASIC_ATTACK_ACTIONS, BASIC_MOVEMENT_ACTIONS} from "data/powers/basic";
 
 export type {CreatureRule} from "core/battlegrid/creatures/creature_rule";
@@ -96,7 +97,7 @@ export const expend_creature_action = ({creature, action}: { creature: Creature,
             return
         }
     }
-    throw Error(`Expected "${action}" to be available for "${creature.data.name}"`)
+    assert_unreachable(`Expected "${action}" to be available for "${creature.data.name}"`)
 }
 
 export const restore_creature_actions = ({creature, actions}: { creature: Creature, actions: Array<ActionType> }) => {

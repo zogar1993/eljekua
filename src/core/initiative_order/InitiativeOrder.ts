@@ -2,6 +2,7 @@ import type {Creature} from "core/battlegrid/creatures/Creature";
 import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import type {GameEvents} from "core/events/GameEvents";
 import {insert_to_array} from "stdlib/insert_to_array";
+import {assert_is_valid_index} from "stdlib/assert";
 
 export const create_initiative_order = ({game_events}: { game_events: GameEvents }) => {
     let initiatives: Array<{
@@ -25,8 +26,7 @@ export const create_initiative_order = ({game_events}: { game_events: GameEvents
     }
 
     const get_current_creature = (): Creature => {
-        if (current_index >= initiatives.length)
-            throw Error(`Initiative index ${current_index} out of bounds`)
+        assert_is_valid_index(current_index, initiatives)
         return initiatives[current_index].creature
     }
 

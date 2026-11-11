@@ -2,6 +2,7 @@ import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {EvaluateFunctionProps} from "core/virtual_machine/expressions/evaluators/EvaluateAstProps";
 import type {ExprNumbers} from "core/virtual_machine/expressions/types";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
+import {AST_NODE} from "core/virtual_machine/expressions/AST_NODE";
 
 export const evaluate_function_map = ({node, game_state, game_queries}: EvaluateFunctionProps): ExprNumbers => {
     assert_parameters_amount_equals(node, 3)
@@ -23,7 +24,5 @@ export const evaluate_function_map = ({node, game_state, game_queries}: Evaluate
 }
 
 export const get_iteration_variable_name = (node: AstNode): string => {
-    if (node.type === "keyword")
-        return node.value
-    throw Error(`expected keyword for map variable name, got "${node.type}"`)
+    return AST_NODE.as_keyword(node).value
 }

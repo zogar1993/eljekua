@@ -6,6 +6,7 @@ import type {Position} from "core/battlegrid/Position";
 import type {Power} from "core/expressions/parser/transform_power_ir_into_vm_representation";
 import type {HitStatus} from "core/virtual_machine/expressions/constants/HitStatus";
 import {evaluate_ast} from "core/virtual_machine/expressions/evaluators/evaluate_ast";
+import {assert_has_length_one, assert_unreachable} from "stdlib/assert";
 
 export const create_game_queries = ({game_state}: {
     game_state: GameState
@@ -59,14 +60,13 @@ const is_ast_node = (input: AstNode | Expr): input is AstNode =>
     input.type === "weapon" ||
     input.type === "number"
 
-const throw_could_not_cast = ({expr, to}: { expr: Expr, to: string }): never => {
-    throw `Could not cast expression '${expr.type}' to '${to}'`
-}
+const throw_could_not_cast = ({expr, to}: { expr: Expr, to: string }): never =>
+    assert_unreachable(`Could not cast expression '${expr.type}' to '${to}'`)
 
 const cast_creature = (expr: Expr): Creature => {
     if (expr.type === "creatures") {
-        if (expr.value.length === 1) return expr.value[0]
-        throw Error("expected only one creature in expression")
+        assert_has_length_one(expr.value)
+        return expr.value[0]
     }
     return throw_could_not_cast({expr, to: "creatures"})
 }
@@ -78,12 +78,12 @@ const cast_creatures = (expr: Expr): Array<Creature> => {
 
 const cast_position = (expr: Expr): Position => {
     if (expr.type === "positions") {
-        if (expr.value.length === 1) return expr.value[0]
-        throw Error("expected only one position in expression")
+        assert_has_length_one(expr.value)
+        return expr.value[0]
     }
     if (expr.type === "creatures") {
-        if (expr.value.length === 1) return expr.value[0].data.position
-        throw Error("expected only one creature in expression")
+        assert_has_length_one(expr.value)
+        return expr.value[0].data.position
     }
     return throw_could_not_cast({expr, to: "position"})
 }

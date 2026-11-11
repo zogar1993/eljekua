@@ -1,11 +1,11 @@
 import type {Creature} from "core/battlegrid/creatures/Creature";
+import {assert_is_not_negative} from "stdlib/assert";
 
 export const grant_creature_temporary_hit_points = ({creature, amount}: {
     creature: Creature
     amount: number
 }) => {
-    if (amount < 0)
-        throw Error(`temporary hit points must be non-negative, got ${amount}`)
+    assert_is_not_negative(amount)
 
     creature.temporary_hit_points = Math.max(creature.temporary_hit_points, amount)
 }

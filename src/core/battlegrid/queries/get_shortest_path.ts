@@ -7,6 +7,7 @@ import {
     positions_of_same_footprint_equal
 } from "core/battlegrid/Position";
 import {get_reach_adjacent} from "core/battlegrid/position/get_reach_adjacent";
+import {assert_unreachable} from "stdlib/assert";
 
 export const get_shortest_path = ({creature, destination, battle_grid}: {
     creature: Creature,
@@ -70,7 +71,7 @@ export const get_shortest_path = ({creature, destination, battle_grid}: {
         ]
     }
 
-    throw Error(`Path not found from ${JSON.stringify(origin)} to ${JSON.stringify(destination)}`)
+    assert_unreachable(`Path not found from ${JSON.stringify(origin)} to ${JSON.stringify(destination)}`)
 }
 
 const intuitive_distance_between_positions = (a: Position, b: Position) => {

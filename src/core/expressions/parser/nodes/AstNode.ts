@@ -8,6 +8,7 @@ import type {AstNodeFunction} from "core/expressions/parser/nodes/AstNodeFunctio
 import {parse_function} from "core/expressions/parser/nodes/AstNodeFunction";
 import type {Scanner} from "core/expressions/parser/scanner";
 import {is_non_numeric_character, is_numeric_character} from "core/expressions/parser/regexes";
+import {assert_unreachable} from "stdlib/assert";
 import type {AstNodeString} from "core/expressions/parser/nodes/AstNodeString";
 import {parse_string} from "core/expressions/parser/nodes/AstNodeString";
 
@@ -25,7 +26,7 @@ export const parse_any = (scanner: Scanner): AstNode => {
     else if (char === `"`)
         return parse_string(scanner)
     else
-        throw Error(`unexpected character found while parsing ${scanner.text}, can't parse "${scanner.peek()}"`)
+        assert_unreachable(`unexpected character found while parsing ${scanner.text}, can't parse "${scanner.peek()}"`)
 }
 
 export type AstNode = AstNodeNumber | AstNodeKeyword | AstNodeDice | AstNodeWeapon | AstNodeFunction | AstNodeString

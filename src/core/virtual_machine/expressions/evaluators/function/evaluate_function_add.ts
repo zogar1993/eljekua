@@ -6,6 +6,7 @@ import {
     is_number,
     is_number_resolved
 } from "core/virtual_machine/expressions/number_utils";
+import {assert_unreachable} from "stdlib/assert";
 
 export const evaluate_function_add = ({node, game_state, game_queries}: EvaluateFunctionProps): ExprNumber => {
     const params = node.parameters.map(parameter => game_queries.evaluate(parameter))
@@ -16,5 +17,5 @@ export const evaluate_function_add = ({node, game_state, game_queries}: Evaluate
     if (params.every(is_number))
         return add_numbers(params)
 
-    throw Error(`not all params evaluate to numbers on add function`)
+    return assert_unreachable(`not all params evaluate to numbers on add function`)
 }

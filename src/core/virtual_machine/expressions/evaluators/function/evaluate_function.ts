@@ -1,6 +1,7 @@
 import type {Expr} from "core/virtual_machine/expressions/types";
 import type {EvaluateFunctionProps} from "core/virtual_machine/expressions/evaluators/EvaluateAstProps";
 import {FUNCTION_NAME} from "core/expressions/function_names";
+import {assert_unreachable} from "stdlib/assert";
 import {evaluate_function_add} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_add";
 import {
     evaluate_function_equipped
@@ -193,6 +194,6 @@ export const evaluate_function = ({node, game_state, game_queries}: EvaluateFunc
         case FUNCTION_NAME.SIZE:
             return evaluate_function_size({node, game_state, game_queries})
         default:
-            throw Error(`function name '${node.name}' not supported when evaluating node`)
+            assert_unreachable(`function name '${node.name}' not supported when evaluating node`)
     }
 }

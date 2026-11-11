@@ -2,6 +2,7 @@ import type {ExprBoolean} from "core/virtual_machine/expressions/types";
 import type {EvaluateFunctionProps} from "core/virtual_machine/expressions/evaluators/EvaluateAstProps";
 import {assert_parameters_amount_equals} from "core/virtual_machine/expressions/asserts";
 import {positions_equal} from "core/battlegrid/Position";
+import {assert_unreachable} from "stdlib/assert";
 
 export const evaluate_function_not_equals = ({node, game_state, game_queries}: EvaluateFunctionProps): ExprBoolean => {
     assert_parameters_amount_equals(node, 2)
@@ -23,5 +24,5 @@ export const evaluate_function_not_equals = ({node, game_state, game_queries}: E
             params: [parameter1, parameter2]
         }
     }
-    throw Error(`not_equals parameters dont match, got ${parameter1.type} and ${parameter2.type}`)
+    return assert_unreachable(`not_equals parameters dont match, got ${parameter1.type} and ${parameter2.type}`)
 }

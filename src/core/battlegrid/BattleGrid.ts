@@ -7,7 +7,7 @@ import {
 } from "core/battlegrid/Position";
 import type {Creatures} from "core/creatures/Creatures";
 import type {Structure} from "core/battlegrid/Structure";
-import {assert_are_equal, assert_is_included} from "stdlib/assert";
+import {assert_is_included, assert_is_not_undefined} from "stdlib/assert";
 
 export const create_battle_grid = ({size, creatures}: {
     size: { x: number, y: number }
@@ -117,7 +117,7 @@ export const create_battle_grid = ({size, creatures}: {
 
     const get_creature_by_position = (position: Position): Creature => {
         const creature = creatures.get_all().find(creature => positions_share_surface(creature.data.position, position))
-        if (!creature) throw Error(`creature not found for cell ${position}`)
+        assert_is_not_undefined(creature)
         return creature
     }
 

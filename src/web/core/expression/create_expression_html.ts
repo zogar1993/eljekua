@@ -1,5 +1,6 @@
 import type {Expr, ExprNumberResolved} from "core/virtual_machine/expressions/types";
 import {create_html_element} from "web/core/utils/create_html_element";
+import {assert_unreachable} from "stdlib/assert";
 
 export const create_expression_html = (expr: Expr): HTMLElement => {
     const html_expression = create_html_element("span", "expression")
@@ -34,7 +35,7 @@ export const create_expression_html = (expr: Expr): HTMLElement => {
             return html_expression
         }
         default: {
-            throw new Error(`Unsupported expression type ${expr.type}`)
+            assert_unreachable(`Unsupported expression type ${expr.type}`)
         }
     }
 }

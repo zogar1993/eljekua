@@ -7,6 +7,7 @@ import {
     type StatusDuration,
 } from "core/battlegrid/creatures/Creature";
 import type {InstructionApplyStatus} from "core/virtual_machine/instructions/instructions";
+import {assert_unreachable} from "stdlib/assert";
 
 export const interpret_apply_status = ({
                                            instruction,
@@ -63,7 +64,7 @@ const interpret_duration = ({duration, power_owner}: {
                     until: "encounter_end",
                 }
             default:
-                throw Error(`duration '${duration}' not supported`)
+                assert_unreachable(`duration '${duration}' not supported`)
         }
     })
 }
@@ -106,6 +107,6 @@ const interpret_creature_rule = ({status, game_queries}: {
                 value: game_queries.evaluate_number_resolved_expr(status.value)
             }
         default:
-            throw Error(`could not interpret status '${JSON.stringify(status)}'`)
+            assert_unreachable(`could not interpret status '${JSON.stringify(status)}'`)
     }
 }

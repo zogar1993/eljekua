@@ -7,6 +7,7 @@ import {evaluate_dice} from "core/virtual_machine/expressions/evaluators/evaluat
 import {evaluate_keyword} from "core/virtual_machine/expressions/evaluators/evaluate_keyword";
 import {evaluate_function} from "core/virtual_machine/expressions/evaluators/function/evaluate_function";
 import {create_game_queries} from "core/game_state/GameQueries";
+import {assert_unreachable} from "stdlib/assert";
 
 export const evaluate_ast = ({node, game_state}: EvaluateAstProps): Expr => {
     switch (node.type) {
@@ -23,6 +24,6 @@ export const evaluate_ast = ({node, game_state}: EvaluateAstProps): Expr => {
         case "function":
             return evaluate_function({node, game_state, game_queries: create_game_queries({game_state})})
         default:
-            throw Error(`evaluator for type '${(node as { type: string }).type}' does not exist`)
+            assert_unreachable(`evaluator for type '${(node as { type: string }).type}' does not exist`)
     }
 }
