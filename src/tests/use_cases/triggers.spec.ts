@@ -99,15 +99,7 @@ describe("trigger transform validation", () => {
 
 describe("movement interruption triggers", () => {
     const test_game = create_test_game({attack_roll_resolution: ATTACK_ROLL_RESOLUTION_MODE.HIT_STATUS})
-    const {vm_state, instruction_loop} = test_game
-    const {given_a_creature_is_created, given_creature, when_creature, then_creature} = create_creature_test_helpers({
-        creatures: test_game.creatures,
-        instruction_loop,
-        vm_state,
-        add_creature_to_game: test_game.add_creature_to_game,
-        set_current_turn_to_creature: test_game.set_current_turn_to_creature,
-        available_interaction: test_game.game_state.available_interaction,
-    })
+    const {given_a_creature_is_created, given_creature, when_creature, then_creature} = create_creature_test_helpers({...test_game})
 
     test("can interrupt each step of a walk", () => {
         given_a_creature_is_created({name: "linuar", team: 1, position: {x: 0, y: 1, footprint: 1}})
@@ -140,14 +132,7 @@ describe("critical hit reaction triggers", () => {
     beforeEach(() => {
         test_game = create_test_game({attack_roll_resolution: ATTACK_ROLL_RESOLUTION_MODE.HIT_STATUS})
         available_interaction = test_game.game_state.available_interaction
-        const helpers = create_creature_test_helpers({
-            creatures: test_game.creatures,
-            instruction_loop: test_game.instruction_loop,
-            vm_state: test_game.vm_state,
-            add_creature_to_game: test_game.add_creature_to_game,
-            set_current_turn_to_creature: test_game.set_current_turn_to_creature,
-            available_interaction,
-        })
+        const helpers = create_creature_test_helpers({...test_game})
         given_a_creature_is_created = helpers.given_a_creature_is_created
         given_creature = helpers.given_creature
         when_creature = helpers.when_creature

@@ -23,12 +23,7 @@ describe("rigged d20 attack roll resolution", () => {
             attack_total = attack.value
         })
         const {given_a_creature_is_created, when_creature} = create_creature_test_helpers({
-            creatures: test_game.creatures,
-            instruction_loop: test_game.instruction_loop,
-            vm_state: test_game.vm_state,
-            add_creature_to_game: test_game.add_creature_to_game,
-            set_current_turn_to_creature: test_game.set_current_turn_to_creature,
-            available_interaction: test_game.game_state.available_interaction,
+            ...test_game,
             default_attribute_value: 10,
         })
 

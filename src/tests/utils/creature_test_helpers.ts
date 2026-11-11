@@ -2,16 +2,17 @@ import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import type {Creature} from "core/battlegrid/creatures/Creature";
 import {ATTRIBUTES} from "core/character_sheet/attributes";
 import type {Position} from "core/battlegrid/Position";
-import type {Creatures} from "core/creatures/Creatures";
-import type {InstructionLoop} from "core/instruction_loop";
-import type {VMState} from "core/virtual_machine/VMState";
 import {INTERACTION_NONE, INTERACTION_TYPE} from "core/interactions/Interactions";
 import type {AvailableInteraction} from "core/game_state/available_interaction";
 import {HIT_STATUS} from "core/virtual_machine/expressions/constants/HitStatus";
-import type {create_add_creature_to_game} from "core/use_cases/add_creature_to_game";
-import type {create_set_current_turn_to_creature} from "core/use_cases/gameplay/set_current_turn_to_creature";
+import type {create_test_game} from "tests/utils/create_test_game";
 
 export type AttackLogEntry = { attacker: string, target: string, power_name: string }
+
+type CreatureTestHelpersProps = ReturnType<typeof create_test_game> & {
+    attack_log?: Array<AttackLogEntry>
+    default_attribute_value?: number
+}
 
 export const create_creature_test_helpers = ({
     creatures,
@@ -19,19 +20,11 @@ export const create_creature_test_helpers = ({
     vm_state,
     add_creature_to_game,
     set_current_turn_to_creature,
-    available_interaction,
+    game_state,
     attack_log,
     default_attribute_value = 14,
-}: {
-    creatures: Creatures
-    instruction_loop: InstructionLoop
-    vm_state: VMState
-    add_creature_to_game: ReturnType<typeof create_add_creature_to_game>
-    set_current_turn_to_creature: ReturnType<typeof create_set_current_turn_to_creature>
-    available_interaction: AvailableInteraction
-    attack_log?: Array<AttackLogEntry>
-    default_attribute_value?: number
-}) => {
+}: CreatureTestHelpersProps) => {
+    const available_interaction: AvailableInteraction = game_state.available_interaction
     const get_creature_by_name = (creature_name: string) => {
         const creature = creatures.get_all().find(c => c.data.name === creature_name)
         if (!creature) throw Error(`creature name "${creature_name}" not found`)

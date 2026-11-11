@@ -20,12 +20,7 @@ game_events.on_creature_missed.add_handler((creature) => {
 })
 
 const {given_a_creature_is_created, given_creature, when_creature, then_creature} = create_creature_test_helpers({
-    creatures: test_game.creatures,
-    instruction_loop,
-    vm_state,
-    add_creature_to_game: test_game.add_creature_to_game,
-    set_current_turn_to_creature: test_game.set_current_turn_to_creature,
-    available_interaction: test_game.game_state.available_interaction,
+    ...test_game,
     attack_log,
 })
 

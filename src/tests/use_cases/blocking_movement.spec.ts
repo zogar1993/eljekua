@@ -28,14 +28,7 @@ describe("blocking movement", () => {
 
     beforeEach(() => {
         test_game = create_test_game({battle_grid_size: {x: 5, y: 5}})
-        const helpers = create_creature_test_helpers({
-            creatures: test_game.creatures,
-            instruction_loop: test_game.instruction_loop,
-            vm_state: test_game.vm_state,
-            add_creature_to_game: test_game.add_creature_to_game,
-            set_current_turn_to_creature: test_game.set_current_turn_to_creature,
-            available_interaction: test_game.game_state.available_interaction,
-        })
+        const helpers = create_creature_test_helpers({...test_game})
         given_a_creature_is_created = helpers.given_a_creature_is_created
         given_creature = helpers.given_creature
     })
