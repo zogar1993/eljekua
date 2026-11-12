@@ -9,7 +9,9 @@ export const interpret_execute_power = ({
                                             game_queries,
                                         }: InterpretInstructionProps<InstructionExecutePower>) => {
     const {vm_state} = game_state
-    const {name, instructions} = game_queries.evaluate_power(vm_state.get_variable(instruction.power_label))
+    const power = game_queries.evaluate_power(vm_state.get_variable(instruction.power_label))
+    // TODO move name callings into current power, since it is redundant
+    const {name, instructions} = power
 
     const initialization = instruction.initialization ?? []
     const variables: Record<string, Expr> = {}
@@ -23,6 +25,7 @@ export const interpret_execute_power = ({
     }
 
     variables[SYSTEM_KEYWORD.POWER_NAME] = {type: "string", value: name}
+    variables[SYSTEM_KEYWORD.CURRENT_POWER] = {type: "power", value: power}
 
     vm_state.add_scoped_instruction_frame({instructions, variables})
 }
