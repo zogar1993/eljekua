@@ -20,6 +20,7 @@ export const create_game_queries = ({game_state}: {
         // from the interpreting of instructions that affect the game context.
         evaluate: (node: AstNode) => evaluate_ast({node, game_state}),
 
+        //TODO fix evaluates, as they are not really evaluating, but just parsing
         evaluate_creature: (input: AstNode | Expr): Creature =>
             cast_creature(resolve_expr(input)),
         evaluate_creatures: (input: AstNode | Expr): Array<Creature> =>
