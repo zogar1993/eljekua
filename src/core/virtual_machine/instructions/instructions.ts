@@ -198,6 +198,7 @@ export type InstructionApplyStatus = {
         type: "gain_attack_bonus"
         value: AstNode
         against_creatures: AstNode | null,
+        conditions: Array<AstNode>
     } | {
         type: "gain_defense_bonus"
         value: AstNode

@@ -30,7 +30,9 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
         attack_parts.push({type: "number_resolved", value: d20_value, description: "d20"})
 
         for (const {rule} of attacker.statuses)
-            if (rule.type === "gain_attack_bonus" && (rule.against_creatures === null || rule.against_creatures.includes(defender)))
+            if (rule.type === "gain_attack_bonus"
+                && (rule.against_creatures === null || rule.against_creatures.includes(defender))
+                && rule.conditions.every(condition => game_queries.evaluate_boolean(condition)))
                 attack_parts.push(rule.value)
 
         remove_creature_statuses({

@@ -140,6 +140,7 @@ export type IRInstructionApplyStatus = {
         type: "gain_attack_bonus"
         value: number | string
         against_creatures?: string,
+        conditions?: Array<string>
     } | {
         type: "gain_defense_bonus"
         value: number | string

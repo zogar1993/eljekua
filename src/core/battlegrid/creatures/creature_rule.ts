@@ -34,6 +34,7 @@ export type CreatureRuleGainAttackBonus = {
     type: "gain_attack_bonus"
     value: ExprNumberResolved
     against_creatures: Array<Creature> | null
+    conditions: Array<AstNode>
 }
 
 export type CreatureRuleGainDefenseBonus = {

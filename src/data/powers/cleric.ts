@@ -111,6 +111,59 @@ const lance_of_faith: IRPower = {
     },
 }
 
+const righteous_brand: IRPower = {
+    name: "Righteous Brand",
+    class: "Cleric",
+    level: 1,
+    description: "You smite your foe with your weapon and brand it with a ghostly, glowing symbol of your deity's anger. By naming one of your allies when the symbol appears, you add divine power to that ally's attacks against the branded foe.",
+    keywords: ["Divine", "Weapon"],
+    type: {
+        action: "standard",
+        cooldown: "at-will",
+        attack: true,
+    },
+    targeting: {
+        targeting_type: "melee_weapon",
+        target_type: "creature",
+        amount: 1,
+    },
+    damage: {
+        lvl_1: '$add({1W},$attr_mod(owner, "str"))',
+        lvl_21: '$add({2W},$attr_mod(owner, "str"))',
+    },
+    roll: {
+        attack: "str",
+        defense: "ac",
+        hit: [
+            {
+                type: INSTRUCTION_TYPE.APPLY_DAMAGE,
+                value: "primary_damage",
+                target_label: "primary_target",
+            },
+            {
+                type: INSTRUCTION_TYPE.SELECT_TARGET,
+                targeting_type: "ranged",
+                target_type: "ally",
+                amount: 1,
+                distance: "5",
+                target_label: "branded_ally",
+            },
+            {
+                type: INSTRUCTION_TYPE.APPLY_STATUS,
+                target_label: "branded_ally",
+                duration: "until_end_of_your_next_turn",
+                status: {
+                    type: "gain_attack_bonus",
+                    value: 3,
+                    //TODO against_creatures could be a condition too
+                    against_creatures: "primary_target",
+                    conditions: ['$equals($targeting_type(current_power), "melee")'],
+                },
+            },
+        ],
+    },
+}
+
 const priests_shield: IRPower = {
     name: "Priest's Shield",
     class: "Cleric",
@@ -177,4 +230,4 @@ const priests_shield: IRPower = {
     },
 }
 
-export const CLERIC_POWERS = [cause_fear, lance_of_faith, priests_shield].map(transform_power_ir_into_vm_representation)
+export const CLERIC_POWERS = [cause_fear, lance_of_faith, priests_shield, righteous_brand].map(transform_power_ir_into_vm_representation)

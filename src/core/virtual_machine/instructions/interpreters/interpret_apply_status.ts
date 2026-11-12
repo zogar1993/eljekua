@@ -83,7 +83,8 @@ const interpret_creature_rule = ({status, game_queries}: {
             return {
                 type: "gain_attack_bonus",
                 against_creatures: status.against_creatures ? game_queries.evaluate_creatures(status.against_creatures) : null,
-                value: game_queries.evaluate_number_resolved_expr(status.value)
+                value: game_queries.evaluate_number_resolved_expr(status.value),
+                conditions: status.conditions,
             }
         case "gain_defense_bonus":
             return {

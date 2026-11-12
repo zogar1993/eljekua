@@ -438,7 +438,8 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
             return {
                 type: "gain_attack_bonus",
                 against_creatures: status.against_creatures ? to_ast(status.against_creatures) : null,
-                value: to_ast(status.value)
+                value: to_ast(status.value),
+                conditions: status.conditions?.map(condition => to_ast(condition)) ?? [],
             }
         case "gain_defense_bonus":
             return {
