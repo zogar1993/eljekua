@@ -39,6 +39,7 @@ export const FUNCTION_NAME = {
     POSITION: "position",
     SKILL: "skill",
     SIZE: "size",
+    TARGETING_TYPE: "targeting_type",
 } as const
 
 export type FunctionName = typeof FUNCTION_NAME[keyof typeof FUNCTION_NAME]

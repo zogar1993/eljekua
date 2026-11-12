@@ -110,6 +110,9 @@ import {
 import {
     evaluate_function_size
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_size";
+import {
+    evaluate_function_targeting_type
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_targeting_type";
 
 export const evaluate_function = ({node, game_state, game_queries}: EvaluateFunctionProps): Expr => {
     switch (node.name) {
@@ -193,6 +196,8 @@ export const evaluate_function = ({node, game_state, game_queries}: EvaluateFunc
             return evaluate_function_skill({node, game_state, game_queries})
         case FUNCTION_NAME.SIZE:
             return evaluate_function_size({node, game_state, game_queries})
+        case FUNCTION_NAME.TARGETING_TYPE:
+            return evaluate_function_targeting_type({node, game_state, game_queries})
         default:
             assert_unreachable(`function name '${node.name}' not supported when evaluating node`)
     }
