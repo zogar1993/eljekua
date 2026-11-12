@@ -13,6 +13,7 @@ export type {
     CreatureRuleGainVulnerability,
     CreatureRuleGainAttackBonus,
     CreatureRuleGainDefenseBonus,
+    CreatureRuleSlowed,
     CreatureRuleRestrictTargeting,
     CreatureRuleDamageModifier,
 } from "core/battlegrid/creatures/creature_rule";

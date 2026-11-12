@@ -9,7 +9,12 @@ export type CreatureRule =
     CreatureRuleGainVulnerability |
     CreatureRuleGainAttackBonus |
     CreatureRuleGainDefenseBonus |
+    CreatureRuleSlowed |
     CreatureRuleRestrictTargeting
+
+export type CreatureRuleSlowed = {
+    type: "slowed"
+}
 
 export type CreatureRuleGrantCombatAdvantage = {
     type: "grant_combat_advantage"

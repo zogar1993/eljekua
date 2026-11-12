@@ -448,6 +448,8 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
                 defense: status.defense,
                 value: to_ast(status.value)
             }
+        case "slowed":
+            return {type: "slowed"}
         default:
             assert_unreachable(`"${ir.status.type}" is not a valid "apply_status" type`)
     }

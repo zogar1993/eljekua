@@ -32,7 +32,7 @@ export type IRPower = {
     class?: string
     level?: number
     description?: string
-    keywords?: Array<"Divine" | "Fear" | "Implement" | "Invigorating" | "Martial" | "Radiant" | "Weapon">
+    keywords?: Array<"Arcane" | "Cold" | "Divine" | "Evocation" | "Fear" | "Implement" | "Invigorating" | "Martial" | "Radiant" | "Weapon">
     type: {
         action: ActionType
         cooldown?: "at-will" | "encounter" | "daily"
@@ -146,6 +146,8 @@ export type IRInstructionApplyStatus = {
         value: number | string
         defense: DefenseCode
         against_creatures?: string,
+    } | {
+        type: "slowed"
     }
 }
 

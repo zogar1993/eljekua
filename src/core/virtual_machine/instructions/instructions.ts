@@ -204,6 +204,8 @@ export type InstructionApplyStatus = {
         value: AstNode
         defense: DefenseCode
         against_creatures: AstNode | null,
+    } | {
+        type: "slowed"
     }
 }
 
