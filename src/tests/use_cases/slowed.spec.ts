@@ -1,4 +1,5 @@
-import {add_creature_status} from "core/battlegrid/creatures/Creature";
+import {add_creature_status, type Status} from "core/battlegrid/creatures/Creature";
+import type {PositionFootprintOne} from "core/battlegrid/Position";
 import {
     Power,
     transform_power_ir_into_vm_representation,
@@ -51,7 +52,7 @@ describe("movement while slowed", () => {
         expect(interaction.type).toBe(INTERACTION_TYPE.SELECT_PATH)
         if (interaction.type !== INTERACTION_TYPE.SELECT_PATH) return
 
-        const is_clickable = (position: Position) =>
+        const is_clickable = (position: PositionFootprintOne) =>
             interaction.clickable.some(target => target.x === position.x && target.y === position.y)
 
         expect(is_clickable(TWO_SQUARES_AWAY)).toBe(true)
@@ -70,7 +71,7 @@ describe("movement while slowed", () => {
         expect(interaction.type).toBe(INTERACTION_TYPE.SELECT_PATH)
         if (interaction.type !== INTERACTION_TYPE.SELECT_PATH) return
 
-        const is_clickable = (position: typeof ONE_SQUARE_AWAY) =>
+        const is_clickable = (position: PositionFootprintOne) =>
             interaction.clickable.some(target => target.x === position.x && target.y === position.y)
 
         expect(is_clickable(ONE_SQUARE_AWAY)).toBe(true)
@@ -94,7 +95,7 @@ const APPLY_SLOWED: Power = transform_power_ir_into_vm_representation({
     }],
 })
 
-const SLOWED_UNTIL_ENCOUNTER_END = {
-    rule: {type: "slowed"} as const,
-    durations: [{until: "encounter_end"}] as const,
+const SLOWED_UNTIL_ENCOUNTER_END: Status = {
+    rule: {type: "slowed"},
+    durations: [{until: "encounter_end"}],
 }
