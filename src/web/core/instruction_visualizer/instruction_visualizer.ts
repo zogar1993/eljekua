@@ -273,7 +273,7 @@ const create_creature_details = (creatures: Array<Creature>): HTMLElement => {
         append_detail_row(block, "level", String(creature.data.level))
         append_detail_row(block, "size", creature.data.size)
         append_detail_row(block, "team", creature.data.team === null ? "none" : String(creature.data.team))
-        append_detail_row(block, "movement", String(creature.data.movement))
+        append_detail_row(block, "speed", String(creature.data.speed))
 
         if (creature.available_actions.length)
             append_detail_row(block, "actions", creature.available_actions.join(", "))

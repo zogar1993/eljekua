@@ -38,7 +38,7 @@ export const create_creature_test_helpers = ({
             position: c.position,
             size: c.size ?? "medium",
             image: c.image ?? `url("/public/saber-and-pistol.svg")`,
-            movement: c.movement ?? 5,
+            speed: c.speed ?? 5,
             hp_current: c.hp_current ?? 10,
             hp_max: c.hp_max ?? 10,
             level: c.level ?? 1,

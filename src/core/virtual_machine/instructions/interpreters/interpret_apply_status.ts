@@ -107,7 +107,6 @@ const interpret_creature_rule = ({status, game_queries}: {
                 against_damage_types: status.against_damage_types,
                 value: game_queries.evaluate_number_resolved_expr(status.value)
             }
-            //TODO movement should be called speed for creature attributes
         case "slowed":
             return {type: "slowed"}
         default:

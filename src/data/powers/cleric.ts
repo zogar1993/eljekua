@@ -35,7 +35,7 @@ const cause_fear: IRPower = {
                     },
                     targeting: {
                         targeting_type: "movement",
-                        distance: '$add($movement(owner), $attr_mod(attacker, "cha"))',
+                        distance: '$add($speed(owner), $attr_mod(attacker, "cha"))',
                         destination_requirement: "$let($max($map(targets, x, $distance(x, attacker))), max_distance, $filter(targets, y, $equals($distance(y, attacker), max_distance)))",
                     },
                     effect: [

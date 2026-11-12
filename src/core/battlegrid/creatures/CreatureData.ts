@@ -16,7 +16,7 @@ export type CreatureData = {
     skills: Partial<Record<SkillCode, number>>
     position: Position
     image: string
-    movement: number
+    speed: number
     hp_current: number
     hp_max: number
     team: number | null

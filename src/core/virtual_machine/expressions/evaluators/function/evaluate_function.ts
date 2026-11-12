@@ -99,8 +99,8 @@ import {
     evaluate_function_template_name
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_template_name";
 import {
-    evaluate_function_movement
-} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_movement";
+    evaluate_function_speed
+} from "core/virtual_machine/expressions/evaluators/function/evaluate_function_speed";
 import {
     evaluate_function_position
 } from "core/virtual_machine/expressions/evaluators/function/evaluate_function_position";
@@ -188,8 +188,8 @@ export const evaluate_function = ({node, game_state, game_queries}: EvaluateFunc
             return evaluate_function_attr_mod_lvl({node, game_state, game_queries})
         case FUNCTION_NAME.TEMPLATE_NAME:
             return evaluate_function_template_name({node, game_state, game_queries})
-        case FUNCTION_NAME.MOVEMENT:
-            return evaluate_function_movement({node, game_state, game_queries})
+        case FUNCTION_NAME.SPEED:
+            return evaluate_function_speed({node, game_state, game_queries})
         case FUNCTION_NAME.POSITION:
             return evaluate_function_position({node, game_state, game_queries})
         case FUNCTION_NAME.SKILL:

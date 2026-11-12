@@ -35,7 +35,7 @@ export const FUNCTION_NAME = {
     ATTR_MOD: "attr_mod",
     ATTR_MOD_LVL: "attr_mod_lvl",
     TEMPLATE_NAME: "template_name",
-    MOVEMENT: "movement",
+    SPEED: "speed",
     POSITION: "position",
     SKILL: "skill",
     SIZE: "size",

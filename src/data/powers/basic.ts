@@ -33,7 +33,7 @@ const movement: IRPower = {
     },
     targeting: {
         targeting_type: "movement",
-        distance: "$movement(owner)",
+        distance: "$speed(owner)",
     },
     effect: [
         {

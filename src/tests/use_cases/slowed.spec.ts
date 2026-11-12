@@ -40,8 +40,8 @@ describe("apply status slowed", () => {
 })
 
 describe("movement while slowed", () => {
-    test("caps walk reach at 2 when base movement is higher", () => {
-        given_a_creature_is_created({name: "mover", team: 1, position: ORIGIN, movement: 6})
+    test("caps walk reach at 2 when base speed is higher", () => {
+        given_a_creature_is_created({name: "mover", team: 1, position: ORIGIN, speed: 6})
         const mover = test_game.creatures.get_all().find(creature => creature.data.name === "mover")!
         add_creature_status({creature: mover, status: SLOWED_UNTIL_ENCOUNTER_END})
         given_creature("mover").is_in_its_turn()
@@ -59,8 +59,8 @@ describe("movement while slowed", () => {
         expect(is_clickable(THREE_SQUARES_AWAY)).toBe(false)
     })
 
-    test("does not reduce walk reach when base movement is already below the cap", () => {
-        given_a_creature_is_created({name: "mover", team: 1, position: ORIGIN, movement: 1})
+    test("does not reduce walk reach when base speed is already below the cap", () => {
+        given_a_creature_is_created({name: "mover", team: 1, position: ORIGIN, speed: 1})
         const mover = test_game.creatures.get_all().find(creature => creature.data.name === "mover")!
         add_creature_status({creature: mover, status: SLOWED_UNTIL_ENCOUNTER_END})
         given_creature("mover").is_in_its_turn()

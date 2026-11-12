@@ -41,7 +41,7 @@ export const create_expression_test_context = () => {
             position: overrides.position ?? ISOLATED_POSITION,
             size: overrides.size ?? "medium",
             image: "",
-            movement: overrides.movement ?? 5,
+            speed: overrides.speed ?? 5,
             hp_current: overrides.hp_current ?? 10,
             hp_max: overrides.hp_max ?? 10,
             level: overrides.level ?? 1,

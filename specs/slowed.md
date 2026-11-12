@@ -7,7 +7,7 @@
 
 ## Movement that uses speed
 
-- Slowed applies to movement that resolves distance from the creature's speed (for example walk via `$movement(owner)`).
+- Slowed applies to movement that resolves distance from the creature's speed (for example walk via `$speed(owner)`).
 - Powers that declare a fixed movement distance without using the creature's speed are not reduced by slowed.
 
 ## Exceptions
