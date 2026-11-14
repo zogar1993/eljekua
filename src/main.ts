@@ -150,6 +150,7 @@ const build_character = (
         constant_rules: data.constant_rules ?? [],
         modifiers: data.modifiers ?? [],
         languages: data.languages ?? [],
+        initiative_modifier: data.initiative_modifier ?? null,
     }
 }
 
@@ -177,6 +178,7 @@ const build_monster = (
         modifiers: overrides.modifiers ?? monster.modifiers?.map(transform_modifier) ?? [],
         languages: overrides.languages ?? monster.languages,
         powers: overrides.powers ?? monster.powers.map(transform_power_ir_into_vm_representation),
+        initiative_modifier: overrides.initiative_modifier ?? monster.initiative,
     }
 }
 

@@ -2,11 +2,25 @@ import type {Expr, ExprNumber, ExprNumberResolved, ExprNumberUnresolved} from "c
 import {roll_d} from "core/randomness/dice";
 import {assert_is_not_empty} from "stdlib/assert";
 
+export const number_resolved = (number: number): ExprNumberResolved => ({
+    type: "number_resolved",
+    value: number,
+    params: [],
+    description: String(number)
+})
+
 export const add_numbers_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved => ({
     type: "number_resolved",
     value: numbers.reduce((accum, num) => accum + num.value, 0),
     params: numbers,
     description: "+"
+})
+
+export const multiply_numbers_resolved = (numbers: Array<ExprNumberResolved>): ExprNumberResolved => ({
+    type: "number_resolved",
+    value: numbers.reduce((accum, num) => accum * num.value, 1),
+    params: numbers,
+    description: "*"
 })
 
 export const subtract_numbers_resolved = (a: ExprNumberResolved, b: ExprNumberResolved): ExprNumberResolved => ({

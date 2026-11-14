@@ -57,6 +57,7 @@ export const create_expression_test_context = () => {
             constant_rules: overrides.constant_rules ?? [],
             modifiers: overrides.modifiers ?? [],
             languages: overrides.languages ?? [],
+            initiative_modifier: overrides.initiative_modifier ?? null,
         }
 
         return game_state.creatures.create(data)

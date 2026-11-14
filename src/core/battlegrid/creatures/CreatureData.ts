@@ -26,4 +26,5 @@ export type CreatureData = {
     modifiers: Array<Modifier>
     languages: Array<string>
     powers: Array<Power>
+    initiative_modifier: number | null
 }

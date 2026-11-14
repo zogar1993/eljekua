@@ -1,7 +1,7 @@
 import type {CreatureData} from "core/battlegrid/creatures/CreatureData";
 import type {GameState} from "core/game_state/GameState";
-import {roll_d} from "core/randomness/dice";
 import type {GameEvents} from "core/events/GameEvents";
+import {roll_d} from "core/randomness/dice";
 
 
 export const create_add_creature_to_game = ({
@@ -19,5 +19,6 @@ export const create_add_creature_to_game = ({
 
     game_events.on_creature_added_to_game.raise(creature)
 
-    initiative_order.add_entry({creature, initiative: roll_d(20)})
+    const initiative_roll = roll_d(20)
+    initiative_order.add_entry({creature, initiative_roll})
 }

@@ -54,6 +54,7 @@ export const create_creature_test_helpers = ({
             constant_rules: c.constant_rules ?? [],
             modifiers: c.modifiers ?? [],
             languages: c.languages ?? [],
+            initiative_modifier: c.initiative_modifier ?? null,
         }
 
         add_creature_to_game({data})
