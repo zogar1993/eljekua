@@ -21,6 +21,8 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
     const roll_results = new Map<Creature, HitStatus>()
 
     defenders.forEach(defender => {
+        vm_state.set_variable(SYSTEM_KEYWORD.DEFENDER, {type: "creatures", value: [defender]})
+
         const attack_parts: Array<ExprNumberResolved> = []
         attack_parts.push(game_queries.evaluate_number_resolved_expr(instruction.attack))
 
@@ -31,7 +33,6 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
 
         for (const {rule} of attacker.statuses)
             if (rule.type === "gain_attack_bonus"
-                && (rule.against_creatures === null || rule.against_creatures.includes(defender))
                 && rule.conditions.every(condition => game_queries.evaluate_boolean(condition)))
                 attack_parts.push(rule.value)
 

@@ -38,7 +38,6 @@ export type CreatureRuleGainVulnerability = {
 export type CreatureRuleGainAttackBonus = {
     type: "gain_attack_bonus"
     value: ExprNumberResolved
-    against_creatures: Array<Creature> | null
     conditions: Array<AstNode>
 }
 
@@ -80,7 +79,7 @@ export const creature_rule_applies_to_damage_type = (
 }
 
 export const creature_rule_applies_to_attacker = ({rule, attacker}: {
-    rule: CreatureRuleGrantCombatAdvantage | CreatureRuleGainResistance | CreatureRuleGainVulnerability | CreatureRuleGainAttackBonus | CreatureRuleGainDefenseBonus
+    rule: CreatureRuleGrantCombatAdvantage | CreatureRuleGainResistance | CreatureRuleGainVulnerability | CreatureRuleGainDefenseBonus
     attacker: Creature
 }): boolean =>
     rule.against_creatures === null || rule.against_creatures.includes(attacker)

@@ -104,7 +104,7 @@ const lance_of_faith: IRPower = {
                 status: {
                     type: "gain_attack_bonus",
                     value: 2,
-                    against_creatures: "primary_target",
+                    conditions: ["$includes(primary_target, defender)"],
                 },
             },
         ],
@@ -155,9 +155,10 @@ const righteous_brand: IRPower = {
                 status: {
                     type: "gain_attack_bonus",
                     value: 3,
-                    //TODO against_creatures could be a condition too
-                    against_creatures: "primary_target",
-                    conditions: ['$equals($targeting_type(current_power), "melee")'],
+                    conditions: [
+                        "$includes(primary_target, defender)",
+                        '$equals($targeting_type(current_power), "melee")',
+                    ],
                 },
             },
         ],
