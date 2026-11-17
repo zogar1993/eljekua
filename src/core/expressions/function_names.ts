@@ -40,6 +40,7 @@ export const FUNCTION_NAME = {
     SKILL: "skill",
     SIZE: "size",
     TARGETING_TYPE: "targeting_type",
+    INCLUDES: "includes",
 } as const
 
 export type FunctionName = typeof FUNCTION_NAME[keyof typeof FUNCTION_NAME]
