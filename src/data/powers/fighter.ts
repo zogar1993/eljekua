@@ -290,6 +290,7 @@ const crushing_surge: IRPower = {
     },
 }
 
+//TODO deduplicate tide of iron
 const tide_of_iron_true = {
     name: "Tide of Iron",
     description: "You punctuate your scything attacks with wicked jabs and small cutting blows that slip through your enemy's defenses.",
