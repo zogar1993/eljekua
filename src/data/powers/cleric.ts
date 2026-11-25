@@ -153,11 +153,12 @@ const righteous_brand: IRPower = {
                 type: INSTRUCTION_TYPE.APPLY_STATUS,
                 target_label: "branded_ally",
                 duration: "until_end_of_your_next_turn",
+                variables: {afflicted_creature: "primary_target"},
                 status: {
                     type: "gain_attack_bonus",
                     value: 3,
                     conditions: [
-                        "$includes(primary_target, defender)",
+                        "$includes(afflicted_creature, defender)",
                         '$equals($targeting_type(current_power), "melee")',
                     ],
                 },
