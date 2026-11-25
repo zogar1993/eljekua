@@ -40,6 +40,11 @@ export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
         game_events.on_vm_variable_set.raise([name, value])
     }
 
+    const set_variables = (variables: Record<string, Expr>) => {
+        for (const [label, value] of Object.entries(variables))
+            set_variable(label, value)
+    }
+
     const add_scoped_instruction_frame = ({instructions, variables}: {
         instructions: ReadonlyArray<Instruction>,
         variables: Record<string, Expr>
@@ -137,6 +142,8 @@ export const create_vm_state = ({game_events}: { game_events: GameEvents }) => {
         get_variable,
         set_variable,
         has_variable,
+
+        set_variables,
     }
 }
 
