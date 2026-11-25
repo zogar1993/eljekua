@@ -38,6 +38,7 @@ export const power_resolute_shield: IRPower = {
                 status: {
                     type: "gain_resistance",
                     value: '$attr_mod(owner, "con")',
+                    //TODO get rid of the against_creatures pattern completely, favor conditions
                     against_creatures: "primary_target",
                 }
             }
