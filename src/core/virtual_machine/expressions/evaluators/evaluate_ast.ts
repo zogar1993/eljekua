@@ -22,6 +22,7 @@ export const evaluate_ast = ({node, game_state}: EvaluateAstProps): Expr => {
         case "keyword":
             return evaluate_keyword({node, game_state})
         case "function":
+            //TODO create_game_queries here is not good
             return evaluate_function({node, game_state, game_queries: create_game_queries({game_state})})
         default:
             assert_unreachable(`evaluator for type '${(node as { type: string }).type}' does not exist`)
