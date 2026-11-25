@@ -11,6 +11,7 @@ import {assert_has_length_one, assert_unreachable} from "stdlib/assert";
 export const create_game_queries = ({game_state}: {
     game_state: GameState
 }) => {
+    //TODO this is not great. differenciate ast nodes from expressions
     const resolve_expr = (input: AstNode | Expr): Expr =>
         is_ast_node(input) ? evaluate_ast({node: input, game_state}) : input
 
