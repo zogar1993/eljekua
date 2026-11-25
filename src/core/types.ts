@@ -123,6 +123,7 @@ export type IRInstructionApplyStatus = {
     type: typeof INSTRUCTION_TYPE.APPLY_STATUS,
     target_label: string,
     duration: IRStatusDuration
+    variables?: Record<string, string>,
     status: {
         type: "grant_combat_advantage",
         against_creatures?: string,

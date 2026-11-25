@@ -7,7 +7,9 @@ import {
     type StatusDuration,
 } from "core/battlegrid/creatures/Creature";
 import type {InstructionApplyStatus} from "core/virtual_machine/instructions/instructions";
+import type {VMState} from "core/virtual_machine/VMState";
 import {assert_unreachable} from "stdlib/assert";
+import {map_record} from "stdlib/map_record";
 
 export const interpret_apply_status = ({
                                            instruction,
@@ -21,16 +23,17 @@ export const interpret_apply_status = ({
     for (const target of targets)
         add_creature_status({
             creature: target,
-            status: interpret_status_effect({instruction, game_queries, power_owner})
+            status: interpret_status_effect({instruction, game_queries, power_owner, vm_state})
         })
 }
 
-const interpret_status_effect = ({instruction, game_queries, power_owner}: {
+const interpret_status_effect = ({instruction, game_queries, power_owner, vm_state}: {
     instruction: InstructionApplyStatus,
     power_owner: Creature,
-    game_queries: GameQueries
+    game_queries: GameQueries,
+    vm_state: VMState,
 }) => ({
-    rule: interpret_creature_rule({status: instruction.status, game_queries}),
+    rule: interpret_creature_rule({instruction, game_queries, vm_state}),
     durations: interpret_duration({duration: instruction.duration, power_owner})
 })
 
@@ -69,9 +72,10 @@ const interpret_duration = ({duration, power_owner}: {
     })
 }
 
-const interpret_creature_rule = ({status, game_queries}: {
-    status: InstructionApplyStatus["status"],
-    game_queries: GameQueries
+const interpret_creature_rule = ({instruction: {status, variables}, game_queries, vm_state}: {
+    instruction: InstructionApplyStatus,
+    game_queries: GameQueries,
+    vm_state: VMState,
 }): CreatureRule => {
     switch (status.type) {
         case "grant_combat_advantage":
@@ -84,6 +88,7 @@ const interpret_creature_rule = ({status, game_queries}: {
                 type: "gain_attack_bonus",
                 value: game_queries.evaluate_number_resolved_expr(status.value),
                 conditions: status.conditions,
+                variables: map_record(variables, (key) => vm_state.get_variable(key)),
             }
         case "gain_defense_bonus":
             return {

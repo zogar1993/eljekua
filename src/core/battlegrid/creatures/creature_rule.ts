@@ -1,7 +1,7 @@
 import type {DefenseCode} from "core/character_sheet/get_creature_defense";
 import type {AstNode} from "core/expressions/parser/nodes/AstNode";
 import type {Creature} from "core/battlegrid/creatures/Creature";
-import type {ExprNumberResolved} from "core/virtual_machine/expressions/types";
+import type {Expr, ExprNumberResolved} from "core/virtual_machine/expressions/types";
 
 export type CreatureRule =
     CreatureRuleGrantCombatAdvantage |
@@ -39,6 +39,7 @@ export type CreatureRuleGainAttackBonus = {
     type: "gain_attack_bonus"
     value: ExprNumberResolved
     conditions: Array<AstNode>
+    variables: Record<string, Expr>
 }
 
 export type CreatureRuleGainDefenseBonus = {

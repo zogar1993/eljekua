@@ -280,6 +280,7 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                 type: INSTRUCTION_TYPE.APPLY_STATUS,
                 target: to_ast(instruction.target_label),
                 duration: typeof instruction.duration === "string" ? [instruction.duration] : instruction.duration,
+                variables: instruction.variables ?? {},
                 status: transform_apply_status_ir(instruction)
             }]
         case INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS:

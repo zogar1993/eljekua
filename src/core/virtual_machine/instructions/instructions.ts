@@ -181,6 +181,7 @@ export type InstructionApplyStatus = {
     type: typeof INSTRUCTION_TYPE.APPLY_STATUS,
     target: AstNode,
     duration: Array<StatusDurationValue>
+    variables: Record<string, string>,
     status: {
         type: "grant_combat_advantage",
         against_creatures: AstNode | null,
