@@ -9,7 +9,7 @@ import {
 import type {InstructionApplyStatus} from "core/virtual_machine/instructions/instructions";
 import type {VMState} from "core/virtual_machine/VMState";
 import {assert_unreachable} from "stdlib/assert";
-import {map_record} from "stdlib/map_record";
+import {transform_record_values} from "stdlib/record";
 
 export const interpret_apply_status = ({
                                            instruction,
@@ -88,7 +88,7 @@ const interpret_creature_rule = ({instruction: {status, variables}, game_queries
                 type: "gain_attack_bonus",
                 value: game_queries.evaluate_number_resolved_expr(status.value),
                 conditions: status.conditions,
-                variables: map_record(variables, (key) => vm_state.get_variable(key)),
+                variables: transform_record_values(variables, (key) => vm_state.get_variable(key)),
             }
         case "gain_defense_bonus":
             return {

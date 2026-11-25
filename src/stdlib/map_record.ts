@@ -1,2 +1,0 @@
-export const map_record = <In, Out>(record: Record<string, In>, func: (value: In) => Out): Record<string, Out> =>
-    Object.fromEntries(Object.entries(record).map(([key, value]) => [key, func(value)]))
