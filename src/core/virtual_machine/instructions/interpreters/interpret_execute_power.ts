@@ -10,7 +10,7 @@ export const interpret_execute_power = ({
                                         }: InterpretInstructionProps<InstructionExecutePower>) => {
     const {vm_state} = game_state
     const power = game_queries.evaluate_power(vm_state.get_variable(instruction.power_label))
-    // TODO move name callings into current power, since it is redundant
+    // TODO NEXT move name callings into current power, since it is redundant
     const {name, instructions} = power
 
     const initialization = instruction.initialization ?? []

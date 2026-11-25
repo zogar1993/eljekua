@@ -35,7 +35,7 @@ export const get_potential_triggers = ({
     const trigger_owners = creatures.get_all()
         .filter(creature => !already_triggered.includes(creature))
         .map(creature => {
-            // TODO this is ugly since it mutates inside of a query
+            // TODO NEXT this is ugly since it mutates inside of a query
             vm_state.set_variable(SYSTEM_KEYWORD.TRIGGER_OWNER, {type: "creatures", value: [creature]})
             const powers = creature.data.powers.filter(power => {
                 if (!power.trigger) return false

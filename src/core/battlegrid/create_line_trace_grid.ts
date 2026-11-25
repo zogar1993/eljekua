@@ -26,7 +26,7 @@ const get_quadrants_for_position = ({position, map_border, max_distance}: {
     return quadrants;
 }
 
-//TODO Need to contemplate obstacles that occupy a position
+//TODO NEXT Need to contemplate obstacles that occupy a position
 export const create_line_trace_grid = ({battle_grid, orig, line_type, max_distance}: {
     battle_grid: BattleGrid,
     orig: PositionBasic,
