@@ -35,10 +35,11 @@ export const power_shield_faint: IRPower = {
                 type: INSTRUCTION_TYPE.APPLY_STATUS,
                 target_label: "owner",
                 duration: ["until_end_of_your_next_turn", "until_your_next_attack_roll_against_target"],
+                variables: {afflicted_creature: "primary_target"},
                 status: {
                     type: "gain_attack_bonus",
                     value: 3,
-                    conditions: ["$includes(primary_target, defender)"],
+                    conditions: ["$includes(afflicted_creature, defender)"],
                 }
             }
         ],
