@@ -5,18 +5,14 @@ import {ATTACK_ROLL_RESOLUTION_MODE} from "core/settings/AttackRollResolutionMod
 import {create_test_game} from "tests/utils/create_test_game";
 
 const test_game = create_test_game({attack_roll_resolution: ATTACK_ROLL_RESOLUTION_MODE.HIT_STATUS})
-const {vm_state, instruction_loop, game_events, game_queries} = test_game
+const {vm_state, game_events, game_queries} = test_game
 
 const attack_log: Array<AttackLogEntry> = []
 
 game_events.on_creature_missed.add_handler((creature) => {
     const attacker = game_queries.evaluate_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
-    const power_name = game_queries.evaluate_string(vm_state.get_variable(SYSTEM_KEYWORD.POWER_NAME))
-    attack_log.push({
-        attacker: attacker.data.name,
-        target: creature.data.name,
-        power_name,
-    })
+    const power_name = game_queries.evaluate_power(vm_state.get_variable(SYSTEM_KEYWORD.CURRENT_POWER)).name
+    attack_log.push({attacker: attacker.data.name, target: creature.data.name, power_name})
 })
 
 const {given_a_creature_is_created, given_creature, when_creature, then_creature} = create_creature_test_helpers({

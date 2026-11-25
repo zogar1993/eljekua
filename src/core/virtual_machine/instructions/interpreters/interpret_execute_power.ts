@@ -10,8 +10,6 @@ export const interpret_execute_power = ({
                                         }: InterpretInstructionProps<InstructionExecutePower>) => {
     const {vm_state} = game_state
     const power = game_queries.evaluate_power(vm_state.get_variable(instruction.power_label))
-    // TODO NEXT move name callings into current power, since it is redundant
-    const {name, instructions} = power
 
     const initialization = instruction.initialization ?? []
     const variables: Record<string, Expr> = {}
@@ -20,12 +18,11 @@ export const interpret_execute_power = ({
         variables[to_label] = vm_state.get_variable(from_label)
 
     if (!initialization.some(({to_label}) => to_label === SYSTEM_KEYWORD.OWNER)) {
-        let owner = vm_state.get_acting_creature()
+        const owner = vm_state.get_acting_creature()
         variables[SYSTEM_KEYWORD.OWNER] = {type: "creatures", value: [owner]}
     }
 
-    variables[SYSTEM_KEYWORD.POWER_NAME] = {type: "string", value: name}
     variables[SYSTEM_KEYWORD.CURRENT_POWER] = {type: "power", value: power}
 
-    vm_state.add_scoped_instruction_frame({instructions, variables})
+    vm_state.add_scoped_instruction_frame({instructions: power.instructions, variables})
 }

@@ -16,7 +16,7 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
     const d20_rolls = game_queries.evaluate_attack_d20_rolls(vm_state.get_variable(SYSTEM_KEYWORD.ATTACK_D20_ROLLS))
     const attacker = game_queries.evaluate_creature(vm_state.get_variable(SYSTEM_KEYWORD.OWNER))
     const defenders = game_queries.evaluate_creatures(vm_state.get_variable(instruction.defender_label))
-    const power_name = game_queries.evaluate_string(vm_state.get_variable(SYSTEM_KEYWORD.POWER_NAME))
+    const power_name = game_queries.evaluate_power(vm_state.get_variable(SYSTEM_KEYWORD.CURRENT_POWER)).name
 
     const roll_results = new Map<Creature, HitStatus>()
 

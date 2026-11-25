@@ -22,7 +22,6 @@ export const AST_NODE = {
 
 export const SYSTEM_KEYWORD = {
     OWNER: "owner",
-    POWER_NAME: "power_name",
     CURRENT_POWER: "current_power",
     PRIMARY_TARGET: "primary_target",
     TRIGGER_ACTIVATOR: "trigger_activator",
