@@ -33,6 +33,8 @@ export const SYSTEM_KEYWORD = {
     DEFENDER: "defender",
 } as const
 
+export const SYSTEM_KEYWORDS = new Set<string>(Object.values(SYSTEM_KEYWORD))
+
 export const AST = {
     OWNER: to_ast(SYSTEM_KEYWORD.OWNER)
 } as const

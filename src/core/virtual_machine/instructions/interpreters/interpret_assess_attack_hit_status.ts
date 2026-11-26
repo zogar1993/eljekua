@@ -34,7 +34,6 @@ export const interpret_assess_attack_hit_status = (props: InterpretInstructionPr
         for (const {rule} of attacker.statuses) {
             if (rule.type !== "gain_attack_bonus") continue
 
-            //TODO this works but we need to disambiguate the names at transform time
             game_state.vm_state.set_variables(rule.variables)
 
             if (rule.conditions.every(condition => game_queries.evaluate_boolean(condition)))

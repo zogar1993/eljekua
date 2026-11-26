@@ -28,10 +28,12 @@ import {
     assert_unreachable
 } from "stdlib/assert";
 import {FUNCTION_NAME} from "core/expressions/function_names";
-import {ATTACK_ROLL_RESOLUTION_MODE, type AttackRollResolutionMode} from "core/settings/AttackRollResolutionMode";
-import {SYSTEM_KEYWORD} from "core/virtual_machine/expressions/AST_NODE";
+import {ATTACK_ROLL_RESOLUTION_MODE, type AttackRollResolutionMode} from "core/settings/AttackRollResolutionMode"
+import {SYSTEM_KEYWORD, SYSTEM_KEYWORDS} from "core/virtual_machine/expressions/AST_NODE";
+import {transform_record_keys} from "stdlib/record";
 
 const PRIMARY_TARGET_LABEL = "primary_target"
+const STATUS_RULE_VARIABLE_PREFIX = "#"
 
 export const transform_power_ir_into_vm_representation = (power: IRPower): Power => {
     const attack_roll_params = power.roll ? create_attack_roll_params(power.roll) : null
@@ -88,8 +90,8 @@ export type Trigger = {
 }
 
 export const TRIGGER_TIMING = {
-  INTERRUPTION: "interruption",
-  REACTION: "reaction",
+    INTERRUPTION: "interruption",
+    REACTION: "reaction",
 } as const
 
 export type TriggerTiming = typeof TRIGGER_TIMING[keyof typeof TRIGGER_TIMING]
@@ -275,14 +277,15 @@ const transform_generic_instruction = (instruction: IRInstruction): Array<Instru
                     destination: to_ast("push_position")
                 }
             ]
-        case INSTRUCTION_TYPE.APPLY_STATUS:
+        case INSTRUCTION_TYPE.APPLY_STATUS: {
             return [{
                 type: INSTRUCTION_TYPE.APPLY_STATUS,
                 target: to_ast(instruction.target_label),
                 duration: typeof instruction.duration === "string" ? [instruction.duration] : instruction.duration,
-                variables: instruction.variables ?? {},
-                status: transform_apply_status_ir(instruction)
+                variables: transform_record_keys(instruction.variables ?? {}, (key) => `${STATUS_RULE_VARIABLE_PREFIX}${key}`),
+                status: transform_apply_status_ir(instruction),
             }]
+        }
         case INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS:
             return [{
                 type: INSTRUCTION_TYPE.ADD_POWERS_AS_OPTIONS,
@@ -436,10 +439,13 @@ const transform_apply_status_ir = (ir: IRInstructionApplyStatus): InstructionApp
                 value: to_ast(status.value)
             }
         case "gain_attack_bonus":
+            const conditions = status.conditions?.map(condition => to_ast(condition)) ?? []
             return {
                 type: "gain_attack_bonus",
                 value: to_ast(status.value),
-                conditions: status.conditions?.map(condition => to_ast(condition)) ?? [],
+                conditions: conditions.map(condition => rename_ast_keywords(condition,
+                    (key) => SYSTEM_KEYWORDS.has(key) ? key : `${STATUS_RULE_VARIABLE_PREFIX}${key}`)
+                )
             }
         case "gain_defense_bonus":
             return {
@@ -477,7 +483,10 @@ const WALK_STEP_LOOP_BODY_LENGTH = 3
 
 const create_walk_index_label = (destination_label: string) => `${destination_label}_walk_index`
 
-const transform_walk = ({target_label, destination_label}: { target_label: string, destination_label: string }): Array<Instruction> => {
+const transform_walk = ({target_label, destination_label}: {
+    target_label: string,
+    destination_label: string
+}): Array<Instruction> => {
     const index_label = create_walk_index_label(destination_label)
 
     return [
@@ -591,4 +600,19 @@ const mark_primary_attack_damage = (instructions: Array<Instruction>): boolean =
     }
 
     return false
+}
+
+const rename_ast_keywords = (node: AstNode, rename: (keyword: string) => string): AstNode => {
+    switch (node.type) {
+        case "keyword":
+            return {type: "keyword", value: rename(node.value)}
+        case "function":
+            return {
+                type: "function",
+                name: node.name,
+                parameters: node.parameters.map(parameter => rename_ast_keywords(parameter, rename)),
+            }
+        default:
+            return node
+    }
 }
